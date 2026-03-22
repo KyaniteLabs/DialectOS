@@ -27,6 +27,7 @@ import {
   validateContentLength,
   RateLimiter,
   SecurityError,
+  ErrorCode,
   createSafeError,
 } from "@espanol/security";
 import {
@@ -511,7 +512,7 @@ async function handleTranslateText(
 
     // Validate input
     if (!params.text || params.text.trim().length === 0) {
-      throw new SecurityError("Text cannot be empty", "INVALID_INPUT" as any);
+      throw new SecurityError("Text cannot be empty", ErrorCode.INVALID_INPUT);
     }
 
     validateContentLength(params.text);
@@ -577,7 +578,7 @@ async function handleDetectDialect(
 
     // Validate input
     if (!params.text || params.text.trim().length === 0) {
-      throw new SecurityError("Text cannot be empty", "INVALID_INPUT" as any);
+      throw new SecurityError("Text cannot be empty", ErrorCode.INVALID_INPUT);
     }
 
     validateContentLength(params.text);
@@ -611,7 +612,9 @@ async function handleDetectDialect(
 
     // Return best match or default
     const bestMatch = scores[0];
-    const confidence = bestMatch ? Math.min(bestMatch.score / 3, 1) : 0;
+    // 3 keyword matches = 100% confidence
+    const CONFIDENCE_NORMALIZER = 3;
+    const confidence = bestMatch ? Math.min(bestMatch.score / CONFIDENCE_NORMALIZER, 1) : 0;
     const detectedDialect = bestMatch ? bestMatch.dialect : "es-ES";
     const matchedKeywords = bestMatch ? bestMatch.keywords : [];
     const dialectInfo = DIALECT_METADATA.find((d) => d.code === detectedDialect);
@@ -660,7 +663,7 @@ async function handleTranslateCodeComment(
 
     // Validate input
     if (!params.code || params.code.trim().length === 0) {
-      throw new SecurityError("Code cannot be empty", "INVALID_INPUT" as any);
+      throw new SecurityError("Code cannot be empty", ErrorCode.INVALID_INPUT);
     }
 
     validateContentLength(params.code);
@@ -861,7 +864,7 @@ async function handleSearchGlossary(
 
     // Validate input
     if (!params.query || params.query.trim().length === 0) {
-      throw new SecurityError("Query cannot be empty", "INVALID_INPUT" as any);
+      throw new SecurityError("Query cannot be empty", ErrorCode.INVALID_INPUT);
     }
 
     // Search glossary

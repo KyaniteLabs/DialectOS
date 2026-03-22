@@ -29,7 +29,8 @@ import {
   createSafeError,
 } from "@espanol/security";
 import type { ProviderRegistry } from "@espanol/providers";
-import { ToolResult, BaseToolOptions } from "../lib/types.js";
+import { ToolResult } from "../lib/types.js";
+import type { BaseToolOptions } from "../lib/types.js";
 import { createProviderRegistry as createProviderRegistryImpl } from "../lib/provider-factory.js";
 
 // Re-export for backward compatibility

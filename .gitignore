@@ -3,3 +3,7 @@ dist/
 *.tsbuildinfo
 coverage/
 .DS_Store
+*.log
+.pnpm-debug.log*
+.env*
+*.tgz

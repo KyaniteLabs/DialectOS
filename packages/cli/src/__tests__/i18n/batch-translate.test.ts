@@ -42,8 +42,10 @@ describe("batch-translate command", () => {
       }),
     };
 
-    // Mock validateFilePath to return the input path
-    vi.mocked(validateFilePath).mockImplementation((path) => path as string);
+    // Mock validateFilePath to return an absolute path (path.join normalizes ./ prefixes)
+    vi.mocked(validateFilePath).mockImplementation((path) => {
+      return path.startsWith("./") ? path.slice(2) : path;
+    });
 
     vi.spyOn(process, "exit").mockImplementation(((code?: number) => {
       throw new Error(`Process exited with code ${code}`);
@@ -81,7 +83,7 @@ describe("batch-translate command", () => {
       expect(writeLocaleFile).toHaveBeenCalledTimes(2);
 
       expect(writeLocaleFile).toHaveBeenCalledWith(
-        "./locales/es-MX.json",
+        "locales/es-MX.json",
         [
           { key: "common.hello", value: "Hola" },
           { key: "common.goodbye", value: "Adiós" },
@@ -90,7 +92,7 @@ describe("batch-translate command", () => {
       );
 
       expect(writeLocaleFile).toHaveBeenCalledWith(
-        "./locales/es-AR.json",
+        "locales/es-AR.json",
         [
           { key: "common.hello", value: "Buen día" },
           { key: "common.goodbye", value: "Chau" },
@@ -99,7 +101,7 @@ describe("batch-translate command", () => {
       );
 
       expect(writeInfo).toHaveBeenCalledWith("Batch translation completed");
-      expect(writeInfo).toHaveBeenCalledWith("Directory: ./locales");
+      expect(writeInfo).toHaveBeenCalledWith("Directory: locales");
       expect(writeInfo).toHaveBeenCalledWith("Base locale: en");
       expect(writeInfo).toHaveBeenCalledWith("Targets: es-MX, es-AR");
       expect(writeInfo).toHaveBeenCalledWith("Total keys translated: 4");
@@ -126,7 +128,7 @@ describe("batch-translate command", () => {
 
       expect(writeLocaleFile).toHaveBeenCalledTimes(1);
       expect(writeLocaleFile).toHaveBeenCalledWith(
-        "./locales/es-ES.json",
+        "locales/es-ES.json",
         [{ key: "common.hello", value: "Hola" }],
         2
       );
@@ -159,7 +161,7 @@ describe("batch-translate command", () => {
       );
 
       expect(writeLocaleFile).toHaveBeenCalledWith(
-        "./locales/es-ES.json",
+        "locales/es-ES.json",
         [
           { key: "common.hello", value: "Hola" },
           { key: "nav.home", value: "Inicio" },

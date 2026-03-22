@@ -20,6 +20,7 @@ import { executeApplyGenderNeutral } from "./commands/i18n/apply-gender-neutral.
 import { getDefaultProviderRegistry } from "./lib/provider-factory.js";
 import { writeError, writeOutput } from "./lib/output.js";
 import type { SpanishDialect } from "@espanol/types";
+import { parse, format } from "node:path";
 
 const program = new Command();
 
@@ -264,7 +265,8 @@ i18nCommand
   .option("--output <path>", "Output path for variant locale file")
   .action(async (source, options) => {
     try {
-      const output = options.output || source.replace(/es-ES\.json$/, `${options.variant}.json`);
+      const parsed = parse(source);
+      const output = options.output || format({ ...parsed, name: options.variant, base: `${options.variant}.json` });
       const result = await executeManageVariants({
         source,
         variant: options.variant as SpanishDialect,

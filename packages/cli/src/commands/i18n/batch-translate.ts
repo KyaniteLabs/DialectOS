@@ -8,6 +8,7 @@ import { validateFilePath, MAX_ARRAY_LENGTH } from "@espanol/security";
 import type { TranslationProvider, SpanishDialect, ProviderName } from "@espanol/types";
 import { ALL_SPANISH_DIALECTS } from "@espanol/types";
 import { writeError, writeInfo } from "../../lib/output.js";
+import { join } from "node:path";
 
 /**
  * Validate dialect codes
@@ -62,7 +63,7 @@ export async function executeBatchTranslate(
     const validatedDir = validateFilePath(directory);
 
     // Read base locale file
-    const basePath = `${validatedDir}/${baseLocale}.json`;
+    const basePath = join(validatedDir, `${baseLocale}.json`);
     const baseEntries = readLocaleFile(basePath);
 
     // Track total translations
@@ -71,7 +72,7 @@ export async function executeBatchTranslate(
     // Translate to each target dialect
     for (const targetDialect of targets) {
       try {
-        const targetPath = `${validatedDir}/${targetDialect}.json`;
+        const targetPath = join(validatedDir, `${targetDialect}.json`);
 
         // Check if target file exists
         let targetEntries: any[] = [];

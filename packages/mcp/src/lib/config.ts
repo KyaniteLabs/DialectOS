@@ -59,13 +59,14 @@ export function loadConfig(configPath?: string): MCPConfig {
   }
 
   if (process.env.ALLOWED_LOCALE_DIRS) {
-    config.security.allowedDirs = process.env.ALLOWED_LOCALE_DIRS.split(",").filter(Boolean);
+    config.security.allowedDirs = process.env.ALLOWED_LOCALE_DIRS.split(",").map(s => s.trim()).filter(Boolean);
   }
 
   if (process.env.ESPANOL_LOG_LEVEL) {
     const validLevels = ["error", "warn", "info", "debug"] as const;
-    if (validLevels.includes(process.env.ESPANOL_LOG_LEVEL as any)) {
-      config.logging.level = process.env.ESPANOL_LOG_LEVEL as MCPConfig["logging"]["level"];
+    const level = process.env.ESPANOL_LOG_LEVEL;
+    if (validLevels.includes(level as typeof validLevels[number])) {
+      config.logging.level = level as MCPConfig["logging"]["level"];
     }
   }
 

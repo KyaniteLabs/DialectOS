@@ -7,6 +7,7 @@
 
 import { readFileSync, writeFileSync, renameSync, rmSync, realpathSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { randomBytes } from "node:crypto";
 
 // Import from workspace packages (when implemented)
 // For now, we're implementing inline but structure for future imports
@@ -114,7 +115,7 @@ export function sanitizeErrorMessage(message: string): string {
  * @returns Path to temp file with random hex suffix
  */
 export function createSecureTempPath(parentDir: string): string {
-  const randomSuffix = Math.random().toString(16).substring(2, 10);
+  const randomSuffix = randomBytes(4).toString("hex");
   return join(parentDir, `.tmp_${randomSuffix}`);
 }
 

@@ -45,8 +45,8 @@ export class RetryPolicy {
    * Check if error is a client error (4xx) that shouldn't be retried
    */
   private isClientError(error: Error): boolean {
-    const statusCode = (error as any).statusCode;
-    return statusCode >= 400 && statusCode < 500;
+    const statusCode = (error as Error & { statusCode?: number }).statusCode;
+    return typeof statusCode === "number" && statusCode >= 400 && statusCode < 500;
   }
 
   /**

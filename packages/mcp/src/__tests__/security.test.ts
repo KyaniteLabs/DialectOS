@@ -10,6 +10,8 @@ import { readFileSync } from "node:fs";
 vi.mock("node:fs", () => ({
   readFileSync: vi.fn(),
   writeFileSync: vi.fn(),
+  existsSync: vi.fn().mockReturnValue(true),
+  statSync: vi.fn().mockReturnValue({ isDirectory: () => true }),
 }));
 
 // Mock core libraries

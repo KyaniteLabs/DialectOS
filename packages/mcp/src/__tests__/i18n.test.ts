@@ -20,6 +20,8 @@ class MockSecurityError extends Error {
 vi.mock("node:fs", () => ({
   readFileSync: vi.fn(),
   writeFileSync: vi.fn(),
+  existsSync: vi.fn().mockReturnValue(true),
+  statSync: vi.fn().mockReturnValue({ isDirectory: () => true }),
 }));
 
 // Mock the core libraries
@@ -48,6 +50,16 @@ vi.mock("@espanol/security", () => {
       acquire: vi.fn().mockResolvedValue(undefined),
     })),
     SecurityError,
+    ErrorCode: {
+      PATH_TRAVERSAL: "PATH_TRAVERSAL",
+      INVALID_PATH: "INVALID_PATH",
+      FILE_TOO_LARGE: "FILE_TOO_LARGE",
+      CONTENT_TOO_LONG: "CONTENT_TOO_LONG",
+      INVALID_INPUT: "INVALID_INPUT",
+      RATE_LIMITED: "RATE_LIMITED",
+      SANITIZATION_FAILED: "SANITIZATION_FAILED",
+      VALIDATION_FAILED: "VALIDATION_FAILED",
+    },
     createSafeError: vi.fn((error) => {
       if (error.code) {
         return { error: error.message, code: error.code };

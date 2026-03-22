@@ -89,12 +89,12 @@ export class DeepLProvider implements TranslationProvider {
         sourceLang === "auto" ? null : (sourceLang.toUpperCase() as deepl.SourceLanguageCode);
 
       // Execute translation with timeout
-      const result = await Promise.race([
+      const result = await Promise.race<deepl.TextResult>([
         this.client.translateText(text, sourceLangUpper, targetLangUpper, translateOptions),
-        new Promise<never>((_, reject) =>
+        new Promise<deepl.TextResult>((_, reject) =>
           setTimeout(() => reject(new Error("Request timed out")), HTTP_TIMEOUT)
         ),
-      ]) as deepl.TextResult;
+      ]);
 
       // Record success
       this.breaker.recordSuccess();

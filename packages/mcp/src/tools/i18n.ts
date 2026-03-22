@@ -11,7 +11,8 @@
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { z } from "zod";
 import type {
   SpanishDialect,
@@ -33,6 +34,7 @@ import {
   validateContentLength,
   RateLimiter,
   SecurityError,
+  ErrorCode,
   createSafeError,
   MAX_ARRAY_LENGTH,
 } from "@espanol/security";
@@ -82,13 +84,6 @@ interface CheckFormalityParams {
 interface ApplyGenderNeutralParams {
   localePath: string;
   strategy?: GenderNeutralStrategy;
-}
-
-interface BatchTranslateResult {
-  totalKeys: number;
-  totalTranslated: number;
-  targets: string[];
-  errors: string[];
 }
 
 // ============================================================================
@@ -417,16 +412,24 @@ async function handleBatchTranslateLocales(
     if (params.targets.length > MAX_ARRAY_LENGTH) {
       throw new SecurityError(
         `Cannot exceed ${MAX_ARRAY_LENGTH} target dialects`,
-        "VALIDATION_FAILED" as any
+        ErrorCode.VALIDATION_FAILED
       );
     }
 
     // Validate directory
     const directory = validateFilePath(params.directory);
 
+    // Verify directory exists and is actually a directory
+    if (!existsSync(directory) || !statSync(directory).isDirectory()) {
+      throw new SecurityError(
+        `Directory does not exist or is not a directory: ${directory}`,
+        ErrorCode.INVALID_PATH
+      );
+    }
+
     // Determine base locale file
     const baseLocale = params.baseLocale || "en";
-    const basePath = `${directory}/${baseLocale}.json`;
+    const basePath = join(directory, `${baseLocale}.json`);
 
     // Read base locale
     const baseEntries = readLocaleFile(basePath);
@@ -444,7 +447,7 @@ async function handleBatchTranslateLocales(
     // Translate to each target dialect
     for (const targetDialect of params.targets) {
       try {
-        const targetPath = `${directory}/${targetDialect}.json`;
+        const targetPath = join(directory, `${targetDialect}.json`);
 
         // Read existing target or create new
         let targetEntries: I18nEntry[] = [];
@@ -714,7 +717,7 @@ async function handleApplyGenderNeutral(
     if (!transforms) {
       throw new SecurityError(
         `Invalid gender-neutral strategy: ${strategy}`,
-        "INVALID_INPUT" as any
+        ErrorCode.INVALID_INPUT
       );
     }
 

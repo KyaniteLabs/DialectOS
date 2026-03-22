@@ -57,7 +57,7 @@ export interface TranslateOptions {
   /** Additional context to help with translation accuracy */
   context?: string;
   /** Specific dialect variant (e.g., "es-MX" for Mexican Spanish) */
-  dialect?: string;
+  dialect?: SpanishDialect;
 }
 
 /**

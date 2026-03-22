@@ -13,8 +13,8 @@ packages/
 ├── providers/        @espanol/providers — DeepL, LibreTranslate, MyMemory
 ├── security/         @espanol/security  — Rate limiting, path validation, sanitization
 ├── types/            @espanol/types    — Shared TypeScript types
-├── locale-utils/     @espanol/locale   — Locale file diff/merge utilities
-└── markdown-parser/  @espanol/md       — Structure-preserving markdown parser
+├── locale-utils/     @espanol/locale-utils   — Locale file diff/merge utilities
+└── markdown-parser/  @espanol/markdown-parser — Structure-preserving markdown parser
 ```
 
 ## 16 MCP Tools
