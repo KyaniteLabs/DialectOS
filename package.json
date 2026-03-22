@@ -1,8 +1,8 @@
 {
-  "name": "espanol",
+  "name": "dialectos",
   "version": "0.1.0",
   "private": true,
-  "description": "Spanish translation toolkit — CLI-first with optional MCP adapter",
+  "description": "DialectOS — Spanish dialect translation server (MCP + CLI)",
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",

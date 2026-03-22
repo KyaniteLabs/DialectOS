@@ -1,6 +1,6 @@
 # @espanol/mcp
 
-MCP adapter for Espanol — provides 16 Model Context Protocol tools for Spanish translation, i18n management, and documentation translation.
+MCP adapter for DialectOS — provides 16 Model Context Protocol tools for Spanish dialect translation, i18n management, and documentation translation.
 
 ## Installation
 
@@ -16,11 +16,11 @@ Add to your MCP client configuration:
 ```json
 {
   "mcpServers": {
-    "espanol": {
+    "dialectos": {
       "command": "npx",
-      "args": ["espanol-mcp"],
+      "args": ["-y", "@espanol/mcp"],
       "env": {
-        "DEEPL_AUTH_KEY": "your-deepl-api-key"
+        "ALLOWED_LOCALE_DIRS": "/path/to/your/locales"
       }
     }
   }
@@ -31,9 +31,9 @@ Add to your MCP client configuration:
 ```json
 {
   "mcpServers": {
-    "espanol": {
+    "dialectos": {
       "command": "npx",
-      "args": ["espanol-mcp"],
+      "args": ["-y", "@espanol/mcp"],
       "env": {}
     }
   }
@@ -70,7 +70,7 @@ Add to your MCP client configuration:
 | `detect_dialect` | Detect Spanish dialect from text | `text` |
 | `translate_code_comment` | Translate code comments | `code`, `dialect?` |
 | `translate_readme` | Translate README files | `filePath`, `dialect?` |
-| `search_glossary` | Search built-in glossary (50+ terms) | `query` |
+| `search_glossary` | Search built-in glossary (500+ terms) | `query` |
 | `list_dialects` | List all 20 Spanish dialects | (none) |
 
 ## Configuration
@@ -81,16 +81,15 @@ Add to your MCP client configuration:
 |----------|-------------|---------|
 | `DEEPL_AUTH_KEY` | DeepL API key | (none) |
 | `LIBRETRANSLATE_URL` | LibreTranslate endpoint URL | (none) |
+| `ALLOWED_LOCALE_DIRS` | Comma-separated allowed directories | `process.cwd()` |
+| `MYMEMORY_RATE_LIMIT` | MyMemory provider requests/min | `60` |
 | `ESPANOL_RATE_LIMIT` | Rate limit as `max,windowMs` | `60,60000` |
-| `ESPANOL_MAX_FILE_SIZE` | Max file size in bytes | `524288` (512KB) |
-| `ESPANOL_MAX_CONTENT_LENGTH` | Max content length in chars | `50000` |
-| `ALLOWED_LOCALE_DIRS` | Comma-separated allowed directories | (none) |
 | `ESPANOL_LOG_LEVEL` | Logging level | `error` |
 
 ### Config File
 
 ```bash
-espanol-mcp --config ./espanol.config.json
+espanol-mcp --config ./dialectos.config.json
 ```
 
 ```json
@@ -105,14 +104,6 @@ espanol-mcp --config ./espanol.config.json
 }
 ```
 
-## Translation Providers
-
-| Provider | Auth | Cost | Notes |
-|----------|------|------|-------|
-| DeepL | `DEEPL_AUTH_KEY` | Paid (Pro) | Best quality |
-| MyMemory | None | Free | 500 bytes/request, fallback |
-| LibreTranslate | `LIBRETRANSLATE_URL` | Self-hosted | Requires own server |
-
 ## Security
 
 - Path traversal protection on all file operations
@@ -121,17 +112,10 @@ espanol-mcp --config ./espanol.config.json
 - Rate limiting (60 requests/minute default)
 - Input sanitization (no null bytes, no control chars)
 - Error message sanitization (no API keys, no stack traces)
-- Batch operation limits (max 20 targets)
-
-## Spanish Dialects
-
-Supports 20 dialects: es-ES (Castilian), es-MX (Mexican), es-AR (Argentine), es-CO (Colombian), es-CU (Cuban), es-PE (Peruvian), es-CL (Chilean), es-VE (Venezuelan), es-UY (Uruguayan), es-PY (Paraguayan), es-BO (Bolivian), es-EC (Ecuadorian), es-GT (Guatemalan), es-HN (Honduran), es-SV (Salvadoran), es-NI (Nicaraguan), es-CR (Costa Rican), es-PA (Panamanian), es-DO (Dominican), es-PR (Puerto Rican).
 
 ## Development
 
 ```bash
-cd espanol
-pnpm install
 pnpm --filter @espanol/mcp test
 pnpm --filter @espanol/mcp build
 ```
