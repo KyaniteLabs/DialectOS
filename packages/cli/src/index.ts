@@ -103,6 +103,7 @@ program
   .option("--checkpoint-file <path>", "Checkpoint file for resumable translation")
   .option("--resume", "Resume from checkpoint when available", true)
   .option("--no-resume", "Ignore existing checkpoint")
+  .option("--failure-policy <policy>", "Section failure policy: strict|allow-partial", "strict")
   .action(async (input, options) => {
     try {
       const registry = getDefaultProviderRegistry();

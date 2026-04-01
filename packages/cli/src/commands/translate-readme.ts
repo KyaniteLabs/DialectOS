@@ -30,7 +30,12 @@ import {
   type GlossaryMode,
 } from "../lib/glossary-enforcement.js";
 import { validateMarkdownStructure } from "../lib/structure-validator.js";
-import { loadCheckpoint, saveCheckpoint, type TranslationCheckpoint } from "../lib/checkpoint.js";
+import {
+  loadCheckpoint,
+  saveCheckpoint,
+  hashSource,
+  type TranslationCheckpoint,
+} from "../lib/checkpoint.js";
 import {
   translateWithFallback,
   type AdaptivePacingState,
@@ -142,7 +147,11 @@ async function translateReadme(
   const glossaryMode = (options.glossaryMode || "off") as GlossaryMode;
   const checkpointPath = options.checkpointFile || `${options.output || validatedPath}.checkpoint.json`;
   const checkpoint = options.resume ? await loadCheckpoint(checkpointPath) : null;
-  const translatedByIndex = checkpoint?.translatedByIndex || {};
+  const sourceHash = hashSource(content);
+  const translatedByIndex =
+    checkpoint && checkpoint.sourcePath === validatedPath && checkpoint.sourceHash === sourceHash
+      ? checkpoint.translatedByIndex
+      : {};
   const pacing: AdaptivePacingState = { delayMs: 0 };
 
   for (const [idx, section] of parsed.sections.entries()) {
@@ -188,6 +197,7 @@ async function translateReadme(
       translatedByIndex[idx] = translatedContent;
       const state: TranslationCheckpoint = {
         sourcePath: validatedPath,
+        sourceHash,
         totalSections: parsed.sections.length,
         translatedByIndex,
       };

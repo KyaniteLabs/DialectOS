@@ -224,6 +224,38 @@ date: 2024-01-01
         executeCommand(registry, ["/nonexistent/file.md", "--output", outputFile])
       ).rejects.toThrow();
     });
+
+    it("should ignore stale checkpoint after source changes", async () => {
+      const checkpointFile = path.join(testDir, "README.ck.json");
+      const contentV1 = "# Title\n\nAlpha paragraph.";
+      const contentV2 = "# Title\n\nAlpha paragraph with NEWTOKEN.";
+      await fs.writeFile(inputFile, contentV1);
+
+      const registry = new MockRegistry(
+        new MockProvider((text) => `[ES] ${text}`)
+      ) as ProviderRegistry;
+
+      await executeCommand(registry, [
+        inputFile,
+        "--checkpoint-file",
+        checkpointFile,
+        "--output",
+        outputFile,
+      ]);
+
+      await fs.writeFile(inputFile, contentV2);
+      await executeCommand(registry, [
+        inputFile,
+        "--checkpoint-file",
+        checkpointFile,
+        "--resume",
+        "--output",
+        outputFile,
+      ]);
+
+      const result = await fs.readFile(outputFile, "utf-8");
+      expect(result).toContain("NEWTOKEN");
+    });
   });
 
   describe("translation options", () => {
@@ -488,6 +520,23 @@ date: 2024-01-01
 
       const result = await fs.readFile(outputFile, "utf-8");
       expect(result).toContain("---");
+    });
+
+    it("should catch injected HTML tags from adversarial fixture", async () => {
+      const fixture = path.join(
+        process.cwd(),
+        "src/__tests__/fixtures/adversarial-markdown.md"
+      );
+      const content = await fs.readFile(fixture, "utf-8");
+      await fs.writeFile(inputFile, content);
+
+      const registry = new MockRegistry(
+        new MockProvider(() => "<script>alert('x')</script>")
+      ) as ProviderRegistry;
+
+      await expect(
+        executeCommand(registry, [inputFile, "--output", outputFile])
+      ).rejects.toThrow("Structure validation failed");
     });
   });
 });

@@ -165,6 +165,58 @@ describe("extract-translatable command", () => {
 
       await expect(executeExtractTranslatable("../../../etc/passwd", getProvider)).rejects.toThrow("Path traversal detected");
     });
+
+    it("should fail strict policy when section translation fails", async () => {
+      mockReadFile.mockResolvedValue("Broken section");
+      mockParseMarkdown.mockReturnValue({
+        sections: [
+          {
+            type: "paragraph",
+            content: "Broken section",
+            raw: "Broken section",
+            translatable: true,
+          },
+        ],
+        translatableSections: 1,
+        codeBlockCount: 0,
+        linkCount: 0,
+      });
+      (mockProvider.translate as any).mockRejectedValue(new Error("provider down"));
+      mockReconstructMarkdown.mockImplementation((_orig: unknown, translated: any[]) => translated[0].content);
+
+      await expect(
+        executeTranslateApiDocs("./test.md", "es-ES", { failurePolicy: "strict" as any }, () =>
+          makeRegistry(mockProvider)
+        )
+      ).rejects.toThrow("Section translation failed");
+    });
+
+    it("should allow partial output when policy is allow-partial", async () => {
+      mockReadFile.mockResolvedValue("Broken section");
+      mockParseMarkdown.mockReturnValue({
+        sections: [
+          {
+            type: "paragraph",
+            content: "Broken section",
+            raw: "Broken section",
+            translatable: true,
+          },
+        ],
+        translatableSections: 1,
+        codeBlockCount: 0,
+        linkCount: 0,
+      });
+      (mockProvider.translate as any).mockRejectedValue(new Error("provider down"));
+      mockReconstructMarkdown.mockImplementation((_orig: unknown, translated: any[]) => translated[0].content);
+
+      await executeTranslateApiDocs(
+        "./test.md",
+        "es-ES",
+        { failurePolicy: "allow-partial" as any },
+        () => makeRegistry(mockProvider)
+      );
+      expect(mockWriteOutput).toHaveBeenCalled();
+    });
   });
 });
 
@@ -463,6 +515,51 @@ describe("translate-api-docs command", () => {
       const out = mockWriteOutput.mock.calls[0]?.[0] as string;
       expect(out).toContain("ingenieria agentic");
       expect(out).toContain("Shorts");
+    });
+
+    it("should ignore stale checkpoint hash and retranslate", async () => {
+      const checkpointPath = "/tmp/api-docs.ck.json";
+      mockReadFile.mockImplementation((filePath: string) => {
+        if (filePath === checkpointPath) {
+          return Promise.resolve(JSON.stringify({
+            sourcePath: "./test.md",
+            sourceHash: "stale-hash",
+            totalSections: 1,
+            translatedByIndex: { 0: "STALE TRANSLATION" },
+          }));
+        }
+        return Promise.resolve("Fresh source content");
+      });
+
+      mockParseMarkdown.mockReturnValue({
+        sections: [
+          {
+            type: "paragraph",
+            content: "Fresh source content",
+            raw: "Fresh source content",
+            translatable: true,
+          },
+        ],
+        translatableSections: 1,
+        codeBlockCount: 0,
+        linkCount: 0,
+      });
+      (mockProvider.translate as any).mockResolvedValue({
+        translatedText: "FRESH TRANSLATION",
+        detectedLanguage: "en",
+        provider: "mymemory",
+      });
+      mockReconstructMarkdown.mockImplementation((_orig: unknown, translated: any[]) => translated[0].content);
+
+      await executeTranslateApiDocs(
+        "./test.md",
+        "es-ES",
+        { checkpointFile: checkpointPath, resume: true },
+        () => makeRegistry(mockProvider)
+      );
+
+      expect(mockProvider.translate).toHaveBeenCalled();
+      expect(mockWriteOutput).toHaveBeenCalledWith(expect.stringContaining("FRESH TRANSLATION"));
     });
   });
 });
