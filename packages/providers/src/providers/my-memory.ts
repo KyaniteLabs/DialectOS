@@ -17,6 +17,8 @@ export class MyMemoryProvider implements TranslationProvider {
   private breaker: CircuitBreaker;
   private rateLimiter: RateLimiter;
   private timeoutMs: number;
+  private maxRetries: number;
+  private retryDelayMs: number;
 
   constructor(options?: {
     failureThreshold?: number;
@@ -24,6 +26,8 @@ export class MyMemoryProvider implements TranslationProvider {
     maxRequests?: number;
     windowMs?: number;
     timeoutMs?: number;
+    maxRetries?: number;
+    retryDelayMs?: number;
   }) {
     // Initialize circuit breaker
     this.breaker = new CircuitBreaker(
@@ -41,6 +45,10 @@ export class MyMemoryProvider implements TranslationProvider {
     this.timeoutMs =
       options?.timeoutMs ||
       (envTimeout > 0 ? envTimeout : DEFAULT_MYMEMORY_TIMEOUT);
+    const envRetries = parseInt(process.env.MYMEMORY_MAX_RETRIES || "", 10);
+    this.maxRetries = options?.maxRetries ?? (envRetries > 0 ? envRetries : 4);
+    const envRetryDelay = parseInt(process.env.MYMEMORY_RETRY_DELAY_MS || "", 10);
+    this.retryDelayMs = options?.retryDelayMs ?? (envRetryDelay > 0 ? envRetryDelay : 2000);
   }
 
   async translate(
@@ -116,47 +124,81 @@ export class MyMemoryProvider implements TranslationProvider {
 
     await this.rateLimiter.acquire();
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
+      try {
+        const params = new URLSearchParams({
+          q: chunk,
+          langpair: `${sourceLang === "auto" ? "autodetect" : sourceLang}|${targetLang}`,
+        });
+        const url = `${MYMEMORY_ENDPOINT}?${params.toString()}`;
+        const response = await fetch(url, { method: "GET", signal: controller.signal });
+        clearTimeout(timeoutId);
 
-    try {
-      const params = new URLSearchParams({
-        q: chunk,
-        langpair: `${sourceLang === "auto" ? "autodetect" : sourceLang}|${targetLang}`,
-      });
-      const url = `${MYMEMORY_ENDPOINT}?${params.toString()}`;
-      const response = await fetch(url, { method: "GET", signal: controller.signal });
-      clearTimeout(timeoutId);
+        if (response.status === 429 && attempt < this.maxRetries) {
+          const retryAfter = parseInt(response.headers.get("retry-after") || "", 10);
+          const waitMs =
+            Number.isFinite(retryAfter) && retryAfter > 0
+              ? retryAfter * 1000
+              : this.retryDelayMs * (attempt + 1);
+          await new Promise((r) => setTimeout(r, waitMs));
+          continue;
+        }
 
-      if (!response.ok) {
-        throw new Error(`MyMemory API error: ${response.statusText}`);
-      }
+        if (!response.ok) {
+          throw new Error(`MyMemory API error: ${response.statusText}`);
+        }
 
-      const contentType = response.headers.get("content-type");
-      if (!contentType?.includes("application/json")) {
-        throw new Error("Invalid response content type");
-      }
+        const contentType = response.headers.get("content-type");
+        if (!contentType?.includes("application/json")) {
+          throw new Error("Invalid response content type");
+        }
 
-      const data = (await response.json()) as {
-        responseStatus: number;
-        responseDetails?: string;
-        responseData: { translatedText: string };
-      };
-      if (data.responseStatus !== 200) {
-        throw new Error(`MyMemory error: ${data.responseDetails || "Unknown error"}`);
-      }
+        const data = (await response.json()) as {
+          responseStatus: number;
+          responseDetails?: string;
+          responseData: { translatedText: string };
+        };
+        if (data.responseStatus !== 200) {
+          if (
+            /TOO MANY REQUESTS|RATE LIMIT/i.test(data.responseDetails || "") &&
+            attempt < this.maxRetries
+          ) {
+            await new Promise((r) =>
+              setTimeout(r, this.retryDelayMs * (attempt + 1))
+            );
+            continue;
+          }
+          throw new Error(`MyMemory error: ${data.responseDetails || "Unknown error"}`);
+        }
 
-      this.breaker.recordSuccess();
-      return data.responseData.translatedText;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof Error && error.name === "AbortError") {
+        this.breaker.recordSuccess();
+        return data.responseData.translatedText;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error instanceof Error && error.name === "AbortError") {
+          if (attempt < this.maxRetries) {
+            await new Promise((r) =>
+              setTimeout(r, this.retryDelayMs * (attempt + 1))
+            );
+            continue;
+          }
+          this.breaker.recordFailure();
+          throw new Error("Request timed out");
+        }
+        if (attempt < this.maxRetries) {
+          await new Promise((r) =>
+            setTimeout(r, this.retryDelayMs * (attempt + 1))
+          );
+          continue;
+        }
         this.breaker.recordFailure();
-        throw new Error("Request timed out");
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(sanitizeErrorMessage(`MyMemory error: ${message}`));
       }
-      this.breaker.recordFailure();
-      const message = error instanceof Error ? error.message : String(error);
-      throw new Error(sanitizeErrorMessage(`MyMemory error: ${message}`));
     }
+    this.breaker.recordFailure();
+    throw new Error("MyMemory error: max retries exceeded");
   }
 }
