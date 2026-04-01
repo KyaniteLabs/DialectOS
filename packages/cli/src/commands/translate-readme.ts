@@ -18,6 +18,24 @@ import {
 } from "@espanol/markdown-parser";
 import { validateMarkdownPath, createSecureTempPath } from "@espanol/security";
 import type { ProviderRegistry } from "@espanol/providers";
+import {
+  loadProtectedTokens,
+  protectTokensInText,
+  restoreProtectedTokens,
+  detectIdentityTokens,
+} from "../lib/token-protection.js";
+import {
+  loadGlossary,
+  prepareGlossaryProtectedText,
+  type GlossaryMode,
+} from "../lib/glossary-enforcement.js";
+import { validateMarkdownStructure } from "../lib/structure-validator.js";
+import { loadCheckpoint, saveCheckpoint, type TranslationCheckpoint } from "../lib/checkpoint.js";
+import {
+  translateWithFallback,
+  type AdaptivePacingState,
+} from "../lib/resilient-translation.js";
+import { calculateQualityScore } from "../lib/quality-score.js";
 
 interface TranslateReadmeOptions {
   dialect: string;
@@ -25,6 +43,14 @@ interface TranslateReadmeOptions {
   provider?: string;
   formal?: boolean;
   informal?: boolean;
+  protectTokens?: string;
+  glossaryFile?: string;
+  glossaryMode?: GlossaryMode;
+  protectIdentities?: boolean;
+  validateStructure?: boolean;
+  structureMode?: "warn" | "strict";
+  checkpointFile?: string;
+  resume?: boolean;
 }
 
 /**
@@ -46,6 +72,17 @@ export function createTranslateReadmeCommand(
     .option("-p, --provider <provider>", "Translation provider")
     .option("-f, --formal", "Use formal register")
     .option("-i, --informal", "Use informal register")
+    .option("--protect-tokens <file>", "JSON file with protected tokens")
+    .option("--glossary-file <file>", "JSON glossary file with term mappings")
+    .option("--glossary-mode <mode>", "Glossary mode: off|strict", "off")
+    .option("--protect-identities", "Auto-protect handles/domains/usernames", true)
+    .option("--no-protect-identities", "Disable auto identity protection")
+    .option("--validate-structure", "Validate markdown structure after translation", true)
+    .option("--no-validate-structure", "Disable structure validation")
+    .option("--structure-mode <mode>", "Structure validation mode: warn|strict", "strict")
+    .option("--checkpoint-file <file>", "Checkpoint file for resumable translation")
+    .option("--resume", "Resume from checkpoint when available", true)
+    .option("--no-resume", "Ignore existing checkpoint")
     .action(async (input: string, options: TranslateReadmeOptions) => {
       try {
         await translateReadme(input, options, getRegistry);
@@ -88,10 +125,6 @@ async function translateReadme(
 
   // 4. Get translation provider
   const registry = getRegistry();
-  const provider = options.provider
-    ? registry.get(options.provider)
-    : registry.getAuto();
-
   // 5. Build translation options
   const translateOptions: TranslateOptions = {
     dialect: options.dialect as SpanishDialect,
@@ -104,30 +137,95 @@ async function translateReadme(
 
   // 6. Translate each translatable section
   const translatedSections: MarkdownSection[] = [];
+  const protectedTokens = await loadProtectedTokens(options.protectTokens);
+  const glossary = await loadGlossary(options.glossaryFile);
+  const glossaryMode = (options.glossaryMode || "off") as GlossaryMode;
+  const checkpointPath = options.checkpointFile || `${options.output || validatedPath}.checkpoint.json`;
+  const checkpoint = options.resume ? await loadCheckpoint(checkpointPath) : null;
+  const translatedByIndex = checkpoint?.translatedByIndex || {};
+  const pacing: AdaptivePacingState = { delayMs: 0 };
 
-  for (const section of parsed.sections) {
+  for (const [idx, section] of parsed.sections.entries()) {
     if (!section.translatable) {
       // Non-translatable sections keep original
       translatedSections.push(section);
     } else {
-      // Translate the content
-      const result = await provider.translate(
+      if (translatedByIndex[idx]) {
+        translatedSections.push({ ...section, content: translatedByIndex[idx] });
+        continue;
+      }
+      const glossaryChunk = prepareGlossaryProtectedText(
         section.content,
-        "en", // Assume source is English
-        "es", // Target is Spanish
-        translateOptions
+        glossary,
+        glossaryMode
+      );
+      const runtimeTokens = options.protectIdentities
+        ? detectIdentityTokens(glossaryChunk.text)
+        : [];
+      const mergedTokens = Array.from(new Set([...protectedTokens, ...runtimeTokens]));
+      const protectedChunk = protectTokensInText(glossaryChunk.text, mergedTokens);
+      const result = await translateWithFallback(
+        registry,
+        options.provider,
+        protectedChunk.text,
+        "en",
+        "es",
+        translateOptions,
+        pacing
+      );
+
+      const translatedContent = restoreProtectedTokens(
+        restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
+        glossaryChunk.replacements
       );
 
       // Create translated section
       translatedSections.push({
         ...section,
-        content: result.translatedText,
+        content: translatedContent,
       });
+
+      translatedByIndex[idx] = translatedContent;
+      const state: TranslationCheckpoint = {
+        sourcePath: validatedPath,
+        totalSections: parsed.sections.length,
+        translatedByIndex,
+      };
+      await saveCheckpoint(checkpointPath, state);
     }
   }
 
   // 7. Reconstruct markdown
   const translated = reconstructMarkdown(parsed.sections, translatedSections);
+
+  if (options.validateStructure) {
+    const validation = validateMarkdownStructure(content, translated);
+    if (!validation.valid) {
+      const msg = `Structure validation failed: ${validation.violations.join("; ")}`;
+      if ((options.structureMode || "strict") === "strict") {
+        throw new Error(msg);
+      }
+      console.warn(msg);
+    }
+  }
+
+  const validation = options.validateStructure
+    ? validateMarkdownStructure(content, translated)
+    : { valid: true, violations: [] };
+  const quality = calculateQualityScore(
+    content,
+    translated,
+    protectedTokens,
+    glossary?.mappings || {},
+    validation.valid
+  );
+  console.error(
+    `[quality] score=${quality.score} token=${(quality.tokenIntegrity * 100).toFixed(
+      0
+    )}% glossary=${(quality.glossaryFidelity * 100).toFixed(0)}% structure=${
+      quality.structureIntegrity === 1 ? "pass" : "fail"
+    }`
+  );
 
   // 8. Write output
   if (options.output) {

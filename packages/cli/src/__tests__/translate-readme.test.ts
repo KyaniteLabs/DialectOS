@@ -48,12 +48,26 @@ class MockRegistry implements Partial<ProviderRegistry> {
   get(_name: string): TranslationProvider {
     return this.provider;
   }
+
+  listProviders(): string[] {
+    return [this.provider.name];
+  }
+
+  isAvailable(_name: string): boolean {
+    return true;
+  }
+
+  recordSuccess(_name: string): void {}
+
+  recordFailure(_name: string): void {}
 }
 
 describe("translate-readme command", () => {
   const testDir = "/tmp/espanol-cli-test";
   const inputFile = path.join(testDir, "README.md");
   const outputFile = path.join(testDir, "README.es.md");
+  const tokensFile = path.join(testDir, "tokens.json");
+  const glossaryFile = path.join(testDir, "glossary.json");
 
   // Helper to execute command
   async function executeCommand(
@@ -253,6 +267,100 @@ date: 2024-01-01
 
       const result = await fs.readFile(outputFile, "utf-8");
       expect(result).toContain("# [Informal] Hello");
+    });
+
+    it("should preserve protected tokens when token file is provided", async () => {
+      const content = "# Kyanite Labs and @pastorsimon1798";
+      await fs.writeFile(inputFile, content);
+      await fs.writeFile(tokensFile, JSON.stringify({
+        tokens: ["Kyanite Labs", "@pastorsimon1798"],
+      }));
+
+      const registry = new MockRegistry(
+        new MockProvider((text) =>
+          text
+            .replace("Kyanite Labs", "Laboratorios Cianita")
+            .replace("@pastorsimon1798", "@pastoresimon1798")
+        )
+      ) as ProviderRegistry;
+
+      await executeCommand(registry, [
+        inputFile,
+        "--protect-tokens",
+        tokensFile,
+        "--output",
+        outputFile,
+      ]);
+
+      const result = await fs.readFile(outputFile, "utf-8");
+      expect(result).toContain("Kyanite Labs");
+      expect(result).toContain("@pastorsimon1798");
+      expect(result).not.toContain("Laboratorios Cianita");
+      expect(result).not.toContain("@pastoresimon1798");
+    });
+
+    it("should enforce strict glossary mappings for domain terms", async () => {
+      const content = "# agentic engineering and Shorts";
+      await fs.writeFile(inputFile, content);
+      await fs.writeFile(glossaryFile, JSON.stringify({
+        mappings: {
+          "agentic engineering": "ingenieria agentic",
+          Shorts: "Shorts",
+        },
+        critical: ["agentic engineering"],
+      }));
+
+      const registry = new MockRegistry(
+        new MockProvider((text) => `[ES] ${text}`)
+      ) as ProviderRegistry;
+
+      await executeCommand(registry, [
+        inputFile,
+        "--glossary-file",
+        glossaryFile,
+        "--glossary-mode",
+        "strict",
+        "--output",
+        outputFile,
+      ]);
+
+      const result = await fs.readFile(outputFile, "utf-8");
+      expect(result).toContain("ingenieria agentic");
+      expect(result).toContain("Shorts");
+    });
+
+    it("should auto-protect identity tokens by default", async () => {
+      const content = "# Follow @pastorsimon1798 on kyanitelabs.tech";
+      await fs.writeFile(inputFile, content);
+
+      const registry = new MockRegistry(
+        new MockProvider((text) =>
+          text
+            .replace("@pastorsimon1798", "@pastoresimon1798")
+            .replace("kyanitelabs.tech", "kyanitelabs.es")
+        )
+      ) as ProviderRegistry;
+
+      await executeCommand(registry, [inputFile, "--output", outputFile]);
+
+      const result = await fs.readFile(outputFile, "utf-8");
+      expect(result).toContain("@pastorsimon1798");
+      expect(result).toContain("kyanitelabs.tech");
+      expect(result).not.toContain("@pastoresimon1798");
+      expect(result).not.toContain("kyanitelabs.es");
+    });
+
+    it("should fail in strict mode when structure is corrupted", async () => {
+      const content = "# Header\n\nParagraph.";
+      await fs.writeFile(inputFile, content);
+
+      const registry = new MockRegistry(
+        new MockProvider(() => "<g id=\"1\">Header</g>")
+      ) as ProviderRegistry;
+
+      await expect(
+        executeCommand(registry, [inputFile, "--output", outputFile])
+      ).rejects.toThrow("Structure validation failed");
     });
   });
 

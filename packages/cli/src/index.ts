@@ -92,16 +92,22 @@ program
   .option("--dialect <dialect>", "Spanish dialect (e.g., es-ES, es-MX, es-AR)", "es-ES")
   .option("--provider <provider>", "Translation provider (deepl, libre, mymemory, or auto for automatic selection)", "auto")
   .option("--output <path>", "Write translation to file instead of stdout")
+  .option("--protect-tokens <file>", "JSON file with protected tokens")
+  .option("--glossary-file <file>", "JSON glossary file with term mappings")
+  .option("--glossary-mode <mode>", "Glossary mode: off|strict", "off")
+  .option("--protect-identities", "Auto-protect handles/domains/usernames", true)
+  .option("--no-protect-identities", "Disable auto identity protection")
+  .option("--validate-structure", "Validate markdown structure after translation", true)
+  .option("--no-validate-structure", "Disable structure validation")
+  .option("--structure-mode <mode>", "Structure validation mode: warn|strict", "strict")
+  .option("--checkpoint-file <path>", "Checkpoint file for resumable translation")
+  .option("--resume", "Resume from checkpoint when available", true)
+  .option("--no-resume", "Ignore existing checkpoint")
   .action(async (input, options) => {
     try {
       const registry = getDefaultProviderRegistry();
 
-      await executeTranslateApiDocs(input, options.dialect, options, (providerName) => {
-        if (!providerName || providerName === "auto") {
-          return registry.getAuto();
-        }
-        return registry.get(providerName);
-      });
+      await executeTranslateApiDocs(input, options.dialect, options, () => registry);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       writeError(message);

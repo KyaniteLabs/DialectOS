@@ -1,6 +1,6 @@
 /**
  * MyMemory translation provider
- * Free, no authentication required. Rate limited to 5000 chars per request.
+ * Free, no authentication required. Public endpoint enforces small query sizes.
  */
 
 import type { TranslationProvider, TranslationResult } from "../types.js";
@@ -8,19 +8,26 @@ import { CircuitBreaker } from "../circuit-breaker.js";
 import { RateLimiter, sanitizeErrorMessage, HTTP_TIMEOUT } from "@espanol/security";
 
 const MYMEMORY_ENDPOINT = "https://api.mymemory.translated.net/get";
-const MYMEMORY_TIMEOUT = 15000; // 15 seconds (faster timeout for free service)
-const MAX_CHARS = 5000;
+const DEFAULT_MYMEMORY_TIMEOUT = 15000; // 15 seconds (faster timeout for free service)
+const MAX_CHARS = 500;
+const CHUNK_SIZE = 450;
 
 export class MyMemoryProvider implements TranslationProvider {
   readonly name = "mymemory";
   private breaker: CircuitBreaker;
   private rateLimiter: RateLimiter;
+  private timeoutMs: number;
+  private maxRetries: number;
+  private retryDelayMs: number;
 
   constructor(options?: {
     failureThreshold?: number;
     resetTimeoutMs?: number;
     maxRequests?: number;
     windowMs?: number;
+    timeoutMs?: number;
+    maxRetries?: number;
+    retryDelayMs?: number;
   }) {
     // Initialize circuit breaker
     this.breaker = new CircuitBreaker(
@@ -33,6 +40,15 @@ export class MyMemoryProvider implements TranslationProvider {
       options?.maxRequests || 10,
       options?.windowMs || 60000
     );
+
+    const envTimeout = parseInt(process.env.MYMEMORY_TIMEOUT_MS || "", 10);
+    this.timeoutMs =
+      options?.timeoutMs ||
+      (envTimeout > 0 ? envTimeout : DEFAULT_MYMEMORY_TIMEOUT);
+    const envRetries = parseInt(process.env.MYMEMORY_MAX_RETRIES || "", 10);
+    this.maxRetries = options?.maxRetries ?? (envRetries > 0 ? envRetries : 4);
+    const envRetryDelay = parseInt(process.env.MYMEMORY_RETRY_DELAY_MS || "", 10);
+    this.retryDelayMs = options?.retryDelayMs ?? (envRetryDelay > 0 ? envRetryDelay : 2000);
   }
 
   async translate(
@@ -45,84 +61,144 @@ export class MyMemoryProvider implements TranslationProvider {
       dialect?: string;
     }
   ): Promise<TranslationResult> {
-    // Warn if text exceeds character limit
-    if (text.length > MAX_CHARS) {
-      console.warn(
-        `MyMemory: Request text exceeds ${MAX_CHARS} character limit (got ${text.length} chars)`
-      );
+    const chunks = this.chunkText(text, CHUNK_SIZE);
+    const translatedChunks: string[] = [];
+
+    for (const chunk of chunks) {
+      translatedChunks.push(await this.translateChunk(chunk, sourceLang, targetLang));
     }
 
-    // Check circuit breaker
+    return {
+      translatedText: translatedChunks.join(""),
+    };
+  }
+
+  private chunkText(text: string, maxLength: number): string[] {
+    if (text.length <= MAX_CHARS) {
+      return [text];
+    }
+
+    const chunks: string[] = [];
+    let remaining = text;
+
+    while (remaining.length > 0) {
+      if (remaining.length <= maxLength) {
+        chunks.push(remaining);
+        break;
+      }
+
+      const window = remaining.slice(0, maxLength);
+      let splitAt = Math.max(
+        window.lastIndexOf("\n\n"),
+        window.lastIndexOf(". "),
+        window.lastIndexOf("! "),
+        window.lastIndexOf("? "),
+        window.lastIndexOf(", "),
+        window.lastIndexOf(" ")
+      );
+
+      if (splitAt < Math.floor(maxLength * 0.5)) {
+        splitAt = maxLength;
+      }
+
+      const cut = window.slice(0, splitAt).length;
+      chunks.push(remaining.slice(0, cut));
+      remaining = remaining.slice(cut);
+    }
+
+    return chunks;
+  }
+
+  private async translateChunk(
+    chunk: string,
+    sourceLang: string,
+    targetLang: string
+  ): Promise<string> {
+    if (chunk.length > MAX_CHARS) {
+      throw new Error(`Chunk exceeds MyMemory max size (${MAX_CHARS})`);
+    }
+
     if (!this.breaker.canExecute()) {
       throw new Error("MyMemory provider is temporarily unavailable (circuit open)");
     }
 
-    // Check rate limit
     await this.rateLimiter.acquire();
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), MYMEMORY_TIMEOUT);
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs);
+      try {
+        const params = new URLSearchParams({
+          q: chunk,
+          langpair: `${sourceLang === "auto" ? "autodetect" : sourceLang}|${targetLang}`,
+        });
+        const url = `${MYMEMORY_ENDPOINT}?${params.toString()}`;
+        const response = await fetch(url, { method: "GET", signal: controller.signal });
+        clearTimeout(timeoutId);
 
-    try {
-      // Build URL parameters
-      const params = new URLSearchParams({
-        q: text,
-        langpair: `${sourceLang === "auto" ? "autodetect" : sourceLang}|${targetLang}`,
-      });
+        if (response.status === 429 && attempt < this.maxRetries) {
+          const retryAfter = parseInt(response.headers.get("retry-after") || "", 10);
+          const waitMs =
+            Number.isFinite(retryAfter) && retryAfter > 0
+              ? retryAfter * 1000
+              : this.retryDelayMs * (attempt + 1);
+          await new Promise((r) => setTimeout(r, waitMs));
+          continue;
+        }
 
-      const url = `${MYMEMORY_ENDPOINT}?${params.toString()}`;
+        if (!response.ok) {
+          throw new Error(`MyMemory API error: ${response.statusText}`);
+        }
 
-      // Execute request - NO auth header for MyMemory
-      const response = await fetch(url, {
-        method: "GET",
-        signal: controller.signal,
-      });
+        const contentType = response.headers.get("content-type");
+        if (!contentType?.includes("application/json")) {
+          throw new Error("Invalid response content type");
+        }
 
-      clearTimeout(timeoutId);
+        const data = (await response.json()) as {
+          responseStatus: number;
+          responseDetails?: string;
+          responseData: { translatedText: string };
+        };
+        if (data.responseStatus !== 200) {
+          if (
+            /TOO MANY REQUESTS|RATE LIMIT/i.test(data.responseDetails || "") &&
+            attempt < this.maxRetries
+          ) {
+            await new Promise((r) =>
+              setTimeout(r, this.retryDelayMs * (attempt + 1))
+            );
+            continue;
+          }
+          throw new Error(`MyMemory error: ${data.responseDetails || "Unknown error"}`);
+        }
 
-      // Validate response
-      if (!response.ok) {
-        throw new Error(`MyMemory API error: ${response.statusText}`);
-      }
-
-      // Validate Content-Type
-      const contentType = response.headers.get("content-type");
-      if (!contentType?.includes("application/json")) {
-        throw new Error("Invalid response content type");
-      }
-
-      const data = await response.json() as {
-        responseStatus: number;
-        responseDetails?: string;
-        responseData: { translatedText: string };
-      };
-
-      // Check response status
-      if (data.responseStatus !== 200) {
-        throw new Error(`MyMemory error: ${data.responseDetails || "Unknown error"}`);
-      }
-
-      // Record success
-      this.breaker.recordSuccess();
-
-      return {
-        translatedText: data.responseData.translatedText,
-      };
-    } catch (error) {
-      clearTimeout(timeoutId);
-
-      // Handle AbortError (timeout)
-      if (error instanceof Error && error.name === "AbortError") {
+        this.breaker.recordSuccess();
+        return data.responseData.translatedText;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error instanceof Error && error.name === "AbortError") {
+          if (attempt < this.maxRetries) {
+            await new Promise((r) =>
+              setTimeout(r, this.retryDelayMs * (attempt + 1))
+            );
+            continue;
+          }
+          this.breaker.recordFailure();
+          throw new Error("Request timed out");
+        }
+        if (attempt < this.maxRetries) {
+          await new Promise((r) =>
+            setTimeout(r, this.retryDelayMs * (attempt + 1))
+          );
+          continue;
+        }
         this.breaker.recordFailure();
-        throw new Error("Request timed out");
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(sanitizeErrorMessage(`MyMemory error: ${message}`));
       }
-
-      // Record failure
-      this.breaker.recordFailure();
-
-      // Sanitize error message
-      const message = error instanceof Error ? error.message : String(error);
-      throw new Error(sanitizeErrorMessage(`MyMemory error: ${message}`));
     }
+    this.breaker.recordFailure();
+    throw new Error("MyMemory error: max retries exceeded");
   }
 }

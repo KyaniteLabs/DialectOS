@@ -89,8 +89,9 @@ export class LibreTranslateProvider implements TranslationProvider {
         format: "text",
       });
 
-      // Execute request
-      const response = await fetch(this.endpoint, {
+      // Execute request against LibreTranslate translate route
+      const endpoint = this.endpoint.replace(/\/+$/, "");
+      const response = await fetch(`${endpoint}/translate`, {
         method: "POST",
         headers,
         body,

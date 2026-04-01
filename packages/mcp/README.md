@@ -82,7 +82,8 @@ Add to your MCP client configuration:
 | `DEEPL_AUTH_KEY` | DeepL API key | (none) |
 | `LIBRETRANSLATE_URL` | LibreTranslate endpoint URL | (none) |
 | `ALLOWED_LOCALE_DIRS` | Comma-separated allowed directories | `process.cwd()` |
-| `MYMEMORY_RATE_LIMIT` | MyMemory provider requests/min | `60` |
+| `ENABLE_MYMEMORY` | Opt-in enable legacy MyMemory provider | `0` |
+| `MYMEMORY_RATE_LIMIT` | MyMemory provider requests/min (when enabled) | `60` |
 | `ESPANOL_RATE_LIMIT` | Rate limit as `max,windowMs` | `60,60000` |
 | `ESPANOL_LOG_LEVEL` | Logging level | `error` |
 

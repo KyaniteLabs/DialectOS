@@ -25,7 +25,7 @@ export function createProviderRegistry(): ProviderRegistry {
     registry.register(deeplProvider);
   }
 
-  // Register LibreTranslate if URL is available
+  // Register LibreTranslate if URL is available (recommended self-hosted default)
   const libreUrl = process.env.LIBRETRANSLATE_URL;
   if (libreUrl) {
     const libreProvider = new LibreTranslateProvider({
@@ -34,9 +34,18 @@ export function createProviderRegistry(): ProviderRegistry {
     registry.register(libreProvider);
   }
 
-  // Always register MyMemory (free, no auth required)
-  const myMemoryProvider = new MyMemoryProvider();
-  registry.register(myMemoryProvider);
+  // MyMemory is opt-in only (legacy fallback). Set ENABLE_MYMEMORY=1 to register it.
+  const enableMyMemory = process.env.ENABLE_MYMEMORY === "1";
+  if (enableMyMemory) {
+    // Align CLI behavior with MCP: allow runtime limit tuning for bulk docs.
+    const myMemoryLimit = parseInt(process.env.MYMEMORY_RATE_LIMIT || "", 10);
+    const myMemoryWindow = parseInt(process.env.MYMEMORY_RATE_WINDOW_MS || "", 10);
+    const myMemoryProvider = new MyMemoryProvider({
+      maxRequests: myMemoryLimit > 0 ? myMemoryLimit : 60,
+      windowMs: myMemoryWindow > 0 ? myMemoryWindow : 60000,
+    });
+    registry.register(myMemoryProvider);
+  }
 
   return registry;
 }
