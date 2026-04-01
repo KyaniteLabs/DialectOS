@@ -55,6 +55,7 @@ describe("translate-readme command", () => {
   const inputFile = path.join(testDir, "README.md");
   const outputFile = path.join(testDir, "README.es.md");
   const tokensFile = path.join(testDir, "tokens.json");
+  const glossaryFile = path.join(testDir, "glossary.json");
 
   // Helper to execute command
   async function executeCommand(
@@ -284,6 +285,36 @@ date: 2024-01-01
       expect(result).toContain("@pastorsimon1798");
       expect(result).not.toContain("Laboratorios Cianita");
       expect(result).not.toContain("@pastoresimon1798");
+    });
+
+    it("should enforce strict glossary mappings for domain terms", async () => {
+      const content = "# agentic engineering and Shorts";
+      await fs.writeFile(inputFile, content);
+      await fs.writeFile(glossaryFile, JSON.stringify({
+        mappings: {
+          "agentic engineering": "ingenieria agentic",
+          Shorts: "Shorts",
+        },
+        critical: ["agentic engineering"],
+      }));
+
+      const registry = new MockRegistry(
+        new MockProvider((text) => `[ES] ${text}`)
+      ) as ProviderRegistry;
+
+      await executeCommand(registry, [
+        inputFile,
+        "--glossary-file",
+        glossaryFile,
+        "--glossary-mode",
+        "strict",
+        "--output",
+        outputFile,
+      ]);
+
+      const result = await fs.readFile(outputFile, "utf-8");
+      expect(result).toContain("ingenieria agentic");
+      expect(result).toContain("Shorts");
     });
   });
 

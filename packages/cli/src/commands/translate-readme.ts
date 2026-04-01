@@ -23,6 +23,11 @@ import {
   protectTokensInText,
   restoreProtectedTokens,
 } from "../lib/token-protection.js";
+import {
+  loadGlossary,
+  prepareGlossaryProtectedText,
+  type GlossaryMode,
+} from "../lib/glossary-enforcement.js";
 
 interface TranslateReadmeOptions {
   dialect: string;
@@ -31,6 +36,8 @@ interface TranslateReadmeOptions {
   formal?: boolean;
   informal?: boolean;
   protectTokens?: string;
+  glossaryFile?: string;
+  glossaryMode?: GlossaryMode;
 }
 
 /**
@@ -53,6 +60,8 @@ export function createTranslateReadmeCommand(
     .option("-f, --formal", "Use formal register")
     .option("-i, --informal", "Use informal register")
     .option("--protect-tokens <file>", "JSON file with protected tokens")
+    .option("--glossary-file <file>", "JSON glossary file with term mappings")
+    .option("--glossary-mode <mode>", "Glossary mode: off|strict", "off")
     .action(async (input: string, options: TranslateReadmeOptions) => {
       try {
         await translateReadme(input, options, getRegistry);
@@ -112,13 +121,20 @@ async function translateReadme(
   // 6. Translate each translatable section
   const translatedSections: MarkdownSection[] = [];
   const protectedTokens = await loadProtectedTokens(options.protectTokens);
+  const glossary = await loadGlossary(options.glossaryFile);
+  const glossaryMode = (options.glossaryMode || "off") as GlossaryMode;
 
   for (const section of parsed.sections) {
     if (!section.translatable) {
       // Non-translatable sections keep original
       translatedSections.push(section);
     } else {
-      const protectedChunk = protectTokensInText(section.content, protectedTokens);
+      const glossaryChunk = prepareGlossaryProtectedText(
+        section.content,
+        glossary,
+        glossaryMode
+      );
+      const protectedChunk = protectTokensInText(glossaryChunk.text, protectedTokens);
       // Translate the content
       const result = await provider.translate(
         protectedChunk.text,
@@ -130,7 +146,10 @@ async function translateReadme(
       // Create translated section
       translatedSections.push({
         ...section,
-        content: restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
+        content: restoreProtectedTokens(
+          restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
+          glossaryChunk.replacements
+        ),
       });
     }
   }

@@ -14,6 +14,11 @@ import {
   protectTokensInText,
   restoreProtectedTokens,
 } from "../lib/token-protection.js";
+import {
+  loadGlossary,
+  prepareGlossaryProtectedText,
+  type GlossaryMode,
+} from "../lib/glossary-enforcement.js";
 
 // ============================================================================
 // extract-translatable Command
@@ -78,6 +83,10 @@ export interface TranslateApiDocsOptions {
   output?: string;
   /** Optional protected token file path */
   protectTokens?: string;
+  /** Optional glossary file path */
+  glossaryFile?: string;
+  /** Glossary mode */
+  glossaryMode?: GlossaryMode;
 }
 
 /**
@@ -100,21 +109,31 @@ async function translateSection(
   section: MarkdownSection,
   provider: TranslationProvider,
   dialect: SpanishDialect,
-  protectedTokens: string[]
+  protectedTokens: string[],
+  glossary: Awaited<ReturnType<typeof loadGlossary>>,
+  glossaryMode: GlossaryMode
 ): Promise<MarkdownSection> {
   if (!section.translatable) {
     return section;
   }
 
   try {
-    const protectedChunk = protectTokensInText(section.content, protectedTokens);
+    const glossaryChunk = prepareGlossaryProtectedText(
+      section.content,
+      glossary,
+      glossaryMode
+    );
+    const protectedChunk = protectTokensInText(glossaryChunk.text, protectedTokens);
     const result = await provider.translate(protectedChunk.text, "auto", dialect, {
       dialect,
     });
 
     return {
       ...section,
-      content: restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
+      content: restoreProtectedTokens(
+        restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
+        glossaryChunk.replacements
+      ),
     };
   } catch (error) {
     // If translation fails, return original section
@@ -130,13 +149,22 @@ async function translateSections(
   parsed: ParsedMarkdown,
   provider: TranslationProvider,
   dialect: SpanishDialect,
-  protectedTokens: string[]
+  protectedTokens: string[],
+  glossary: Awaited<ReturnType<typeof loadGlossary>>,
+  glossaryMode: GlossaryMode
 ): Promise<MarkdownSection[]> {
   const translatedSections: MarkdownSection[] = [];
 
   for (const section of parsed.sections) {
     if (section.translatable) {
-      const translated = await translateSection(section, provider, dialect, protectedTokens);
+      const translated = await translateSection(
+        section,
+        provider,
+        dialect,
+        protectedTokens,
+        glossary,
+        glossaryMode
+      );
       translatedSections.push(translated);
     } else {
       // Keep non-translatable sections as-is
@@ -180,9 +208,18 @@ export async function executeTranslateApiDocs(
     const providerName = options?.provider;
     const provider = getProvider(providerName);
     const protectedTokens = await loadProtectedTokens(options?.protectTokens);
+    const glossary = await loadGlossary(options?.glossaryFile);
+    const glossaryMode = (options?.glossaryMode || "off") as GlossaryMode;
 
     // Translate all translatable sections
-    const translatedSections = await translateSections(parsed, provider, validatedDialect, protectedTokens);
+    const translatedSections = await translateSections(
+      parsed,
+      provider,
+      validatedDialect,
+      protectedTokens,
+      glossary,
+      glossaryMode
+    );
 
     // Reconstruct markdown with translated content
     const translated = reconstructMarkdown(parsed.sections, translatedSections);

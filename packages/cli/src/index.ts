@@ -93,6 +93,8 @@ program
   .option("--provider <provider>", "Translation provider (deepl, libre, mymemory, or auto for automatic selection)", "auto")
   .option("--output <path>", "Write translation to file instead of stdout")
   .option("--protect-tokens <file>", "JSON file with protected tokens")
+  .option("--glossary-file <file>", "JSON glossary file with term mappings")
+  .option("--glossary-mode <mode>", "Glossary mode: off|strict", "off")
   .action(async (input, options) => {
     try {
       const registry = getDefaultProviderRegistry();

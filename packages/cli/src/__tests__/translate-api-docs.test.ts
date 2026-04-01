@@ -160,6 +160,7 @@ describe("translate-api-docs command", () => {
   let mockProvider: TranslationProvider;
   const testDir = "/tmp/espanol-cli-api-test";
   const tokenFile = path.join(testDir, "tokens.json");
+  const glossaryFile = path.join(testDir, "glossary.json");
 
   beforeEach(() => {
     mockProvider = {
@@ -401,6 +402,55 @@ describe("translate-api-docs command", () => {
 
       expect(mockWriteOutput).toHaveBeenCalledWith(expect.stringContaining("Kyanite Labs"));
       expect(mockWriteOutput).toHaveBeenCalledWith(expect.stringContaining("@pastorsimon1798"));
+    });
+
+    it("should enforce strict glossary mappings in API doc translation", async () => {
+      mockReadFile.mockImplementation((filePath: string) => {
+        if (filePath === glossaryFile) {
+          return Promise.resolve(JSON.stringify({
+            mappings: {
+              "agentic engineering": "ingenieria agentic",
+              Shorts: "Shorts",
+            },
+            critical: ["agentic engineering"],
+          }));
+        }
+        return Promise.resolve("agentic engineering with Shorts");
+      });
+
+      mockParseMarkdown.mockReturnValue({
+        sections: [
+          {
+            type: "paragraph",
+            content: "agentic engineering with Shorts",
+            raw: "agentic engineering with Shorts",
+            translatable: true,
+          },
+        ],
+        translatableSections: 1,
+        codeBlockCount: 0,
+        linkCount: 0,
+      });
+
+      (mockProvider.translate as any).mockImplementation(async (inputText: string) => ({
+        translatedText: `[ES] ${inputText}`,
+        detectedLanguage: "en",
+        provider: "mymemory",
+      }));
+
+      mockReconstructMarkdown.mockImplementation((_orig: unknown, translated: any[]) => translated[0].content);
+      const getProvider = vi.fn().mockReturnValue(mockProvider);
+
+      await executeTranslateApiDocs(
+        "./test.md",
+        "es-ES",
+        { glossaryFile, glossaryMode: "strict" as any },
+        getProvider
+      );
+
+      const out = mockWriteOutput.mock.calls[0]?.[0] as string;
+      expect(out).toContain("ingenieria agentic");
+      expect(out).toContain("Shorts");
     });
   });
 });
