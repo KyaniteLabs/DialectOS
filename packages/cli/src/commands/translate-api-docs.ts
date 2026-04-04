@@ -206,21 +206,21 @@ async function translateSections(
 ): Promise<{ sections: MarkdownSection[]; failures: number }> {
   const translatedSections: MarkdownSection[] = [];
   const checkpoint = resume ? await loadCheckpoint(checkpointPath) : null;
-  const translatedByIndex =
+  const translatedByIndex: Record<number, string> =
     checkpoint && checkpoint.sourcePath === sourcePath && checkpoint.sourceHash === sourceHash
       ? checkpoint.translatedByIndex
       : (() => {
           if (checkpoint && !checkpoint.sourceHash) {
             console.warn("Checkpoint predates source hashing — retranslating all sections");
           }
-          return {};
+          return {} as Record<number, string>;
         })();
   const pacing: AdaptivePacingState = { delayMs: 0 };
   let failures = 0;
 
   for (const [idx, section] of parsed.sections.entries()) {
     if (section.translatable) {
-      if (translatedByIndex[idx]) {
+      if (idx in translatedByIndex) {
         translatedSections.push({ ...section, content: translatedByIndex[idx] });
         continue;
       }
@@ -294,8 +294,12 @@ export async function executeTranslateApiDocs(
     const glossary = await loadGlossary(options?.glossaryFile);
     const glossaryMode = (options?.glossaryMode || "off") as GlossaryMode;
     const protectIdentities = options?.protectIdentities !== false;
-    const checkpointPath =
+    const rawCheckpointPath =
       options?.checkpointFile || `${options?.output || validatedPath}.checkpoint.json`;
+    // Only validate user-supplied checkpoint paths; auto-generated ones derive from validated paths
+    const checkpointPath = options?.checkpointFile
+      ? validateFilePath(rawCheckpointPath)
+      : rawCheckpointPath;
     const resume = options?.resume !== false;
     const sourceHash = hashSource(content);
 
@@ -342,6 +346,13 @@ export async function executeTranslateApiDocs(
 
     // Write output
     await writeOutput(translated, options?.output);
+
+    // Clean up checkpoint file after successful completion
+    try {
+      await fs.promises.unlink(checkpointPath);
+    } catch {
+      // Checkpoint file may not exist or already deleted — ignore
+    }
     const quality = calculateQualityScore(
       content,
       translated,

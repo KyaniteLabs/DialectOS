@@ -12,11 +12,12 @@
 import { Command } from "commander";
 import { promises as fs } from "node:fs";
 import type { SpanishDialect, TranslateOptions, MarkdownSection } from "@espanol/types";
+import { ALL_SPANISH_DIALECTS } from "@espanol/types";
 import {
   parseMarkdown,
   reconstructMarkdown,
 } from "@espanol/markdown-parser";
-import { validateMarkdownPath, createSecureTempPath } from "@espanol/security";
+import { validateMarkdownPath, validateFilePath, validateContentLength, createSecureTempPath } from "@espanol/security";
 import type { ProviderRegistry } from "@espanol/providers";
 import {
   loadProtectedTokens,
@@ -56,6 +57,7 @@ interface TranslateReadmeOptions {
   structureMode?: "warn" | "strict";
   checkpointFile?: string;
   resume?: boolean;
+  failurePolicy?: "strict" | "allow-partial";
 }
 
 /**
@@ -88,6 +90,7 @@ export function createTranslateReadmeCommand(
     .option("--checkpoint-file <file>", "Checkpoint file for resumable translation")
     .option("--resume", "Resume from checkpoint when available", true)
     .option("--no-resume", "Ignore existing checkpoint")
+    .option("--failure-policy <policy>", "Behavior on section failure: strict|allow-partial", "strict")
     .action(async (input: string, options: TranslateReadmeOptions) => {
       try {
         await translateReadme(input, options, getRegistry);
@@ -112,8 +115,16 @@ async function translateReadme(
   // 1. Validate input path
   const validatedPath = validateMarkdownPath(input);
 
+  // 1b. Validate dialect
+  if (options.dialect && !ALL_SPANISH_DIALECTS.includes(options.dialect as SpanishDialect)) {
+    throw new Error(
+      `Invalid dialect: ${options.dialect}. Valid dialects are: ${ALL_SPANISH_DIALECTS.join(", ")}`
+    );
+  }
+
   // 2. Read file content
   const content = await fs.readFile(validatedPath, "utf-8");
+  validateContentLength(content);
 
   // 3. Parse markdown
   const parsed = parseMarkdown(content);
@@ -145,26 +156,29 @@ async function translateReadme(
   const protectedTokens = await loadProtectedTokens(options.protectTokens);
   const glossary = await loadGlossary(options.glossaryFile);
   const glossaryMode = (options.glossaryMode || "off") as GlossaryMode;
-  const checkpointPath = options.checkpointFile || `${options.output || validatedPath}.checkpoint.json`;
+  const rawCheckpointPath = options.checkpointFile || `${options.output || validatedPath}.checkpoint.json`;
+  // Only validate user-supplied checkpoint paths; auto-generated ones derive from validated paths
+  const checkpointPath = options.checkpointFile ? validateFilePath(rawCheckpointPath) : rawCheckpointPath;
   const checkpoint = options.resume ? await loadCheckpoint(checkpointPath) : null;
   const sourceHash = hashSource(content);
-  const translatedByIndex =
+  const translatedByIndex: Record<number, string> =
     checkpoint && checkpoint.sourcePath === validatedPath && checkpoint.sourceHash === sourceHash
       ? checkpoint.translatedByIndex
       : (() => {
           if (checkpoint && !checkpoint.sourceHash) {
             console.warn("Checkpoint predates source hashing — retranslating all sections");
           }
-          return {};
+          return {} as Record<number, string>;
         })();
   const pacing: AdaptivePacingState = { delayMs: 0 };
+  let failures = 0;
 
   for (const [idx, section] of parsed.sections.entries()) {
     if (!section.translatable) {
       // Non-translatable sections keep original
       translatedSections.push(section);
     } else {
-      if (translatedByIndex[idx]) {
+      if (idx in translatedByIndex) {
         translatedSections.push({ ...section, content: translatedByIndex[idx] });
         continue;
       }
@@ -213,12 +227,22 @@ async function translateReadme(
         // Keep original section on failure — do NOT checkpoint
         console.error(`Failed to translate section ${idx}: ${error instanceof Error ? error.message : String(error)}`);
         translatedSections.push(section);
+        failures++;
       }
     }
   }
 
   // 7. Reconstruct markdown
   const translated = reconstructMarkdown(parsed.sections, translatedSections);
+
+  // 7b. Enforce failure policy
+  const failurePolicy = options.failurePolicy ?? "strict";
+  if (failures > 0 && failurePolicy === "strict") {
+    throw new Error(`Section translation failed for ${failures} translatable block(s)`);
+  }
+  if (failures > 0 && failurePolicy === "allow-partial") {
+    console.warn(`Partial translation output: ${failures} translatable block(s) failed`);
+  }
 
   // Call validateMarkdownStructure once and reuse the result
   const validation = options.validateStructure
@@ -253,6 +277,13 @@ async function translateReadme(
     await writeOutput(options.output, translated);
   } else {
     console.log(translated);
+  }
+
+  // Clean up checkpoint file after successful completion
+  try {
+    await fs.unlink(checkpointPath);
+  } catch {
+    // Checkpoint may not exist — ignore
   }
 }
 

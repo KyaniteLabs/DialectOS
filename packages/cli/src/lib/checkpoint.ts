@@ -13,10 +13,15 @@ export async function loadCheckpoint(path: string): Promise<TranslationCheckpoin
     const raw = await fs.readFile(path, "utf-8");
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object" || !parsed.sourcePath) {
+      console.warn(`Checkpoint at ${path} is missing required fields — ignoring`);
       return null;
     }
     return parsed as TranslationCheckpoint;
-  } catch {
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code !== "ENOENT") {
+      console.warn(`Failed to load checkpoint at ${path}: ${code || error}`);
+    }
     return null;
   }
 }

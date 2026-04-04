@@ -177,8 +177,15 @@ export function validateFilePath(
     realPath = fs.realpathSync.native(resolvedPath);
   } catch (error) {
     if (error instanceof SecurityError) throw error;
-    // File doesn't exist yet, use resolved path
-    realPath = resolvedPath;
+    // File doesn't exist yet — resolve parent directory (which exists) and rejoin
+    const parentDir = path.dirname(resolvedPath);
+    try {
+      const realParent = fs.realpathSync.native(parentDir);
+      realPath = path.join(realParent, path.basename(resolvedPath));
+    } catch {
+      // Parent doesn't exist either — use resolved path as-is
+      realPath = resolvedPath;
+    }
   }
 
   // Check against allowed directories
