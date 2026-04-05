@@ -22,7 +22,12 @@ import {
   type GlossaryMode,
 } from "../lib/glossary-enforcement.js";
 import { validateMarkdownStructure } from "../lib/structure-validator.js";
-import { loadCheckpoint, saveCheckpoint, type TranslationCheckpoint } from "../lib/checkpoint.js";
+import {
+  loadCheckpoint,
+  saveCheckpoint,
+  hashSource,
+  type TranslationCheckpoint,
+} from "../lib/checkpoint.js";
 import {
   translateWithFallback,
   type AdaptivePacingState,
@@ -106,6 +111,8 @@ export interface TranslateApiDocsOptions {
   checkpointFile?: string;
   /** Resume from checkpoint */
   resume?: boolean;
+  /** Behavior when one or more sections fail translation */
+  failurePolicy?: "strict" | "allow-partial";
 }
 
 /**
@@ -134,9 +141,9 @@ async function translateSection(
   glossaryMode: GlossaryMode,
   protectIdentities: boolean,
   pacing: AdaptivePacingState
-): Promise<MarkdownSection> {
+): Promise<{ section: MarkdownSection; failed: boolean }> {
   if (!section.translatable) {
-    return section;
+    return { section, failed: false };
   }
 
   try {
@@ -164,16 +171,19 @@ async function translateSection(
     );
 
     return {
-      ...section,
-      content: restoreProtectedTokens(
-        restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
-        glossaryChunk.replacements
-      ),
+      section: {
+        ...section,
+        content: restoreProtectedTokens(
+          restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
+          glossaryChunk.replacements
+        ),
+      },
+      failed: false,
     };
   } catch (error) {
     // If translation fails, return original section
     console.error(`Failed to translate section: ${error instanceof Error ? error.message : String(error)}`);
-    return section;
+    return { section, failed: true };
   }
 }
 
@@ -191,16 +201,26 @@ async function translateSections(
   protectIdentities: boolean,
   checkpointPath: string,
   sourcePath: string,
+  sourceHash: string,
   resume: boolean
-): Promise<MarkdownSection[]> {
+): Promise<{ sections: MarkdownSection[]; failures: number }> {
   const translatedSections: MarkdownSection[] = [];
   const checkpoint = resume ? await loadCheckpoint(checkpointPath) : null;
-  const translatedByIndex = checkpoint?.translatedByIndex || {};
+  const translatedByIndex: Record<number, string> =
+    checkpoint && checkpoint.sourcePath === sourcePath && checkpoint.sourceHash === sourceHash
+      ? checkpoint.translatedByIndex
+      : (() => {
+          if (checkpoint && !checkpoint.sourceHash) {
+            console.warn("Checkpoint predates source hashing — retranslating all sections");
+          }
+          return {} as Record<number, string>;
+        })();
   const pacing: AdaptivePacingState = { delayMs: 0 };
+  let failures = 0;
 
   for (const [idx, section] of parsed.sections.entries()) {
     if (section.translatable) {
-      if (translatedByIndex[idx]) {
+      if (idx in translatedByIndex) {
         translatedSections.push({ ...section, content: translatedByIndex[idx] });
         continue;
       }
@@ -215,10 +235,16 @@ async function translateSections(
         protectIdentities,
         pacing
       );
-      translatedSections.push(translated);
-      translatedByIndex[idx] = translated.content;
+      translatedSections.push(translated.section);
+      if (translated.failed) {
+        failures++;
+      } else {
+        // Only save successfully translated sections to checkpoint
+        translatedByIndex[idx] = translated.section.content;
+      }
       const state: TranslationCheckpoint = {
         sourcePath,
+        sourceHash,
         totalSections: parsed.sections.length,
         translatedByIndex,
       };
@@ -229,7 +255,7 @@ async function translateSections(
     }
   }
 
-  return translatedSections;
+  return { sections: translatedSections, failures };
 }
 
 /**
@@ -268,12 +294,17 @@ export async function executeTranslateApiDocs(
     const glossary = await loadGlossary(options?.glossaryFile);
     const glossaryMode = (options?.glossaryMode || "off") as GlossaryMode;
     const protectIdentities = options?.protectIdentities !== false;
-    const checkpointPath =
+    const rawCheckpointPath =
       options?.checkpointFile || `${options?.output || validatedPath}.checkpoint.json`;
+    // Only validate user-supplied checkpoint paths; auto-generated ones derive from validated paths
+    const checkpointPath = options?.checkpointFile
+      ? validateFilePath(rawCheckpointPath)
+      : rawCheckpointPath;
     const resume = options?.resume !== false;
+    const sourceHash = hashSource(content);
 
     // Translate all translatable sections
-    const translatedSections = await translateSections(
+    const sectionResult = await translateSections(
       parsed,
       registry,
       providerName,
@@ -284,11 +315,23 @@ export async function executeTranslateApiDocs(
       protectIdentities,
       checkpointPath,
       validatedPath,
+      sourceHash,
       resume
     );
+    const failurePolicy = options?.failurePolicy ?? "strict";
+    if (sectionResult.failures > 0 && failurePolicy === "strict") {
+      throw new Error(
+        `Section translation failed for ${sectionResult.failures} translatable block(s)`
+      );
+    }
+    if (sectionResult.failures > 0 && failurePolicy === "allow-partial") {
+      console.warn(
+        `Partial translation output: ${sectionResult.failures} translatable block(s) failed`
+      );
+    }
 
     // Reconstruct markdown with translated content
-    const translated = reconstructMarkdown(parsed.sections, translatedSections);
+    const translated = reconstructMarkdown(parsed.sections, sectionResult.sections);
 
     const validation = validateMarkdownStructure(content, translated);
     if (options?.validateStructure !== false) {
@@ -301,8 +344,7 @@ export async function executeTranslateApiDocs(
       }
     }
 
-    // Write output
-    await writeOutput(translated, options?.output);
+    // Log quality score before writing output
     const quality = calculateQualityScore(
       content,
       translated,
@@ -317,6 +359,16 @@ export async function executeTranslateApiDocs(
         quality.structureIntegrity === 1 ? "pass" : "fail"
       }`
     );
+
+    // Write output
+    await writeOutput(translated, options?.output);
+
+    // Clean up checkpoint file after successful completion
+    try {
+      await fs.promises.unlink(checkpointPath);
+    } catch {
+      // Checkpoint file may not exist or already deleted — ignore
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     writeError(message);

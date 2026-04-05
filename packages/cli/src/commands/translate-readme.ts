@@ -12,11 +12,13 @@
 import { Command } from "commander";
 import { promises as fs } from "node:fs";
 import type { SpanishDialect, TranslateOptions, MarkdownSection } from "@espanol/types";
+import { ALL_SPANISH_DIALECTS } from "@espanol/types";
 import {
   parseMarkdown,
   reconstructMarkdown,
 } from "@espanol/markdown-parser";
-import { validateMarkdownPath, createSecureTempPath } from "@espanol/security";
+import { validateMarkdownPath, validateFilePath, validateContentLength } from "@espanol/security";
+import { writeOutput } from "../lib/output.js";
 import type { ProviderRegistry } from "@espanol/providers";
 import {
   loadProtectedTokens,
@@ -30,7 +32,12 @@ import {
   type GlossaryMode,
 } from "../lib/glossary-enforcement.js";
 import { validateMarkdownStructure } from "../lib/structure-validator.js";
-import { loadCheckpoint, saveCheckpoint, type TranslationCheckpoint } from "../lib/checkpoint.js";
+import {
+  loadCheckpoint,
+  saveCheckpoint,
+  hashSource,
+  type TranslationCheckpoint,
+} from "../lib/checkpoint.js";
 import {
   translateWithFallback,
   type AdaptivePacingState,
@@ -51,6 +58,7 @@ interface TranslateReadmeOptions {
   structureMode?: "warn" | "strict";
   checkpointFile?: string;
   resume?: boolean;
+  failurePolicy?: "strict" | "allow-partial";
 }
 
 /**
@@ -83,6 +91,7 @@ export function createTranslateReadmeCommand(
     .option("--checkpoint-file <file>", "Checkpoint file for resumable translation")
     .option("--resume", "Resume from checkpoint when available", true)
     .option("--no-resume", "Ignore existing checkpoint")
+    .option("--failure-policy <policy>", "Behavior on section failure: strict|allow-partial", "strict")
     .action(async (input: string, options: TranslateReadmeOptions) => {
       try {
         await translateReadme(input, options, getRegistry);
@@ -107,18 +116,25 @@ async function translateReadme(
   // 1. Validate input path
   const validatedPath = validateMarkdownPath(input);
 
+  // 1b. Validate dialect
+  if (options.dialect && !ALL_SPANISH_DIALECTS.includes(options.dialect as SpanishDialect)) {
+    throw new Error(
+      `Invalid dialect: ${options.dialect}. Valid dialects are: ${ALL_SPANISH_DIALECTS.join(", ")}`
+    );
+  }
+
   // 2. Read file content
   const content = await fs.readFile(validatedPath, "utf-8");
+  validateContentLength(content);
 
   // 3. Parse markdown
   const parsed = parseMarkdown(content);
 
   if (parsed.sections.length === 0) {
-    const result = "";
     if (options.output) {
-      await writeOutput(options.output, result);
+      await writeOutput("", options.output);
     } else {
-      console.log(result);
+      console.log("");
     }
     return;
   }
@@ -140,17 +156,29 @@ async function translateReadme(
   const protectedTokens = await loadProtectedTokens(options.protectTokens);
   const glossary = await loadGlossary(options.glossaryFile);
   const glossaryMode = (options.glossaryMode || "off") as GlossaryMode;
-  const checkpointPath = options.checkpointFile || `${options.output || validatedPath}.checkpoint.json`;
+  const rawCheckpointPath = options.checkpointFile || `${options.output || validatedPath}.checkpoint.json`;
+  // Only validate user-supplied checkpoint paths; auto-generated ones derive from validated paths
+  const checkpointPath = options.checkpointFile ? validateFilePath(rawCheckpointPath) : rawCheckpointPath;
   const checkpoint = options.resume ? await loadCheckpoint(checkpointPath) : null;
-  const translatedByIndex = checkpoint?.translatedByIndex || {};
+  const sourceHash = hashSource(content);
+  const translatedByIndex: Record<number, string> =
+    checkpoint && checkpoint.sourcePath === validatedPath && checkpoint.sourceHash === sourceHash
+      ? checkpoint.translatedByIndex
+      : (() => {
+          if (checkpoint && !checkpoint.sourceHash) {
+            console.warn("Checkpoint predates source hashing — retranslating all sections");
+          }
+          return {} as Record<number, string>;
+        })();
   const pacing: AdaptivePacingState = { delayMs: 0 };
+  let failures = 0;
 
   for (const [idx, section] of parsed.sections.entries()) {
     if (!section.translatable) {
       // Non-translatable sections keep original
       translatedSections.push(section);
     } else {
-      if (translatedByIndex[idx]) {
+      if (idx in translatedByIndex) {
         translatedSections.push({ ...section, content: translatedByIndex[idx] });
         continue;
       }
@@ -164,54 +192,71 @@ async function translateReadme(
         : [];
       const mergedTokens = Array.from(new Set([...protectedTokens, ...runtimeTokens]));
       const protectedChunk = protectTokensInText(glossaryChunk.text, mergedTokens);
-      const result = await translateWithFallback(
-        registry,
-        options.provider,
-        protectedChunk.text,
-        "en",
-        "es",
-        translateOptions,
-        pacing
-      );
+      try {
+        const result = await translateWithFallback(
+          registry,
+          options.provider,
+          protectedChunk.text,
+          "en",
+          "es",
+          translateOptions,
+          pacing
+        );
 
-      const translatedContent = restoreProtectedTokens(
-        restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
-        glossaryChunk.replacements
-      );
+        const translatedContent = restoreProtectedTokens(
+          restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
+          glossaryChunk.replacements
+        );
 
-      // Create translated section
-      translatedSections.push({
-        ...section,
-        content: translatedContent,
-      });
+        // Create translated section
+        translatedSections.push({
+          ...section,
+          content: translatedContent,
+        });
 
-      translatedByIndex[idx] = translatedContent;
-      const state: TranslationCheckpoint = {
-        sourcePath: validatedPath,
-        totalSections: parsed.sections.length,
-        translatedByIndex,
-      };
-      await saveCheckpoint(checkpointPath, state);
+        // Only checkpoint successful translations
+        translatedByIndex[idx] = translatedContent;
+        const state: TranslationCheckpoint = {
+          sourcePath: validatedPath,
+          sourceHash,
+          totalSections: parsed.sections.length,
+          translatedByIndex,
+        };
+        await saveCheckpoint(checkpointPath, state);
+      } catch (error) {
+        // Keep original section on failure — do NOT checkpoint
+        console.error(`Failed to translate section ${idx}: ${error instanceof Error ? error.message : String(error)}`);
+        translatedSections.push(section);
+        failures++;
+      }
     }
   }
 
   // 7. Reconstruct markdown
   const translated = reconstructMarkdown(parsed.sections, translatedSections);
 
-  if (options.validateStructure) {
-    const validation = validateMarkdownStructure(content, translated);
-    if (!validation.valid) {
-      const msg = `Structure validation failed: ${validation.violations.join("; ")}`;
-      if ((options.structureMode || "strict") === "strict") {
-        throw new Error(msg);
-      }
-      console.warn(msg);
-    }
+  // 7b. Enforce failure policy
+  const failurePolicy = options.failurePolicy ?? "strict";
+  if (failures > 0 && failurePolicy === "strict") {
+    throw new Error(`Section translation failed for ${failures} translatable block(s)`);
+  }
+  if (failures > 0 && failurePolicy === "allow-partial") {
+    console.warn(`Partial translation output: ${failures} translatable block(s) failed`);
   }
 
+  // Call validateMarkdownStructure once and reuse the result
   const validation = options.validateStructure
     ? validateMarkdownStructure(content, translated)
     : { valid: true, violations: [] };
+
+  if (options.validateStructure && !validation.valid) {
+    const msg = `Structure validation failed: ${validation.violations.join("; ")}`;
+    if ((options.structureMode || "strict") === "strict") {
+      throw new Error(msg);
+    }
+    console.warn(msg);
+  }
+
   const quality = calculateQualityScore(
     content,
     translated,
@@ -228,34 +273,12 @@ async function translateReadme(
   );
 
   // 8. Write output
-  if (options.output) {
-    await writeOutput(options.output, translated);
-  } else {
-    console.log(translated);
-  }
-}
+  await writeOutput(translated, options.output);
 
-/**
- * Write output to file with atomic write
- * Uses temp file + rename for atomicity
- */
-async function writeOutput(filePath: string, content: string): Promise<void> {
-  // Create temp file in same directory as target
-  const tempPath = createSecureTempPath(filePath);
-
+  // Clean up checkpoint file after successful completion
   try {
-    // Write to temp file
-    await fs.writeFile(tempPath, content, "utf-8");
-
-    // Atomic rename to final path
-    await fs.rename(tempPath, filePath);
-  } catch (error) {
-    // Clean up temp file on error
-    try {
-      await fs.unlink(tempPath);
-    } catch {
-      // Ignore cleanup errors
-    }
-    throw error;
+    await fs.unlink(checkpointPath);
+  } catch {
+    // Checkpoint may not exist — ignore
   }
 }

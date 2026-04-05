@@ -1,0 +1,35 @@
+{
+  "results": [
+    {
+      "name": "translate_text",
+      "ok": true,
+      "code": 0,
+      "stderr": ""
+    },
+    {
+      "name": "translate_readme_strict_token",
+      "ok": true,
+      "code": 0,
+      "stderr": "[quality] score=100 token=100% glossary=100% structure=pass"
+    },
+    {
+      "name": "translate_api_docs_bad_provider_should_fail",
+      "ok": true,
+      "code": 1,
+      "stderr": "Error: Section translation failed for 3 translatable block(s)"
+    },
+    {
+      "name": "translate_readme_synthetic_strict_expected_fail",
+      "ok": true,
+      "code": 1,
+      "stderr": "Error: Structure validation failed: Unexpected HTML tags introduced: script"
+    },
+    {
+      "name": "checkpoint_invalidates_on_source_change",
+      "ok": true,
+      "code": 0,
+      "stderr": "[quality] score=100 token=100% glossary=100% structure=pass"
+    }
+  ],
+  "all_green": true
+}

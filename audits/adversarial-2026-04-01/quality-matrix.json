@@ -1,0 +1,78 @@
+{
+  "generated_at": "2026-04-01",
+  "rows": [
+    {
+      "file": "audits/adversarial-2026-04-01/corpus/declaration-excerpt.md",
+      "ok": true,
+      "sec": 1.03,
+      "quality": {
+        "score": 100,
+        "token": 100,
+        "glossary": 100,
+        "structure": "pass"
+      },
+      "error": "[quality] score=100 token=100% glossary=100% structure=pass"
+    },
+    {
+      "file": "audits/adversarial-2026-04-01/corpus/constitution-excerpt.md",
+      "ok": true,
+      "sec": 0.82,
+      "quality": {
+        "score": 100,
+        "token": 100,
+        "glossary": 100,
+        "structure": "pass"
+      },
+      "error": "[quality] score=100 token=100% glossary=100% structure=pass"
+    },
+    {
+      "file": "audits/adversarial-2026-04-01/corpus/nasa-apollo11-excerpt.md",
+      "ok": true,
+      "sec": 0.46,
+      "quality": {
+        "score": 100,
+        "token": 100,
+        "glossary": 100,
+        "structure": "pass"
+      },
+      "error": "[quality] score=100 token=100% glossary=100% structure=pass"
+    },
+    {
+      "file": "audits/adversarial-2026-04-01/corpus/token-lock-stress.md",
+      "ok": true,
+      "sec": 0.63,
+      "quality": {
+        "score": 100,
+        "token": 100,
+        "glossary": 100,
+        "structure": "pass"
+      },
+      "error": "[quality] score=100 token=100% glossary=100% structure=pass"
+    },
+    {
+      "file": "README.md",
+      "ok": true,
+      "sec": 2.82,
+      "quality": {
+        "score": 100,
+        "token": 100,
+        "glossary": 100,
+        "structure": "pass"
+      },
+      "error": "[quality] score=100 token=100% glossary=100% structure=pass"
+    },
+    {
+      "file": "README.md",
+      "ok": true,
+      "sec": 3.02,
+      "quality": {
+        "score": 100,
+        "token": 100,
+        "glossary": 100,
+        "structure": "pass"
+      },
+      "error": "[quality] score=100 token=100% glossary=100% structure=pass"
+    }
+  ],
+  "pass_rate": 1.0
+}

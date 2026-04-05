@@ -103,11 +103,19 @@ program
   .option("--checkpoint-file <path>", "Checkpoint file for resumable translation")
   .option("--resume", "Resume from checkpoint when available", true)
   .option("--no-resume", "Ignore existing checkpoint")
-  .action(async (input, options) => {
+  .option("--failure-policy <policy>", "Section failure policy: strict|allow-partial", "strict")
+  .hook("preAction", (thisCommand: Command) => {
+    const policy = thisCommand.opts().failurePolicy;
+    if (policy && !["strict", "allow-partial"].includes(policy)) {
+      console.error(`Invalid --failure-policy '${policy}'. Must be 'strict' or 'allow-partial'.`);
+      process.exit(1);
+    }
+  })
+  .action(async (input: string, options: Record<string, unknown>) => {
     try {
       const registry = getDefaultProviderRegistry();
 
-      await executeTranslateApiDocs(input, options.dialect, options, () => registry);
+      await executeTranslateApiDocs(input, options.dialect as string, options, () => registry);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       writeError(message);
