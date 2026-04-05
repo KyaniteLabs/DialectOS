@@ -5,7 +5,7 @@
 
 import { readLocaleFile, writeLocaleFile } from "@espanol/locale-utils";
 import { validateFilePath, MAX_ARRAY_LENGTH } from "@espanol/security";
-import type { TranslationProvider, SpanishDialect, ProviderName } from "@espanol/types";
+import type { TranslationProvider, SpanishDialect, ProviderName, I18nEntry } from "@espanol/types";
 import { ALL_SPANISH_DIALECTS } from "@espanol/types";
 import { writeError, writeInfo } from "../../lib/output.js";
 import { join } from "node:path";
@@ -75,7 +75,7 @@ export async function executeBatchTranslate(
         const targetPath = join(validatedDir, `${targetDialect}.json`);
 
         // Check if target file exists
-        let targetEntries: any[] = [];
+        let targetEntries: I18nEntry[] = [];
         try {
           targetEntries = readLocaleFile(targetPath);
         } catch {
@@ -84,7 +84,7 @@ export async function executeBatchTranslate(
         }
 
         // Translate all base keys
-        const translatedEntries: any[] = [];
+        const translatedEntries: I18nEntry[] = [];
 
         for (const baseEntry of baseEntries) {
           try {
