@@ -19,6 +19,7 @@ import { executeCheckFormality } from "./commands/i18n/check-formality.js";
 import { executeApplyGenderNeutral } from "./commands/i18n/apply-gender-neutral.js";
 import { getDefaultProviderRegistry } from "./lib/provider-factory.js";
 import { writeError, writeOutput } from "./lib/output.js";
+import { SecurityError, createSafeError } from "@espanol/security";
 import type { SpanishDialect } from "@espanol/types";
 import { parse, format } from "node:path";
 
@@ -362,6 +363,14 @@ i18nCommand
 
 // Parse arguments
 program.parseAsync(process.argv).catch((error) => {
-  writeError(error.message);
+  // Handle SecurityError with proper error classification
+  if (error instanceof SecurityError) {
+    const safeError = createSafeError(error);
+    writeError(`Security Error [${safeError.code}]: ${safeError.error}`);
+  } else {
+    // Handle other errors
+    const safeError = createSafeError(error);
+    writeError(safeError.error);
+  }
   process.exit(1);
 });
