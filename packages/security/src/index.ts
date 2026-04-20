@@ -499,6 +499,18 @@ export function sanitizeErrorMessage(message: string): string {
   // Remove 32+ character hex strings (likely keys/tokens)
   sanitized = sanitized.replace(/\b[a-f0-9]{32,}\b/gi, "[REDACTED]");
 
+  // Remove DeepL API keys (format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx)
+  sanitized = sanitized.replace(
+    /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}:[a-z]{2}\b/gi,
+    "[REDACTED]"
+  );
+
+  // Remove DeepL API keys without suffix (legacy format)
+  sanitized = sanitized.replace(
+    /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi,
+    "[REDACTED]"
+  );
+
   // Remove Unix file paths
   sanitized = sanitized.replace(/\/[a-zA-Z0-9_\-./~]+/g, "[path]");
 
