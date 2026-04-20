@@ -111,7 +111,12 @@ export class DeepLProvider implements TranslationProvider {
       this.breaker.recordFailure();
 
       // Sanitize error message
-      const message = error instanceof Error ? error.message : String(error);
+      // Pre-sanitize with known authKey to catch any format edge cases
+      let message = error instanceof Error ? error.message : String(error);
+      const authKey = (this.client as any).authKey;
+      if (authKey && typeof authKey === "string" && message.includes(authKey)) {
+        message = message.replaceAll(authKey, "[REDACTED]");
+      }
       throw new Error(sanitizeErrorMessage(`DeepL error: ${message}`));
     }
   }
