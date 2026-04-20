@@ -45,14 +45,17 @@ export function protectTokensInText(text: string, tokens: string[]): ProtectedTe
   return { text: protectedText, replacements };
 }
 
+function escapeRegExp(string: string): string {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export function restoreProtectedTokens(text: string, replacements: Map<string, string>): string {
   let restored = text;
   replacements.forEach((token, placeholder) => {
     restored = restored.split(placeholder).join(token);
     // Some providers normalize placeholders (e.g. "__ESPANOL_GLOSS_6__" -> "ESPANOL GLOSS 6")
-    const normalized = placeholder
-      .replace(/^_+|_+$/g, "")
-      .replace(/_/g, "[_\\s]*");
+    const base = escapeRegExp(placeholder.replace(/^_+|_+$/g, ""));
+    const normalized = base.replace(/_/g, "[_\\s]*");
     const regex = new RegExp(`\\b${normalized}\\b`, "g");
     restored = restored.replace(regex, token);
   });
