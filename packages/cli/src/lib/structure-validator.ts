@@ -61,7 +61,7 @@ export function validateMarkdownStructure(
     );
   }
 
-  const tagRegex = /<([a-z][a-z0-9-]*)\b[^>]*>/gi;
+  const tagRegex = /<([a-zA-Z][a-zA-Z0-9-]*)\b[^>]*>/gi;
   const translatedTags = Array.from(translatedContent.matchAll(tagRegex)).map(
     (m) => m[1].toLowerCase()
   );
