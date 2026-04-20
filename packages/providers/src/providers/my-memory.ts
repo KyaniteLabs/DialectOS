@@ -89,6 +89,13 @@ export class MyMemoryProvider implements TranslationProvider {
       return [text];
     }
 
+    // Use Intl.Segmenter for grapheme-aware splitting (Node 20+)
+    // This prevents splitting surrogate pairs (emojis, historic scripts)
+    const segmenter =
+      typeof Intl !== "undefined" && "Segmenter" in Intl
+        ? new Intl.Segmenter("en", { granularity: "grapheme" })
+        : null;
+
     const chunks: string[] = [];
     let remaining = text;
 
@@ -110,6 +117,21 @@ export class MyMemoryProvider implements TranslationProvider {
 
       if (splitAt < Math.floor(maxLength * 0.5)) {
         splitAt = maxLength;
+      }
+
+      // If we have a segmenter, ensure we don't split a grapheme cluster
+      if (segmenter && splitAt < remaining.length) {
+        const segments = Array.from(segmenter.segment(remaining));
+        let charCount = 0;
+        let graphemeIdx = 0;
+        for (const seg of segments) {
+          charCount += seg.segment.length;
+          graphemeIdx++;
+          if (charCount >= splitAt) {
+            break;
+          }
+        }
+        splitAt = segments.slice(0, graphemeIdx).reduce((sum, s) => sum + s.segment.length, 0);
       }
 
       const cut = window.slice(0, splitAt).length;
