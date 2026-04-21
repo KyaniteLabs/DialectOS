@@ -32,7 +32,7 @@ function createServer(config: MCPConfig = loadConfig()): McpServer {
   const server = new McpServer(
     {
       name: "@espanol/mcp",
-      version: "0.1.1",
+      version: "0.1.0",
     },
     {
       capabilities: {},
