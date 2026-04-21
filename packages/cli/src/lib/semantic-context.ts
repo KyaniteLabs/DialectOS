@@ -1,5 +1,5 @@
 import type { SpanishDialect, FormalityLevel } from "@espanol/types";
-import { getDialectGrammarProfile } from "@espanol/types";
+import { buildDialectQualityPrompt, getDialectGrammarProfile } from "@espanol/types";
 import { getDialectInfo } from "./dialect-info.js";
 
 export type SemanticDomain =
@@ -95,6 +95,7 @@ export function buildSemanticTranslationContext(options: BuildSemanticContextOpt
   const signals = analyzeSemanticContext(options.text, options.formality || "auto");
   const dialect = getDialectInfo(options.dialect);
   const grammarProfile = getDialectGrammarProfile(options.dialect);
+  const qualityPrompt = buildDialectQualityPrompt(options.dialect);
   const dialectTerms = dialect
     ? [...dialect.formalTerms.slice(0, 4), ...dialect.slangTerms.slice(0, 4)].join(", ")
     : options.dialect;
@@ -117,6 +118,7 @@ export function buildSemanticTranslationContext(options: BuildSemanticContextOpt
     options.sectionType ? `Current section type: ${options.sectionType}.` : undefined,
     dialectTerms ? `Use regional vocabulary naturally where appropriate; examples/signals: ${dialectTerms}.` : undefined,
     grammarGuidance ? `Dialect grammar and style profile: ${grammarGuidance}` : undefined,
+    qualityPrompt ? `Dialect quality contract: ${qualityPrompt}` : undefined,
     "Preserve product names, code identifiers, URLs, placeholders, markdown structure, and glossary-locked terms.",
     "Prefer idiomatic Spanish for the target audience over one-to-one lexical substitution.",
   ].filter(Boolean).join(" ");

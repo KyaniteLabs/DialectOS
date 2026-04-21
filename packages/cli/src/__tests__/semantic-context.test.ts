@@ -48,4 +48,24 @@ describe("semantic translation context", () => {
     expect(spain).toContain("vosotros/vosotras");
     expect(spain).toContain("coger is neutral in Spain");
   });
+  it("includes quality-contract fallback and safety policy", () => {
+    const mexico = buildSemanticTranslationContext({
+      text: "Translate the onboarding instructions for users.",
+      dialect: "es-MX",
+      documentKind: "plain",
+    });
+    expect(mexico).toContain("evidenceTier=corpus-backed");
+    expect(mexico).toContain("Localize grammar and common vocabulary confidently");
+    expect(mexico).toContain("Avoid literal coger");
+
+    const philippines = buildSemanticTranslationContext({
+      text: "Translate account settings for a public website.",
+      dialect: "es-PH",
+      documentKind: "plain",
+    });
+    expect(philippines).toContain("marketTier=heritage");
+    expect(philippines).toContain("Use conservative neutral Spanish");
+    expect(philippines).toContain("do not fake local fluency");
+  });
+
 });
