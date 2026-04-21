@@ -1,0 +1,29 @@
+[
+  {
+    "id": "bz-public-service-neutral",
+    "source": "Use Belizean Spanish for public service copy.",
+    "domain": "general",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Belizean Spanish",
+      "neutral Belize-aware Spanish",
+      "Use ustedes plural",
+      "do not invent Kriol/English mixing"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "kriol",
+      "bway"
+    ],
+    "notes": "Belize should stay neutral and Belize-aware without fabricated Kriol or English code-switching.",
+    "requiredOutputAny": [
+      "beliceño",
+      "Belice"
+    ],
+    "preferredOutputAny": [
+      "beliceño"
+    ]
+  }
+]

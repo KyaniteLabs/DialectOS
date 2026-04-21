@@ -1,0 +1,29 @@
+[
+  {
+    "id": "gq-food-name",
+    "source": "Use yam in the recipe.",
+    "domain": "general",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Equatoguinean Spanish",
+      "conservative standard Spanish",
+      "do not fake local slang",
+      "formal/institutional clarity"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "asere",
+      "güey"
+    ],
+    "notes": "Equatoguinean Spanish should stay conservative while preserving sourced local food vocabulary like yam/ñame.",
+    "requiredOutputAny": [
+      "ñame"
+    ],
+    "preferredOutputAny": [
+      "ñame"
+    ]
+  }
+]

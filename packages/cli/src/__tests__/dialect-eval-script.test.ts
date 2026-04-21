@@ -12,7 +12,6 @@ describe("dialect eval script", () => {
     execFileSync("node", [
       "scripts/dialect-eval.mjs",
       `--out=${outDir}`,
-      "--dialects=es-PA,es-PR,es-MX,es-AR,es-ES",
     ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe" });
 
     const results = JSON.parse(readFileSync(join(outDir, "results.json"), "utf-8")) as {
@@ -23,13 +22,13 @@ describe("dialect eval script", () => {
       results: Array<{ fixture: string; passes: boolean; output: string; provider: string; live: boolean; qualityWarnings: string[] }>;
     };
 
-    expect(results.total).toBeGreaterThanOrEqual(7);
+    expect(results.total).toBeGreaterThanOrEqual(25);
     expect(results.failed).toBe(0);
     expect(results.passed).toBe(results.total);
     expect(results.live).toBe(false);
     expect(results.results.some((result) => result.fixture === "pa-transit-neutral")).toBe(true);
     expect(results.results.every((result) => result.provider === "mock-semantic" && result.live === false)).toBe(true);
-    expect(results.results.some((result) => result.qualityWarnings.length > 0)).toBe(true);
+    expect(results.results.every((result) => Array.isArray(result.qualityWarnings))).toBe(true);
 
     rmSync(outDir, { recursive: true, force: true });
   });

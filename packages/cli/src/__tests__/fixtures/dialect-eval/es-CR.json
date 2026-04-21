@@ -1,0 +1,31 @@
+[
+  {
+    "id": "cr-support-usted",
+    "source": "Please update your password before continuing.",
+    "domain": "security",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Costa Rican Spanish",
+      "Prefer usted for respectful Costa Rican UX/support copy",
+      "Avoid forced pura vida/mae branding",
+      "Use ustedes plural"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "mae",
+      "pura vida"
+    ],
+    "notes": "Costa Rica should not be over-tuteado; respectful support copy should allow usted naturally.",
+    "requiredOutputAny": [
+      "usted",
+      "actualice",
+      "su contraseña"
+    ],
+    "preferredOutputAny": [
+      "usted",
+      "actualice"
+    ]
+  }
+]

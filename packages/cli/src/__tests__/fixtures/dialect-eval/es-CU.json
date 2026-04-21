@@ -1,0 +1,29 @@
+[
+  {
+    "id": "cu-transit-guagua",
+    "source": "Take the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Cuban Spanish",
+      "Caribbean/Cuban flavor",
+      "Use ustedes for plural address",
+      "Avoid asere/yuma"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "asere",
+      "yuma"
+    ],
+    "notes": "Cuban transit output should accept guagua for bus while avoiding casual relationship slang.",
+    "requiredOutputAny": [
+      "guagua"
+    ],
+    "preferredOutputAny": [
+      "guagua"
+    ]
+  }
+]

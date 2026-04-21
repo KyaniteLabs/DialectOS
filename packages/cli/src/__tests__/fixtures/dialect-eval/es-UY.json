@@ -1,0 +1,30 @@
+[
+  {
+    "id": "uy-informal-voseo",
+    "source": "You can update your account now.",
+    "domain": "support",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Uruguayan Spanish",
+      "Use natural Uruguayan/Rioplatense voseo",
+      "Use ustedes for plural address",
+      "avoid boludo"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "boludo"
+    ],
+    "notes": "Informal Uruguayan output should preserve Rioplatense voseo without forced bo/ta slang.",
+    "requiredOutputAny": [
+      "vos podés",
+      "podés",
+      "vos puedes"
+    ],
+    "preferredOutputAny": [
+      "vos",
+      "podés"
+    ]
+  }
+]

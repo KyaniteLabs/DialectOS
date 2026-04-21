@@ -1,0 +1,28 @@
+[
+  {
+    "id": "pe-support-formal",
+    "source": "Contact support if the payment fails.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Peruvian Spanish",
+      "Default to neutral Peruvian Spanish",
+      "Do not force slang like causa/pata",
+      "Default to neutral Peruvian Spanish with ustedes plural"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "causa",
+      "pata",
+      "cholo"
+    ],
+    "notes": "Peruvian formal support copy should stay neutral and avoid colloquial identity-sensitive terms.",
+    "preferredOutputAny": [
+      "soporte",
+      "comuníquese",
+      "póngase"
+    ]
+  }
+]

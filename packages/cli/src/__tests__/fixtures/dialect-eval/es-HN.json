@@ -1,0 +1,30 @@
+[
+  {
+    "id": "hn-informal-voseo",
+    "source": "You can update your account now.",
+    "domain": "support",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Honduran Spanish",
+      "Use vos only for informal Honduran audience fit",
+      "Use usted for formal support/business copy",
+      "avoid maje"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "maje"
+    ],
+    "notes": "Informal Honduran output should allow voseo but avoid slang that can read insulting.",
+    "requiredOutputAny": [
+      "vos podés",
+      "podés",
+      "vos puedes"
+    ],
+    "preferredOutputAny": [
+      "vos",
+      "podés"
+    ]
+  }
+]

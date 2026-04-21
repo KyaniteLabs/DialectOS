@@ -1,0 +1,30 @@
+[
+  {
+    "id": "do-transit-guagua",
+    "source": "Take the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Dominican Spanish",
+      "Use Dominican flavor only when casual register is explicit",
+      "no voseo/vosotros",
+      "Avoid tiguere/vaina"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "tiguere",
+      "vaina",
+      "que lo que"
+    ],
+    "notes": "Dominican transit output can use guagua while avoiding caricatured casual slang.",
+    "requiredOutputAny": [
+      "guagua"
+    ],
+    "preferredOutputAny": [
+      "guagua"
+    ]
+  }
+]

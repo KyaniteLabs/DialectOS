@@ -1,0 +1,29 @@
+[
+  {
+    "id": "bo-food-llajwa",
+    "source": "Buy hot sauce for lunch.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Bolivian Spanish",
+      "Default to clear Bolivian Spanish",
+      "Use ustedes plural",
+      "Treat identity terms carefully"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cholo",
+      "cholita"
+    ],
+    "notes": "Bolivia fixture checks a food-context regional term while forbidding sensitive identity terms by default.",
+    "requiredOutputAny": [
+      "llajwa",
+      "llajua"
+    ],
+    "preferredOutputAny": [
+      "llajwa"
+    ]
+  }
+]

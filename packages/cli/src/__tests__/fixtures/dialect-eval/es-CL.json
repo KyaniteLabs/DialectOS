@@ -1,0 +1,29 @@
+[
+  {
+    "id": "cl-food-palta",
+    "source": "Buy avocado for lunch.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Chilean Spanish",
+      "Keep Chilean output comprehensible",
+      "Use ustedes for plural address",
+      "Avoid Chilean slang"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "wea",
+      "hueón",
+      "cachái"
+    ],
+    "notes": "Chile should localize avocado as palta in a food context without forcing heavy slang.",
+    "requiredOutputAny": [
+      "palta"
+    ],
+    "preferredOutputAny": [
+      "palta"
+    ]
+  }
+]

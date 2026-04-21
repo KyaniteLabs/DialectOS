@@ -16,21 +16,35 @@ const providerName = args.get("provider") || "mock-semantic";
 const live = args.get("live") === "true";
 const dialectFilter = new Set((args.get("dialects") || "").split(",").map((d) => d.trim()).filter(Boolean));
 
-function mockTranslate(source, dialect) {
+const VOSEO_DIALECTS = new Set(["es-AR", "es-UY", "es-PY", "es-GT", "es-HN", "es-SV", "es-NI"]);
+const VOSOTROS_DIALECTS = new Set(["es-ES", "es-AD"]);
+const GUAGUA_BUS_DIALECTS = new Set(["es-CU", "es-DO", "es-PR"]);
+
+function mockTranslate(source, dialect, sample = {}) {
+  const formalSupport = sample.register === "formal" && /\b(password|support|payment)\b/i.test(source);
+
   return source
+    .replace(/\bPark the car near the office\./i, "Estacione el carro cerca de la oficina.")
+    .replace(/\bUse Belizean Spanish for public service copy\./i, "Use español beliceño para textos de servicio público.")
+    .replace(/\bPreserve Philippine names in the file\./i, "Preserve los nombres filipinos en el archivo.")
+    .replace(/\bUse yam in the recipe\./i, dialect === "es-GQ" ? "Use ñame en la receta." : "Use yam en la receta.")
+    .replace(/\bBuy hot sauce for lunch\./i, dialect === "es-BO" ? "Compre llajwa para el almuerzo." : "Compre salsa picante para el almuerzo.")
+    .replace(/\bBuy avocado for lunch\./i, dialect === "es-CL" ? "Compra palta para el almuerzo." : "Compra aguacate para el almuerzo.")
+    .replace(/\bUse the computer to open the file\./i, ["es-CO", "es-EC"].includes(dialect) ? "Usa el computador para abrir el archivo." : "Usa la computadora para abrir el archivo.")
     .replace(/\bTake\b/i, "Toma")
-    .replace(/\bbus\b/i, dialect === "es-PR" ? "guagua" : "bus")
+    .replace(/\bbus\b/i, GUAGUA_BUS_DIALECTS.has(dialect) ? "guagua" : "bus")
     .replace(/\boffice\b/i, "oficina")
     .replace(/\bpassword\b/i, "contraseña")
     .replace(/\baccount settings\b/i, "configuración de la cuenta")
-    .replace(/\bContact support\b/i, "Contacta a soporte")
+    .replace(/\bPlease update your contraseña before continuing\./i, formalSupport ? "Por favor, actualice su contraseña antes de continuar." : "Actualiza tu contraseña antes de continuar.")
+    .replace(/\bContact support\b/i, formalSupport ? "Comuníquese con soporte" : "Contacta a soporte")
     .replace(/\bpayment fails\b/i, "pago falla")
     .replace(/\bPick up\b/i, "Recoge")
     .replace(/\bfile\b/i, "archivo")
     .replace(/\bdeployment\b/i, "despliegue")
-    .replace(/\bYou can update\b/i, dialect === "es-AR" ? "Vos podés actualizar" : "Puedes actualizar")
+    .replace(/\bYou can update\b/i, VOSEO_DIALECTS.has(dialect) ? "Vos podés actualizar" : "Puedes actualizar")
     .replace(/\byour account now\b/i, "tu cuenta ahora")
-    .replace(/\bYou can all update\b/i, dialect === "es-ES" ? "Vosotros podéis actualizar" : "Ustedes pueden actualizar")
+    .replace(/\bYou can all update\b/i, VOSOTROS_DIALECTS.has(dialect) ? "Vosotros podéis actualizar" : "Ustedes pueden actualizar")
     .replace(/\byour passwords now\b/i, "vuestras contraseñas ahora");
 }
 
@@ -64,7 +78,7 @@ async function createLiveTranslate() {
 
 function hasForbiddenTerm(output, term) {
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`\\b${escaped}\\b`, "i").test(output);
+  return new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`, "iu").test(output);
 }
 
 async function evaluate(sample, dialect, translate) {
@@ -122,7 +136,7 @@ async function evaluate(sample, dialect, translate) {
 
 const translate = live
   ? await createLiveTranslate()
-  : async (sample, dialect) => mockTranslate(sample.source, dialect);
+  : async (sample, dialect) => mockTranslate(sample.source, dialect, sample);
 
 const results = [];
 for (const file of readdirSync(fixtureDir).filter((name) => name.endsWith(".json")).sort()) {

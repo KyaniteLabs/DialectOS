@@ -1,0 +1,27 @@
+[
+  {
+    "id": "ve-support-neutral",
+    "source": "Contact support if the payment fails.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Venezuelan Spanish",
+      "Use Venezuelan vocabulary naturally",
+      "Do not default to voseo nationally",
+      "Avoid arrecho/marico"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "arrecho",
+      "marico"
+    ],
+    "notes": "Venezuelan support copy should remain neutral and not introduce emotionally loaded slang.",
+    "preferredOutputAny": [
+      "soporte",
+      "comuníquese",
+      "póngase"
+    ]
+  }
+]

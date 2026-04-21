@@ -1,0 +1,27 @@
+[
+  {
+    "id": "co-support-respectful",
+    "source": "Contact support if the payment fails.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Colombian Spanish",
+      "Use usted for respectful support/business copy",
+      "Default to nationally intelligible Colombian Spanish",
+      "Avoid marica/parce"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "marica",
+      "parce"
+    ],
+    "notes": "Colombian support copy should be respectful, nationally intelligible, and not slang-forward.",
+    "preferredOutputAny": [
+      "soporte",
+      "comuníquese",
+      "póngase"
+    ]
+  }
+]

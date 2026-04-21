@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { SpanishDialect, FormalityLevel } from "@espanol/types";
+import { ALL_SPANISH_DIALECTS, type SpanishDialect, type FormalityLevel } from "@espanol/types";
 import { buildSemanticTranslationContext } from "../lib/semantic-context.js";
 
 interface DialectEvalSample {
@@ -29,8 +29,8 @@ function loadFixture(file: string): { dialect: SpanishDialect; samples: DialectE
 describe("dialect evaluation harness", () => {
   const fixtures = readdirSync(fixtureDir).filter((file) => file.endsWith(".json"));
 
-  it("has launch fixtures for the initial high-value dialect set", () => {
-    expect(fixtures.sort()).toEqual(["es-AR.json", "es-ES.json", "es-MX.json", "es-PA.json", "es-PR.json"]);
+  it("has provider eval fixtures for every covered dialect", () => {
+    expect(fixtures.sort()).toEqual(ALL_SPANISH_DIALECTS.map((dialect) => `${dialect}.json`).sort());
   });
 
   for (const file of fixtures) {

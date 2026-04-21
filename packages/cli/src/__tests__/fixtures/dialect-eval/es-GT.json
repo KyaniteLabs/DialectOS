@@ -1,0 +1,31 @@
+[
+  {
+    "id": "gt-informal-voseo",
+    "source": "You can update your account now.",
+    "domain": "support",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Guatemalan Spanish",
+      "Use vos for informal Guatemalan voice",
+      "Use usted for respectful/formal contexts",
+      "avoid cerote/culero"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cerote",
+      "culero"
+    ],
+    "notes": "Informal Guatemalan output should support voseo while avoiding strong slang.",
+    "requiredOutputAny": [
+      "vos podés",
+      "podés",
+      "vos puedes"
+    ],
+    "preferredOutputAny": [
+      "vos",
+      "podés"
+    ]
+  }
+]

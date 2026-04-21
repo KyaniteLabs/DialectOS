@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ad-plural-address",
+    "source": "You can all update your passwords now.",
+    "domain": "security",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Andorran Spanish",
+      "Spain-adjacent grammar and plural address",
+      "Do not insert Catalan words",
+      "Use tú/vosotros"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "güey",
+      "parce",
+      "boludo"
+    ],
+    "notes": "Andorra should follow Spain-adjacent plural address without unrequested Catalan code-mixing.",
+    "requiredOutputAny": [
+      "vosotros",
+      "podéis",
+      "vuestras"
+    ],
+    "preferredOutputAny": [
+      "vosotros",
+      "podéis"
+    ]
+  }
+]

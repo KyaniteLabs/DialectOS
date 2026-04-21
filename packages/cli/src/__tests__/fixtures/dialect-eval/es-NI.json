@@ -1,0 +1,30 @@
+[
+  {
+    "id": "ni-informal-voseo",
+    "source": "You can update your account now.",
+    "domain": "support",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Nicaraguan Spanish",
+      "Use vos for informal Nicaraguan voice",
+      "Use usted for formal/support text",
+      "Use ustedes plural"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "maje"
+    ],
+    "notes": "Informal Nicaraguan output should preserve voseo without forcing unrelated slang.",
+    "requiredOutputAny": [
+      "vos podés",
+      "podés",
+      "vos puedes"
+    ],
+    "preferredOutputAny": [
+      "vos",
+      "podés"
+    ]
+  }
+]

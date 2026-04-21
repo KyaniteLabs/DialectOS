@@ -1,0 +1,29 @@
+[
+  {
+    "id": "ec-computer-computador",
+    "source": "Use the computer to open the file.",
+    "domain": "technical",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Ecuadorian Spanish",
+      "Use neutral Ecuadorian vocabulary",
+      "Use ustedes plural",
+      "Do not default to voseo"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "chucha",
+      "longo"
+    ],
+    "notes": "Ecuador should prefer computador/esfero-style vocabulary without regional slang in technical copy.",
+    "requiredOutputAny": [
+      "computador"
+    ],
+    "preferredOutputAny": [
+      "computador"
+    ]
+  }
+]

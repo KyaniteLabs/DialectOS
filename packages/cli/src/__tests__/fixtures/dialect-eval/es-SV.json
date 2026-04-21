@@ -1,0 +1,31 @@
+[
+  {
+    "id": "sv-informal-voseo",
+    "source": "You can update your account now.",
+    "domain": "support",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Salvadoran Spanish",
+      "Use Salvadoran voseo for informal copy",
+      "Use usted for respectful and formal contexts",
+      "Avoid cerote/maje"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cerote",
+      "maje"
+    ],
+    "notes": "Informal Salvadoran output should preserve voseo and avoid strong slang by default.",
+    "requiredOutputAny": [
+      "vos podés",
+      "podés",
+      "vos puedes"
+    ],
+    "preferredOutputAny": [
+      "vos",
+      "podés"
+    ]
+  }
+]

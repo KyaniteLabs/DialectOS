@@ -1,0 +1,33 @@
+[
+  {
+    "id": "us-public-service-parking",
+    "source": "Park the car near the office.",
+    "domain": "general",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "U.S. Spanish",
+      "accessible U.S. Spanish",
+      "avoid unnecessary Spanglish",
+      "Use ustedes plural"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "güey",
+      "parce",
+      "boludo"
+    ],
+    "notes": "U.S. Spanish public-service copy should be accessible and avoid Spain-only aparcar/vosotros defaults.",
+    "requiredOutputAny": [
+      "estacione",
+      "estaciona",
+      "parquee",
+      "parquea"
+    ],
+    "preferredOutputAny": [
+      "estacione",
+      "estaciona"
+    ]
+  }
+]

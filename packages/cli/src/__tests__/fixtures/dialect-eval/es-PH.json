@@ -1,0 +1,32 @@
+[
+  {
+    "id": "ph-institutional-neutral",
+    "source": "Preserve Philippine names in the file.",
+    "domain": "technical",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Philippine Spanish",
+      "conservative, intelligible Spanish",
+      "Do not default to Latin American slang or voseo",
+      "Preserve Philippine names"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "güey",
+      "parce"
+    ],
+    "notes": "Philippine Spanish should remain conservative and preserve Philippine references without inventing Chavacano.",
+    "requiredOutputAny": [
+      "filipinos",
+      "Filipinas",
+      "filipinas"
+    ],
+    "preferredOutputAny": [
+      "filipinos",
+      "Filipinas"
+    ]
+  }
+]
