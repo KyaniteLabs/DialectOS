@@ -11,17 +11,15 @@
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { readFileSync, existsSync, statSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import type {
   SpanishDialect,
   ProviderName,
   I18nEntry,
-  LocaleDiff,
   FormalityIssue,
   GenderNeutralStrategy,
-  VariantResult,
 } from "@espanol/types";
 import {
   readLocaleFile,
@@ -40,12 +38,10 @@ import {
 } from "@espanol/security";
 import {
   ProviderRegistry,
-  DeepLProvider,
-  LibreTranslateProvider,
-  MyMemoryProvider,
 } from "@espanol/providers";
 import { ToolResult } from "../lib/types.js";
 import { createProviderRegistry } from "../lib/provider-factory.js";
+import { prepareProviderRequest } from "../lib/provider-request.js";
 
 // ============================================================================
 // Types
@@ -135,6 +131,41 @@ const DIALECT_ADAPTATIONS: Record<string, Record<string, string>> = {
     "coger": "tomar",
     "prisas": "prisa",
     "dinero": "dinero",
+  },
+  "es-GQ": {
+    "ordenador": "computadora",
+    "coche": "carro",
+    "móvil": "celular",
+    "patata": "papa",
+    "gafas": "lentes",
+  },
+  "es-US": {
+    "ordenador": "computadora",
+    "coche": "carro",
+    "móvil": "celular",
+    "patata": "papa",
+    "gafas": "lentes",
+  },
+  "es-PH": {
+    "ordenador": "computadora",
+    "coche": "carro",
+    "móvil": "celular",
+    "patata": "papa",
+    "gafas": "lentes",
+  },
+  "es-BZ": {
+    "ordenador": "computadora",
+    "coche": "carro",
+    "móvil": "celular",
+    "patata": "papa",
+    "gafas": "lentes",
+  },
+  "es-AD": {
+    "ordenador": "computadora",
+    "coche": "carro",
+    "móvil": "celular",
+    "patata": "papa",
+    "gafas": "lentes",
   },
 };
 
@@ -341,6 +372,7 @@ async function handleTranslateMissingKeys(
 
     // Translate missing keys
     let translatedCount = 0;
+    const errors: string[] = [];
     const updatedTargetEntries = [...targetEntries];
 
     for (const key of missingKeys) {
@@ -348,11 +380,19 @@ async function handleTranslateMissingKeys(
       if (!baseEntry) continue;
 
       try {
-        const result = await provider.translate(
+        const prepared = prepareProviderRequest(
+          registry,
+          provider.name,
           baseEntry.value,
           "en",
           params.dialect || "es-ES",
           { dialect: params.dialect }
+        );
+        const result = await provider.translate(
+          baseEntry.value,
+          prepared.sourceLang,
+          prepared.targetLang,
+          prepared.options
         );
 
         updatedTargetEntries.push({
@@ -361,7 +401,8 @@ async function handleTranslateMissingKeys(
         });
         translatedCount++;
       } catch (error) {
-        // Silently skip failed translations — provider already handles error logging
+        const safe = createSafeError(error);
+        errors.push(`${key}: ${safe.error}`);
       }
     }
 
@@ -375,9 +416,12 @@ async function handleTranslateMissingKeys(
           text: JSON.stringify({
             translatedCount,
             missingKeys,
+            errors,
+            skippedCount: errors.length,
           }),
         },
       ],
+      isError: translatedCount === 0 && missingKeys.length > 0 && errors.length > 0,
     };
   } catch (error) {
     const safeError = createSafeError(error);
@@ -464,11 +508,19 @@ async function handleBatchTranslateLocales(
         // Translate missing keys
         for (const entry of missingEntries) {
           try {
-            const result = await provider.translate(
+            const prepared = prepareProviderRequest(
+              registry,
+              provider.name,
               entry.value,
               "en",
               targetDialect,
               { dialect: targetDialect }
+            );
+            const result = await provider.translate(
+              entry.value,
+              prepared.sourceLang,
+              prepared.targetLang,
+              prepared.options
             );
 
             targetEntries.push({

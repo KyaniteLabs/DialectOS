@@ -238,7 +238,6 @@ describe("Zod Validation Schemas", () => {
   describe("providerNameSchema", () => {
     it("should accept valid providers", () => {
       expect(() => providerNameSchema.parse("deepl")).not.toThrow();
-      expect(() => providerNameSchema.parse("deepl-free")).not.toThrow();
       expect(() => providerNameSchema.parse("libre")).not.toThrow();
       expect(() => providerNameSchema.parse("mymemory")).not.toThrow();
     });
@@ -247,6 +246,7 @@ describe("Zod Validation Schemas", () => {
       expect(() => providerNameSchema.parse("google")).toThrow();
       expect(() => providerNameSchema.parse("")).toThrow();
       expect(() => providerNameSchema.parse("deeplx")).toThrow();
+      expect(() => providerNameSchema.parse("deepl-free")).toThrow();
     });
   });
 

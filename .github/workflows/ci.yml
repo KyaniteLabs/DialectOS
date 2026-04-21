@@ -31,6 +31,17 @@ jobs:
 
       - run: pnpm build
 
+      - name: Verify npm package contents
+        run: |
+          for pkg in packages/*; do
+            (cd "$pkg" && npm pack --dry-run) >/tmp/"$(basename "$pkg")"-pack.txt 2>&1
+            if grep -E 'src/__tests__|src/.*\.test\.ts|fixtures/' /tmp/"$(basename "$pkg")"-pack.txt; then
+              echo "Unexpected test/source fixture content in package $pkg"
+              cat /tmp/"$(basename "$pkg")"-pack.txt
+              exit 1
+            fi
+          done
+
       - run: pnpm test
 
   adversarial-ci:

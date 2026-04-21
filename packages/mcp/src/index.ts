@@ -17,6 +17,9 @@ import { registerDocsTools } from "./tools/docs.js";
 import { registerI18nTools } from "./tools/i18n.js";
 import { registerTranslatorTools } from "./tools/translator.js";
 import { setupGlobalHandlers } from "./lib/error-handler.js";
+import { loadConfig, getConfigPath, type MCPConfig } from "./lib/config.js";
+import { createProviderRegistry } from "./lib/provider-factory.js";
+import { RateLimiter } from "@espanol/security";
 
 // ============================================================================
 // MCP Server Setup
@@ -25,21 +28,27 @@ import { setupGlobalHandlers } from "./lib/error-handler.js";
 /**
  * Create and configure the MCP server
  */
-function createServer(): McpServer {
+function createServer(config: MCPConfig = loadConfig()): McpServer {
   const server = new McpServer(
     {
       name: "@espanol/mcp",
-      version: "0.1.1",
+      version: "0.1.0",
     },
     {
       capabilities: {},
     }
   );
 
+  const registry = createProviderRegistry();
+  const rateLimiter = new RateLimiter(
+    config.rateLimit.maxRequests,
+    config.rateLimit.windowMs
+  );
+
   // Register all tool categories (16 tools total)
-  registerDocsTools(server);
-  registerI18nTools(server);
-  registerTranslatorTools(server);
+  registerDocsTools(server, { registry, rateLimiter });
+  registerI18nTools(server, { registry, rateLimiter });
+  registerTranslatorTools(server, { registry, rateLimiter });
 
   return server;
 }
@@ -53,7 +62,7 @@ function createServer(): McpServer {
  */
 async function main(): Promise<void> {
   setupGlobalHandlers();
-  const server = createServer();
+  const server = createServer(loadConfig(getConfigPath()));
 
   const transport = new StdioServerTransport();
   await server.connect(transport);

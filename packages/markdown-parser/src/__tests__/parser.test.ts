@@ -737,6 +737,33 @@ describe("reconstructMarkdown", () => {
     expect(result).toContain("|");
   });
 
+  it("should reconstruct translated table cells while preserving separators", () => {
+    const sections: MarkdownSection[] = [
+      {
+        type: "table",
+        content: "Name Description Create item Delete item",
+        raw: "| Name | Description |\n| --- | --- |\n| Create | Create item |\n| Delete | Delete item |",
+        translatable: true,
+      },
+    ];
+    const translatedSections: MarkdownSection[] = [
+      {
+        type: "table",
+        content: "Nombre Descripción Crear Crear elemento Eliminar Eliminar elemento",
+        raw: sections[0].raw,
+        translatable: true,
+      },
+    ];
+
+    const result = reconstructMarkdown(sections, translatedSections);
+
+    expect(result).toContain("| Nombre | Descripción |");
+    expect(result).toContain("| Crear | Crear elemento |");
+    expect(result).toContain("| Eliminar | Eliminar elemento |");
+    expect(result).toContain("| --- | --- |");
+    expect(result).not.toContain("| Name | Description |");
+  });
+
   it("should preserve blockquote markers", () => {
     const sections: MarkdownSection[] = [
       {

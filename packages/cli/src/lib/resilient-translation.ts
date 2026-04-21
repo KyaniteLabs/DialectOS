@@ -5,6 +5,12 @@ export interface AdaptivePacingState {
   delayMs: number;
 }
 
+export interface ResilientTranslationResult extends TranslationResult {
+  providerUsed: string;
+  fallbackCount: number;
+  retryCount: number;
+}
+
 const THROTTLE_PATTERN = /(too many requests|rate limit|429)/i;
 
 export function isThrottleError(error: unknown): boolean {
@@ -34,18 +40,39 @@ export async function translateWithFallback(
   targetLang: string,
   options: TranslateOptions,
   pacing: AdaptivePacingState
-): Promise<TranslationResult> {
+): Promise<ResilientTranslationResult> {
   const chain = buildProviderChain(registry, preferredProvider);
   const errors: string[] = [];
 
-  for (const name of chain) {
+  for (const [attemptIndex, name] of chain.entries()) {
     await waitAdaptive(pacing);
     try {
       const provider = registry.get(name);
-      const result = await provider.translate(text, sourceLang, targetLang, options);
+      const maybeRegistry = registry as ProviderRegistry & {
+        prepareRequest?: ProviderRegistry["prepareRequest"];
+      };
+      const prepared = maybeRegistry.prepareRequest?.(
+        name,
+        text,
+        sourceLang,
+        targetLang,
+        options
+      ) ?? { sourceLang, targetLang, options };
+      const result = await provider.translate(
+        text,
+        prepared.sourceLang,
+        prepared.targetLang,
+        prepared.options
+      );
       pacing.delayMs = nextDelay(pacing.delayMs, false);
       registry.recordSuccess(name);
-      return result;
+      return {
+        ...result,
+        provider: result.provider ?? (provider.name as TranslationResult["provider"]),
+        providerUsed: provider.name,
+        fallbackCount: attemptIndex,
+        retryCount: 0,
+      };
     } catch (error) {
       const throttled = isThrottleError(error);
       pacing.delayMs = nextDelay(pacing.delayMs, throttled);
@@ -69,7 +96,7 @@ function buildProviderChain(
   const priority =
     envPriority.length > 0
       ? envPriority
-      : ["libre", "deepl", "deepl-free", "mymemory"];
+      : ["libre", "deepl", "mymemory"];
   const available = registry.listProviders().filter((name) => registry.isAvailable(name));
   const ordered = priority.filter((name) => available.includes(name));
   const remainder = available.filter((name) => !ordered.includes(name));

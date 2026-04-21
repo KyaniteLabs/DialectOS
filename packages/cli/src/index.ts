@@ -140,6 +140,7 @@ program
         checkpointFile: options.checkpointFile as string | undefined,
         resume: profile.resume,
         failurePolicy: profile.failurePolicy,
+        policy: profile.profile,
       };
 
       await executeTranslateApiDocs(input, mergedOptions.dialect!, mergedOptions, () => registry);

@@ -524,7 +524,7 @@ describe("MCP Translator Tools", () => {
   });
 
   describe("list_dialects tool", () => {
-    it("should list all 20 Spanish dialects", async () => {
+    it("should list all 25 Spanish dialects", async () => {
       const { registerTranslatorTools } = await import("../tools/translator.js");
       const mockServer = {
         tool: vi.fn(),
@@ -544,8 +544,8 @@ describe("MCP Translator Tools", () => {
       const parsedResult = JSON.parse(result.content[0].text);
       expect(parsedResult.dialects).toBeDefined();
       expect(Array.isArray(parsedResult.dialects)).toBe(true);
-      expect(parsedResult.dialects.length).toBe(20);
-      expect(parsedResult.count).toBe(20);
+      expect(parsedResult.dialects.length).toBe(25);
+      expect(parsedResult.count).toBe(25);
 
       // Check structure of first dialect
       expect(parsedResult.dialects[0]).toHaveProperty("code");
@@ -574,6 +574,11 @@ describe("MCP Translator Tools", () => {
       expect(dialectCodes).toContain("es-MX");
       expect(dialectCodes).toContain("es-AR");
       expect(dialectCodes).toContain("es-CO");
+      expect(dialectCodes).toContain("es-GQ");
+      expect(dialectCodes).toContain("es-US");
+      expect(dialectCodes).toContain("es-PH");
+      expect(dialectCodes).toContain("es-BZ");
+      expect(dialectCodes).toContain("es-AD");
     });
   });
 

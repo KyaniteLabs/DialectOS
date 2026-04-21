@@ -25,6 +25,8 @@ export interface TranslationPolicy {
   protectIdentities: boolean;
   /** Whether to resume from checkpoints */
   resume: boolean;
+  /** Minimum semantic similarity required before output is considered safe */
+  semanticThreshold: number | null;
 }
 
 const POLICY_PRESETS: Record<PolicyProfile, TranslationPolicy> = {
@@ -36,6 +38,7 @@ const POLICY_PRESETS: Record<PolicyProfile, TranslationPolicy> = {
     glossaryMode: "strict",
     protectIdentities: true,
     resume: true,
+    semanticThreshold: 0.6,
   },
   balanced: {
     profile: "balanced",
@@ -45,6 +48,7 @@ const POLICY_PRESETS: Record<PolicyProfile, TranslationPolicy> = {
     glossaryMode: "strict",
     protectIdentities: true,
     resume: true,
+    semanticThreshold: 0.4,
   },
   permissive: {
     profile: "permissive",
@@ -54,6 +58,7 @@ const POLICY_PRESETS: Record<PolicyProfile, TranslationPolicy> = {
     glossaryMode: "off",
     protectIdentities: false,
     resume: false,
+    semanticThreshold: null,
   },
 };
 
@@ -100,4 +105,21 @@ export function listPolicyProfiles(): { name: PolicyProfile; description: string
         "Maximize throughput: skip validation, allow partial failures, disable glossary and identity protection. Suitable for drafts.",
     },
   ];
+}
+
+export function shouldFailSemanticQuality(
+  policy: TranslationPolicy,
+  semanticSimilarity: number
+): boolean {
+  return policy.semanticThreshold !== null && semanticSimilarity < policy.semanticThreshold;
+}
+
+export function formatSemanticQualityError(
+  policy: TranslationPolicy,
+  semanticSimilarity: number
+): string {
+  const threshold = policy.semanticThreshold ?? 0;
+  return `Semantic quality gate failed for ${policy.profile} policy: ${(semanticSimilarity * 100).toFixed(
+    0
+  )}% is below required ${(threshold * 100).toFixed(0)}%`;
 }

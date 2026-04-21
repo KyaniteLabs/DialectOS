@@ -18,8 +18,6 @@ class MockSecurityError extends Error {
 
 // Mock fs module
 vi.mock("node:fs", () => ({
-  readFileSync: vi.fn(),
-  writeFileSync: vi.fn(),
   existsSync: vi.fn().mockReturnValue(true),
   statSync: vi.fn().mockReturnValue({ isDirectory: () => true }),
 }));
@@ -414,6 +412,35 @@ describe("MCP i18n Tools", () => {
       const parsedResult = JSON.parse(result.content[0].text);
       expect(parsedResult.adapted).toBe(false);
       expect(parsedResult.changes).toEqual([]);
+    });
+
+    it("should apply adaptations for newly supported dialects", async () => {
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "computer", value: "El ordenador está en el coche" },
+      ]);
+
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = {
+        tool: vi.fn(),
+      };
+
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+
+      const dialectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "manage_dialect_variants"
+      );
+      const handler = dialectCall![3];
+
+      await handler({
+        sourcePath: "/test/es-ES.json",
+        variant: "es-US" as const,
+        outputPath: "/test/es-US.json",
+      } as any);
+
+      const writtenEntries = vi.mocked(writeLocaleFile).mock.calls[0][1];
+      expect(writtenEntries).toEqual([
+        { key: "computer", value: "El computadora está en el carro" },
+      ]);
     });
   });
 

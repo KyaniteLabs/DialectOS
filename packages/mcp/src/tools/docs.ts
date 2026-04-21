@@ -19,19 +19,18 @@ import type {
 import {
   parseMarkdown,
   reconstructMarkdown,
-  extractTranslatableText,
 } from "@espanol/markdown-parser";
 import {
   validateMarkdownPath,
   validateContentLength,
   RateLimiter,
-  SecurityError,
   createSafeError,
 } from "@espanol/security";
 import type { ProviderRegistry } from "@espanol/providers";
 import { ToolResult } from "../lib/types.js";
 import type { BaseToolOptions } from "../lib/types.js";
 import { createProviderRegistry as createProviderRegistryImpl } from "../lib/provider-factory.js";
+import { prepareProviderRequest } from "../lib/provider-request.js";
 
 // Re-export for backward compatibility
 export { createProviderRegistryImpl as createProviderRegistry };
@@ -113,11 +112,19 @@ async function handleTranslateMarkdown(
         translatedSections.push(section);
       } else {
         // Translate the content
-        const result = await provider.translate(
+        const prepared = prepareProviderRequest(
+          registry,
+          provider.name,
           section.content,
           "en",
           params.dialect || "es-ES",
           { formality, dialect: params.dialect }
+        );
+        const result = await provider.translate(
+          section.content,
+          prepared.sourceLang,
+          prepared.targetLang,
+          prepared.options
         );
 
         translatedSections.push({
@@ -183,9 +190,6 @@ async function handleExtractTranslatable(
 
     // Parse markdown
     const parsed = parseMarkdown(content);
-
-    // Extract translatable text
-    const translatableTexts = extractTranslatableText(parsed);
 
     // Build sections array
     const sections = parsed.sections
@@ -261,7 +265,9 @@ async function handleTranslateApiDocs(
         translatedSections.push(section);
       } else {
         // For API docs, add context about documentation
-        const result = await provider.translate(
+        const prepared = prepareProviderRequest(
+          registry,
+          provider.name,
           section.content,
           "en",
           params.dialect || "es-ES",
@@ -269,6 +275,12 @@ async function handleTranslateApiDocs(
             context: "API documentation",
             dialect: params.dialect,
           }
+        );
+        const result = await provider.translate(
+          section.content,
+          prepared.sourceLang,
+          prepared.targetLang,
+          prepared.options
         );
 
         translatedSections.push({
@@ -347,11 +359,19 @@ async function handleCreateBilingualDoc(
         bilingualParts.push(section.raw);
       } else {
         // Translate the content
-        const result = await provider.translate(
+        const prepared = prepareProviderRequest(
+          registry,
+          provider.name,
           section.content,
           "en",
           params.dialect || "es-ES",
           { dialect: params.dialect }
+        );
+        const result = await provider.translate(
+          section.content,
+          prepared.sourceLang,
+          prepared.targetLang,
+          prepared.options
         );
 
         // Add side-by-side sections

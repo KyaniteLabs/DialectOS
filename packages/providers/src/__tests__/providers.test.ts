@@ -280,6 +280,31 @@ describe("ProviderRegistry", () => {
     expect(retrieved).toBe(mockProvider);
   });
 
+  it("should resolve canonical provider aliases", () => {
+    const registry = new ProviderRegistry();
+    const libreProvider: TranslationProvider = {
+      name: "libretranslate",
+      translate: async () => ({ translatedText: "test" }),
+    };
+
+    registry.register(libreProvider);
+
+    expect(registry.get("libre")).toBe(libreProvider);
+    expect(registry.isAvailable("libre")).toBe(true);
+  });
+
+  it("should not alias nonexistent DeepL free provider to DeepL", () => {
+    const registry = new ProviderRegistry();
+    const deeplProvider: TranslationProvider = {
+      name: "deepl",
+      translate: async () => ({ translatedText: "test" }),
+    };
+
+    registry.register(deeplProvider);
+
+    expect(() => registry.get("deepl-free")).toThrow("Provider not available");
+  });
+
   it("should throw when getting non-existent provider", () => {
     const registry = new ProviderRegistry();
 
@@ -990,6 +1015,35 @@ describe("Provider capabilities", () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].reason).toContain("does not support dialect");
+  });
+
+  it("Registry should prepare dialect requests for providers without native dialect support", () => {
+    const registry = new ProviderRegistry();
+    const provider: TranslationProvider = {
+      name: "nodialect",
+      translate: async () => ({ translatedText: "test" }),
+      getCapabilities: () => ({
+        name: "nodialect",
+        displayName: "No Dialect",
+        needsApiKey: false,
+        supportsFormality: false,
+        supportsContext: false,
+        supportsDialect: false,
+        supportedSourceLangs: ["en", "auto"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 10000,
+        dialectHandling: "none",
+      }),
+    };
+
+    registry.register(provider);
+    const prepared = registry.prepareRequest("nodialect", "hello", "en", "es-MX", {
+      dialect: "es-MX",
+    });
+
+    expect(prepared.targetLang).toBe("es");
+    expect(prepared.options).not.toHaveProperty("dialect");
+    expect(prepared.warnings).toContain("Provider nodialect does not support dialect es-MX; using generic Spanish target es");
   });
 
   it("Registry validateRequest should return empty for valid requests", () => {

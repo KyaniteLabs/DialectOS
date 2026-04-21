@@ -34,6 +34,12 @@ import {
   type AdaptivePacingState,
 } from "../lib/resilient-translation.js";
 import { calculateQualityScore } from "../lib/quality-score.js";
+import {
+  formatSemanticQualityError,
+  resolvePolicy,
+  shouldFailSemanticQuality,
+  type PolicyProfile,
+} from "../lib/translation-policy.js";
 
 // ============================================================================
 // extract-translatable Command
@@ -114,6 +120,8 @@ export interface TranslateApiDocsOptions {
   resume?: boolean;
   /** Behavior when one or more sections fail translation */
   failurePolicy?: "strict" | "allow-partial";
+  /** Operator policy profile */
+  policy?: PolicyProfile;
 }
 
 /**
@@ -354,6 +362,18 @@ export async function executeTranslateApiDocs(
       glossary?.mappings || {},
       validation.valid
     );
+    const policy = resolvePolicy(options?.policy || "balanced", {
+      failurePolicy: options?.failurePolicy,
+      validateStructure: options?.validateStructure,
+      structureMode: options?.structureMode,
+      glossaryMode,
+      protectIdentities,
+      resume,
+    });
+    const semanticGateApplies = content.trim().length >= 120 || translated.trim().length >= 120;
+    if (semanticGateApplies && shouldFailSemanticQuality(policy, quality.semanticSimilarity)) {
+      throw new Error(formatSemanticQualityError(policy, quality.semanticSimilarity));
+    }
     console.error(
       `[quality] score=${quality.score} token=${(quality.tokenIntegrity * 100).toFixed(
         0

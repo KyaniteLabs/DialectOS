@@ -48,7 +48,7 @@ export const DEFAULT_DIALECT: SpanishDialect = "es-ES";
 /**
  * Supported translation providers
  */
-export type ProviderName = "deepl" | "deepl-free" | "libre" | "mymemory";
+export type ProviderName = "deepl" | "libre" | "mymemory";
 
 /**
  * Translation options
@@ -344,7 +344,7 @@ export const dialectSchema = z.enum([
 /**
  * Validates translation provider names
  */
-export const providerNameSchema = z.enum(["deepl", "deepl-free", "libre", "mymemory"], {
+export const providerNameSchema = z.enum(["deepl", "libre", "mymemory"], {
   message: "Invalid translation provider",
 });
 

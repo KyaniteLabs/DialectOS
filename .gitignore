@@ -10,3 +10,6 @@ coverage/
 
 # Translation checkpoints
 *.checkpoint.json
+
+# OMX runtime state
+.omx/

@@ -474,10 +474,7 @@ function reconstructSection(
     }
 
     case "table": {
-      // Tables: try to preserve structure
-      // This is a simplified version - a full implementation would
-      // parse the table structure and replace cell content
-      return original.raw; // Preserve original structure for now
+      return reconstructTable(original, translated);
     }
 
     case "list": {
@@ -532,6 +529,89 @@ function reconstructSection(
       return translated.content;
     }
   }
+}
+
+function splitTableRow(line: string): string[] {
+  const trimmed = line.trim();
+  const withoutOuter = trimmed.startsWith("|") && trimmed.endsWith("|")
+    ? trimmed.slice(1, -1)
+    : trimmed;
+  return withoutOuter.split("|").map((cell) => cell.trim());
+}
+
+function isAlignmentRow(line: string): boolean {
+  const cells = splitTableRow(line);
+  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell.trim()));
+}
+
+function formatTableRow(cells: string[], hadOuterPipes: boolean): string {
+  const body = cells.map((cell) => ` ${cell.trim()} `).join("|");
+  return hadOuterPipes ? `|${body}|` : body;
+}
+
+function tableContentCells(content: string): string[] | null {
+  const lines = content.split("\n").map((line) => line.trim()).filter(Boolean);
+  if (lines.length > 0 && lines.every((line) => line.includes("|"))) {
+    return lines
+      .filter((line) => !isAlignmentRow(line))
+      .flatMap(splitTableRow)
+      .filter((cell) => cell.length > 0);
+  }
+  return null;
+}
+
+function translatedCellsByOriginalShape(originalCells: string[], translatedContent: string): string[] {
+  const tableCells = tableContentCells(translatedContent);
+  if (tableCells && tableCells.length === originalCells.length) {
+    return tableCells;
+  }
+
+  const translatedWords = translatedContent.split(/\s+/).filter(Boolean);
+  if (translatedWords.length === 0) {
+    return [];
+  }
+
+  const cells: string[] = [];
+  let wordIndex = 0;
+  for (const originalCell of originalCells) {
+    const wordCount = Math.max(originalCell.split(/\s+/).filter(Boolean).length, 1);
+    const next = translatedWords.slice(wordIndex, wordIndex + wordCount);
+    if (next.length < wordCount) {
+      return [];
+    }
+    cells.push(next.join(" "));
+    wordIndex += wordCount;
+  }
+
+  if (wordIndex !== translatedWords.length) {
+    return [];
+  }
+
+  return cells;
+}
+
+function reconstructTable(original: MarkdownSection, translated: MarkdownSection): string {
+  const lines = original.raw.split("\n");
+  const dataRows = lines
+    .map((line, index) => ({ line, index }))
+    .filter(({ line }) => line.includes("|") && !isAlignmentRow(line));
+  const originalCells = dataRows.flatMap(({ line }) => splitTableRow(line));
+  const translatedCells = translatedCellsByOriginalShape(originalCells, translated.content);
+
+  if (originalCells.length === 0 || translatedCells.length !== originalCells.length) {
+    return original.raw;
+  }
+
+  let translatedIndex = 0;
+  const rebuilt = [...lines];
+  for (const { line, index } of dataRows) {
+    const cellCount = splitTableRow(line).length;
+    const rowCells = translatedCells.slice(translatedIndex, translatedIndex + cellCount);
+    translatedIndex += cellCount;
+    rebuilt[index] = formatTableRow(rowCells, line.trim().startsWith("|") && line.trim().endsWith("|"));
+  }
+
+  return rebuilt.join("\n");
 }
 
 // ============================================================================

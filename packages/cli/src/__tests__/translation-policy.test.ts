@@ -6,6 +6,7 @@
 import { describe, it, expect } from "vitest";
 import {
   resolvePolicy,
+  shouldFailSemanticQuality,
   listPolicyProfiles,
   type PolicyProfile,
 } from "../lib/translation-policy.js";
@@ -82,6 +83,17 @@ describe("translation policy", () => {
       expect(profiles[0].description).toContain("production");
       expect(profiles[1].description).toContain("CI");
       expect(profiles[2].description).toContain("drafts");
+    });
+  });
+
+  describe("semantic quality gates", () => {
+    it("should fail strict and balanced profiles on low semantic similarity", () => {
+      expect(shouldFailSemanticQuality(resolvePolicy("strict"), 0.59)).toBe(true);
+      expect(shouldFailSemanticQuality(resolvePolicy("balanced"), 0.39)).toBe(true);
+    });
+
+    it("should not fail permissive profile on low semantic similarity", () => {
+      expect(shouldFailSemanticQuality(resolvePolicy("permissive"), 0.01)).toBe(false);
     });
   });
 });

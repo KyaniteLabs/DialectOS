@@ -42,6 +42,28 @@ describe("Configuration System", () => {
     expect(config.rateLimit.windowMs).toBe(30000);
   });
 
+
+
+  it("should not leak env overrides into later default config loads", async () => {
+    const { loadConfig } = await import("../lib/config.js");
+
+    vi.stubEnv("ESPANOL_RATE_LIMIT", "120,30000");
+    expect(loadConfig().rateLimit.maxRequests).toBe(120);
+
+    vi.unstubAllEnvs();
+    delete process.env.ESPANOL_RATE_LIMIT;
+
+    expect(loadConfig().rateLimit.maxRequests).toBe(60);
+    expect(loadConfig().rateLimit.windowMs).toBe(60000);
+  });
+
+  it("should fail fast on invalid numeric env vars", async () => {
+    vi.stubEnv("ESPANOL_RATE_LIMIT", "many,soon");
+    const { loadConfig } = await import("../lib/config.js");
+
+    expect(() => loadConfig()).toThrow(/Invalid MCP config env ESPANOL_RATE_LIMIT/);
+  });
+
   it("should override max file size from env var", async () => {
     vi.stubEnv("ESPANOL_MAX_FILE_SIZE", "1048576");
     const { loadConfig } = await import("../lib/config.js");
@@ -56,6 +78,14 @@ describe("Configuration System", () => {
     const config = loadConfig();
 
     expect(config.security.allowedDirs).toEqual(["/locales", "/data"]);
+  });
+
+
+  it("should fail fast on invalid log level env var", async () => {
+    vi.stubEnv("ESPANOL_LOG_LEVEL", "verbose");
+    const { loadConfig } = await import("../lib/config.js");
+
+    expect(() => loadConfig()).toThrow(/Invalid MCP config env ESPANOL_LOG_LEVEL/);
   });
 
   it("should parse config file", async () => {
@@ -74,15 +104,14 @@ describe("Configuration System", () => {
     expect(config.logging.level).toBe("debug");
   });
 
-  it("should ignore invalid config file and use defaults", async () => {
+  it("should fail fast on invalid config file", async () => {
     mkdirSync(tempDir, { recursive: true });
     const configPath = join(tempDir, "bad.json");
     writeFileSync(configPath, "not valid json{{{");
 
     const { loadConfig } = await import("../lib/config.js");
-    const config = loadConfig(configPath);
 
-    expect(config.rateLimit.maxRequests).toBe(60);
+    expect(() => loadConfig(configPath)).toThrow(/Invalid MCP config/);
   });
 
   it("should get config path from CLI args", async () => {

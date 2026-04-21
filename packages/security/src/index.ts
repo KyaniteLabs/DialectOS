@@ -540,13 +540,6 @@ export function createSafeError(error: unknown): {
   error: string;
   code: ErrorCode;
 } {
-  // Log the real error for debugging
-  if (error instanceof Error) {
-    console.error(`[Security] ${error.name}: ${error.message}`);
-  } else {
-    console.error(`[Security] ${String(error)}`);
-  }
-
   // Extract message
   const message =
     error instanceof Error ? error.message : String(error);

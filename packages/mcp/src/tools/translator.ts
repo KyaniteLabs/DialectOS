@@ -32,12 +32,10 @@ import {
 } from "@espanol/security";
 import {
   ProviderRegistry,
-  DeepLProvider,
-  LibreTranslateProvider,
-  MyMemoryProvider,
 } from "@espanol/providers";
 import { ToolResult } from "../lib/types.js";
 import { createProviderRegistry } from "../lib/provider-factory.js";
+import { prepareProviderRequest } from "../lib/provider-request.js";
 
 // ============================================================================
 // Types
@@ -80,7 +78,7 @@ interface ListDialectsParams {}
 // ============================================================================
 
 /**
- * Metadata for all 20 Spanish dialects with detection keywords
+ * Metadata for all 25 Spanish dialects with detection keywords
  */
 const DIALECT_METADATA: Array<{
   code: SpanishDialect;
@@ -428,6 +426,36 @@ const DIALECT_METADATA: Array<{
       "broki",
     ],
   },
+  {
+    code: "es-GQ",
+    name: "Equatoguinean Spanish",
+    description: "Spanish spoken in Equatorial Guinea",
+    keywords: ["guineano", "malabo", "bubi", "fang", "annobón", "bioko", "ñame", "fufú"],
+  },
+  {
+    code: "es-US",
+    name: "U.S. Spanish",
+    description: "Spanish spoken in the United States by Chicano and heritage communities",
+    keywords: ["troca", "parquear", "lonche", "wacha", "cholo", "vato", "carnal", "neta"],
+  },
+  {
+    code: "es-PH",
+    name: "Philippine Spanish",
+    description: "Spanish and Chavacano-influenced Spanish from the Philippines",
+    keywords: ["jendeh", "kame", "kita", "quilaya", "tamén", "onde", "conele", "vusos"],
+  },
+  {
+    code: "es-BZ",
+    name: "Belizean Spanish",
+    description: "Spanish spoken in Belize",
+    keywords: ["beliceño", "kriol", "garífuna", "cayos", "mestizo", "criollo", "dangriga", "mopan"],
+  },
+  {
+    code: "es-AD",
+    name: "Andorran Spanish",
+    description: "Catalan-influenced Spanish from Andorra",
+    keywords: ["andorrano", "canillo", "escaldes", "encamp", "ordino", "massana", "pirineo", "andorra"],
+  },
 ];
 
 // ============================================================================
@@ -528,11 +556,19 @@ async function handleTranslateText(
     if (params.informal) formality = "informal";
 
     // Translate
-    const result = await provider.translate(
+    const prepared = prepareProviderRequest(
+      registry,
+      provider.name,
       params.text,
       "en",
       params.dialect || "es-ES",
       { formality, dialect: params.dialect }
+    );
+    const result = await provider.translate(
+      params.text,
+      prepared.sourceLang,
+      prepared.targetLang,
+      prepared.options
     );
 
     return {
@@ -702,15 +738,24 @@ async function handleTranslateCodeComment(
 
     // Translate each comment sequentially
     let commentsTranslated = 0;
+    const errors: string[] = [];
     const replacements: Array<{ original: string; translated: string }> = [];
 
     for (const comment of comments) {
       try {
-        const result = await provider.translate(
+        const prepared = prepareProviderRequest(
+          registry,
+          provider.name,
           comment.content,
           "en",
           params.dialect || "es-ES",
           { context: "code comment", dialect: params.dialect }
+        );
+        const result = await provider.translate(
+          comment.content,
+          prepared.sourceLang,
+          prepared.targetLang,
+          prepared.options
         );
 
         const translated = comment.isSingleLine
@@ -719,8 +764,9 @@ async function handleTranslateCodeComment(
 
         replacements.push({ original: comment.full, translated });
         commentsTranslated++;
-      } catch {
-        // Skip failed translations
+      } catch (error) {
+        const safe = createSafeError(error);
+        errors.push(`comment@${comment.index}: ${safe.error}`);
       }
     }
 
@@ -738,9 +784,12 @@ async function handleTranslateCodeComment(
           text: JSON.stringify({
             translatedCode,
             commentsTranslated,
+            errors,
+            skippedCount: errors.length,
           }),
         },
       ],
+      isError: commentsTranslated === 0 && comments.length > 0 && errors.length > 0,
     };
   } catch (error) {
     const safeError = createSafeError(error);
@@ -804,11 +853,19 @@ async function handleTranslateReadme(
           codeBlocksPreserved++;
         }
       } else {
-        const result = await provider.translate(
+        const prepared = prepareProviderRequest(
+          registry,
+          provider.name,
           section.content,
           "en",
           params.dialect || "es-ES",
           { formality, dialect: params.dialect }
+        );
+        const result = await provider.translate(
+          section.content,
+          prepared.sourceLang,
+          prepared.targetLang,
+          prepared.options
         );
 
         translatedSections.push({

@@ -461,6 +461,14 @@ describe("createSafeError", () => {
     expect(result).toHaveProperty("error");
     expect(result).toHaveProperty("code");
   });
+
+  it("should not log as a side effect", () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    createSafeError(new Error("safe response only"));
+
+    expect(errorSpy).not.toHaveBeenCalled();
+  });
 });
 
 describe("RateLimiter", () => {

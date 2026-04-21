@@ -44,7 +44,12 @@ import {
   type AdaptivePacingState,
 } from "../lib/resilient-translation.js";
 import { calculateQualityScore } from "../lib/quality-score.js";
-import { resolvePolicy, type PolicyProfile } from "../lib/translation-policy.js";
+import {
+  formatSemanticQualityError,
+  resolvePolicy,
+  shouldFailSemanticQuality,
+  type PolicyProfile,
+} from "../lib/translation-policy.js";
 import { TelemetryCollector, globalTelemetry } from "../lib/telemetry.js";
 
 interface TranslateReadmeOptions {
@@ -168,9 +173,9 @@ async function translateReadme(
   getRegistry: () => ProviderRegistry
 ): Promise<TranslateReadmeResult> {
   const startTime = Date.now();
+  let providerUsed: string | undefined;
   let fallbackCount = 0;
   let retryCount = 0;
-  let providerUsed: string | undefined;
 
   // 1. Validate input path
   const validatedPath = validateMarkdownPath(input);
@@ -277,6 +282,9 @@ async function translateReadme(
           restoreProtectedTokens(result.translatedText, protectedChunk.replacements),
           glossaryChunk.replacements
         );
+        providerUsed = result.providerUsed;
+        fallbackCount += result.fallbackCount;
+        retryCount += result.retryCount;
 
         // Create translated section
         translatedSections.push({
@@ -337,6 +345,18 @@ async function translateReadme(
     glossary?.mappings || {},
     validation.valid
   );
+  const policy = resolvePolicy(options.policy || "balanced", {
+    failurePolicy: options.failurePolicy,
+    validateStructure: options.validateStructure,
+    structureMode: options.structureMode,
+    glossaryMode,
+    protectIdentities: options.protectIdentities,
+    resume: options.resume,
+  });
+  const semanticGateApplies = content.trim().length >= 120 || translated.trim().length >= 120;
+  if (semanticGateApplies && shouldFailSemanticQuality(policy, quality.semanticSimilarity)) {
+    throw new Error(formatSemanticQualityError(policy, quality.semanticSimilarity));
+  }
   writeInfo(
     `[quality] score=${quality.score} token=${(quality.tokenIntegrity * 100).toFixed(
       0
