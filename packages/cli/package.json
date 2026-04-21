@@ -16,6 +16,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
+    "test:adversarial": "vitest run adversarial-fixtures",
     "clean": "rm -rf dist"
   },
   "dependencies": {
