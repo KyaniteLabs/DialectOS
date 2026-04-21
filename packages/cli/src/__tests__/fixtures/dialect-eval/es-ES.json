@@ -1,0 +1,22 @@
+[
+  {
+    "id": "es-plural-address",
+    "source": "You can all update your passwords now.",
+    "domain": "security",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Peninsular Spanish",
+      "vosotros/vosotras",
+      "coger is neutral in Spain",
+      "address contrast"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "güey",
+      "parce",
+      "boludo"
+    ],
+    "notes": "Spain can use vosotros and should not get Latin American slang."
+  }
+]

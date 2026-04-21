@@ -1,0 +1,44 @@
+[
+  {
+    "id": "pr-transit-neutral",
+    "source": "Take the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Puerto Rican",
+      "Use Puerto Rican vocabulary naturally",
+      "Use tú/usted and ustedes",
+      "avoid-by-default",
+      "never-unless-requested"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cabrón",
+      "bicho",
+      "puñeta"
+    ],
+    "notes": "PR can use guagua in the right context, but strong slang must not be introduced by default."
+  },
+  {
+    "id": "pr-support-formal",
+    "source": "Contact support if the payment fails.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "formal",
+      "support",
+      "Avoid strong slang",
+      "never-unless-requested"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "cabrón",
+      "bicho",
+      "puñeta"
+    ],
+    "notes": "Formal PR support copy should avoid slang."
+  }
+]

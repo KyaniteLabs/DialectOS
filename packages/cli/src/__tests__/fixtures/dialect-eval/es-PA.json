@@ -1,0 +1,43 @@
+[
+  {
+    "id": "pa-transit-neutral",
+    "source": "Take the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Panamanian",
+      "Use neutral Panamanian Spanish",
+      "Use ustedes plural",
+      "avoid-by-default",
+      "prefer-neutral-alternative"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cueco",
+      "chombo",
+      "yeyé"
+    ],
+    "notes": "Panama should default to bus/tomar-style neutral wording, not voseo or sensitive slang."
+  },
+  {
+    "id": "pa-support-formal",
+    "source": "Please update your password before continuing.",
+    "domain": "security",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Use usted",
+      "respectful",
+      "never-unless-requested"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "cueco",
+      "chombo",
+      "yeyé"
+    ],
+    "notes": "Support/security copy should be respectful and neutral."
+  }
+]

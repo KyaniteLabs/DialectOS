@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ar-informal-voseo",
+    "source": "You can update your account now.",
+    "domain": "support",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Argentine Spanish",
+      "Use pronominal and verbal voseo",
+      "Use ustedes for plural address",
+      "boludo"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros"
+    ],
+    "notes": "Informal Argentine output should preserve voseo but avoid unsafe slang unless requested."
+  }
+]

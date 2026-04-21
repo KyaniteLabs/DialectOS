@@ -1,0 +1,22 @@
+[
+  {
+    "id": "mx-ambiguous-coger",
+    "source": "Pick up the file before deployment.",
+    "domain": "technical",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Mexican Spanish",
+      "Avoid literal coger",
+      "prefer-neutral-alternative",
+      "Localize grammar"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "coger",
+      "vos",
+      "vosotros"
+    ],
+    "notes": "Mexico should avoid literal coger for pick up/take."
+  }
+]
