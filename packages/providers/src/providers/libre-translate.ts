@@ -3,7 +3,7 @@
  * Free, community-run translation service with optional authentication
  */
 
-import type { TranslationProvider, TranslationResult } from "../types.js";
+import type { TranslationProvider, TranslationResult, ProviderCapability } from "../types.js";
 import { CircuitBreaker } from "../circuit-breaker.js";
 import { RateLimiter, sanitizeErrorMessage, HTTP_TIMEOUT, validateContentLength, SecurityError, ErrorCode } from "@espanol/security";
 import { languageCodeSchema } from "@espanol/types";
@@ -92,6 +92,22 @@ export class LibreTranslateProvider implements TranslationProvider {
       options?.maxRequests || 60,
       options?.windowMs || 60000
     );
+  }
+
+  getCapabilities(): ProviderCapability {
+    return {
+      name: this.name,
+      displayName: "LibreTranslate",
+      needsApiKey: false,
+      supportsFormality: false,
+      supportsContext: false,
+      supportsDialect: false,
+      supportedSourceLangs: ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh", "ar"],
+      supportedTargetLangs: ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh", "ar"],
+      maxPayloadChars: 5000,
+      dialectHandling: "none",
+      rateLimitHints: { maxRequests: 60, windowMs: 60000 },
+    };
   }
 
   async translate(

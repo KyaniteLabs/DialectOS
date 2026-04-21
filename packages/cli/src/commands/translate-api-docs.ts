@@ -26,6 +26,7 @@ import {
   loadCheckpoint,
   saveCheckpoint,
   hashSource,
+  CURRENT_CHECKPOINT_SCHEMA_VERSION,
   type TranslationCheckpoint,
 } from "../lib/checkpoint.js";
 import {
@@ -245,6 +246,7 @@ async function translateSections(
         translatedByIndex[idx] = translated.section.content;
       }
       const state: TranslationCheckpoint = {
+        schemaVersion: CURRENT_CHECKPOINT_SCHEMA_VERSION,
         sourcePath,
         sourceHash,
         totalSections: parsed.sections.length,

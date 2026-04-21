@@ -1,0 +1,41 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem are you trying to solve?
+      placeholder: I need to translate the same content to multiple dialects at once...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature you'd like to see
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What workarounds or alternatives have you tried?
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Affected Package
+      options:
+        - cli
+        - mcp
+        - providers
+        - security
+        - types
+        - locale-utils
+        - markdown-parser
+        - Other / Not sure

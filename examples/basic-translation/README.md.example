@@ -1,0 +1,30 @@
+# My Awesome Project
+
+This is a sample README to demonstrate DialectOS translation.
+
+## Features
+
+- Fast and reliable
+- Supports multiple platforms
+- Easy to use
+
+## Installation
+
+```bash
+npm install my-awesome-project
+```
+
+## API Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/users` | GET | List all users |
+| `/users` | POST | Create a new user |
+
+## Contributing
+
+We welcome contributions! Please see our contributing guide.
+
+## License
+
+MIT

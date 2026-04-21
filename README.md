@@ -1,51 +1,65 @@
-# DialectOS
+<div align="center">
 
-Spanish dialect translation server built on the Model Context Protocol (MCP).
+# 🌎 DialectOS
 
-DialectOS provides 16 MCP tools that understand Spanish dialect differences — translating, detecting, and adapting content across 20 regional variants (es-ES, es-MX, es-AR, es-CO, etc.) while preserving markdown structure, code comments, and locale file formatting.
+**The first Model Context Protocol server built specifically for Spanish dialects.**
 
-## Architecture
+Translate, detect, and adapt content across **20 regional Spanish variants** while preserving markdown structure, code comments, and locale file formatting.
 
-```
-packages/
-├── mcp/              @espanol/mcp       — 16 MCP tools (stdio server)
-├── cli/              @espanol/cli       — CLI commands for translation workflows
-├── providers/        @espanol/providers — DeepL, LibreTranslate, MyMemory
-├── security/         @espanol/security  — Rate limiting, path validation, sanitization
-├── types/            @espanol/types    — Shared TypeScript types
-├── locale-utils/     @espanol/locale-utils   — Locale file diff/merge utilities
-└── markdown-parser/  @espanol/markdown-parser — Structure-preserving markdown parser
-```
+[![CI](https://github.com/Pastorsimon1798/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Pastorsimon1798/DialectOS/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-590%20passing-brightgreen)](https://github.com/Pastorsimon1798/DialectOS/actions)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
+[![pnpm](https://img.shields.io/badge/pnpm-9.15.0-orange)](package.json)
+[![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
+[![Security](https://img.shields.io/badge/security-hardened-success)](https://github.com/Pastorsimon1798/DialectOS/security)
 
-## 16 MCP Tools
+[📖 Documentation](https://github.com/Pastorsimon1798/DialectOS#readme) ·
+[🚀 Quick Start](#quick-start) ·
+[🛠️ MCP Tools](#mcp-tools) ·
+[📦 Packages](#packages) ·
+[🤝 Contributing](CONTRIBUTING.md) ·
+[📋 Roadmap](ROADMAP.md)
 
-**Markdown Translation (4)**
-- `translate_markdown` — Translate markdown while preserving structure
-- `extract_translatable` — Extract translatable text from markdown
-- `translate_api_docs` — Translate API documentation
-- `create_bilingual_doc` — Create side-by-side bilingual documents
+</div>
 
-**i18n Operations (6)**
-- `detect_missing_keys` — Compare locale files for missing keys
-- `translate_missing_keys` — Translate missing keys
-- `batch_translate_locales` — Batch translate to multiple dialects
-- `manage_dialect_variants` — Create dialect-specific variants
-- `check_formality` — Check formality consistency (tú vs usted)
-- `apply_gender_neutral` — Apply gender-neutral language (elles, latine, x)
+---
 
-**Translation (6)**
-- `translate_text` — Translate text to a specific Spanish dialect
-- `detect_dialect` — Detect Spanish dialect from text
-- `translate_code_comment` — Translate code comments (preserving code)
-- `translate_readme` — Translate README files
-- `search_glossary` — Search built-in glossary (500+ terms)
-- `list_dialects` — List all 20 supported dialects with metadata
+## ✨ What makes DialectOS different?
 
-## Quick Start
+| Feature | Google Translate | DeepL API | **DialectOS** |
+|---------|-----------------|-----------|---------------|
+| Spanish dialect awareness | ❌ Generic "Spanish" | ⚠️ Limited variants | ✅ **20 regional variants** |
+| MCP native integration | ❌ | ❌ | ✅ **16 MCP tools** |
+| Markdown structure preservation | ❌ | ❌ | ✅ **Tables, code blocks, links intact** |
+| i18n locale file support | ❌ | ❌ | ✅ **JSON/YAML/PO diff & merge** |
+| Gender-neutral language | ❌ | ❌ | ✅ **elles / latine / -x** |
+| Formality checking (tú vs usted) | ❌ | ❌ | ✅ **Cross-dialect consistency** |
+| Adversarial quality gates | ❌ | ❌ | ✅ **Semantic drift + structure validation** |
+| Self-hosted / free tier | ❌ Paid | ⚠️ Limited free | ✅ **LibreTranslate + MyMemory fallback** |
 
-### As MCP Server
+---
 
-Add to your MCP client configuration (e.g. Claude Desktop `claude_desktop_config.json`):
+## 🎯 Why this exists
+
+> *"We shipped a product to Mexico using our Spain Spanish translations. Users thought we were being intentionally rude."*
+
+Spanish is not one language — it's **20+ regional variants** with different vocabulary, formality levels, slang, and grammatical preferences. Existing translation tools treat Spanish as a monolith.
+
+**DialectOS solves this by:**
+- Understanding regional differences (es-MX vs es-ES vs es-AR vs es-CO...)
+- Preserving technical document structure during translation
+- Providing glossary enforcement for consistent terminology
+- Adding quality gates that catch semantic drift before it reaches users
+- Running as an MCP server so AI assistants can translate natively
+
+---
+
+## 🚀 Quick Start
+
+### 30-second MCP setup
+
+Add to your Claude Desktop, Cursor, or any MCP client:
 
 ```json
 {
@@ -54,73 +68,212 @@ Add to your MCP client configuration (e.g. Claude Desktop `claude_desktop_config
       "command": "npx",
       "args": ["-y", "@espanol/mcp"],
       "env": {
-        "ALLOWED_LOCALE_DIRS": "/path/to/your/locales"
+        "DEEPL_AUTH_KEY": "your-key",
+        "ALLOWED_LOCALE_DIRS": "/path/to/locales"
       }
     }
   }
 }
 ```
 
-### From Source
+### CLI install
+
+```bash
+# Install globally
+npm install -g @espanol/cli
+
+# Translate to Mexican Spanish
+espanol translate "Hello world" --dialect es-MX
+
+# Translate a README preserving structure
+espanol translate-readme README.md --dialect es-AR --output README.ar.md
+
+# Detect missing i18n keys
+espanol i18n detect-missing ./locales/en.json ./locales/es.json
+
+# List all supported dialects
+espanol dialects list
+```
+
+### From source
 
 ```bash
 git clone https://github.com/Pastorsimon1798/DialectOS.git
 cd DialectOS
 pnpm install
 pnpm build
-pnpm --filter @espanol/mcp start
+pnpm test        # 590 tests passing
 ```
 
-### CLI
+---
 
-```bash
-pnpm install -g @espanol/cli
-espanol translate "Hello world" --dialect es-MX
-espanol i18n detect-missing ./locales/en.json ./locales/es.json
-espanol dialects list
+## 🛠️ MCP Tools
+
+### Markdown Translation (4 tools)
+| Tool | Description |
+|------|-------------|
+| `translate_markdown` | Translate while preserving tables, code blocks, links |
+| `extract_translatable` | Extract only translatable text from markdown |
+| `translate_api_docs` | Translate API docs with table cell-level translation |
+| `create_bilingual_doc` | Side-by-side bilingual documents |
+
+### i18n Operations (6 tools)
+| Tool | Description |
+|------|-------------|
+| `detect_missing_keys` | Compare locale files for missing keys |
+| `translate_missing_keys` | Auto-translate missing keys |
+| `batch_translate_locales` | Batch translate to multiple dialects |
+| `manage_dialect_variants` | Create dialect-specific variants |
+| `check_formality` | Check tú vs usted consistency |
+| `apply_gender_neutral` | Apply gender-neutral language |
+
+### Translation (6 tools)
+| Tool | Description |
+|------|-------------|
+| `translate_text` | Translate to any Spanish dialect |
+| `detect_dialect` | Detect dialect from sample text |
+| `translate_code_comment` | Translate comments, preserve code |
+| `translate_readme` | Full README translation pipeline |
+| `search_glossary` | Search 500+ term glossary |
+| `list_dialects` | List all 20 supported dialects |
+
+---
+
+## 📦 Packages
+
+| Package | Version | Description | Tests |
+|---------|---------|-------------|-------|
+| [`@espanol/mcp`](packages/mcp) | `0.1.0` | 16 MCP tools (stdio server) | 80 |
+| [`@espanol/cli`](packages/cli) | `0.1.0` | CLI commands for translation workflows | 218 |
+| [`@espanol/providers`](packages/providers) | `0.1.0` | DeepL, LibreTranslate, MyMemory with circuit breaker | 58 |
+| [`@espanol/security`](packages/security) | `0.1.0` | Rate limiting, SSRF protection, sanitization | 65 |
+| [`@espanol/types`](packages/types) | `0.1.0` | Shared TypeScript types | 41 |
+| [`@espanol/locale-utils`](packages/locale-utils) | `0.1.0` | Locale file diff/merge utilities | 55 |
+| [`@espanol/markdown-parser`](packages/markdown-parser) | `0.1.0` | Structure-preserving markdown parser | 73 |
+
+**Total: 590 tests across 7 packages**
+
+---
+
+## 🛡️ Security & Quality
+
+DialectOS has undergone adversarial security hardening:
+
+- **18 CVEs resolved** via dependency overrides
+- **SSRF protection** on all provider endpoints
+- **Circuit breaker** with half-open probe locks
+- **Atomic checkpoint writes** with schema versioning
+- **HTML injection detection** in translated output
+- **Semantic drift scoring** — catches "looks valid but meaning changed"
+- **Provider capability negotiation** — validates language support before API calls
+- **Chaos harness** for deterministic resilience testing
+
+See [`SECURITY.md`](SECURITY.md) for details.
+
+---
+
+## 🎨 Supported Dialects
+
+| Code | Region | Example Difference |
+|------|--------|-------------------|
+| `es-ES` | Spain | *"Coche"* (car), *"Ordenador"* (computer) |
+| `es-MX` | Mexico | *"Carro"*, *"Computadora"* |
+| `es-AR` | Argentina | *"Auto"*, *"Computadora"*, *"Che"* |
+| `es-CO` | Colombia | *"Carro"*, *"Computador"* |
+| `es-CL` | Chile | *"Auto"*, *"Computador"* |
+| `es-PE` | Peru | *"Carro"*, *"Computadora"* |
+| `es-VE` | Venezuela | *"Carro"*, *"Computadora"* |
+| `es-UY` | Uruguay | *"Auto"*, *"Computadora"* |
+
+...and 12 more. Full list via `espanol dialects list`.
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        MCP Client                            │
+│              (Claude Desktop / Cursor / etc.)                │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ stdio
+┌──────────────────────▼──────────────────────────────────────┐
+│                   @espanol/mcp                               │
+│              16 tools • JSON-RPC over stdio                  │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────────┐
+│                   @espanol/cli                               │
+│   translate-readme • translate-api-docs • i18n • dialects   │
+│   ├─ Policy profiles (strict/balanced/permissive)           │
+│   ├─ Quality gates (token/glossary/structure/semantic)      │
+│   ├─ Checkpoint resumption                                  │
+│   └─ Telemetry & health reports                             │
+└──────────────────────┬──────────────────────────────────────┘
+                       │
+┌──────────────────────▼──────────────────────────────────────┐
+│                @espanol/providers                            │
+│   ┌─────────┐  ┌─────────────────┐  ┌─────────────────┐    │
+│   │  DeepL  │  │ LibreTranslate  │  │   MyMemory      │    │
+│   │ Primary │  │ Self-hosted     │  │ Free fallback   │    │
+│   └─────────┘  └─────────────────┘  └─────────────────┘    │
+│        │                │                    │              │
+│        └────────────────┴────────────────────┘              │
+│              Circuit Breaker + Rate Limiter                  │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## Configuration
+---
 
-### Environment Variables
+## 📊 Quality Gates
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DEEPL_AUTH_KEY` | DeepL API key | — |
-| `LIBRETRANSLATE_URL` | LibreTranslate endpoint | — |
-| `ALLOWED_LOCALE_DIRS` | Comma-separated allowed directories for file tools | `process.cwd()` |
-| `ENABLE_MYMEMORY` | Opt-in enable legacy MyMemory provider | `0` |
-| `MYMEMORY_RATE_LIMIT` | MyMemory provider requests/min (when enabled) | `60` |
-| `ESPANOL_RATE_LIMIT` | Tool-level rate limit `max,windowMs` | `60,60000` |
-| `ESPANOL_LOG_LEVEL` | Logging level | `error` |
+Every translation passes through 4 quality dimensions:
 
-### Translation Providers
-
-| Provider | Auth | Cost | Quality |
-|----------|------|------|---------|
-| DeepL | `DEEPL_AUTH_KEY` | Paid | Excellent |
-| LibreTranslate | `LIBRETRANSLATE_URL` | Self-hosted | Good |
-| MyMemory | None | Free | Basic |
-
-All providers use circuit breaker pattern with automatic failover.
-
-## Security
-
-- Path traversal protection with symlink resolution
-- Content length limits (512KB max)
-- Rate limiting (60 req/min tool-level, configurable per-provider)
-- Input sanitization (null bytes, control characters)
-- Error message sanitization (no stack traces, no internal paths, no API keys)
-
-## Development
-
-```bash
-pnpm install          # Install all dependencies
-pnpm -r build         # Build all packages
-pnpm -r test          # Run all tests (480+ tests across 7 packages)
-pnpm --filter @espanol/mcp test  # Run MCP tests only (80 tests)
+```
+Quality Score = tokenIntegrity×25% + glossaryFidelity×30% + structureIntegrity×20% + semanticSimilarity×25%
 ```
 
-## License
+| Gate | What it checks | Example failure |
+|------|---------------|-----------------|
+| **Token Integrity** | Protected terms preserved | "Kyanite Labs" → "Cianita Labs" |
+| **Glossary Fidelity** | Enforced terminology used | "API" → "Interfaz" (when glossary says "API") |
+| **Structure Integrity** | Markdown structure intact | Missing code fence, broken table |
+| **Semantic Similarity** | Meaning not drifted | "API is down" → "Hello world" |
 
-MIT
+---
+
+## 🤝 Contributing
+
+We welcome contributors! See [`CONTRIBUTING.md`](CONTRIBUTING.md) for:
+- Setting up your development environment
+- Running the test suite
+- Submitting pull requests
+- Code style guidelines
+
+**Good first issues** are tagged with `good first issue` — perfect for newcomers.
+
+---
+
+## 📋 Roadmap
+
+See [`ROADMAP.md`](ROADMAP.md) for upcoming features including:
+- Portuguese dialect support (pt-BR, pt-PT)
+- Real-time collaborative translation
+- Custom provider plugins
+- VS Code extension
+
+---
+
+## 📄 License
+
+MIT — see [`LICENSE`](LICENSE) for details.
+
+---
+
+<div align="center">
+
+Made with ❤️ by [Pastorsimon1798](https://github.com/Pastorsimon1798) and contributors.
+
+**Star ⭐ this repo if it helps your project!**
+
+</div>

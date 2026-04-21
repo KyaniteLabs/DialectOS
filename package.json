@@ -16,7 +16,25 @@
     "i18n",
     "localization",
     "mcp",
-    "cli"
+    "model-context-protocol",
+    "cli",
+    "dialect",
+    "regional-spanish",
+    "es-mx",
+    "es-ar",
+    "es-co",
+    "es-es",
+    "markdown-translation",
+    "locale-utils",
+    "glossary",
+    "formality",
+    "gender-neutral",
+    "ai-tools",
+    "llm-tools",
+    "typescript",
+    "deepl",
+    "libretranslate",
+    "mymemory"
   ],
   "license": "MIT",
   "engines": {
@@ -30,7 +48,7 @@
   "bugs": {
     "url": "https://github.com/Pastorsimon1798/DialectOS/issues"
   },
-  "homepage": "https://github.com/Pastorsimon1798/DialectOS#readme",
+  "homepage": "https://pastorsimon1798.github.io/DialectOS",
   "pnpm": {
     "overrides": {
       "picomatch@>=4.0.0 <4.0.4": ">=4.0.4",

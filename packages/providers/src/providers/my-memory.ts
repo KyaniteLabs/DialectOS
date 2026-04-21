@@ -3,7 +3,7 @@
  * Free, no authentication required. Public endpoint enforces small query sizes.
  */
 
-import type { TranslationProvider, TranslationResult } from "../types.js";
+import type { TranslationProvider, TranslationResult, ProviderCapability } from "../types.js";
 import { CircuitBreaker } from "../circuit-breaker.js";
 import { RateLimiter, sanitizeErrorMessage, validateContentLength, SecurityError, ErrorCode } from "@espanol/security";
 import { languageCodeSchema } from "@espanol/types";
@@ -50,6 +50,22 @@ export class MyMemoryProvider implements TranslationProvider {
     this.maxRetries = options?.maxRetries ?? (envRetries > 0 ? envRetries : 4);
     const envRetryDelay = parseInt(process.env.MYMEMORY_RETRY_DELAY_MS || "", 10);
     this.retryDelayMs = options?.retryDelayMs ?? (envRetryDelay > 0 ? envRetryDelay : 2000);
+  }
+
+  getCapabilities(): ProviderCapability {
+    return {
+      name: this.name,
+      displayName: "MyMemory",
+      needsApiKey: false,
+      supportsFormality: false,
+      supportsContext: false,
+      supportsDialect: false,
+      supportedSourceLangs: ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh", "ar", "nl", "pl", "sv", "tr"],
+      supportedTargetLangs: ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "zh", "ar", "nl", "pl", "sv", "tr"],
+      maxPayloadChars: MAX_CHARS,
+      dialectHandling: "none",
+      rateLimitHints: { maxRequests: 10, windowMs: 60000 },
+    };
   }
 
   async translate(

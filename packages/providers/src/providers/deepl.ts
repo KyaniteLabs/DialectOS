@@ -4,7 +4,7 @@
  */
 
 import * as deepl from "deepl-node";
-import type { TranslationProvider, TranslationResult } from "../types.js";
+import type { TranslationProvider, TranslationResult, ProviderCapability } from "../types.js";
 import { CircuitBreaker } from "../circuit-breaker.js";
 import { RateLimiter, sanitizeErrorMessage, HTTP_TIMEOUT, validateContentLength, SecurityError, ErrorCode } from "@espanol/security";
 import { languageCodeSchema } from "@espanol/types";
@@ -14,6 +14,12 @@ const DEEPL_FORMALITY_MAP: Record<string, "more" | "less" | "default"> = {
   informal: "less",
   auto: "default",
 };
+
+const DEEPL_SUPPORTED_LANGS = [
+  "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hu", "id",
+  "it", "ja", "ko", "lt", "lv", "nb", "nl", "pl", "pt", "ro", "ru", "sk",
+  "sl", "sv", "tr", "uk", "zh",
+];
 
 export class DeepLProvider implements TranslationProvider {
   readonly name = "deepl";
@@ -59,6 +65,22 @@ export class DeepLProvider implements TranslationProvider {
       options?.maxRequests || 60,
       options?.windowMs || 60000
     );
+  }
+
+  getCapabilities(): ProviderCapability {
+    return {
+      name: this.name,
+      displayName: "DeepL",
+      needsApiKey: true,
+      supportsFormality: true,
+      supportsContext: true,
+      supportsDialect: true,
+      supportedSourceLangs: [...DEEPL_SUPPORTED_LANGS, "auto"],
+      supportedTargetLangs: DEEPL_SUPPORTED_LANGS,
+      maxPayloadChars: 50000,
+      dialectHandling: "native",
+      rateLimitHints: { maxRequests: 60, windowMs: 60000 },
+    };
   }
 
   async translate(

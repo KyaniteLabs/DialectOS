@@ -36,6 +36,7 @@ import {
   loadCheckpoint,
   saveCheckpoint,
   hashSource,
+  CURRENT_CHECKPOINT_SCHEMA_VERSION,
   type TranslationCheckpoint,
 } from "../lib/checkpoint.js";
 import {
@@ -43,6 +44,8 @@ import {
   type AdaptivePacingState,
 } from "../lib/resilient-translation.js";
 import { calculateQualityScore } from "../lib/quality-score.js";
+import { resolvePolicy, type PolicyProfile } from "../lib/translation-policy.js";
+import { TelemetryCollector, globalTelemetry } from "../lib/telemetry.js";
 
 interface TranslateReadmeOptions {
   dialect: string;
@@ -59,6 +62,7 @@ interface TranslateReadmeOptions {
   checkpointFile?: string;
   resume?: boolean;
   failurePolicy?: "strict" | "allow-partial";
+  policy?: PolicyProfile;
 }
 
 /**
@@ -91,10 +95,46 @@ export function createTranslateReadmeCommand(
     .option("--checkpoint-file <file>", "Checkpoint file for resumable translation")
     .option("--resume", "Resume from checkpoint when available", true)
     .option("--no-resume", "Ignore existing checkpoint")
-    .option("--failure-policy <policy>", "Behavior on section failure: strict|allow-partial", "strict")
+    .option("--failure-policy <policy>", "Behavior on section failure: strict|allow-partial")
+    .option("--policy <profile>", "Policy profile: strict|balanced|permissive", "balanced")
     .action(async (input: string, options: TranslateReadmeOptions) => {
+      // Resolve policy profile and merge with explicit overrides
+      const policy = resolvePolicy(options.policy, {
+        failurePolicy: options.failurePolicy,
+        validateStructure: options.validateStructure,
+        structureMode: options.structureMode,
+        glossaryMode: options.glossaryMode,
+        protectIdentities: options.protectIdentities,
+        resume: options.resume,
+      });
+      const mergedOptions: TranslateReadmeOptions = {
+        ...options,
+        failurePolicy: policy.failurePolicy,
+        validateStructure: policy.validateStructure,
+        structureMode: policy.structureMode,
+        glossaryMode: policy.glossaryMode,
+        protectIdentities: policy.protectIdentities,
+        resume: policy.resume,
+      };
       try {
-        await translateReadme(input, options, getRegistry);
+        const result = await translateReadme(input, mergedOptions, getRegistry);
+        globalTelemetry.record({
+          command: "translate-readme",
+          provider: mergedOptions.provider,
+          providerUsed: result.providerUsed,
+          fallbackCount: result.fallbackCount,
+          retryCount: result.retryCount,
+          sectionCount: result.sectionCount,
+          failureCount: result.failureCount,
+          qualityScore: result.qualityScore,
+          tokenIntegrity: result.tokenIntegrity,
+          glossaryFidelity: result.glossaryFidelity,
+          structureIntegrity: result.structureIntegrity,
+          semanticSimilarity: result.semanticSimilarity,
+          durationMs: result.durationMs,
+          dialect: mergedOptions.dialect,
+          timestamp: new Date().toISOString(),
+        });
       } catch (error) {
         if (error instanceof Error) {
           writeError(error.message);
@@ -108,11 +148,30 @@ export function createTranslateReadmeCommand(
 /**
  * Main translation function
  */
+export interface TranslateReadmeResult {
+  qualityScore: number;
+  tokenIntegrity: number;
+  glossaryFidelity: number;
+  structureIntegrity: number;
+  semanticSimilarity: number;
+  providerUsed?: string;
+  fallbackCount: number;
+  retryCount: number;
+  failureCount: number;
+  sectionCount: number;
+  durationMs: number;
+}
+
 async function translateReadme(
   input: string,
   options: TranslateReadmeOptions,
   getRegistry: () => ProviderRegistry
-): Promise<void> {
+): Promise<TranslateReadmeResult> {
+  const startTime = Date.now();
+  let fallbackCount = 0;
+  let retryCount = 0;
+  let providerUsed: string | undefined;
+
   // 1. Validate input path
   const validatedPath = validateMarkdownPath(input);
 
@@ -136,7 +195,18 @@ async function translateReadme(
     } else {
       writeInfo("");
     }
-    return;
+    return {
+      qualityScore: 100,
+      tokenIntegrity: 1,
+      glossaryFidelity: 1,
+      structureIntegrity: 1,
+      semanticSimilarity: 1,
+      fallbackCount: 0,
+      retryCount: 0,
+      failureCount: 0,
+      sectionCount: 0,
+      durationMs: Date.now() - startTime,
+    };
   }
 
   // 4. Get translation provider
@@ -217,6 +287,7 @@ async function translateReadme(
         // Only checkpoint successful translations
         translatedByIndex[idx] = translatedContent;
         const state: TranslationCheckpoint = {
+          schemaVersion: CURRENT_CHECKPOINT_SCHEMA_VERSION,
           sourcePath: validatedPath,
           sourceHash,
           totalSections: parsed.sections.length,
@@ -271,7 +342,7 @@ async function translateReadme(
       0
     )}% glossary=${(quality.glossaryFidelity * 100).toFixed(0)}% structure=${
       quality.structureIntegrity === 1 ? "pass" : "fail"
-    }`
+    } semantic=${(quality.semanticSimilarity * 100).toFixed(0)}%`
   );
 
   // 8. Write output
@@ -283,4 +354,18 @@ async function translateReadme(
   } catch {
     // Checkpoint may not exist — ignore
   }
+
+  return {
+    qualityScore: quality.score,
+    tokenIntegrity: quality.tokenIntegrity,
+    glossaryFidelity: quality.glossaryFidelity,
+    structureIntegrity: quality.structureIntegrity,
+    semanticSimilarity: quality.semanticSimilarity,
+    providerUsed,
+    fallbackCount,
+    retryCount,
+    failureCount: failures,
+    sectionCount: parsed.sections.length,
+    durationMs: Date.now() - startTime,
+  };
 }

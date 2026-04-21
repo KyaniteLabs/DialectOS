@@ -13,6 +13,7 @@ import {
   MyMemoryProvider,
   TranslationProvider,
   TranslationResult,
+  ChaosProvider,
 } from "../index.js";
 import { SecurityError, ErrorCode, sanitizeErrorMessage } from "@espanol/security";
 
@@ -790,5 +791,415 @@ describe("Rate limiting", () => {
     await expect(provider.translate("Test", "en", "es")).rejects.toThrow(
       "Rate limit exceeded"
     );
+  });
+});
+
+describe("Provider capabilities", () => {
+  it("DeepL should report native dialect support", () => {
+    const provider = new DeepLProvider("test-key", undefined, {
+      timeout: 5000,
+      failureThreshold: 3,
+      resetTimeoutMs: 1000,
+      maxRequests: 10,
+      windowMs: 1000,
+    });
+    const caps = provider.getCapabilities!();
+    expect(caps.name).toBe("deepl");
+    expect(caps.supportsFormality).toBe(true);
+    expect(caps.supportsDialect).toBe(true);
+    expect(caps.dialectHandling).toBe("native");
+    expect(caps.needsApiKey).toBe(true);
+    expect(caps.maxPayloadChars).toBe(50000);
+    expect(caps.supportedTargetLangs).toContain("es");
+    expect(caps.rateLimitHints).toEqual({ maxRequests: 60, windowMs: 60000 });
+  });
+
+  it("LibreTranslate should report no dialect support", () => {
+    const provider = new LibreTranslateProvider({
+      endpoint: "https://libretranslate.de",
+    });
+    const caps = provider.getCapabilities!();
+    expect(caps.name).toBe("libretranslate");
+    expect(caps.supportsFormality).toBe(false);
+    expect(caps.supportsDialect).toBe(false);
+    expect(caps.dialectHandling).toBe("none");
+    expect(caps.needsApiKey).toBe(false);
+    expect(caps.maxPayloadChars).toBe(5000);
+  });
+
+  it("MyMemory should report small payload limit", () => {
+    const provider = new MyMemoryProvider();
+    const caps = provider.getCapabilities!();
+    expect(caps.name).toBe("mymemory");
+    expect(caps.maxPayloadChars).toBe(500);
+    expect(caps.dialectHandling).toBe("none");
+    expect(caps.rateLimitHints).toEqual({ maxRequests: 10, windowMs: 60000 });
+  });
+
+  it("Registry should return capabilities by name", () => {
+    const registry = new ProviderRegistry();
+    const mockProvider: TranslationProvider = {
+      name: "mock",
+      translate: async () => ({ translatedText: "test" }),
+      getCapabilities: () => ({
+        name: "mock",
+        displayName: "Mock",
+        needsApiKey: false,
+        supportsFormality: true,
+        supportsContext: false,
+        supportsDialect: true,
+        supportedSourceLangs: ["en", "es"],
+        supportedTargetLangs: ["en", "es", "fr"],
+        maxPayloadChars: 1000,
+        dialectHandling: "approximate",
+      }),
+    };
+
+    registry.register(mockProvider);
+    const caps = registry.getCapabilities("mock");
+
+    expect(caps).not.toBeNull();
+    expect(caps!.maxPayloadChars).toBe(1000);
+    expect(caps!.dialectHandling).toBe("approximate");
+  });
+
+  it("Registry should find providers by target language", () => {
+    const registry = new ProviderRegistry();
+    const providerEs: TranslationProvider = {
+      name: "es-only",
+      translate: async () => ({ translatedText: "test" }),
+      getCapabilities: () => ({
+        name: "es-only",
+        displayName: "ES Only",
+        needsApiKey: false,
+        supportsFormality: false,
+        supportsContext: false,
+        supportsDialect: false,
+        supportedSourceLangs: ["en"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 1000,
+        dialectHandling: "none",
+      }),
+    };
+    const providerFr: TranslationProvider = {
+      name: "fr-only",
+      translate: async () => ({ translatedText: "test" }),
+      getCapabilities: () => ({
+        name: "fr-only",
+        displayName: "FR Only",
+        needsApiKey: false,
+        supportsFormality: false,
+        supportsContext: false,
+        supportsDialect: false,
+        supportedSourceLangs: ["en"],
+        supportedTargetLangs: ["fr"],
+        maxPayloadChars: 1000,
+        dialectHandling: "none",
+      }),
+    };
+
+    registry.register(providerEs);
+    registry.register(providerFr);
+
+    const esProviders = registry.findByTargetLang("es");
+    expect(esProviders).toHaveLength(1);
+    expect(esProviders[0].name).toBe("es-only");
+
+    const frProviders = registry.findByTargetLang("fr");
+    expect(frProviders).toHaveLength(1);
+    expect(frProviders[0].name).toBe("fr-only");
+  });
+
+  it("Registry validateRequest should catch oversized payloads", () => {
+    const registry = new ProviderRegistry();
+    const provider: TranslationProvider = {
+      name: "tiny",
+      translate: async () => ({ translatedText: "test" }),
+      getCapabilities: () => ({
+        name: "tiny",
+        displayName: "Tiny",
+        needsApiKey: false,
+        supportsFormality: false,
+        supportsContext: false,
+        supportsDialect: false,
+        supportedSourceLangs: ["en"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 10,
+        dialectHandling: "none",
+      }),
+    };
+
+    registry.register(provider);
+    const errors = registry.validateRequest("tiny", "this is way too long", "en", "es");
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].reason).toContain("Payload too large");
+  });
+
+  it("Registry validateRequest should catch unsupported languages", () => {
+    const registry = new ProviderRegistry();
+    const provider: TranslationProvider = {
+      name: "mono",
+      translate: async () => ({ translatedText: "test" }),
+      getCapabilities: () => ({
+        name: "mono",
+        displayName: "Mono",
+        needsApiKey: false,
+        supportsFormality: false,
+        supportsContext: false,
+        supportsDialect: false,
+        supportedSourceLangs: ["en"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 10000,
+        dialectHandling: "none",
+      }),
+    };
+
+    registry.register(provider);
+    const errors = registry.validateRequest("mono", "hi", "de", "ja");
+
+    expect(errors.length).toBeGreaterThanOrEqual(2);
+    const reasons = errors.map((e) => e.reason);
+    expect(reasons.some((r) => r.includes("Unsupported source language"))).toBe(true);
+    expect(reasons.some((r) => r.includes("Unsupported target language"))).toBe(true);
+  });
+
+  it("Registry validateRequest should catch unsupported dialect", () => {
+    const registry = new ProviderRegistry();
+    const provider: TranslationProvider = {
+      name: "nodialect",
+      translate: async () => ({ translatedText: "test" }),
+      getCapabilities: () => ({
+        name: "nodialect",
+        displayName: "No Dialect",
+        needsApiKey: false,
+        supportsFormality: false,
+        supportsContext: false,
+        supportsDialect: false,
+        supportedSourceLangs: ["en"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 10000,
+        dialectHandling: "none",
+      }),
+    };
+
+    registry.register(provider);
+    const errors = registry.validateRequest("nodialect", "hi", "en", "es", {
+      dialect: "es-MX",
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].reason).toContain("does not support dialect");
+  });
+
+  it("Registry validateRequest should return empty for valid requests", () => {
+    const registry = new ProviderRegistry();
+    const provider: TranslationProvider = {
+      name: "good",
+      translate: async () => ({ translatedText: "test" }),
+      getCapabilities: () => ({
+        name: "good",
+        displayName: "Good",
+        needsApiKey: false,
+        supportsFormality: true,
+        supportsContext: false,
+        supportsDialect: true,
+        supportedSourceLangs: ["en", "auto"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 10000,
+        dialectHandling: "native",
+      }),
+    };
+
+    registry.register(provider);
+    const errors = registry.validateRequest("good", "hello", "auto", "es", {
+      formality: "formal",
+      dialect: "es-MX",
+    });
+
+    expect(errors).toHaveLength(0);
+  });
+});
+
+describe("ChaosProvider", () => {
+  it("should inject timeout errors", async () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+    };
+
+    const chaos = new ChaosProvider(inner, { mode: "timeout" });
+    await expect(chaos.translate("hi", "en", "es")).rejects.toThrow(
+      "simulated timeout"
+    );
+  });
+
+  it("should inject HTTP 5xx errors", async () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+    };
+
+    const chaos = new ChaosProvider(inner, { mode: "http-5xx" });
+    await expect(chaos.translate("hi", "en", "es")).rejects.toThrow("500");
+  });
+
+  it("should inject HTTP 429 errors", async () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+    };
+
+    const chaos = new ChaosProvider(inner, { mode: "http-429" });
+    await expect(chaos.translate("hi", "en", "es")).rejects.toThrow("429");
+  });
+
+  it("should inject latency but eventually succeed", async () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+    };
+
+    const chaos = new ChaosProvider(inner, { mode: "latency", delayMs: 50 });
+    const start = Date.now();
+    const result = await chaos.translate("hi", "en", "es");
+    const elapsed = Date.now() - start;
+
+    expect(result.translatedText).toBe("ok");
+    expect(elapsed).toBeGreaterThanOrEqual(45);
+  });
+
+  it("should inject partial failures (empty response)", async () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+    };
+
+    const chaos = new ChaosProvider(inner, { mode: "partial-failure" });
+    const result = await chaos.translate("hi", "en", "es");
+
+    expect(result.translatedText).toBe("");
+  });
+
+  it("should only fail on specified call indices", async () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+    };
+
+    const chaos = new ChaosProvider(inner, {
+      mode: "timeout",
+      failOnCalls: [2, 3],
+    });
+
+    // Call 1 succeeds
+    const r1 = await chaos.translate("a", "en", "es");
+    expect(r1.translatedText).toBe("ok");
+
+    // Call 2 fails
+    await expect(chaos.translate("b", "en", "es")).rejects.toThrow();
+
+    // Call 3 fails
+    await expect(chaos.translate("c", "en", "es")).rejects.toThrow();
+
+    // Call 4 succeeds
+    const r4 = await chaos.translate("d", "en", "es");
+    expect(r4.translatedText).toBe("ok");
+  });
+
+  it("should delegate getCapabilities to inner provider", () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+      getCapabilities: () => ({
+        name: "stable",
+        displayName: "Stable",
+        needsApiKey: false,
+        supportsFormality: false,
+        supportsContext: false,
+        supportsDialect: false,
+        supportedSourceLangs: ["en"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 1000,
+        dialectHandling: "none",
+      }),
+    };
+
+    const chaos = new ChaosProvider(inner, { mode: "timeout" });
+    const caps = chaos.getCapabilities();
+
+    expect(caps).not.toBeNull();
+    expect(caps!.name).toBe("stable");
+    expect(caps!.maxPayloadChars).toBe(1000);
+  });
+
+  it("should track call count", async () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+    };
+
+    const chaos = new ChaosProvider(inner, { mode: "latency", delayMs: 1 });
+    expect(chaos.getCallCount()).toBe(0);
+
+    await chaos.translate("a", "en", "es");
+    expect(chaos.getCallCount()).toBe(1);
+
+    await chaos.translate("b", "en", "es");
+    expect(chaos.getCallCount()).toBe(2);
+  });
+
+  it("should reset call count", async () => {
+    const inner: TranslationProvider = {
+      name: "stable",
+      translate: async () => ({ translatedText: "ok" }),
+    };
+
+    const chaos = new ChaosProvider(inner, { mode: "latency", delayMs: 1 });
+    await chaos.translate("a", "en", "es");
+    expect(chaos.getCallCount()).toBe(1);
+
+    chaos.reset();
+    expect(chaos.getCallCount()).toBe(0);
+  });
+
+  it("should demonstrate registry fallback under chaos", async () => {
+    const registry = new ProviderRegistry();
+
+    // Primary provider fails with 5xx
+    const primary: TranslationProvider = {
+      name: "primary",
+      translate: async () => ({ translatedText: "primary" }),
+    };
+    const chaosPrimary = new ChaosProvider(primary, { mode: "http-5xx" });
+
+    // Fallback provider succeeds
+    const fallback: TranslationProvider = {
+      name: "fallback",
+      translate: async () => ({ translatedText: "fallback" }),
+    };
+
+    registry.register(chaosPrimary);
+    registry.register(fallback);
+
+    // First call opens circuit on chaos-primary after failure
+    await expect(
+      registry.get("chaos-primary").translate("hi", "en", "es")
+    ).rejects.toThrow("500");
+
+    // Circuit breaker records failure
+    registry.recordFailure("chaos-primary");
+
+    // getAuto should skip chaos-primary if circuit is open
+    // (manually open it for deterministic test)
+    const breaker = registry.getBreaker("chaos-primary");
+    if (breaker) {
+      for (let i = 0; i < 5; i++) breaker.recordFailure();
+    }
+
+    const auto = registry.getAuto();
+    expect(auto.name).toBe("fallback");
+    const result = await auto.translate("hi", "en", "es");
+    expect(result.translatedText).toBe("fallback");
   });
 });

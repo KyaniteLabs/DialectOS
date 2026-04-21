@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DialectOS — Spanish Dialect Translation Server</title>
+  <meta name="description" content="The first MCP server built for Spanish dialects. Translate across 20 regional variants with structure preservation.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #c9d1d9;
+      line-height: 1.6;
+    }
+    .hero {
+      text-align: center;
+      padding: 120px 20px 80px;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+    }
+    .hero h1 { font-size: 64px; margin-bottom: 16px; color: #f0f6fc; }
+    .hero .subtitle { font-size: 22px; color: #8b949e; max-width: 600px; margin: 0 auto 40px; }
+    .hero .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+    .hero .badges img { height: 20px; }
+    .cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .cta a {
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 16px;
+      transition: transform 0.2s;
+    }
+    .cta a:hover { transform: translateY(-2px); }
+    .cta-primary { background: #238636; color: white; }
+    .cta-secondary { background: #21262d; color: #58a6ff; border: 1px solid #30363d; }
+    .features { max-width: 1000px; margin: 0 auto; padding: 80px 20px; }
+    .features h2 { text-align: center; font-size: 36px; margin-bottom: 60px; color: #f0f6fc; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; }
+    .feature-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .feature-card h3 { color: #58a6ff; font-size: 20px; margin-bottom: 12px; }
+    .feature-card p { color: #8b949e; }
+    .stats { display: flex; justify-content: center; gap: 60px; padding: 60px 20px; background: #161b22; }
+    .stat { text-align: center; }
+    .stat .number { font-size: 48px; font-weight: 700; color: #58a6ff; }
+    .stat .label { color: #8b949e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+    .dialects { max-width: 800px; margin: 0 auto; padding: 80px 20px; }
+    .dialects h2 { text-align: center; font-size: 36px; margin-bottom: 40px; color: #f0f6fc; }
+    .dialect-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+    .dialect-tag {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      padding: 8px 16px;
+      text-align: center;
+      font-size: 14px;
+      color: #c9d1d9;
+    }
+    .footer { text-align: center; padding: 60px 20px; color: #8b949e; }
+    .footer a { color: #58a6ff; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <h1>🌎 DialectOS</h1>
+    <p class="subtitle">The first Model Context Protocol server built specifically for Spanish dialects. Translate across 20 regional variants while preserving structure.</p>
+    <div class="badges">
+      <img src="https://img.shields.io/badge/tests-590%20passing-brightgreen" alt="Tests">
+      <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
+      <img src="https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen" alt="Node">
+      <img src="https://img.shields.io/badge/MCP-compatible-purple" alt="MCP">
+    </div>
+    <div class="cta">
+      <a href="https://github.com/Pastorsimon1798/DialectOS" class="cta-primary">⭐ Star on GitHub</a>
+      <a href="https://github.com/Pastorsimon1798/DialectOS#quick-start" class="cta-secondary">📖 Get Started</a>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><div class="number">20</div><div class="label">Dialects</div></div>
+    <div class="stat"><div class="number">16</div><div class="label">MCP Tools</div></div>
+    <div class="stat"><div class="number">590</div><div class="label">Tests Passing</div></div>
+    <div class="stat"><div class="number">7</div><div class="label">Packages</div></div>
+  </section>
+
+  <section class="features">
+    <h2>Why DialectOS?</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>🎯 Dialect-Aware</h3>
+        <p>Understands 20 Spanish regional variants — not just "Spanish". Mexico, Argentina, Colombia, Spain, and more.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🛡️ Structure-Preserving</h3>
+        <p>Tables, code blocks, links, and frontmatter stay intact during translation. No broken markdown.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🤖 MCP Native</h3>
+        <p>16 tools that integrate directly with Claude, Cursor, and any MCP client. No wrappers needed.</p>
+      </div>
+      <div class="feature-card">
+        <h3>📊 Quality Gates</h3>
+        <p>Semantic drift detection, token integrity, glossary fidelity, and structure validation catch errors before release.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🔒 Security-Hardened</h3>
+        <p>SSRF protection, circuit breakers, rate limiting, and adversarial testing. Zero audit vulnerabilities.</p>
+      </div>
+      <div class="feature-card">
+        <h3>🔧 Self-Hostable</h3>
+        <p>DeepL for quality, LibreTranslate for privacy, MyMemory for free tier. Choose your tradeoff.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="dialects">
+    <h2>Supported Dialects</h2>
+    <div class="dialect-grid">
+      <div class="dialect-tag">es-ES 🇪🇸</div>
+      <div class="dialect-tag">es-MX 🇲🇽</div>
+      <div class="dialect-tag">es-AR 🇦🇷</div>
+      <div class="dialect-tag">es-CO 🇨🇴</div>
+      <div class="dialect-tag">es-CL 🇨🇱</div>
+      <div class="dialect-tag">es-PE 🇵🇪</div>
+      <div class="dialect-tag">es-VE 🇻🇪</div>
+      <div class="dialect-tag">es-EC 🇪🇨</div>
+      <div class="dialect-tag">es-UY 🇺🇾</div>
+      <div class="dialect-tag">es-PY 🇵🇾</div>
+      <div class="dialect-tag">es-BO 🇧🇴</div>
+      <div class="dialect-tag">es-GT 🇬🇹</div>
+      <div class="dialect-tag">es-SV 🇸🇻</div>
+      <div class="dialect-tag">es-HN 🇭🇳</div>
+      <div class="dialect-tag">es-NI 🇳🇮</div>
+      <div class="dialect-tag">es-CR 🇨🇷</div>
+      <div class="dialect-tag">es-PA 🇵🇦</div>
+      <div class="dialect-tag">es-DO 🇩🇴</div>
+      <div class="dialect-tag">es-CU 🇨🇺</div>
+      <div class="dialect-tag">es-PR 🇵🇷</div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Made with ❤️ by <a href="https://github.com/Pastorsimon1798">Pastorsimon1798</a> and contributors.</p>
+    <p><a href="https://github.com/Pastorsimon1798/DialectOS">View on GitHub</a> · <a href="https://github.com/Pastorsimon1798/DialectOS/blob/main/LICENSE">MIT License</a></p>
+  </footer>
+</body>
+</html>
