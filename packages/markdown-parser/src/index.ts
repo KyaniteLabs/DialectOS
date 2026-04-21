@@ -12,7 +12,7 @@
  * - Supports translation workflows
  */
 
-import { marked } from "marked";
+import { marked, type Token } from "marked";
 import DOMPurify from "isomorphic-dompurify";
 import {
   type MarkdownSection,
@@ -29,20 +29,18 @@ import {
 // Types
 // ============================================================================
 
-/**
- * Extended token type from marked with additional properties
- */
-interface MarkedToken {
-  type: string;
-  raw?: string;
+// Minimal interface for token walking — we use runtime checks for href/tokens/items
+interface WalkableToken {
+  href?: string;
+  tokens?: WalkableToken[];
+  items?: WalkableToken[];
   text?: string;
+  type?: string;
+  raw?: string;
   depth?: number;
-  items?: any[];
   lang?: string;
   codeBlockStyle?: "indented" | "fenced";
-  tokens?: any[];
-  href?: string;
-  title?: string;
+  title?: string | null;
   [key: string]: any;
 }
 
@@ -61,7 +59,7 @@ function extractUrlsFromContent(content: string): string[] {
   // Use marked's lexer to safely tokenize content (no regex ReDoS)
   const tokens = marked.lexer(content);
 
-  function walkTokens(tokens: any[]): void {
+  function walkTokens(tokens: WalkableToken[]): void {
     for (const token of tokens) {
       if (token.href && typeof token.href === "string") {
         if (!seen.has(token.href)) {
@@ -114,7 +112,7 @@ function validateAllUrls(content: string): void {
 /**
  * Convert a marked token to a MarkdownSection
  */
-function tokenToSection(token: MarkedToken): MarkdownSection {
+function tokenToSection(token: WalkableToken): MarkdownSection {
   const raw = token.raw || "";
 
   switch (token.type) {
@@ -352,7 +350,7 @@ export function parseMarkdown(content: string): ParsedMarkdown {
   linkCount = countLinks(remainingContent);
 
   // Use marked lexer to tokenize
-  const tokens: MarkedToken[] = marked.lexer(remainingContent) as MarkedToken[];
+  const tokens: WalkableToken[] = marked.lexer(remainingContent) as WalkableToken[];
 
   // Convert tokens to sections
   for (const token of tokens) {
