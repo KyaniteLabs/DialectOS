@@ -24,7 +24,7 @@
     "@espanol/security": "workspace:*",
     "@espanol/types": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "zod": "^3.25.0"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
