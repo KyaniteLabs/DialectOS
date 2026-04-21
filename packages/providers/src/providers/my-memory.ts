@@ -5,7 +5,7 @@
 
 import type { TranslationProvider, TranslationResult } from "../types.js";
 import { CircuitBreaker } from "../circuit-breaker.js";
-import { RateLimiter, sanitizeErrorMessage, HTTP_TIMEOUT, validateContentLength, SecurityError, ErrorCode } from "@espanol/security";
+import { RateLimiter, sanitizeErrorMessage, validateContentLength, SecurityError, ErrorCode } from "@espanol/security";
 import { languageCodeSchema } from "@espanol/types";
 
 const MYMEMORY_ENDPOINT = "https://api.mymemory.translated.net/get";
