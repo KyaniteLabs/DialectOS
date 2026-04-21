@@ -3,150 +3,283 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DialectOS — Spanish Dialect Translation Server</title>
-  <meta name="description" content="The first MCP server built for Spanish dialects. Translate across 20 regional variants with structure preservation.">
+  <title>DialectOS — Detect 25 Spanish Dialects Instantly</title>
+  <meta name="description" content="Paste Spanish text and detect which of 25 dialects it is — with formal vs slang register classification. Free, open-source, instant.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #0d1117;
-      color: #c9d1d9;
-      line-height: 1.6;
-    }
-    .hero {
-      text-align: center;
-      padding: 120px 20px 80px;
-      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
-    }
-    .hero h1 { font-size: 64px; margin-bottom: 16px; color: #f0f6fc; }
-    .hero .subtitle { font-size: 22px; color: #8b949e; max-width: 600px; margin: 0 auto 40px; }
-    .hero .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
-    .hero .badges img { height: 20px; }
-    .cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .cta a {
-      padding: 14px 28px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 16px;
-      transition: transform 0.2s;
-    }
-    .cta a:hover { transform: translateY(-2px); }
-    .cta-primary { background: #238636; color: white; }
-    .cta-secondary { background: #21262d; color: #58a6ff; border: 1px solid #30363d; }
-    .features { max-width: 1000px; margin: 0 auto; padding: 80px 20px; }
-    .features h2 { text-align: center; font-size: 36px; margin-bottom: 60px; color: #f0f6fc; }
-    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 32px; }
-    .feature-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      padding: 32px;
-    }
-    .feature-card h3 { color: #58a6ff; font-size: 20px; margin-bottom: 12px; }
-    .feature-card p { color: #8b949e; }
-    .stats { display: flex; justify-content: center; gap: 60px; padding: 60px 20px; background: #161b22; }
-    .stat { text-align: center; }
-    .stat .number { font-size: 48px; font-weight: 700; color: #58a6ff; }
-    .stat .label { color: #8b949e; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-    .dialects { max-width: 800px; margin: 0 auto; padding: 80px 20px; }
-    .dialects h2 { text-align: center; font-size: 36px; margin-bottom: 40px; color: #f0f6fc; }
-    .dialect-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
-    .dialect-tag {
-      background: #21262d;
-      border: 1px solid #30363d;
-      border-radius: 20px;
-      padding: 8px 16px;
-      text-align: center;
-      font-size: 14px;
-      color: #c9d1d9;
-    }
-    .footer { text-align: center; padding: 60px 20px; color: #8b949e; }
-    .footer a { color: #58a6ff; text-decoration: none; }
+    body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; }
+    .gradient-text { background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); }
+    .dialect-card { transition: all 0.2s; }
+    .dialect-card:hover { transform: translateY(-2px); border-color: rgba(56, 189, 248, 0.4); }
+    .keyword-tag { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    .confidence-bar { transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+    textarea:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
+    .register-badge { font-variant-numeric: tabular-nums; }
   </style>
 </head>
-<body>
-  <section class="hero">
-    <h1>🌎 DialectOS</h1>
-    <p class="subtitle">The first Model Context Protocol server built specifically for Spanish dialects. Translate across 20 regional variants while preserving structure.</p>
-    <div class="badges">
-      <img src="https://img.shields.io/badge/tests-590%20passing-brightgreen" alt="Tests">
-      <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License">
-      <img src="https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen" alt="Node">
-      <img src="https://img.shields.io/badge/MCP-compatible-purple" alt="MCP">
+<body class="min-h-screen">
+  <!-- Hero -->
+  <header class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-sky-900/20 to-transparent"></div>
+    <div class="relative max-w-5xl mx-auto px-6 pt-20 pb-12 text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-sm font-medium mb-6">
+        <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
+        595 tests passing · Open source · MIT
+      </div>
+      <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+        <span class="gradient-text">DialectOS</span>
+      </h1>
+      <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+        Paste Spanish text. Detect which of <strong class="text-slate-200">25 dialects</strong> it is — 
+        with formal vs slang register classification. No signup. No API key.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="https://github.com/Pastorsimon1798/DialectOS" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          Star on GitHub
+        </a>
+        <a href="#demo" class="px-6 py-3 bg-sky-600 hover:bg-sky-500 rounded-xl font-semibold text-sm text-white transition-colors">
+          Try the Demo →
+        </a>
+      </div>
     </div>
-    <div class="cta">
-      <a href="https://github.com/Pastorsimon1798/DialectOS" class="cta-primary">⭐ Star on GitHub</a>
-      <a href="https://github.com/Pastorsimon1798/DialectOS#quick-start" class="cta-secondary">📖 Get Started</a>
-    </div>
-  </section>
+  </header>
 
-  <section class="stats">
-    <div class="stat"><div class="number">20</div><div class="label">Dialects</div></div>
-    <div class="stat"><div class="number">16</div><div class="label">MCP Tools</div></div>
-    <div class="stat"><div class="number">590</div><div class="label">Tests Passing</div></div>
-    <div class="stat"><div class="number">7</div><div class="label">Packages</div></div>
-  </section>
-
-  <section class="features">
-    <h2>Why DialectOS?</h2>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h3>🎯 Dialect-Aware</h3>
-        <p>Understands 20 Spanish regional variants — not just "Spanish". Mexico, Argentina, Colombia, Spain, and more.</p>
+  <!-- Stats -->
+  <section class="max-w-4xl mx-auto px-6 mb-12">
+    <div class="glass rounded-2xl p-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="text-3xl font-bold text-sky-400">25</div>
+        <div class="text-sm text-slate-500 mt-1">Dialects</div>
       </div>
-      <div class="feature-card">
-        <h3>🛡️ Structure-Preserving</h3>
-        <p>Tables, code blocks, links, and frontmatter stay intact during translation. No broken markdown.</p>
+      <div>
+        <div class="text-3xl font-bold text-violet-400">595</div>
+        <div class="text-sm text-slate-500 mt-1">Tests</div>
       </div>
-      <div class="feature-card">
-        <h3>🤖 MCP Native</h3>
-        <p>16 tools that integrate directly with Claude, Cursor, and any MCP client. No wrappers needed.</p>
+      <div>
+        <div class="text-3xl font-bold text-emerald-400">16</div>
+        <div class="text-sm text-slate-500 mt-1">MCP Tools</div>
       </div>
-      <div class="feature-card">
-        <h3>📊 Quality Gates</h3>
-        <p>Semantic drift detection, token integrity, glossary fidelity, and structure validation catch errors before release.</p>
-      </div>
-      <div class="feature-card">
-        <h3>🔒 Security-Hardened</h3>
-        <p>SSRF protection, circuit breakers, rate limiting, and adversarial testing. Zero audit vulnerabilities.</p>
-      </div>
-      <div class="feature-card">
-        <h3>🔧 Self-Hostable</h3>
-        <p>DeepL for quality, LibreTranslate for privacy, MyMemory for free tier. Choose your tradeoff.</p>
+      <div>
+        <div class="text-3xl font-bold text-amber-400">3</div>
+        <div class="text-sm text-slate-500 mt-1">Registers</div>
       </div>
     </div>
   </section>
 
-  <section class="dialects">
-    <h2>Supported Dialects</h2>
-    <div class="dialect-grid">
-      <div class="dialect-tag">es-ES 🇪🇸</div>
-      <div class="dialect-tag">es-MX 🇲🇽</div>
-      <div class="dialect-tag">es-AR 🇦🇷</div>
-      <div class="dialect-tag">es-CO 🇨🇴</div>
-      <div class="dialect-tag">es-CL 🇨🇱</div>
-      <div class="dialect-tag">es-PE 🇵🇪</div>
-      <div class="dialect-tag">es-VE 🇻🇪</div>
-      <div class="dialect-tag">es-EC 🇪🇨</div>
-      <div class="dialect-tag">es-UY 🇺🇾</div>
-      <div class="dialect-tag">es-PY 🇵🇾</div>
-      <div class="dialect-tag">es-BO 🇧🇴</div>
-      <div class="dialect-tag">es-GT 🇬🇹</div>
-      <div class="dialect-tag">es-SV 🇸🇻</div>
-      <div class="dialect-tag">es-HN 🇭🇳</div>
-      <div class="dialect-tag">es-NI 🇳🇮</div>
-      <div class="dialect-tag">es-CR 🇨🇷</div>
-      <div class="dialect-tag">es-PA 🇵🇦</div>
-      <div class="dialect-tag">es-DO 🇩🇴</div>
-      <div class="dialect-tag">es-CU 🇨🇺</div>
-      <div class="dialect-tag">es-PR 🇵🇷</div>
+  <!-- Demo -->
+  <section id="demo" class="max-w-4xl mx-auto px-6 mb-16">
+    <div class="glass rounded-2xl p-6 md:p-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-slate-200">Paste Spanish text</h2>
+        <div class="flex gap-2">
+          <button onclick="loadExample('mx')" class="px-3 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors">🇲🇽 Mexican</button>
+          <button onclick="loadExample('ar')" class="px-3 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors">🇦🇷 Argentine</button>
+          <button onclick="loadExample('es')" class="px-3 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors">🇪🇸 Spanish</button>
+          <button onclick="loadExample('co')" class="px-3 py-1 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors">🇨🇴 Colombian</button>
+        </div>
+      </div>
+      <textarea id="input" rows="4" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl p-4 text-slate-200 placeholder-slate-600 resize-none text-base leading-relaxed" placeholder="Escribe algo en español... Che boludo, qué onda? ¿Vale, vosotros venís? ¡Parce, qué chévere!"></textarea>
+      <div id="results" class="mt-6 hidden">
+        <!-- Filled by JS -->
+      </div>
     </div>
   </section>
 
-  <footer class="footer">
-    <p>Made with ❤️ by <a href="https://github.com/Pastorsimon1798">Pastorsimon1798</a> and contributors.</p>
-    <p><a href="https://github.com/Pastorsimon1798/DialectOS">View on GitHub</a> · <a href="https://github.com/Pastorsimon1798/DialectOS/blob/main/LICENSE">MIT License</a></p>
+  <!-- Compare -->
+  <section class="max-w-4xl mx-auto px-6 mb-16">
+    <h2 class="text-2xl font-bold text-center mb-8 text-slate-200">Same word, 25 different ways</h2>
+    <div class="glass rounded-2xl p-6 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-slate-500 border-b border-slate-700">
+            <th class="text-left py-3 px-2 font-medium">Word</th>
+            <th class="text-left py-3 px-2 font-medium">Spain 🇪🇸</th>
+            <th class="text-left py-3 px-2 font-medium">Mexico 🇲🇽</th>
+            <th class="text-left py-3 px-2 font-medium">Argentina 🇦🇷</th>
+            <th class="text-left py-3 px-2 font-medium">Colombia 🇨🇴</th>
+            <th class="text-left py-3 px-2 font-medium">Chile 🇨🇱</th>
+          </tr>
+        </thead>
+        <tbody class="text-slate-300">
+          <tr class="border-b border-slate-800/50"><td class="py-2.5 px-2 font-medium text-sky-400">Computer</td><td class="py-2.5 px-2">ordenador</td><td class="py-2.5 px-2">computadora</td><td class="py-2.5 px-2">computadora</td><td class="py-2.5 px-2">computador</td><td class="py-2.5 px-2">computadora</td></tr>
+          <tr class="border-b border-slate-800/50"><td class="py-2.5 px-2 font-medium text-sky-400">Car</td><td class="py-2.5 px-2">coche</td><td class="py-2.5 px-2">carro</td><td class="py-2.5 px-2">auto</td><td class="py-2.5 px-2">carro</td><td class="py-2.5 px-2">auto</td></tr>
+          <tr class="border-b border-slate-800/50"><td class="py-2.5 px-2 font-medium text-sky-400">Potato</td><td class="py-2.5 px-2">patata</td><td class="py-2.5 px-2">papa</td><td class="py-2.5 px-2">papa</td><td class="py-2.5 px-2">papa</td><td class="py-2.5 px-2">papa</td></tr>
+          <tr class="border-b border-slate-800/50"><td class="py-2.5 px-2 font-medium text-sky-400">Juice</td><td class="py-2.5 px-2">zumo</td><td class="py-2.5 px-2">jugo</td><td class="py-2.5 px-2">jugo</td><td class="py-2.5 px-2">jugo</td><td class="py-2.5 px-2">jugo</td></tr>
+          <tr class="border-b border-slate-800/50"><td class="py-2.5 px-2 font-medium text-sky-400">Glasses</td><td class="py-2.5 px-2">gafas</td><td class="py-2.5 px-2">lentes</td><td class="py-2.5 px-2">anteojos</td><td class="py-2.5 px-2">lentes</td><td class="py-2.5 px-2">lentes</td></tr>
+          <tr class="border-b border-slate-800/50"><td class="py-2.5 px-2 font-medium text-sky-400">Cool</td><td class="py-2.5 px-2">guay</td><td class="py-2.5 px-2">chido</td><td class="py-2.5 px-2">piola / bárbaro</td><td class="py-2.5 px-2">chévere / bacano</td><td class="py-2.5 px-2">bacán</td></tr>
+          <tr><td class="py-2.5 px-2 font-medium text-sky-400">2nd plural</td><td class="py-2.5 px-2">vosotros</td><td class="py-2.5 px-2">ustedes</td><td class="py-2.5 px-2">ustedes / vos</td><td class="py-2.5 px-2">ustedes</td><td class="py-2.5 px-2">ustedes / vos</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Dialect Grid -->
+  <section class="max-w-5xl mx-auto px-6 mb-16">
+    <h2 class="text-2xl font-bold text-center mb-8 text-slate-200">All 25 Dialects</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="dialectGrid"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="text-center py-12 text-slate-500 text-sm">
+    <p class="mb-2">
+      <a href="https://github.com/Pastorsimon1798/DialectOS" class="text-sky-400 hover:text-sky-300">DialectOS</a> — 
+      Open source under MIT License
+    </p>
+    <p>Made by <a href="https://github.com/Pastorsimon1798" class="text-slate-400 hover:text-slate-300">Pastorsimon1798</a></p>
   </footer>
+
+  <script>
+    // ─── Dialect Data ───
+    const DIALECTS = {
+      'es-ES': { name: 'Spain', flag: '🇪🇸', keywords: ['ordenador','coche','zumo','vale','vosotros','vuestro','conducir','aparcar','ladrillo','patata','piso','coger','móvil','bolígrafo','autobús'], formal: ['ordenador','vosotros','conducir','aparcar','coger','bolígrafo','autobús','frigorífico'], slang: ['vale','tío','tía','mola','guay','flipar','chaval','currar'] },
+      'es-MX': { name: 'Mexico', flag: '🇲🇽', keywords: ['computadora','carro','pluma','jugo','departamento','camión','habitación','rentar','estacionamiento','aguacate','plátano','falda','celular','chido','güey'], formal: ['computadora','departamento','estacionamiento','habitación','rentar','camión','plátano','celular'], slang: ['chido','güey','neta','padre','chamba','crudo','fresa','naco'] },
+      'es-AR': { name: 'Argentina', flag: '🇦🇷', keywords: ['papa','auto','laburo','che','vos','pibe','mina','bondi','quilombo','fiaca','morfar','pulenta','guita','boludo','piola'], formal: ['auto','computadora','departamento','celular','remera','frutilla','poroto','maní'], slang: ['che','pibe','mina','bondi','quilombo','fiaca','morfar','boludo'] },
+      'es-CO': { name: 'Colombia', flag: '🇨🇴', keywords: ['parce','chévere','veci','mono','rajo','guaro','chino','llave','marica','guayabo','vaina','bacano','pilas','pana','rumba'], formal: ['computador','carro','celular','esfero','papa','lentes','maní','banano'], slang: ['parce','chévere','veci','mono','vaina','bacano','pilas','pana','rumba','parcero'] },
+      'es-CU': { name: 'Cuba', flag: '🇨🇺', keywords: ['asere','yuma','jinetera','grifo','guagua','fufú','mechero','pichar','temba','socio','qué bola','candela','jama','pinchar','yal'], formal: ['computadora','carro','celular','apartamento','guagua','papa','lentes','habichuela'], slang: ['asere','yuma','jinetera','grifo','fufú','mechero','pichar','temba','qué bola','jama'] },
+      'es-PE': { name: 'Peru', flag: '🇵🇪', keywords: ['chibolo','causa','chifa','poto','brich','huaico','chapo','flaco','mina','pata','chela','jato','huarique','pe','cholo'], formal: ['computadora','carro','celular','pluma','papa','lentes','maní','frutilla'], slang: ['chibolo','causa','chifa','poto','pata','chela','jato','huarique','cholo','flaco'] },
+      'es-CL': { name: 'Chile', flag: '🇨🇱', keywords: ['wea','hueón','cachái','pololo','fome','bacán','palta','choclo','guagua','lianta','chucha','la raja','flaite','caleta','al tiro'], formal: ['auto','computadora','celular','papa','lentes','maní','poroto','frutilla'], slang: ['wea','hueón','cachái','pololo','fome','bacán','lianta','chucha','flaite','caleta'] },
+      'es-VE': { name: 'Venezuela', flag: '🇻🇪', keywords: ['chamo','pana','guarambare','chinga','pajúo','siso','pirobo','sifrino','cocuyo','porra','chimbo','morrocoy','guarapo','arrecho','ladilla'], formal: ['computadora','carro','celular','lapicero','papa','lentes','maní','caraota'], slang: ['chamo','pana','guarambare','pajúo','pirobo','sifrino','porra','chimbo','arrecho','ladilla'] },
+      'es-UY': { name: 'Uruguay', flag: '🇺🇾', keywords: ['bo','ta','vamo','chajá','gurí','porta','fogón','fiaca','payador','changa','mufa','karai','gurisa','mate','cana'], formal: ['auto','computadora','apartamento','celular','papa','anteojos','frutilla','poroto'], slang: ['bo','ta','vamo','chajá','gurí','porta','fogón','fiaca','changa','mufa'] },
+      'es-PY': { name: 'Paraguay', flag: '🇵🇾', keywords: ['jopara','chipa','terere','tranquilopa','haku','mbarete','de balde','al pedo','vai-vai','me hallo','chake','che','gua\'u','jaha','jagua'], formal: ['auto','computadora','celular','papa','anteojos','frutilla','poroto','maní'], slang: ['jopara','chipa','terere','tranquilopa','haku','mbarete','de balde','al pedo','vai-vai','chake'] },
+      'es-BO': { name: 'Bolivia', flag: '🇧🇴', keywords: ['wawa','jach\'a','ch\'iti','qhatu','jallalla','ch\'usa','llunk\'u','api','chairo','pucha','chango','cholita','jichi','q\'omer','llajwa'], formal: ['computadora','carro','celular','papa','lentes','frijol','wawa','cholita'], slang: ['wawa','ch\'iti','jallalla','ch\'usa','pucha','chango','jichi','q\'omer','llajwa','chutar'] },
+      'es-EC': { name: 'Ecuador', flag: '🇪🇨', keywords: ['chévere','pana','chado','guagua','chulla','chucha','bacán','caña','longo','achachay','chibolo','yapa','cacho','ñaño','chuchaqui'], formal: ['computador','carro','celular','esfero','papa','lentes','maní','banano'], slang: ['chévere','pana','chado','chulla','chucha','bacán','longo','achachay','chibolo','yapa'] },
+      'es-GT': { name: 'Guatemala', flag: '🇬🇹', keywords: ['pisto','chapín','shute','chucho','clavo','boche','shumo','ishtmo','chiclero','canche','culero','morral','cipote','patojo','bochinche'], formal: ['computadora','carro','celular','papa','lentes','frijol'], slang: ['pisto','shute','chucho','clavo','boche','shumo','canche','culero','morral','bochinche'] },
+      'es-HN': { name: 'Honduras', flag: '🇭🇳', keywords: ['catracho','mañe','pucher','chepa','cirilo','arrastrado','tirijisi','chino','pichu','chure','choco','chule','cipote','bayunco','ñaño'], formal: ['computadora','carro','celular','papa','lentes','frijol'], slang: ['catracho','mañe','pucher','chepa','tirijisi','pichu','chure','choco','chule','bayunco'] },
+      'es-SV': { name: 'El Salvador', flag: '🇸🇻', keywords: ['guanaco','bicho','puch','chero','tuanis','chel','ceo','chunche','pisto','chamba','pacha','chivo','chuco','cerote','maje'], formal: ['computadora','carro','celular','papa','lentes','frijol'], slang: ['bicho','puch','chero','tuanis','chel','ceo','chunche','pisto','chamba','cerote'] },
+      'es-NI': { name: 'Nicaragua', flag: '🇳🇮', keywords: ['pinolero','chele','naca','sapa','bicho','tropas','chunche','arre','samaritano','chavalo','jincho','pichilingo','bole','chigüe','maje'], formal: ['computadora','carro','celular','papa','lentes','frijol'], slang: ['chele','naca','sapa','bicho','tropas','chunche','arre','jincho','pichilingo','bole'] },
+      'es-CR': { name: 'Costa Rica', flag: '🇨🇷', keywords: ['pura vida','tuanis','mae','pisto','pulpería','chunche','brete','yigüirro','guaro','roine','sarasa','jupa','bomba','carajillo','guacho'], formal: ['computadora','carro','celular','papa','lentes','frijol'], slang: ['pura vida','tuanis','mae','pisto','chunche','brete','guaro','roine','sarasa','jupa'] },
+      'es-PA': { name: 'Panama', flag: '🇵🇦', keywords: ['sorrin','chombo','fufu','aju','tongo','pelar','chivo','chilin','rasca','talla','majare','chuleta','yeye','chicha','pitillo'], formal: ['computadora','carro','celular','lapicero','papa','lentes','frijol'], slang: ['sorrin','chombo','fufu','aju','tongo','pelar','palo','yeyo','majare','chuleta'] },
+      'es-DO': { name: 'Dominican Rep.', flag: '🇩🇴', keywords: ['tiguere','concon','vívere','aplatar','guagua','pora','jevo','china','bandola','kukú','papichulo','vaina','que lo que','chin','yeyo'], formal: ['computadora','carro','celular','apartamento','guagua','papa','lentes','habichuela'], slang: ['tiguere','concon','vívere','pora','jevo','bandola','kukú','papichulo','vaina','que lo que'] },
+      'es-PR': { name: 'Puerto Rico', flag: '🇵🇷', keywords: ['bichote','cabrón','zafacón','pulpo','guagua','jevo','pichar','chota','almohada','floor','parking','chevere','nene','mami','papi'], formal: ['computadora','carro','celular','apartamento','guagua','papa','lentes','habichuela'], slang: ['bichote','cabrón','pulpo','jevo','pichar','chota','floor','parking','chevere','janguear'] },
+      'es-GQ': { name: 'Eq. Guinea', flag: '🇬🇶', keywords: ['ñame','guineano','bubi','fang','malabo','fufú','batata','camisola','bacalao','bangá','malamba','ndowe','annobón','bioko','río muni'], formal: ['computadora','carro','celular','papa','lentes','guineano','malabo','annobón'], slang: ['ñame','fufú','batata','camisola','bacalao','bangá','malamba','ndowe','bata','mongomo'] },
+      'es-US': { name: 'U.S. Spanish', flag: '🇺🇸', keywords: ['troca','parquear','lonche','wacha','cholo','ese','firme','simón','vato','carnal','neta','mande','fresa','chafa','huero'], formal: ['computadora','carro','celular','papa','lentes','mija','mijo','raza'], slang: ['troca','parquear','lonche','wacha','cholo','ese','firme','simón','vato','carnal'] },
+      'es-PH': { name: 'Philippines', flag: '🇵🇭', keywords: ['jendeh','kame','kita','evo','quilaya','tamén','onde','kamo','sila','conele','connosotros','nisos','vusos','jaha','mo\'o'], formal: ['kame','kita','kamo','sila','conele','connosotros','nisos','vusos','jaha','onde'], slang: ['jendeh','evo','quilaya','tamén','mo\'o','ta','maga','eli','akon','dele'] },
+      'es-BZ': { name: 'Belize', flag: '🇧🇿', keywords: ['breki','kriol','garífuna','cayos','beliceño','zapote','cayuco','bway','mopan','kekchi','yucatec','placencia','dangriga','criollo','mestizo'], formal: ['computadora','carro','celular','papa','lentes','beliceño','mestizo','criollo'], slang: ['breki','kriol','cayos','zapote','cayuco','bway','mopan','kekchi','placencia','dangriga'] },
+      'es-AD': { name: 'Andorra', flag: '🇦🇩', keywords: ['andorrano','madriu','canillo','escaldes','encamp','ordino','massana','caldea','comú','pirineo','andorra','parroquia','principado','vall','pas'], formal: ['andorrano','madriu','canillo','escaldes','encamp','ordino','massana','caldea','parroquia','principado'], slang: ['comú','pirineo','vall','pas','xaval','doncs','molt','clar','aixo','andorra'] },
+    };
+
+    // ─── Detection Logic ───
+    function getWords(text) {
+      const words = new Set();
+      const tokens = text.toLowerCase().match(/[a-záéíóúüñ'’]+/g) || [];
+      for (const t of tokens) words.add(t);
+      for (let i = 0; i < tokens.length - 1; i++) {
+        words.add(tokens[i] + ' ' + tokens[i+1]);
+        if (i < tokens.length - 2) words.add(tokens[i] + ' ' + tokens[i+1] + ' ' + tokens[i+2]);
+      }
+      return words;
+    }
+
+    function detectDialect(text) {
+      const lower = text.toLowerCase();
+      const wordSet = getWords(text);
+      const results = [];
+      for (const [code, data] of Object.entries(DIALECTS)) {
+        const match = kw => {
+          const k = kw.toLowerCase();
+          return k.includes(' ') ? lower.includes(k) : wordSet.has(k);
+        };
+        const kwM = data.keywords.filter(match);
+        const fM = data.formal.filter(match);
+        const sM = data.slang.filter(match);
+        const score = kwM.length + fM.length + sM.length;
+        const all = [...new Set([...kwM, ...fM, ...sM])];
+        let reg = 'neutral';
+        if (sM.length > fM.length) reg = 'slang';
+        else if (fM.length > sM.length) reg = 'formal';
+        results.push({ code, name: data.name, flag: data.flag, score, matched: all, reg, slang: sM.length, formal: fM.length });
+      }
+      results.sort((a,b) => b.score - a.score);
+      const best = results[0];
+      let conf = 0.1;
+      if (best.score >= 4) conf = 0.9;
+      else if (best.score === 3) conf = 0.7;
+      else if (best.score === 2) conf = 0.5;
+      else if (best.score === 1) conf = 0.3;
+      return { best, all: results, confidence: conf };
+    }
+
+    // ─── UI ───
+    const EXAMPLES = {
+      mx: 'La computadora está en el departamento. Usé la pluma para escribir. Ese güey está bien chido.',
+      ar: 'Che, voy en auto al laburo. ¿Comemos papa hoy? Boludo, qué quilombo.',
+      es: 'El ordenador está en el coche. Bebo zumo. ¡Vale! Vosotros venís.',
+      co: '¡Parce! ¿Qué más? ¡Chévere! Veci, vamos a la fiesta. Llave, pilas.',
+    };
+
+    function loadExample(key) {
+      document.getElementById('input').value = EXAMPLES[key];
+      analyze();
+    }
+
+    function renderDialectGrid() {
+      const grid = document.getElementById('dialectGrid');
+      for (const [code, data] of Object.entries(DIALECTS)) {
+        const div = document.createElement('div');
+        div.className = 'glass rounded-xl p-3 text-center dialect-card cursor-pointer';
+        div.innerHTML = `<div class="text-2xl mb-1">${data.flag}</div><div class="text-sm font-medium text-slate-300">${code}</div><div class="text-xs text-slate-500">${data.name}</div>`;
+        div.onclick = () => { document.getElementById('input').value = data.keywords.slice(0,3).join(' '); analyze(); };
+        grid.appendChild(div);
+      }
+    }
+
+    function analyze() {
+      const text = document.getElementById('input').value.trim();
+      const results = document.getElementById('results');
+      if (!text) { results.classList.add('hidden'); return; }
+
+      const { best, all, confidence } = detectDialect(text);
+      results.classList.remove('hidden');
+
+      const registerColor = best.reg === 'slang' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                            best.reg === 'formal' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                            'bg-slate-500/20 text-slate-400 border-slate-500/30';
+
+      const otherDialects = all.slice(1, 4).filter(d => d.score > 0).map(d =>
+        `<div class="flex items-center justify-between py-1.5"><span class="text-sm text-slate-400">${d.flag} ${d.code}</span><div class="flex-1 mx-3 h-1.5 bg-slate-800 rounded-full overflow-hidden"><div class="confidence-bar h-full bg-slate-600 rounded-full" style="width:${Math.min(100, d.score * 25)}%"></div></div><span class="text-xs text-slate-500 w-8 text-right">${d.score}</span></div>`
+      ).join('');
+
+      results.innerHTML = `
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="glass rounded-xl p-5">
+            <div class="text-xs text-slate-500 uppercase tracking-wider mb-3">Detected Dialect</div>
+            <div class="flex items-center gap-3 mb-2">
+              <span class="text-4xl">${best.flag}</span>
+              <div>
+                <div class="text-2xl font-bold text-slate-100">${best.code}</div>
+                <div class="text-sm text-slate-400">${best.name}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3 mt-4">
+              <div class="flex-1">
+                <div class="flex justify-between text-xs mb-1"><span class="text-slate-500">Confidence</span><span class="text-slate-300">${Math.round(confidence * 100)}%</span></div>
+                <div class="h-2 bg-slate-800 rounded-full overflow-hidden"><div class="confidence-bar h-full rounded-full ${confidence >= 0.7 ? 'bg-emerald-500' : confidence >= 0.4 ? 'bg-amber-500' : 'bg-slate-600'}" style="width:${confidence * 100}%"></div></div>
+              </div>
+              <span class="register-badge px-3 py-1 rounded-lg text-xs font-medium border ${registerColor}">${best.reg.toUpperCase()}</span>
+            </div>
+          </div>
+          <div class="glass rounded-xl p-5">
+            <div class="text-xs text-slate-500 uppercase tracking-wider mb-3">Matched Keywords (${best.matched.length})</div>
+            <div class="flex flex-wrap gap-1.5">
+              ${best.matched.length ? best.matched.map(m => `<span class="keyword-tag px-2.5 py-1 rounded-lg bg-sky-500/15 text-sky-400 text-xs font-medium border border-sky-500/20">${m}</span>`).join('') : '<span class="text-sm text-slate-600">No strong matches — text may be neutral Spanish</span>'}
+            </div>
+          </div>
+        </div>
+        ${otherDialects ? `
+        <div class="glass rounded-xl p-5 mt-4">
+          <div class="text-xs text-slate-500 uppercase tracking-wider mb-2">Runner-ups</div>
+          ${otherDialects}
+        </div>` : ''}
+      `;
+    }
+
+    document.getElementById('input').addEventListener('input', analyze);
+    renderDialectGrid();
+  </script>
 </body>
 </html>
