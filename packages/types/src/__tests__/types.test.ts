@@ -31,20 +31,21 @@ import {
 
 describe("Type Definitions", () => {
   describe("Spanish Dialects", () => {
-    it("should have exactly 20 dialects", () => {
-      expect(ALL_SPANISH_DIALECTS).toHaveLength(20);
+    it("should have exactly 25 dialects", () => {
+      expect(ALL_SPANISH_DIALECTS).toHaveLength(25);
     });
 
     it("should have DEFAULT_DIALECT as 'es-ES'", () => {
       expect(DEFAULT_DIALECT).toBe("es-ES");
     });
 
-    it("should include all 20 dialect codes", () => {
+    it("should include all 25 dialect codes", () => {
       const expected = [
         "es-ES", "es-MX", "es-AR", "es-CO", "es-CU",
         "es-PE", "es-CL", "es-VE", "es-UY", "es-PY",
         "es-BO", "es-EC", "es-GT", "es-HN", "es-SV",
         "es-NI", "es-CR", "es-PA", "es-DO", "es-PR",
+        "es-GQ", "es-US", "es-PH", "es-BZ", "es-AD",
       ];
       expect(ALL_SPANISH_DIALECTS).toEqual(expect.arrayContaining(expected));
     });
@@ -230,7 +231,7 @@ describe("Zod Validation Schemas", () => {
       expect(() => dialectSchema.parse("es-XX")).toThrow();
       expect(() => dialectSchema.parse("en-US")).toThrow();
       expect(() => dialectSchema.parse("")).toThrow();
-      expect(() => dialectSchema.parse("es-US")).toThrow();
+      expect(() => dialectSchema.parse("es-XX")).toThrow();
     });
   });
 
@@ -334,7 +335,7 @@ describe("Zod Validation Schemas", () => {
       expect(() => batchTargetsSchema.parse(["es-ES", "es-MX", "es-AR"])).not.toThrow();
     });
 
-    it("should accept array with all 20 dialects", () => {
+    it("should accept array with all 25 dialects", () => {
       expect(() => batchTargetsSchema.parse(ALL_SPANISH_DIALECTS)).not.toThrow();
     });
 
@@ -342,7 +343,7 @@ describe("Zod Validation Schemas", () => {
       expect(() => batchTargetsSchema.parse([])).toThrow();
     });
 
-    it("should reject arrays with more than 20 dialects", () => {
+    it("should reject arrays with more than 25 dialects", () => {
       const tooMany = [...ALL_SPANISH_DIALECTS, "es-ES"];
       expect(() => batchTargetsSchema.parse(tooMany)).toThrow();
     });

@@ -66,6 +66,9 @@ Become the **standard translation infrastructure** for AI-powered multilingual w
 
 ## ✅ Recently Completed
 
+- [x] **25 Spanish dialects** — Expanded from 20 to 25 (added `es-GQ`, `es-US`, `es-PH`, `es-BZ`, `es-AD`)
+- [x] **Formal vs slang register differentiation** — `detectRegister()`, `--register` CLI flag, MCP `register` param
+- [x] **Comprehensive dialect adaptations** — 200+ vocabulary rules in `manage-variants` covering all 25 dialects
 - [x] Adversarial fixture corpus + CI lane
 - [x] Provider capability negotiation
 - [x] Semantic drift quality gate

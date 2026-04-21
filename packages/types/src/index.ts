@@ -5,14 +5,15 @@ import { z } from "zod";
 // ============================================================================
 
 /**
- * All 20 Spanish dialect codes following BCP 47 standard
- * Consolidated from i18n-espanol-mcp and traductor-mcp
+ * All 25 Spanish dialect codes following BCP 47 standard
+ * Covers all Spanish-speaking countries and major territories
  */
 export type SpanishDialect =
   | "es-ES" | "es-MX" | "es-AR" | "es-CO" | "es-CU"
   | "es-PE" | "es-CL" | "es-VE" | "es-UY" | "es-PY"
   | "es-BO" | "es-EC" | "es-GT" | "es-HN" | "es-SV"
-  | "es-NI" | "es-CR" | "es-PA" | "es-DO" | "es-PR";
+  | "es-NI" | "es-CR" | "es-PA" | "es-DO" | "es-PR"
+  | "es-GQ" | "es-US" | "es-PH" | "es-BZ" | "es-AD";
 
 /**
  * Dialect metadata with name and description
@@ -25,13 +26,14 @@ export interface DialectInfo {
 }
 
 /**
- * All 20 Spanish dialects as a constant array
+ * All 25 Spanish dialects as a constant array
  */
 export const ALL_SPANISH_DIALECTS: SpanishDialect[] = [
   "es-ES", "es-MX", "es-AR", "es-CO", "es-CU",
   "es-PE", "es-CL", "es-VE", "es-UY", "es-PY",
   "es-BO", "es-EC", "es-GT", "es-HN", "es-SV",
   "es-NI", "es-CR", "es-PA", "es-DO", "es-PR",
+  "es-GQ", "es-US", "es-PH", "es-BZ", "es-AD",
 ];
 
 /**
@@ -327,13 +329,14 @@ export const languageCodeSchema = z.string().min(1).regex(/^[a-z]{2}(-[A-Z]{2})?
 });
 
 /**
- * Validates Spanish dialect codes (all 20 supported dialects)
+ * Validates Spanish dialect codes (all 25 supported dialects)
  */
 export const dialectSchema = z.enum([
   "es-ES", "es-MX", "es-AR", "es-CO", "es-CU",
   "es-PE", "es-CL", "es-VE", "es-UY", "es-PY",
   "es-BO", "es-EC", "es-GT", "es-HN", "es-SV",
   "es-NI", "es-CR", "es-PA", "es-DO", "es-PR",
+  "es-GQ", "es-US", "es-PH", "es-BZ", "es-AD",
 ], {
   errorMap: () => ({ message: "Invalid Spanish dialect code" }),
 });
@@ -368,6 +371,6 @@ export const translationRequestSchema = z.object({
 
 /**
  * Validates batch translation target arrays
- * Must have at least 1 dialect and at most 20 dialects
+ * Must have at least 1 dialect and at most 25 dialects
  */
-export const batchTargetsSchema = z.array(dialectSchema).min(1, "At least one target dialect is required").max(20, "Cannot exceed 20 target dialects");
+export const batchTargetsSchema = z.array(dialectSchema).min(1, "At least one target dialect is required").max(25, "Cannot exceed 25 target dialects");

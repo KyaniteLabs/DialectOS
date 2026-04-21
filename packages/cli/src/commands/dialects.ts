@@ -6,7 +6,8 @@ import { writeOutput } from "../lib/output.js";
 import {
   formatDialectList,
   formatDetectionResult,
-  detectDialect
+  detectDialect,
+  type RegisterPreference
 } from "../lib/dialect-info.js";
 
 /**
@@ -30,6 +31,7 @@ export async function executeDialectsList(options: DialectsListOptions = {}): Pr
  */
 export interface DialectsDetectOptions {
   format?: "text" | "json";
+  register?: RegisterPreference;
 }
 
 /**
@@ -40,9 +42,10 @@ export async function executeDialectsDetect(
   options: DialectsDetectOptions = {}
 ): Promise<void> {
   const format = options.format || "text";
+  const register = options.register || "any";
 
-  // Detect dialect
-  const result = detectDialect(text);
+  // Detect dialect with register preference
+  const result = detectDialect(text, register);
 
   // Format and output
   const output = formatDetectionResult(result, format);

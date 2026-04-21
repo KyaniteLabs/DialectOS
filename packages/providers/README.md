@@ -6,7 +6,7 @@ Translation providers with circuit breaker, retry logic, and capability negotiat
 
 | Provider | Auth Required | Dialect Support | Max Payload |
 |----------|--------------|-----------------|-------------|
-| DeepL | ✅ API key | Native (20 variants) | 50,000 chars |
+| DeepL | ✅ API key | Native (25 variants) | 50,000 chars |
 | LibreTranslate | Optional | None | 5,000 chars |
 | MyMemory | ❌ Free | None | 500 chars |
 

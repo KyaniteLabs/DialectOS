@@ -40,15 +40,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - MyMemory provider with grapheme-aware chunking
 - Provider registry with capability-based validation
 
+#### Dialect Expansion (20 → 25)
+- Added 5 new dialects: `es-GQ` (Equatorial Guinea), `es-US` (U.S. Spanish), `es-PH` (Philippine/Chavacano), `es-BZ` (Belize), `es-AD` (Andorra)
+- Expanded keyword sets from ~13 to 20–30 verified lexical items per dialect
+- Full `DIALECT_ADAPTATIONS` coverage for all 25 dialects in `manage-variants`
+- Verified keywords via web research to avoid false positives (e.g. replaced Tagalog words with Chavacano markers for `es-PH`)
+
+#### Register Differentiation (Formal vs Slang)
+- `DialectMetadata` now includes `formalMarkers`, `slangMarkers`, and `grammarFeatures`
+- `detectRegister(text)` classifies input as `"formal" | "neutral" | "slang"` via marker scoring
+- `getRegisterMarkers(dialect)` returns per-dialect formal/slang marker sets
+- CLI `--register <formal|neutral|slang>` flag on `translate` and `translate-api-docs`
+- MCP `register` parameter on `translate_missing_keys` and `batch_translate_locales`
+- `dialects detect` command outputs register classification alongside dialect code
+
 #### CLI
 - `translate-readme` with checkpoint resumption
 - `translate-api-docs` with partial failure policies
 - `i18n detect-missing` for locale file comparison
 - `i18n batch-translate` for multi-dialect workflows
-- `dialects list` with metadata for all 20 variants
+- `i18n manage-variants` with 200+ vocabulary adaptation rules across 25 dialects
+- `dialects list` with metadata for all 25 variants
+- `dialects detect` with register classification
 
 #### MCP
 - 16 MCP tools for markdown, i18n, and translation operations
+- `register` parameter on translation tools for formal/slang/neutral output
 - Structured JSON error handling
 - Graceful shutdown on SIGINT/SIGTERM
 

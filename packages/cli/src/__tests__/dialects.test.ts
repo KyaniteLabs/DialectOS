@@ -24,7 +24,7 @@ describe("dialects command", () => {
   });
 
   describe("dialects list", () => {
-    it("should list all 20 Spanish dialects", async () => {
+    it("should list all 25 Spanish dialects", async () => {
       const { executeDialectsList } = await import("../commands/dialects.js");
 
       await executeDialectsList({ format: "text" });
@@ -52,7 +52,7 @@ describe("dialects command", () => {
       expect(parsed[0]).toHaveProperty("description");
     });
 
-    it("should include all 20 dialect codes", async () => {
+    it("should include all 25 dialect codes", async () => {
       const { executeDialectsList } = await import("../commands/dialects.js");
 
       await executeDialectsList({ format: "json" });
@@ -61,7 +61,7 @@ describe("dialects command", () => {
       const parsed = JSON.parse(output);
       const codes = parsed.map((d: any) => d.code);
 
-      // Check all 20 dialects are present
+      // Check all 25 dialects are present
       expect(codes).toContain("es-ES");
       expect(codes).toContain("es-MX");
       expect(codes).toContain("es-AR");
@@ -82,7 +82,12 @@ describe("dialects command", () => {
       expect(codes).toContain("es-PA");
       expect(codes).toContain("es-DO");
       expect(codes).toContain("es-PR");
-      expect(codes.length).toBe(20);
+      expect(codes).toContain("es-GQ");
+      expect(codes).toContain("es-US");
+      expect(codes).toContain("es-PH");
+      expect(codes).toContain("es-BZ");
+      expect(codes).toContain("es-AD");
+      expect(codes.length).toBe(25);
     });
   });
 
@@ -125,6 +130,28 @@ describe("dialects command", () => {
       expect(writeOutput).toHaveBeenCalled();
       const output = vi.mocked(writeOutput).mock.calls[0][0];
       expect(output).toContain("es-ES");
+    });
+
+    it("should detect slang register in Mexican Spanish", async () => {
+      const { executeDialectsDetect } = await import("../commands/dialects.js");
+
+      await executeDialectsDetect("Ese güey está bien chido. Neta, qué padre.", { register: "slang" });
+
+      expect(writeOutput).toHaveBeenCalled();
+      const output = vi.mocked(writeOutput).mock.calls[0][0];
+      expect(output).toContain("es-MX");
+      expect(output).toMatch(/slang|Register/);
+    });
+
+    it("should detect formal register in Peninsular Spanish", async () => {
+      const { executeDialectsDetect } = await import("../commands/dialects.js");
+
+      await executeDialectsDetect("El ordenador y el frigorífico están en el piso. Vosotros debéis conducir.", { register: "formal" });
+
+      expect(writeOutput).toHaveBeenCalled();
+      const output = vi.mocked(writeOutput).mock.calls[0][0];
+      expect(output).toContain("es-ES");
+      expect(output).toMatch(/formal|Register/);
     });
 
     it("should return default dialect (es-ES) when no markers detected", async () => {
@@ -179,6 +206,36 @@ describe("dialects command", () => {
       const output = vi.mocked(writeOutput).mock.calls[0][0];
       // Should detect at least one dialect
       expect(output).toMatch(/es-[A-Z]{2}/i);
+    });
+
+    it("should detect U.S. Spanish (es-US) from keyword markers", async () => {
+      const { executeDialectsDetect } = await import("../commands/dialects.js");
+
+      await executeDialectsDetect("Voy a parquear la troca. Ese vato es mi carnal.");
+
+      expect(writeOutput).toHaveBeenCalled();
+      const output = vi.mocked(writeOutput).mock.calls[0][0];
+      expect(output).toContain("es-US");
+    });
+
+    it("should detect Equatoguinean Spanish (es-GQ) from keyword markers", async () => {
+      const { executeDialectsDetect } = await import("../commands/dialects.js");
+
+      await executeDialectsDetect("El guineano come ñame en Malabo.");
+
+      expect(writeOutput).toHaveBeenCalled();
+      const output = vi.mocked(writeOutput).mock.calls[0][0];
+      expect(output).toContain("es-GQ");
+    });
+
+    it("should detect Philippine Spanish (es-PH) from keyword markers", async () => {
+      const { executeDialectsDetect } = await import("../commands/dialects.js");
+
+      await executeDialectsDetect("Jendeh yo sabé. Kame ya anda conele. Evo ta mirá?");
+
+      expect(writeOutput).toHaveBeenCalled();
+      const output = vi.mocked(writeOutput).mock.calls[0][0];
+      expect(output).toContain("es-PH");
     });
   });
 

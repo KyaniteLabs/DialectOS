@@ -176,9 +176,13 @@ dialectsCommand
   .description("Detect Spanish dialect from text")
   .argument("<text>", "Text to analyze for dialect detection")
   .option("--format <format>", "Output format (text or json)", "text")
+  .option("--register <register>", "Register preference: formal | slang | any", "any")
   .action(async (text, options) => {
     try {
-      await executeDialectsDetect(text, { format: options.format });
+      const register = ["formal", "slang", "any"].includes(options.register)
+        ? options.register
+        : "any";
+      await executeDialectsDetect(text, { format: options.format, register });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       writeError(message);

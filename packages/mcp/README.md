@@ -1,6 +1,6 @@
 # @espanol/mcp
 
-Model Context Protocol server providing 16 tools for Spanish dialect translation.
+Model Context Protocol server providing 16 tools for Spanish dialect translation across 25 regional variants.
 
 ## Usage
 
@@ -43,7 +43,7 @@ Add to your MCP client configuration:
 - `translate_code_comment` — Translate comments, preserve code
 - `translate_readme` — Full README translation pipeline
 - `search_glossary` — Search 500+ term glossary
-- `list_dialects` — List all 20 supported dialects
+- `list_dialects` — List all 25 supported dialects
 
 ## Security
 

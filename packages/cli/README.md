@@ -16,6 +16,10 @@ npm install -g @espanol/cli
 # Translate text to a specific dialect
 espanol translate "Hello world" --dialect es-MX
 
+# Translate with formal / slang register
+espanol translate "Hello world" --dialect es-MX --register formal
+espanol translate "Hello world" --dialect es-AR --register slang
+
 # Translate a README preserving structure
 espanol translate-readme README.md --dialect es-AR --output README.ar.md
 
@@ -35,6 +39,9 @@ espanol i18n translate-missing ./locales/en.json ./locales/es.json --dialect es-
 # Batch translate to multiple dialects
 espanol i18n batch-translate ./locales/en.json --dialects es-MX,es-AR,es-CO
 
+# Create dialect-specific variant from es-ES base
+espanol i18n manage-variants ./locales/es-ES.json --variant es-MX --output ./locales/es-MX.json
+
 # Check formality consistency
 espanol i18n check-formality ./locales/es.json --expected formal
 
@@ -48,8 +55,9 @@ espanol i18n apply-gender-neutral ./locales/es.json --output ./locales/es-neutra
 # List all supported dialects
 espanol dialects list
 
-# Detect dialect from text
+# Detect dialect from text (includes register classification)
 espanol dialects detect "Che boludo, qué onda?"
+espanol dialects detect "Estimado señor, le saludo cordialmente"
 ```
 
 ### Glossary

@@ -8,5 +8,5 @@ Shared TypeScript types and schemas for DialectOS.
 - `ProviderCapability` — Capability metadata (languages, payload limits, features)
 - `TranslationResult` — Standardized translation output
 - `TranslateOptions` — Translation options (dialect, formality, context)
-- `SpanishDialect` — Union type of all 20 supported dialects
+- `SpanishDialect` — Union type of all 25 supported dialects
 - `ALL_SPANISH_DIALECTS` — Array of all dialect codes
