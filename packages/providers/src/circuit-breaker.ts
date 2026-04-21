@@ -10,7 +10,8 @@ export class CircuitBreaker {
   private failureCount = 0;
   private lastFailureTime?: number;
   private nextAttemptTime?: number;
-  private probeLock = false;
+  private probeLockTime?: number;
+  private static readonly PROBE_LOCK_TIMEOUT_MS = 5000;
 
   constructor(
     private readonly failureThreshold: number,
@@ -29,18 +30,22 @@ export class CircuitBreaker {
       if (this.nextAttemptTime && now >= this.nextAttemptTime) {
         this.state = "half-open";
         this.failureCount = 0;
-        this.probeLock = true; // This call becomes the probe request
+        this.probeLockTime = now; // This call becomes the probe request
         return true;
       }
       return false;
     }
 
-    // If circuit is half-open, only allow one probe request at a time
+    // If circuit is half-open, only allow one probe request at a time.
+    // The probe lock auto-expires after PROBE_LOCK_TIMEOUT_MS to prevent
+    // deadlock when canExecute() is called for availability checks but
+    // no actual request executes (e.g., ProviderRegistry.getAuto() picks
+    // a different provider).
     if (this.state === "half-open") {
-      if (this.probeLock) {
+      if (this.probeLockTime && now - this.probeLockTime < CircuitBreaker.PROBE_LOCK_TIMEOUT_MS) {
         return false;
       }
-      this.probeLock = true;
+      this.probeLockTime = now;
       return true;
     }
 
@@ -55,7 +60,7 @@ export class CircuitBreaker {
     this.state = "closed";
     this.lastFailureTime = undefined;
     this.nextAttemptTime = undefined;
-    this.probeLock = false;
+    this.probeLockTime = undefined;
   }
 
   /**
@@ -69,7 +74,7 @@ export class CircuitBreaker {
     if (this.state === "half-open") {
       this.state = "open";
       this.nextAttemptTime = Date.now() + this.resetTimeoutMs;
-      this.probeLock = false;
+      this.probeLockTime = undefined;
       return;
     }
 
@@ -95,6 +100,6 @@ export class CircuitBreaker {
     this.failureCount = 0;
     this.lastFailureTime = undefined;
     this.nextAttemptTime = undefined;
-    this.probeLock = false;
+    this.probeLockTime = undefined;
   }
 }

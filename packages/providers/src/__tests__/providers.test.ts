@@ -142,6 +142,31 @@ describe("CircuitBreaker", () => {
     expect(breaker.getState()).toBe("closed");
     expect(breaker.canExecute()).toBe(true);
   });
+
+  it("should auto-release probe lock after timeout if no result recorded", async () => {
+    const breaker = new CircuitBreaker(3, 100); // 100ms timeout
+
+    // Open the circuit
+    breaker.recordFailure();
+    breaker.recordFailure();
+    breaker.recordFailure();
+    expect(breaker.getState()).toBe("open");
+
+    // Wait for reset timeout
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    // First canExecute() locks the probe
+    expect(breaker.canExecute()).toBe(true);
+    // Second call fails immediately
+    expect(breaker.canExecute()).toBe(false);
+
+    // Simulate time passing beyond the probe lock timeout (5s)
+    // We can't wait 5s in tests, so we verify the internal state:
+    // If we manually reset the probe lock time to the past, it should allow a new probe
+    (breaker as any).probeLockTime = Date.now() - 6000;
+    expect(breaker.canExecute()).toBe(true);
+    expect(breaker.getState()).toBe("half-open");
+  });
 });
 
 describe("RetryPolicy", () => {
