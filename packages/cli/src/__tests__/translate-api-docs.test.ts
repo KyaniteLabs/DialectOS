@@ -285,7 +285,10 @@ describe("translate-api-docs command", () => {
         "Header1 Header2 Cell1 Cell2",
         "auto",
         "es-ES",
-        { dialect: "es-ES" }
+        expect.objectContaining({
+          dialect: "es-ES",
+          context: expect.stringContaining("do not translate literally word-by-word"),
+        })
       );
       expect(mockWriteOutput).toHaveBeenCalled();
     });
@@ -319,7 +322,10 @@ describe("translate-api-docs command", () => {
         "Item 1\nNested item",
         "auto",
         "es-ES",
-        { dialect: "es-ES" }
+        expect.objectContaining({
+          dialect: "es-ES",
+          context: expect.stringContaining("Current section type: list"),
+        })
       );
       expect(mockWriteOutput).toHaveBeenCalled();
     });
@@ -361,7 +367,10 @@ describe("translate-api-docs command", () => {
         "Some text",
         "auto",
         "es-ES",
-        { dialect: "es-ES" }
+        expect.objectContaining({
+          dialect: "es-ES",
+          context: expect.stringContaining("Document kind: api-docs"),
+        })
       );
       expect(mockWriteOutput).toHaveBeenCalled();
     });
@@ -401,7 +410,10 @@ describe("translate-api-docs command", () => {
         "# API",
         "auto",
         "es-ES",
-        { dialect: "es-ES" }
+        expect.objectContaining({
+          dialect: "es-ES",
+          context: expect.stringContaining("Document domain: technical"),
+        })
       );
       expect(mockWriteOutput).toHaveBeenCalled();
     });

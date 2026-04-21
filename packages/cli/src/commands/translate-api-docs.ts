@@ -34,6 +34,7 @@ import {
   type AdaptivePacingState,
 } from "../lib/resilient-translation.js";
 import { calculateQualityScore } from "../lib/quality-score.js";
+import { buildSemanticTranslationContext } from "../lib/semantic-context.js";
 import {
   formatSemanticQualityError,
   resolvePolicy,
@@ -168,6 +169,12 @@ async function translateSection(
     const protectedChunk = protectTokensInText(glossaryChunk.text, mergedTokens);
     const options: TranslateOptions = {
       dialect,
+      context: buildSemanticTranslationContext({
+        text: section.content,
+        dialect,
+        documentKind: "api-docs",
+        sectionType: section.type,
+      }),
     };
     const result = await translateWithFallback(
       registry,
