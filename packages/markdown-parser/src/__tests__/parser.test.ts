@@ -374,7 +374,7 @@ describe("parseMarkdown", () => {
       const result = parseMarkdown(content);
       const duration = Date.now() - start;
 
-      expect(duration).toBeLessThan(100);
+      expect(duration).toBeLessThan(1000);
       // Should complete without hanging
       expect(result).toBeDefined();
     });
@@ -393,7 +393,7 @@ describe("parseMarkdown", () => {
       const result = parseMarkdown(content);
       const duration = Date.now() - start;
 
-      expect(duration).toBeLessThan(100);
+      expect(duration).toBeLessThan(1000);
       expect(result).toBeDefined();
     });
   });

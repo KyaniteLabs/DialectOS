@@ -382,3 +382,5 @@ export const batchTargetsSchema = z.array(dialectSchema).min(1, "At least one ta
 export * from "./glossary-data.js";
 
 export * from "./dialect-profiles.js";
+
+export * from "./dialect-quality.js";
