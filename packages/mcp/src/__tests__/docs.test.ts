@@ -18,7 +18,6 @@ class MockSecurityError extends Error {
 // Mock fs module
 vi.mock("node:fs", () => ({
   readFileSync: vi.fn(),
-  writeFileSync: vi.fn(),
 }));
 
 // Mock the core libraries

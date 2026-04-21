@@ -18,8 +18,6 @@ class MockSecurityError extends Error {
 
 // Mock fs module
 vi.mock("node:fs", () => ({
-  readFileSync: vi.fn(),
-  writeFileSync: vi.fn(),
   existsSync: vi.fn().mockReturnValue(true),
   statSync: vi.fn().mockReturnValue({ isDirectory: () => true }),
 }));
