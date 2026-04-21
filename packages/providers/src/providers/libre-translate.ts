@@ -167,16 +167,20 @@ export class LibreTranslateProvider implements TranslationProvider {
       }
 
       // Keep timeout active while reading body — start a fresh timeout race
+      let bodyTimeoutId: ReturnType<typeof setTimeout> | undefined;
       const data = (await Promise.race([
         response.json(),
-        new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Response body timed out")), LIBRETRANSLATE_TIMEOUT)
-        ),
+        new Promise<never>((_, reject) => {
+          bodyTimeoutId = setTimeout(
+            () => reject(new Error("Response body timed out")),
+            LIBRETRANSLATE_TIMEOUT
+          );
+        }),
       ])) as {
         translatedText: string;
         detectedLanguage?: { language: string };
       };
-
+      if (bodyTimeoutId) clearTimeout(bodyTimeoutId);
       clearTimeout(timeoutId);
 
       // Record success
