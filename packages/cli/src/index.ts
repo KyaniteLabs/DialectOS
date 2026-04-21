@@ -8,7 +8,7 @@
 import { Command } from "commander";
 import { executeTranslate } from "./commands/translate.js";
 import { createTranslateReadmeCommand } from "./commands/translate-readme.js";
-import { executeTranslateApiDocs, executeExtractTranslatable } from "./commands/translate-api-docs.js";
+import { executeTranslateApiDocs, executeExtractTranslatable, type TranslateApiDocsOptions } from "./commands/translate-api-docs.js";
 import { executeDialectsList, executeDialectsDetect } from "./commands/dialects.js";
 import { executeGlossarySearch, executeGlossaryGet } from "./commands/glossary.js";
 import { executeDetectMissing } from "./commands/i18n/detect-missing.js";
@@ -22,6 +22,7 @@ import { writeError, writeOutput } from "./lib/output.js";
 import { SecurityError, createSafeError } from "@espanol/security";
 import type { SpanishDialect } from "@espanol/types";
 import { parse, format } from "node:path";
+import { resolvePolicy, type PolicyProfile } from "./lib/translation-policy.js";
 
 const program = new Command();
 
@@ -104,7 +105,8 @@ program
   .option("--checkpoint-file <path>", "Checkpoint file for resumable translation")
   .option("--resume", "Resume from checkpoint when available", true)
   .option("--no-resume", "Ignore existing checkpoint")
-  .option("--failure-policy <policy>", "Section failure policy: strict|allow-partial", "strict")
+  .option("--failure-policy <policy>", "Section failure policy: strict|allow-partial")
+  .option("--policy <profile>", "Policy profile: strict|balanced|permissive", "balanced")
   .hook("preAction", (thisCommand: Command) => {
     const policy = thisCommand.opts().failurePolicy;
     if (policy && !["strict", "allow-partial"].includes(policy)) {
@@ -116,7 +118,31 @@ program
     try {
       const registry = getDefaultProviderRegistry();
 
-      await executeTranslateApiDocs(input, options.dialect as string, options, () => registry);
+      // Resolve policy profile and merge with explicit overrides
+      const profile = resolvePolicy(options.policy as PolicyProfile, {
+        failurePolicy: options.failurePolicy as "strict" | "allow-partial" | undefined,
+        validateStructure: options.validateStructure as boolean | undefined,
+        structureMode: options.structureMode as "warn" | "strict" | undefined,
+        glossaryMode: options.glossaryMode as "off" | "strict" | undefined,
+        protectIdentities: options.protectIdentities as boolean | undefined,
+        resume: options.resume as boolean | undefined,
+      });
+      const mergedOptions: TranslateApiDocsOptions = {
+        dialect: options.dialect as SpanishDialect,
+        provider: options.provider as string,
+        output: options.output as string | undefined,
+        protectTokens: options.protectTokens as string | undefined,
+        glossaryFile: options.glossaryFile as string | undefined,
+        glossaryMode: profile.glossaryMode,
+        protectIdentities: profile.protectIdentities,
+        validateStructure: profile.validateStructure,
+        structureMode: profile.structureMode,
+        checkpointFile: options.checkpointFile as string | undefined,
+        resume: profile.resume,
+        failurePolicy: profile.failurePolicy,
+      };
+
+      await executeTranslateApiDocs(input, mergedOptions.dialect!, mergedOptions, () => registry);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       writeError(message);

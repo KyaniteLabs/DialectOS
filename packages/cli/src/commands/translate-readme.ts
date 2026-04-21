@@ -36,6 +36,7 @@ import {
   loadCheckpoint,
   saveCheckpoint,
   hashSource,
+  CURRENT_CHECKPOINT_SCHEMA_VERSION,
   type TranslationCheckpoint,
 } from "../lib/checkpoint.js";
 import {
@@ -43,6 +44,7 @@ import {
   type AdaptivePacingState,
 } from "../lib/resilient-translation.js";
 import { calculateQualityScore } from "../lib/quality-score.js";
+import { resolvePolicy, type PolicyProfile } from "../lib/translation-policy.js";
 
 interface TranslateReadmeOptions {
   dialect: string;
@@ -59,6 +61,7 @@ interface TranslateReadmeOptions {
   checkpointFile?: string;
   resume?: boolean;
   failurePolicy?: "strict" | "allow-partial";
+  policy?: PolicyProfile;
 }
 
 /**
@@ -91,10 +94,29 @@ export function createTranslateReadmeCommand(
     .option("--checkpoint-file <file>", "Checkpoint file for resumable translation")
     .option("--resume", "Resume from checkpoint when available", true)
     .option("--no-resume", "Ignore existing checkpoint")
-    .option("--failure-policy <policy>", "Behavior on section failure: strict|allow-partial", "strict")
+    .option("--failure-policy <policy>", "Behavior on section failure: strict|allow-partial")
+    .option("--policy <profile>", "Policy profile: strict|balanced|permissive", "balanced")
     .action(async (input: string, options: TranslateReadmeOptions) => {
+      // Resolve policy profile and merge with explicit overrides
+      const policy = resolvePolicy(options.policy, {
+        failurePolicy: options.failurePolicy,
+        validateStructure: options.validateStructure,
+        structureMode: options.structureMode,
+        glossaryMode: options.glossaryMode,
+        protectIdentities: options.protectIdentities,
+        resume: options.resume,
+      });
+      const mergedOptions: TranslateReadmeOptions = {
+        ...options,
+        failurePolicy: policy.failurePolicy,
+        validateStructure: policy.validateStructure,
+        structureMode: policy.structureMode,
+        glossaryMode: policy.glossaryMode,
+        protectIdentities: policy.protectIdentities,
+        resume: policy.resume,
+      };
       try {
-        await translateReadme(input, options, getRegistry);
+        await translateReadme(input, mergedOptions, getRegistry);
       } catch (error) {
         if (error instanceof Error) {
           writeError(error.message);
@@ -217,6 +239,7 @@ async function translateReadme(
         // Only checkpoint successful translations
         translatedByIndex[idx] = translatedContent;
         const state: TranslationCheckpoint = {
+          schemaVersion: CURRENT_CHECKPOINT_SCHEMA_VERSION,
           sourcePath: validatedPath,
           sourceHash,
           totalSections: parsed.sections.length,
