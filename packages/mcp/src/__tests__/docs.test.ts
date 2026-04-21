@@ -25,7 +25,6 @@ vi.mock("node:fs", () => ({
 vi.mock("@espanol/markdown-parser", () => ({
   parseMarkdown: vi.fn(),
   reconstructMarkdown: vi.fn(),
-  extractTranslatableText: vi.fn(),
 }));
 
 vi.mock("@espanol/security", () => {
@@ -73,7 +72,6 @@ vi.mock("@espanol/providers", () => ({
 import {
   parseMarkdown,
   reconstructMarkdown,
-  extractTranslatableText,
 } from "@espanol/markdown-parser";
 import {
   validateMarkdownPath,
@@ -140,12 +138,6 @@ describe("MCP Docs Tools", () => {
     vi.mocked(reconstructMarkdown).mockReturnValue(
       "# Hola Mundo\n\nEste es un párrafo de prueba.\n\n```javascript\nconsole.log('code');\n```"
     );
-
-    // Mock extractTranslatableText
-    vi.mocked(extractTranslatableText).mockReturnValue([
-      "Hello World",
-      "This is a test paragraph.",
-    ]);
 
     // Mock validateMarkdownPath
     vi.mocked(validateMarkdownPath).mockReturnValue("/test/path.md");

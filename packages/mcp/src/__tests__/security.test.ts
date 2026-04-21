@@ -18,7 +18,6 @@ vi.mock("node:fs", () => ({
 vi.mock("@espanol/markdown-parser", () => ({
   parseMarkdown: vi.fn(),
   reconstructMarkdown: vi.fn(),
-  extractTranslatableText: vi.fn(),
 }));
 
 vi.mock("@espanol/locale-utils", () => ({
@@ -80,7 +79,6 @@ vi.mock("@espanol/providers", () => ({
 import {
   parseMarkdown,
   reconstructMarkdown,
-  extractTranslatableText,
 } from "@espanol/markdown-parser";
 import {
   readLocaleFile,
@@ -154,9 +152,6 @@ describe("MCP Security Tests", () => {
 
     // Mock reconstructMarkdown
     vi.mocked(reconstructMarkdown).mockReturnValue("# Hola Mundo");
-
-    // Mock extractTranslatableText
-    vi.mocked(extractTranslatableText).mockReturnValue(["Hello World"]);
 
     // Mock readLocaleFile
     vi.mocked(readLocaleFile).mockReturnValue([
