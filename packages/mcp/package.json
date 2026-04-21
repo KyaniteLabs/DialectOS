@@ -1,6 +1,6 @@
 {
   "name": "@espanol/mcp",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "MCP adapter for Espanol — thin wrapper around CLI/core",
   "type": "module",
   "main": "dist/index.js",
