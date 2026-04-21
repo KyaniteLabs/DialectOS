@@ -70,6 +70,7 @@ function hasForbiddenTerm(output, term) {
 async function evaluate(sample, dialect, translate) {
   const failures = [];
   const warnings = [];
+  const qualityWarnings = [];
   let output = "";
 
   try {
@@ -81,6 +82,20 @@ async function evaluate(sample, dialect, translate) {
   for (const term of sample.forbiddenOutputTerms || []) {
     if (output && hasForbiddenTerm(output, term)) {
       failures.push(`Forbidden output term present: ${term}`);
+    }
+  }
+
+  if (output && sample.requiredOutputAny?.length) {
+    const matched = sample.requiredOutputAny.some((term) => hasForbiddenTerm(output, term));
+    if (!matched) {
+      failures.push(`Missing required output trait; expected one of: ${sample.requiredOutputAny.join(", ")}`);
+    }
+  }
+
+  if (output && sample.preferredOutputAny?.length) {
+    const matched = sample.preferredOutputAny.some((term) => hasForbiddenTerm(output, term));
+    if (!matched) {
+      qualityWarnings.push(`Missing preferred dialect trait; expected one of: ${sample.preferredOutputAny.join(", ")}`);
     }
   }
 
@@ -101,6 +116,7 @@ async function evaluate(sample, dialect, translate) {
     passes: failures.length === 0,
     failures,
     warnings,
+    qualityWarnings,
   };
 }
 
@@ -126,12 +142,13 @@ const summary = {
   total: results.length,
   passed: results.filter((r) => r.passes).length,
   failed: results.filter((r) => !r.passes).length,
+  warnings: results.reduce((count, result) => count + result.qualityWarnings.length + result.warnings.length, 0),
   results,
 };
 
 mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, "results.json"), `${JSON.stringify(summary, null, 2)}\n`);
-console.log(JSON.stringify({ outDir, total: summary.total, passed: summary.passed, failed: summary.failed, live }, null, 2));
+console.log(JSON.stringify({ outDir, total: summary.total, passed: summary.passed, failed: summary.failed, warnings: summary.warnings, live }, null, 2));
 
 if (summary.failed > 0) {
   process.exit(1);

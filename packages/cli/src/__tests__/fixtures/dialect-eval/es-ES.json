@@ -17,6 +17,15 @@
       "parce",
       "boludo"
     ],
-    "notes": "Spain can use vosotros and should not get Latin American slang."
+    "notes": "Spain can use vosotros and should not get Latin American slang.",
+    "requiredOutputAny": [
+      "vosotros",
+      "podéis",
+      "vuestras"
+    ],
+    "preferredOutputAny": [
+      "vosotros",
+      "podéis"
+    ]
   }
 ]

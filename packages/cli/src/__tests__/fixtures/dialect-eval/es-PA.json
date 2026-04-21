@@ -19,7 +19,10 @@
       "chombo",
       "yeyé"
     ],
-    "notes": "Panama should default to bus/tomar-style neutral wording, not voseo or sensitive slang."
+    "notes": "Panama should default to bus/tomar-style neutral wording, not voseo or sensitive slang.",
+    "preferredOutputAny": [
+      "bus"
+    ]
   },
   {
     "id": "pa-support-formal",
@@ -38,6 +41,11 @@
       "chombo",
       "yeyé"
     ],
-    "notes": "Support/security copy should be respectful and neutral."
+    "notes": "Support/security copy should be respectful and neutral.",
+    "preferredOutputAny": [
+      "usted",
+      "actualice",
+      "su contraseña"
+    ]
   }
 ]

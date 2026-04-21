@@ -20,7 +20,7 @@ describe("dialect eval script", () => {
       passed: number;
       failed: number;
       live: boolean;
-      results: Array<{ fixture: string; passes: boolean; output: string; provider: string; live: boolean }>;
+      results: Array<{ fixture: string; passes: boolean; output: string; provider: string; live: boolean; qualityWarnings: string[] }>;
     };
 
     expect(results.total).toBeGreaterThanOrEqual(7);
@@ -29,6 +29,7 @@ describe("dialect eval script", () => {
     expect(results.live).toBe(false);
     expect(results.results.some((result) => result.fixture === "pa-transit-neutral")).toBe(true);
     expect(results.results.every((result) => result.provider === "mock-semantic" && result.live === false)).toBe(true);
+    expect(results.results.some((result) => result.qualityWarnings.length > 0)).toBe(true);
 
     rmSync(outDir, { recursive: true, force: true });
   });

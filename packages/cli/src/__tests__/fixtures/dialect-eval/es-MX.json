@@ -17,6 +17,16 @@
       "vos",
       "vosotros"
     ],
-    "notes": "Mexico should avoid literal coger for pick up/take."
+    "notes": "Mexico should avoid literal coger for pick up/take.",
+    "requiredOutputAny": [
+      "recoge",
+      "recoger",
+      "toma",
+      "agarra"
+    ],
+    "preferredOutputAny": [
+      "recoge",
+      "recoger"
+    ]
   }
 ]

@@ -19,7 +19,10 @@
       "bicho",
       "puñeta"
     ],
-    "notes": "PR can use guagua in the right context, but strong slang must not be introduced by default."
+    "notes": "PR can use guagua in the right context, but strong slang must not be introduced by default.",
+    "preferredOutputAny": [
+      "guagua"
+    ]
   },
   {
     "id": "pr-support-formal",
@@ -39,6 +42,11 @@
       "bicho",
       "puñeta"
     ],
-    "notes": "Formal PR support copy should avoid slang."
+    "notes": "Formal PR support copy should avoid slang.",
+    "preferredOutputAny": [
+      "soporte",
+      "comuníquese",
+      "póngase"
+    ]
   }
 ]

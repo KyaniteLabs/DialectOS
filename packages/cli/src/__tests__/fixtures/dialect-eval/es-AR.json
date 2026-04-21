@@ -15,6 +15,15 @@
     "forbiddenOutputTerms": [
       "vosotros"
     ],
-    "notes": "Informal Argentine output should preserve voseo but avoid unsafe slang unless requested."
+    "notes": "Informal Argentine output should preserve voseo but avoid unsafe slang unless requested.",
+    "requiredOutputAny": [
+      "vos podés",
+      "podés",
+      "vos puedes"
+    ],
+    "preferredOutputAny": [
+      "vos",
+      "podés"
+    ]
   }
 ]
