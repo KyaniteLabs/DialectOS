@@ -82,12 +82,19 @@ export interface TranslationProvider {
     targetLang: string,
     options?: TranslateOptions
   ): Promise<TranslationResult>;
+
+  /**
+   * Return capability metadata for this provider.
+   * Used for capability negotiation and early validation.
+   */
+  getCapabilities?(): ProviderCapability;
 }
 
 /**
- * Provider metadata
+ * Provider capability metadata
+ * Used for capability negotiation and request validation
  */
-export interface ProviderMetadata {
+export interface ProviderCapability {
   /** Unique provider name */
   name: string;
   /** Display name for UI purposes */
@@ -100,7 +107,25 @@ export interface ProviderMetadata {
   supportsContext: boolean;
   /** Whether provider supports dialect option */
   supportsDialect: boolean;
+  /** Supported source language codes */
+  supportedSourceLangs: string[];
+  /** Supported target language codes */
+  supportedTargetLangs: string[];
+  /** Maximum payload size in characters */
+  maxPayloadChars: number;
+  /** How the provider handles dialect variants */
+  dialectHandling: "native" | "approximate" | "none";
+  /** Rate limit hints (requests per window) */
+  rateLimitHints?: {
+    maxRequests: number;
+    windowMs: number;
+  };
 }
+
+/**
+ * @deprecated Use ProviderCapability instead
+ */
+export interface ProviderMetadata extends ProviderCapability {}
 
 // ============================================================================
 // Translation Request/Result Types
