@@ -12,7 +12,7 @@
  * - Supports translation workflows
  */
 
-import { marked } from "marked";
+import { marked, type Token } from "marked";
 import DOMPurify from "isomorphic-dompurify";
 import {
   type MarkdownSection,
@@ -29,20 +29,18 @@ import {
 // Types
 // ============================================================================
 
-/**
- * Extended token type from marked with additional properties
- */
-interface MarkedToken {
-  type: string;
-  raw?: string;
+// Minimal interface for token walking — we use runtime checks for href/tokens/items
+interface WalkableToken {
+  href?: string;
+  tokens?: WalkableToken[];
+  items?: WalkableToken[];
   text?: string;
+  type?: string;
+  raw?: string;
   depth?: number;
-  items?: any[];
   lang?: string;
   codeBlockStyle?: "indented" | "fenced";
-  tokens?: any[];
-  href?: string;
-  title?: string;
+  title?: string | null;
   [key: string]: any;
 }
 
@@ -56,35 +54,29 @@ interface MarkedToken {
  */
 function extractUrlsFromContent(content: string): string[] {
   const urls: string[] = [];
+  const seen = new Set<string>();
 
-  // Match inline links: [text](url)
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  let match;
-  while ((match = linkRegex.exec(content)) !== null) {
-    urls.push(match[2]);
-  }
+  // Use marked's lexer to safely tokenize content (no regex ReDoS)
+  const tokens = marked.lexer(content);
 
-  // Match images: ![alt](url)
-  const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-  while ((match = imgRegex.exec(content)) !== null) {
-    urls.push(match[2]);
-  }
-
-  // Match autolinks: <url>
-  const autolinkRegex = /<([^>\s]+)>/g;
-  while ((match = autolinkRegex.exec(content)) !== null) {
-    const url = match[1];
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      urls.push(url);
+  function walkTokens(tokens: WalkableToken[]): void {
+    for (const token of tokens) {
+      if (token.href && typeof token.href === "string") {
+        if (!seen.has(token.href)) {
+          seen.add(token.href);
+          urls.push(token.href);
+        }
+      }
+      if (token.tokens && Array.isArray(token.tokens)) {
+        walkTokens(token.tokens);
+      }
+      if (token.items && Array.isArray(token.items)) {
+        walkTokens(token.items);
+      }
     }
   }
 
-  // Match reference-style link definitions: [ref]: url
-  const refRegex = /^\s*\[([^\]]+)\]:\s*(\S+)/gm;
-  while ((match = refRegex.exec(content)) !== null) {
-    urls.push(match[2]);
-  }
-
+  walkTokens(tokens);
   return urls;
 }
 
@@ -120,7 +112,7 @@ function validateAllUrls(content: string): void {
 /**
  * Convert a marked token to a MarkdownSection
  */
-function tokenToSection(token: MarkedToken): MarkdownSection {
+function tokenToSection(token: WalkableToken): MarkdownSection {
   const raw = token.raw || "";
 
   switch (token.type) {
@@ -358,7 +350,7 @@ export function parseMarkdown(content: string): ParsedMarkdown {
   linkCount = countLinks(remainingContent);
 
   // Use marked lexer to tokenize
-  const tokens: MarkedToken[] = marked.lexer(remainingContent) as MarkedToken[];
+  const tokens: WalkableToken[] = marked.lexer(remainingContent) as WalkableToken[];
 
   // Convert tokens to sections
   for (const token of tokens) {

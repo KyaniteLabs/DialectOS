@@ -4,6 +4,7 @@
   "description": "Spanish translation CLI — translate text, docs, i18n files with dialect awareness",
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "espanol": "dist/index.js"
   },

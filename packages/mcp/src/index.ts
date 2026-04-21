@@ -65,7 +65,8 @@ async function main(): Promise<void> {
 // Start the server if this file is run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((error) => {
-    console.error("Failed to start MCP server:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(JSON.stringify({ level: "fatal", error: "MCP_STARTUP_FAILED", message }));
     process.exit(1);
   });
 }

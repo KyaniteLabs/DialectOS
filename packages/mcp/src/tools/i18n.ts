@@ -563,7 +563,8 @@ async function handleManageDialectVariants(
     const adaptedEntries = sourceEntries.map((entry) => {
       let newValue = entry.value;
       for (const [source, target] of Object.entries(adaptations)) {
-        const regex = new RegExp(`\\b${source}\\b`, "gi");
+        const escaped = source.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(`\\b${escaped}\\b`, "gi");
         if (regex.test(newValue)) {
           newValue = newValue.replace(regex, target);
           changes.push(`${entry.key}: ${source} -> ${target}`);
@@ -726,7 +727,8 @@ async function handleApplyGenderNeutral(
     const adaptedEntries = entries.map((entry) => {
       let newValue = entry.value;
       for (const [source, target] of Object.entries(transforms)) {
-        const regex = new RegExp(`\\b${source}\\b`, "gi");
+        const escaped = source.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const regex = new RegExp(`\\b${escaped}\\b`, "gi");
         if (regex.test(newValue)) {
           newValue = newValue.replace(regex, target);
           changes.push(`${entry.key}: ${source} -> ${target}`);

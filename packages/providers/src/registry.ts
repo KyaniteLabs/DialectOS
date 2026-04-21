@@ -37,7 +37,7 @@ export class ProviderRegistry {
   get(name: string): TranslationProvider {
     const entry = this.providers.get(name);
     if (!entry) {
-      throw new Error(`Provider not found: ${name}`);
+      throw new Error("Provider not available");
     }
     return entry.provider;
   }
@@ -52,7 +52,7 @@ export class ProviderRegistry {
       }
     }
 
-    throw new Error("No available providers - all circuits are open");
+    throw new Error("No translation providers are currently available");
   }
 
   /**

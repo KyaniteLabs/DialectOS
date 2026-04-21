@@ -495,18 +495,23 @@ describe("RateLimiter", () => {
   });
 
   it("should use sliding window", async () => {
-    const limiter = new RateLimiter(3, 200); // 3 requests per 200ms
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const limiter = new RateLimiter(3, 200); // 3 requests per 200ms
 
-    await limiter.acquire(); // t=0
-    await new Promise(resolve => setTimeout(resolve, 100));
-    await limiter.acquire(); // t=100
-    await new Promise(resolve => setTimeout(resolve, 100));
-    await limiter.acquire(); // t=200
+      await limiter.acquire(); // t=0
+      vi.advanceTimersByTime(100);
+      await limiter.acquire(); // t=100
+      vi.advanceTimersByTime(100);
+      await limiter.acquire(); // t=200
 
-    // At t=200, first request should be outside window
-    // So we should have 2 requests in window (at t=100 and t=200)
-    // Should allow one more
-    await expect(limiter.acquire()).resolves.not.toThrow();
+      // At t=200, first request should be outside window
+      // So we should have 2 requests in window (at t=100 and t=200)
+      // Should allow one more
+      await expect(limiter.acquire()).resolves.not.toThrow();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 

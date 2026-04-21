@@ -53,9 +53,9 @@ describe("CircuitBreaker", () => {
     // Wait for reset timeout
     await new Promise((resolve) => setTimeout(resolve, 150));
 
-    // Should be in half-open state
-    expect(breaker.getState()).toBe("half-open");
+    // canExecute() triggers transition to half-open
     expect(breaker.canExecute()).toBe(true);
+    expect(breaker.getState()).toBe("half-open");
   });
 
   it("should close after success in half-open state", async () => {
@@ -69,6 +69,9 @@ describe("CircuitBreaker", () => {
 
     // Wait for reset timeout
     await new Promise((resolve) => setTimeout(resolve, 150));
+
+    // canExecute() triggers transition to half-open
+    expect(breaker.canExecute()).toBe(true);
     expect(breaker.getState()).toBe("half-open");
 
     // Record success
@@ -87,6 +90,9 @@ describe("CircuitBreaker", () => {
 
     // Wait for reset timeout
     await new Promise((resolve) => setTimeout(resolve, 150));
+
+    // canExecute() triggers transition to half-open
+    expect(breaker.canExecute()).toBe(true);
     expect(breaker.getState()).toBe("half-open");
 
     // Record failure
@@ -111,6 +117,55 @@ describe("CircuitBreaker", () => {
 
     breaker.recordFailure();
     expect(breaker.getState()).toBe("open");
+  });
+
+  it("should allow only one probe request in half-open state", async () => {
+    const breaker = new CircuitBreaker(3, 100); // 100ms timeout
+
+    // Open the circuit
+    breaker.recordFailure();
+    breaker.recordFailure();
+    breaker.recordFailure();
+    expect(breaker.getState()).toBe("open");
+
+    // Wait for reset timeout
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    // First canExecute() should succeed and lock the probe
+    expect(breaker.canExecute()).toBe(true);
+    // Second concurrent canExecute() should fail while probe is in flight
+    expect(breaker.canExecute()).toBe(false);
+    expect(breaker.getState()).toBe("half-open");
+
+    // After success, circuit closes and probe lock releases
+    breaker.recordSuccess();
+    expect(breaker.getState()).toBe("closed");
+    expect(breaker.canExecute()).toBe(true);
+  });
+
+  it("should auto-release probe lock after timeout if no result recorded", async () => {
+    const breaker = new CircuitBreaker(3, 100); // 100ms timeout
+
+    // Open the circuit
+    breaker.recordFailure();
+    breaker.recordFailure();
+    breaker.recordFailure();
+    expect(breaker.getState()).toBe("open");
+
+    // Wait for reset timeout
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    // First canExecute() locks the probe
+    expect(breaker.canExecute()).toBe(true);
+    // Second call fails immediately
+    expect(breaker.canExecute()).toBe(false);
+
+    // Simulate time passing beyond the probe lock timeout (5s)
+    // We can't wait 5s in tests, so we verify the internal state:
+    // If we manually reset the probe lock time to the past, it should allow a new probe
+    (breaker as any).probeLockTime = Date.now() - 6000;
+    expect(breaker.canExecute()).toBe(true);
+    expect(breaker.getState()).toBe("half-open");
   });
 });
 
@@ -190,6 +245,24 @@ describe("RetryPolicy", () => {
     await expect(policy.execute(fn)).rejects.toThrow("timeout");
     expect(fn).toHaveBeenCalledTimes(3); // initial + 2 retries
   });
+
+  it("should respect abort signal", async () => {
+    const policy = new RetryPolicy(3, 1000, 5000);
+    const fn = vi.fn().mockRejectedValue(new Error("timeout"));
+    const controller = new AbortController();
+
+    // Abort after a short delay
+    setTimeout(() => controller.abort(), 50);
+
+    await expect(policy.execute(fn, { signal: controller.signal })).rejects.toThrow("Request aborted");
+  });
+
+  it("should respect maxTotalDurationMs", async () => {
+    const policy = new RetryPolicy(3, 100, 5000);
+    const fn = vi.fn().mockRejectedValue(new Error("timeout"));
+
+    await expect(policy.execute(fn, { maxTotalDurationMs: 50 })).rejects.toThrow("Retry exceeded total duration limit");
+  });
 });
 
 describe("ProviderRegistry", () => {
@@ -209,7 +282,7 @@ describe("ProviderRegistry", () => {
   it("should throw when getting non-existent provider", () => {
     const registry = new ProviderRegistry();
 
-    expect(() => registry.get("nonexistent")).toThrow("Provider not found");
+    expect(() => registry.get("nonexistent")).toThrow("Provider not available");
   });
 
   it("should return first available provider with getAuto", () => {
@@ -285,7 +358,7 @@ describe("ProviderRegistry", () => {
       }
     }
 
-    expect(() => registry.getAuto()).toThrow("No available providers");
+    expect(() => registry.getAuto()).toThrow("No translation providers are currently available");
   });
 
   it("should list all registered provider names", () => {

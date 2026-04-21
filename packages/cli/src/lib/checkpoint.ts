@@ -1,5 +1,6 @@
-import { promises as fs } from "node:fs";
-import { createHash } from "node:crypto";
+import { promises as fs, constants } from "node:fs";
+import { dirname, join } from "node:path";
+import { createHash, randomBytes } from "node:crypto";
 
 export interface TranslationCheckpoint {
   sourcePath: string;
@@ -39,8 +40,31 @@ export async function loadCheckpoint(path: string): Promise<TranslationCheckpoin
   }
 }
 
+function createSecureTempPath(targetPath: string): string {
+  const dir = dirname(targetPath);
+  const suffix = randomBytes(8).toString("hex");
+  return join(dir, `.checkpoint_${suffix}.tmp`);
+}
+
+/**
+ * Atomically save a checkpoint using write-to-temp + rename.
+ * Uses O_EXCL (wx) to prevent race conditions from concurrent writes.
+ */
 export async function saveCheckpoint(path: string, data: TranslationCheckpoint): Promise<void> {
-  await fs.writeFile(path, JSON.stringify(data, null, 2), "utf-8");
+  const tempPath = createSecureTempPath(path);
+  const content = JSON.stringify(data, null, 2);
+  try {
+    await fs.writeFile(tempPath, content, { encoding: "utf-8", flag: "wx", mode: 0o600 });
+    await fs.rename(tempPath, path);
+  } catch (error) {
+    // Best-effort cleanup of temp file on failure
+    try {
+      await fs.unlink(tempPath);
+    } catch {
+      // ignore cleanup errors
+    }
+    throw error;
+  }
 }
 
 export function hashSource(content: string): string {

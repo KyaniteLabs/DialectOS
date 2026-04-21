@@ -47,6 +47,10 @@ export enum ErrorCode {
   RATE_LIMITED = "RATE_LIMITED",
   SANITIZATION_FAILED = "SANITIZATION_FAILED",
   VALIDATION_FAILED = "VALIDATION_FAILED",
+  INVALID_JSON = "INVALID_JSON",
+  DEPTH_EXCEEDED = "DEPTH_EXCEEDED",
+  CIRCULAR_REFERENCE = "CIRCULAR_REFERENCE",
+  KEY_LIMIT_EXCEEDED = "KEY_LIMIT_EXCEEDED",
 }
 
 /**
@@ -495,6 +499,18 @@ export function sanitizeErrorMessage(message: string): string {
   // Remove 32+ character hex strings (likely keys/tokens)
   sanitized = sanitized.replace(/\b[a-f0-9]{32,}\b/gi, "[REDACTED]");
 
+  // Remove DeepL API keys (format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx)
+  sanitized = sanitized.replace(
+    /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}:[a-z]{2}\b/gi,
+    "[REDACTED]"
+  );
+
+  // Remove DeepL API keys without suffix (legacy format)
+  sanitized = sanitized.replace(
+    /\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi,
+    "[REDACTED]"
+  );
+
   // Remove Unix file paths
   sanitized = sanitized.replace(/\/[a-zA-Z0-9_\-./~]+/g, "[path]");
 
@@ -581,6 +597,12 @@ export class RateLimiter {
     this.requests = this.requests.filter(
       (time) => now - time < this.windowMs
     );
+
+    // Hard cap to prevent memory exhaustion from misconfigured large limits
+    const MAX_ARRAY_SIZE = Math.max(this.maxRequests * 2, 1000);
+    if (this.requests.length > MAX_ARRAY_SIZE) {
+      this.requests = this.requests.slice(-this.maxRequests);
+    }
 
     // Check if limit is exceeded
     if (this.requests.length >= this.maxRequests) {

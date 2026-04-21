@@ -6,118 +6,21 @@
  */
 
 import { readFileSync, writeFileSync, renameSync, rmSync, realpathSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { randomBytes } from "node:crypto";
+import { dirname } from "node:path";
 
-// Import from workspace packages (when implemented)
-// For now, we're implementing inline but structure for future imports
-// import { validateJsonPath, sanitizeErrorMessage, createSecureTempPath, SecurityError, ErrorCode, MAX_KEYS, MAX_RECURSION_DEPTH } from "@espanol/security";
-// import type { I18nEntry, LocaleDiff } from "@espanol/types";
+import {
+  validateJsonPath,
+  sanitizeErrorMessage,
+  createSecureTempPath,
+  SecurityError,
+  ErrorCode,
+  MAX_KEYS,
+  MAX_RECURSION_DEPTH,
+} from "@espanol/security";
+import type { I18nEntry, LocaleDiff } from "@espanol/types";
 
-// ============================================================================
-// TYPES (from @espanol/types - inline for now until package is implemented)
-// ============================================================================
-
-export interface I18nEntry {
-  key: string;
-  value: string;
-}
-
-export interface LocaleDiff {
-  missingInTarget: string[];
-  extraInTarget: string[];
-  commonKeys: string[];
-}
-
-// ============================================================================
-// SECURITY TYPES AND CONSTANTS (from @espanol/security)
-// ============================================================================
-
-export class SecurityError extends Error {
-  constructor(
-    message: string,
-    public code: string
-  ) {
-    super(message);
-    this.name = "SecurityError";
-  }
-}
-
-export const ErrorCode = {
-  PATH_TRAVERSAL: "PATH_TRAVERSAL",
-  INVALID_JSON: "INVALID_JSON",
-  DEPTH_EXCEEDED: "DEPTH_EXCEEDED",
-  CIRCULAR_REFERENCE: "CIRCULAR_REFERENCE",
-  KEY_LIMIT_EXCEEDED: "KEY_LIMIT_EXCEEDED",
-} as const;
-
-export const MAX_KEYS = 10000;
-export const MAX_RECURSION_DEPTH = 20;
-
-// ============================================================================
-// SECURITY FUNCTIONS (from @espanol/security)
-// ============================================================================
-
-/**
- * Validate and sanitize a JSON file path.
- * Prevents path traversal attacks and ensures path is within allowed directories.
- *
- * NOTE: This is a simplified version. The full implementation from @espanol/security
- * should be used when that package is implemented.
- */
-export function validateJsonPath(
-  path: string,
-  options: {
-    mustExist?: boolean;
-    checkSize?: boolean;
-  } = {}
-): string {
-  const { mustExist = false, checkSize = false } = options;
-
-  // Basic validation - ensure .json extension
-  if (!path.toLowerCase().endsWith(".json")) {
-    throw new SecurityError("Only .json files are allowed", ErrorCode.INVALID_JSON);
-  }
-
-  // Resolve to absolute path
-  // In production, this would also check against allowed directories
-  // and prevent path traversal attacks
-  return path;
-}
-
-/**
- * Sanitize an error message to remove sensitive information.
- * Removes file paths, system paths, and other potentially sensitive data.
- */
-export function sanitizeErrorMessage(message: string): string {
-  let sanitized = message;
-
-  // Remove file paths (Unix and Windows)
-  sanitized = sanitized.replace(/\/[a-zA-Z0-9_\-\.\/~]+/g, "[path]");
-  sanitized = sanitized.replace(/\\[a-zA-Z0-9_\-\.\\]+/g, "[path]");
-
-  // Remove drive letters (Windows)
-  sanitized = sanitized.replace(/[A-Z]:\\/g, "[drive]");
-
-  // Remove common error codes that might leak info
-  sanitized = sanitized.replace(/ENOENT/g, "file not found");
-  sanitized = sanitized.replace(/EACCES/g, "access denied");
-  sanitized = sanitized.replace(/EPERM/g, "permission denied");
-
-  return sanitized;
-}
-
-/**
- * Create a secure temporary file path with random suffix.
- * Prevents race conditions from predictable temp file names.
- *
- * @param parentDir - Parent directory for the temp file
- * @returns Path to temp file with random hex suffix
- */
-export function createSecureTempPath(parentDir: string): string {
-  const randomSuffix = randomBytes(4).toString("hex");
-  return join(parentDir, `.tmp_${randomSuffix}`);
-}
+export { validateJsonPath, sanitizeErrorMessage, createSecureTempPath, SecurityError, ErrorCode, MAX_KEYS, MAX_RECURSION_DEPTH };
+export type { I18nEntry, LocaleDiff };
 
 // ============================================================================
 // LOCALE UTIL FUNCTIONS

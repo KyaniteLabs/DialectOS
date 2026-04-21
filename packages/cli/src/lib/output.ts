@@ -53,11 +53,23 @@ export async function writeOutput(
 }
 
 /**
+ * Strip ANSI escape sequences and terminal control characters
+ * to prevent injection when logging untrusted content.
+ */
+export function sanitizeConsoleOutput(message: string): string {
+  // Remove ANSI escape sequences
+  let sanitized = message.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, "");
+  // Remove other control characters (keep tab, newline, carriage return)
+  sanitized = sanitized.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, "");
+  return sanitized;
+}
+
+/**
  * Write error message to stderr
  * @param message - The error message
  */
 export function writeError(message: string): void {
-  process.stderr.write(`Error: ${message}\n`);
+  process.stderr.write(`Error: ${sanitizeConsoleOutput(message)}\n`);
 }
 
 /**
@@ -65,5 +77,5 @@ export function writeError(message: string): void {
  * @param message - The info message
  */
 export function writeInfo(message: string): void {
-  process.stderr.write(`${message}\n`);
+  process.stderr.write(`${sanitizeConsoleOutput(message)}\n`);
 }

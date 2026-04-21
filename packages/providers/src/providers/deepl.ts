@@ -6,7 +6,8 @@
 import * as deepl from "deepl-node";
 import type { TranslationProvider, TranslationResult } from "../types.js";
 import { CircuitBreaker } from "../circuit-breaker.js";
-import { RateLimiter, sanitizeErrorMessage, HTTP_TIMEOUT } from "@espanol/security";
+import { RateLimiter, sanitizeErrorMessage, HTTP_TIMEOUT, validateContentLength, SecurityError, ErrorCode } from "@espanol/security";
+import { languageCodeSchema } from "@espanol/types";
 
 const DEEPL_FORMALITY_MAP: Record<string, "more" | "less" | "default"> = {
   formal: "more",
@@ -17,6 +18,7 @@ const DEEPL_FORMALITY_MAP: Record<string, "more" | "less" | "default"> = {
 export class DeepLProvider implements TranslationProvider {
   readonly name = "deepl";
   private client: deepl.DeepLClient;
+  private authKey: string;
   private breaker: CircuitBreaker;
   private rateLimiter: RateLimiter;
 
@@ -35,9 +37,16 @@ export class DeepLProvider implements TranslationProvider {
     if (!authKey) {
       throw new Error("DEEPL_AUTH_KEY environment variable is required");
     }
+    this.authKey = authKey;
 
     // Use mock client if provided (for testing), otherwise create real client
-    this.client = mockClient || new deepl.DeepLClient(authKey);
+    // minTimeout controls axios request timeout — when it fires, the underlying
+    // HTTP request is aborted, preventing dangling promises.
+    this.client =
+      mockClient ||
+      new deepl.DeepLClient(authKey, {
+        minTimeout: options?.timeout || HTTP_TIMEOUT,
+      });
 
     // Initialize circuit breaker
     this.breaker = new CircuitBreaker(
@@ -62,6 +71,16 @@ export class DeepLProvider implements TranslationProvider {
       dialect?: string;
     }
   ): Promise<TranslationResult> {
+    // Validate input length before processing
+    validateContentLength(text);
+
+    // Validate language codes
+    const sourceResult = languageCodeSchema.safeParse(sourceLang === "auto" ? "en" : sourceLang);
+    const targetResult = languageCodeSchema.safeParse(targetLang);
+    if (!sourceResult.success || !targetResult.success) {
+      throw new SecurityError("Invalid language code", ErrorCode.INVALID_INPUT);
+    }
+
     // Check circuit breaker
     if (!this.breaker.canExecute()) {
       throw new Error("DeepL provider is temporarily unavailable (circuit open)");
@@ -88,13 +107,14 @@ export class DeepLProvider implements TranslationProvider {
       const sourceLangUpper: deepl.SourceLanguageCode | null =
         sourceLang === "auto" ? null : (sourceLang.toUpperCase() as deepl.SourceLanguageCode);
 
-      // Execute translation with timeout
-      const result = await Promise.race<deepl.TextResult>([
-        this.client.translateText(text, sourceLangUpper, targetLangUpper, translateOptions),
-        new Promise<deepl.TextResult>((_, reject) =>
-          setTimeout(() => reject(new Error("Request timed out")), HTTP_TIMEOUT)
-        ),
-      ]);
+      // Execute translation — axios timeout (minTimeout) aborts the underlying
+      // HTTP request automatically, avoiding dangling promises from Promise.race.
+      const result = await this.client.translateText(
+        text,
+        sourceLangUpper,
+        targetLangUpper,
+        translateOptions
+      );
 
       // Record success
       this.breaker.recordSuccess();
@@ -108,7 +128,11 @@ export class DeepLProvider implements TranslationProvider {
       this.breaker.recordFailure();
 
       // Sanitize error message
-      const message = error instanceof Error ? error.message : String(error);
+      // Pre-sanitize with known authKey to catch any format edge cases
+      let message = error instanceof Error ? error.message : String(error);
+      if (message.includes(this.authKey)) {
+        message = message.replaceAll(this.authKey, "[REDACTED]");
+      }
       throw new Error(sanitizeErrorMessage(`DeepL error: ${message}`));
     }
   }

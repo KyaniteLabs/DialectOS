@@ -7,3 +7,6 @@ coverage/
 .pnpm-debug.log*
 .env*
 *.tgz
+
+# Translation checkpoints
+*.checkpoint.json

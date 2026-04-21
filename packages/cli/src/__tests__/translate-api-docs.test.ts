@@ -17,6 +17,7 @@ const mockWriteError = vi.fn();
 vi.mock("../lib/output.js", () => ({
   writeOutput: (output: string) => mockWriteOutput(output),
   writeError: (message: string) => mockWriteError(message),
+  sanitizeConsoleOutput: (message: string) => message,
 }));
 
 const mockParseMarkdown = vi.fn();
@@ -43,6 +44,8 @@ vi.mock("node:fs", () => ({
   promises: {
     readFile: (filePath: string, encoding: string) => mockReadFile(filePath, encoding),
     writeFile: vi.fn().mockResolvedValue(undefined),
+    rename: vi.fn().mockResolvedValue(undefined),
+    unlink: vi.fn().mockResolvedValue(undefined),
   },
 }));
 

@@ -3,6 +3,11 @@
  * Retries transient failures while avoiding permanent errors
  */
 
+export interface RetryOptions {
+  signal?: AbortSignal;
+  maxTotalDurationMs?: number;
+}
+
 export class RetryPolicy {
   constructor(
     private readonly maxRetries: number,
@@ -13,10 +18,21 @@ export class RetryPolicy {
   /**
    * Execute a function with retry logic
    */
-  async execute<T>(fn: () => Promise<T>): Promise<T> {
+  async execute<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T> {
     let lastError: Error | undefined;
+    const startTime = Date.now();
 
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      // Check for abort signal
+      if (options?.signal?.aborted) {
+        throw new Error("Request aborted");
+      }
+
+      // Check total duration deadline
+      if (options?.maxTotalDurationMs && Date.now() - startTime >= options.maxTotalDurationMs) {
+        throw new Error("Retry exceeded total duration limit");
+      }
+
       try {
         return await fn();
       } catch (error) {
@@ -34,7 +50,7 @@ export class RetryPolicy {
 
         // Wait before retrying
         const delay = this.calculateDelay(attempt);
-        await this.sleep(delay);
+        await this.sleep(delay, options?.signal);
       }
     }
 
@@ -64,9 +80,22 @@ export class RetryPolicy {
   }
 
   /**
-   * Sleep for specified milliseconds
+   * Sleep for specified milliseconds, abortable via signal
    */
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  private sleep(ms: number, signal?: AbortSignal): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(resolve, ms);
+      if (signal) {
+        const abortHandler = () => {
+          clearTimeout(timeout);
+          reject(new Error("Request aborted"));
+        };
+        if (signal.aborted) {
+          abortHandler();
+        } else {
+          signal.addEventListener("abort", abortHandler, { once: true });
+        }
+      }
+    });
   }
 }

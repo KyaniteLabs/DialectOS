@@ -9,7 +9,7 @@ import { DEFAULT_DIALECT, ALL_SPANISH_DIALECTS } from "@espanol/types";
 import { parseMarkdown, reconstructMarkdown, extractTranslatableText } from "@espanol/markdown-parser";
 import { validateFilePath, validateContentLength } from "@espanol/security";
 import type { ProviderRegistry } from "@espanol/providers";
-import { writeOutput, writeError } from "../lib/output.js";
+import { writeOutput, writeError, sanitizeConsoleOutput } from "../lib/output.js";
 import {
   loadProtectedTokens,
   protectTokensInText,
@@ -182,7 +182,9 @@ async function translateSection(
     };
   } catch (error) {
     // If translation fails, return original section
-    console.error(`Failed to translate section: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `Failed to translate section: ${sanitizeConsoleOutput(error instanceof Error ? error.message : String(error))}`
+    );
     return { section, failed: true };
   }
 }
@@ -296,10 +298,8 @@ export async function executeTranslateApiDocs(
     const protectIdentities = options?.protectIdentities !== false;
     const rawCheckpointPath =
       options?.checkpointFile || `${options?.output || validatedPath}.checkpoint.json`;
-    // Only validate user-supplied checkpoint paths; auto-generated ones derive from validated paths
-    const checkpointPath = options?.checkpointFile
-      ? validateFilePath(rawCheckpointPath)
-      : rawCheckpointPath;
+    // Always validate checkpoint paths to prevent traversal via --output
+    const checkpointPath = validateFilePath(rawCheckpointPath);
     const resume = options?.resume !== false;
     const sourceHash = hashSource(content);
 
