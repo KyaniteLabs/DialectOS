@@ -16,3 +16,7 @@ export { ProviderRegistry } from "./registry.js";
 export { DeepLProvider } from "./providers/deepl.js";
 export { LibreTranslateProvider } from "./providers/libre-translate.js";
 export { MyMemoryProvider } from "./providers/my-memory.js";
+
+// Chaos testing
+export { ChaosProvider } from "./chaos-provider.js";
+export type { ChaosScenario, ChaosMode } from "./chaos-provider.js";
