@@ -60,16 +60,37 @@ export class ProviderRegistry {
   }
 
   /**
-   * Get the first available provider (with closed circuit)
+   * Get the best available provider (with closed circuit).
+   * Semantic dialect-aware providers win over generic machine translation.
    */
   getAuto(): TranslationProvider {
-    for (const [_, entry] of this.providers) {
+    const rankedEntries = Array.from(this.providers.values()).sort((a, b) =>
+      this.providerRank(b.provider) - this.providerRank(a.provider)
+    );
+
+    for (const entry of rankedEntries) {
       if (entry.breaker.canExecute()) {
         return entry.provider;
       }
     }
 
     throw new Error("No translation providers are currently available");
+  }
+
+  private providerRank(provider: TranslationProvider): number {
+    const caps = provider.getCapabilities?.();
+    switch (caps?.dialectHandling) {
+      case "semantic":
+        return 4;
+      case "native":
+        return 3;
+      case "approximate":
+        return 2;
+      case "none":
+        return 1;
+      default:
+        return 0;
+    }
   }
 
   /**

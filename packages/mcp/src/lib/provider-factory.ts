@@ -8,17 +8,31 @@ import {
   DeepLProvider,
   LibreTranslateProvider,
   MyMemoryProvider,
+  LLMProvider,
 } from "@espanol/providers";
 
 /**
  * Create a ProviderRegistry with all available providers
  * Providers are registered based on environment variables:
+ * - LLM_API_URL + LLM_MODEL → LLMProvider (semantic dialect-aware primary)
  * - DEEPL_AUTH_KEY → DeepLProvider
  * - LIBRETRANSLATE_URL → LibreTranslateProvider
  * - MyMemoryProvider is opt-in only (legacy fallback). Set ENABLE_MYMEMORY=1 to register it.
  */
 export function createProviderRegistry(): ProviderRegistry {
   const registry = new ProviderRegistry();
+
+  // Register LLM first when configured; ProviderRegistry also ranks semantic providers first.
+  const llmEndpoint = process.env.LLM_API_URL || process.env.LLM_ENDPOINT;
+  const llmModel = process.env.LLM_MODEL;
+  if (llmEndpoint && llmModel) {
+    registry.register(new LLMProvider({
+      endpoint: llmEndpoint,
+      model: llmModel,
+      apiKey: process.env.LLM_API_KEY,
+      allowLocal: process.env.LLM_ALLOW_LOCAL === "1",
+    }));
+  }
 
   // Register DeepL if API key is available
   const deeplKey = process.env.DEEPL_AUTH_KEY;

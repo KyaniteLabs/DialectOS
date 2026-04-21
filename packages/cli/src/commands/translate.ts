@@ -113,7 +113,7 @@ function validateDialect(dialect: string): SpanishDialect {
 function validateProvider(provider: string | undefined): string | undefined {
   if (!provider) return undefined;
 
-  const validProviders: ProviderName[] = ["deepl", "libre", "mymemory"];
+  const validProviders: ProviderName[] = ["llm", "deepl", "libre", "mymemory"];
   if (provider !== "auto" && !validProviders.includes(provider as ProviderName)) {
     throw new Error(
       `Invalid provider: ${provider}. Valid providers are: auto, ${validProviders.join(", ")}`

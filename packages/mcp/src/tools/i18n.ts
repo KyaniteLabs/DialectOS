@@ -858,7 +858,7 @@ export function registerI18nTools(
       basePath: z.string().describe("Path to the base locale file"),
       targetPath: z.string().describe("Path to the target locale file"),
       dialect: z.string().optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: z.string().optional().describe("Translation provider name (deepl, libre, mymemory)"),
+      provider: z.string().optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
     },
     async (params) => {
       return handleTranslateMissingKeys(params as TranslateMissingKeysParams, registry, rateLimiter);
@@ -873,7 +873,7 @@ export function registerI18nTools(
       directory: z.string().describe("Directory containing locale files"),
       baseLocale: z.string().optional().describe("Base locale name (e.g., en, es-ES)"),
       targets: z.array(z.string()).describe("Array of target Spanish dialect codes"),
-      provider: z.string().optional().describe("Translation provider name (deepl, libre, mymemory)"),
+      provider: z.string().optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
     },
     async (params) => {
       return handleBatchTranslateLocales(params as BatchTranslateLocalesParams, registry, rateLimiter);

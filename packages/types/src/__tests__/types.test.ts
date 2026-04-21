@@ -237,6 +237,7 @@ describe("Zod Validation Schemas", () => {
 
   describe("providerNameSchema", () => {
     it("should accept valid providers", () => {
+      expect(() => providerNameSchema.parse("llm")).not.toThrow();
       expect(() => providerNameSchema.parse("deepl")).not.toThrow();
       expect(() => providerNameSchema.parse("libre")).not.toThrow();
       expect(() => providerNameSchema.parse("mymemory")).not.toThrow();

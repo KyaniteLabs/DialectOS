@@ -961,7 +961,7 @@ export function registerTranslatorTools(
     {
       text: z.string().describe("Text to translate"),
       dialect: z.string().optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: z.string().optional().describe("Translation provider name (deepl, libre, mymemory)"),
+      provider: z.string().optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
       formal: z.boolean().optional().describe("Use formal tone"),
       informal: z.boolean().optional().describe("Use informal tone"),
     },
@@ -989,7 +989,7 @@ export function registerTranslatorTools(
     {
       code: z.string().describe("Source code with comments to translate"),
       dialect: z.string().optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: z.string().optional().describe("Translation provider name (deepl, libre, mymemory)"),
+      provider: z.string().optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
     },
     async (params) => {
       return handleTranslateCodeComment(params as TranslateCodeCommentParams, registry, rateLimiter);
@@ -1003,7 +1003,7 @@ export function registerTranslatorTools(
     {
       filePath: z.string().describe("Path to the README markdown file"),
       dialect: z.string().optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: z.string().optional().describe("Translation provider name (deepl, libre, mymemory)"),
+      provider: z.string().optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
       formal: z.boolean().optional().describe("Use formal tone"),
       informal: z.boolean().optional().describe("Use informal tone"),
     },

@@ -107,6 +107,20 @@ describe("translate command", () => {
     expect(provider.translate).not.toHaveBeenCalled();
   });
 
+  it("should accept llm as a first-class provider name", async () => {
+    const provider = makeProvider((text) => `llm: ${text}`);
+    const getProvider = vi.fn().mockReturnValue(provider);
+
+    await executeTranslate("Hello", { provider: "llm", dialect: "es-PR" }, getProvider);
+
+    expect(getProvider).toHaveBeenCalledWith("llm");
+    expect(provider.translate).toHaveBeenCalledWith("Hello", "auto", "es", expect.objectContaining({
+      dialect: "es-PR",
+      context: expect.stringContaining("Puerto Rican"),
+    }));
+    expect(stdoutSpy).toHaveBeenCalledWith("llm: Hello");
+  });
+
   it("should reject unsupported provider names", async () => {
     const provider = makeProvider();
 

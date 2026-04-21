@@ -440,7 +440,7 @@ export function registerDocsTools(
     {
       filePath: z.string().describe("Path to the markdown file to translate"),
       dialect: z.string().optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: z.string().optional().describe("Translation provider name (deepl, libre, mymemory)"),
+      provider: z.string().optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
       formal: z.boolean().optional().describe("Use formal tone (for languages that distinguish formal/informal)"),
       informal: z.boolean().optional().describe("Use informal tone (for languages that distinguish formal/informal)"),
     },
@@ -468,7 +468,7 @@ export function registerDocsTools(
     {
       filePath: z.string().describe("Path to the API documentation markdown file"),
       dialect: z.string().optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: z.string().optional().describe("Translation provider name (deepl, libre, mymemory)"),
+      provider: z.string().optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
     },
     async (params) => {
       return handleTranslateApiDocs(params as TranslateApiDocsParams, registry, rateLimiter);
@@ -482,7 +482,7 @@ export function registerDocsTools(
     {
       filePath: z.string().describe("Path to the markdown file to translate"),
       dialect: z.string().optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: z.string().optional().describe("Translation provider name (deepl, libre, mymemory)"),
+      provider: z.string().optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
     },
     async (params) => {
       return handleCreateBilingualDoc(params as CreateBilingualDocParams, registry, rateLimiter);

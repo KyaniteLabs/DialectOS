@@ -48,7 +48,7 @@ export const DEFAULT_DIALECT: SpanishDialect = "es-ES";
 /**
  * Supported translation providers
  */
-export type ProviderName = "deepl" | "libre" | "mymemory";
+export type ProviderName = "llm" | "deepl" | "libre" | "mymemory";
 
 /**
  * Translation options
@@ -116,7 +116,7 @@ export interface ProviderCapability {
   /** Maximum payload size in characters */
   maxPayloadChars: number;
   /** How the provider handles dialect variants */
-  dialectHandling: "native" | "approximate" | "none";
+  dialectHandling: "semantic" | "native" | "approximate" | "none";
   /** Rate limit hints (requests per window) */
   rateLimitHints?: {
     maxRequests: number;
@@ -348,7 +348,7 @@ export const dialectSchema = z.enum([
 /**
  * Validates translation provider names
  */
-export const providerNameSchema = z.enum(["deepl", "libre", "mymemory"], {
+export const providerNameSchema = z.enum(["llm", "deepl", "libre", "mymemory"], {
   message: "Invalid translation provider",
 });
 

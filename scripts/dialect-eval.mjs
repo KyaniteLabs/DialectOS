@@ -54,7 +54,7 @@ async function createLiveTranslate() {
   const registry = createProviderRegistry();
   const available = registry.listProviders();
   if (available.length === 0) {
-    throw new Error("No live providers are configured. Set DEEPL_AUTH_KEY, LIBRETRANSLATE_URL, or ENABLE_MYMEMORY=1.");
+    throw new Error("No live providers are configured. Set LLM_API_URL + LLM_MODEL, DEEPL_AUTH_KEY, LIBRETRANSLATE_URL, or ENABLE_MYMEMORY=1.");
   }
 
   return async (sample, dialect) => {

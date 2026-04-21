@@ -36,6 +36,32 @@ class TestRegistry implements Partial<ProviderRegistry> {
 }
 
 describe("translateWithFallback", () => {
+  it("should prefer llm before generic machine translation providers by default", async () => {
+    const llm: TranslationProvider = {
+      name: "llm",
+      translate: vi.fn().mockResolvedValue({ translatedText: "Vos podés" }),
+    };
+    const libre: TranslationProvider = {
+      name: "libre",
+      translate: vi.fn().mockResolvedValue({ translatedText: "Puedes" }),
+    };
+    const registry = new TestRegistry({ libre, llm }) as ProviderRegistry;
+
+    const result = await translateWithFallback(
+      registry,
+      undefined,
+      "You can",
+      "en",
+      "es",
+      { dialect: "es-AR" },
+      { delayMs: 0 }
+    );
+
+    expect(result.translatedText).toBe("Vos podés");
+    expect(result.providerUsed).toBe("llm");
+    expect(libre.translate).not.toHaveBeenCalled();
+  });
+
   it("should report the provider used and fallback count", async () => {
     const failing: TranslationProvider = {
       name: "primary",

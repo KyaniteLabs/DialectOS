@@ -11,6 +11,7 @@ import {
   DeepLProvider,
   LibreTranslateProvider,
   MyMemoryProvider,
+  LLMProvider,
   TranslationProvider,
   TranslationResult,
   ChaosProvider,
@@ -820,6 +821,80 @@ describe("Rate limiting", () => {
 });
 
 describe("Provider capabilities", () => {
+
+  it("LLM should report semantic dialect support", () => {
+    const provider = new LLMProvider({
+      endpoint: "https://llm.example/v1/chat/completions",
+      model: "dialect-model",
+      apiKey: "test-key",
+    });
+    const caps = provider.getCapabilities!();
+    expect(caps.name).toBe("llm");
+    expect(caps.supportsFormality).toBe(true);
+    expect(caps.supportsContext).toBe(true);
+    expect(caps.supportsDialect).toBe(true);
+    expect(caps.dialectHandling).toBe("semantic");
+    expect(caps.needsApiKey).toBe(true);
+    expect(caps.supportedTargetLangs).toContain("es");
+  });
+
+  it("LLM should send dialect context to an OpenAI-compatible chat endpoint", async () => {
+    vi.mocked(global.fetch).mockResolvedValue({
+      ok: true,
+      headers: {
+        get: (name: string) => name === "content-type" ? "application/json" : null,
+      },
+      json: async () => ({
+        choices: [{ message: { content: "Vos podés actualizar tu cuenta ahora." } }],
+      }),
+    } as any);
+
+    const provider = new LLMProvider({
+      endpoint: "https://llm.example/v1/chat/completions",
+      model: "dialect-model",
+      apiKey: "test-key",
+    });
+
+    const result = await provider.translate("You can update your account now.", "en", "es", {
+      dialect: "es-AR",
+      formality: "informal",
+      context: "Use pronominal and verbal voseo.",
+    });
+
+    expect(result.translatedText).toBe("Vos podés actualizar tu cuenta ahora.");
+    expect(result.provider).toBe("llm");
+    expect(result.dialect).toBe("es-AR");
+    expect(global.fetch).toHaveBeenCalledWith("https://llm.example/v1/chat/completions", expect.objectContaining({
+      method: "POST",
+      headers: expect.objectContaining({
+        "Content-Type": "application/json",
+        Authorization: "Bearer test-key",
+      }),
+    }));
+    const body = JSON.parse(vi.mocked(global.fetch).mock.calls.at(-1)![1]!.body as string);
+    expect(body.model).toBe("dialect-model");
+    expect(body.messages[0].content).toContain("semantic dialect-aware Spanish translation engine");
+    expect(body.messages[1].content).toContain("Target dialect: es-AR");
+    expect(body.messages[1].content).toContain("Use pronominal and verbal voseo");
+    expect(body.messages[1].content).toContain("You can update your account now.");
+  });
+
+  it("LLM should reject missing chat completions content", async () => {
+    vi.mocked(global.fetch).mockResolvedValue({
+      ok: true,
+      headers: { get: () => "application/json" },
+      json: async () => ({ choices: [] }),
+    } as any);
+
+    const provider = new LLMProvider({
+      endpoint: "https://llm.example/v1/chat/completions",
+      model: "dialect-model",
+    });
+
+    await expect(provider.translate("Hello", "en", "es", { dialect: "es-MX" })).rejects.toThrow(
+      "LLM response did not include translated content"
+    );
+  });
   it("DeepL should report native dialect support", () => {
     const provider = new DeepLProvider("test-key", undefined, {
       timeout: 5000,
@@ -859,6 +934,68 @@ describe("Provider capabilities", () => {
     expect(caps.maxPayloadChars).toBe(500);
     expect(caps.dialectHandling).toBe("none");
     expect(caps.rateLimitHints).toEqual({ maxRequests: 10, windowMs: 60000 });
+  });
+
+
+  it("Registry auto should prefer semantic dialect providers over generic providers", () => {
+    const registry = new ProviderRegistry();
+    const generic: TranslationProvider = {
+      name: "generic",
+      translate: async () => ({ translatedText: "genérico" }),
+      getCapabilities: () => ({
+        name: "generic",
+        displayName: "Generic",
+        needsApiKey: false,
+        supportsFormality: false,
+        supportsContext: false,
+        supportsDialect: false,
+        supportedSourceLangs: ["en", "auto"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 1000,
+        dialectHandling: "none",
+      }),
+    };
+    const semantic: TranslationProvider = {
+      name: "semantic",
+      translate: async () => ({ translatedText: "vos podés" }),
+      getCapabilities: () => ({
+        name: "semantic",
+        displayName: "Semantic",
+        needsApiKey: true,
+        supportsFormality: true,
+        supportsContext: true,
+        supportsDialect: true,
+        supportedSourceLangs: ["en", "auto"],
+        supportedTargetLangs: ["es"],
+        maxPayloadChars: 1000,
+        dialectHandling: "semantic",
+      }),
+    };
+
+    registry.register(generic);
+    registry.register(semantic);
+
+    expect(registry.getAuto().name).toBe("semantic");
+  });
+
+  it("Registry should preserve dialect and context for semantic providers", () => {
+    const registry = new ProviderRegistry();
+    registry.register(new LLMProvider({
+      endpoint: "https://llm.example/v1/chat/completions",
+      model: "dialect-model",
+    }));
+
+    const prepared = registry.prepareRequest("llm", "hello", "auto", "es", {
+      dialect: "es-PR",
+      formality: "formal",
+      context: "Use Puerto Rican vocabulary naturally.",
+    });
+
+    expect(prepared.targetLang).toBe("es");
+    expect(prepared.options.dialect).toBe("es-PR");
+    expect(prepared.options.context).toContain("Puerto Rican");
+    expect(prepared.options.formality).toBe("formal");
+    expect(prepared.warnings).toEqual([]);
   });
 
   it("Registry should return capabilities by name", () => {

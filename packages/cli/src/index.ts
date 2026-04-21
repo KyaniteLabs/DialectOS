@@ -38,7 +38,7 @@ program
   .description("Translate text to Spanish with dialect awareness")
   .argument("[text]", "Text to translate (can also be provided via stdin or --input-file)")
   .option("--dialect <dialect>", "Spanish dialect (e.g., es-ES, es-MX, es-AR)", "es-ES")
-  .option("--provider <provider>", "Translation provider (deepl, libre, mymemory, or auto for automatic selection)", "auto")
+  .option("--provider <provider>", "Translation provider (llm, deepl, libre, mymemory, or auto for automatic selection)", "auto")
   .option("--formal", "Use formal language (usted)", false)
   .option("--informal", "Use informal language (tú)", false)
   .option("--auto-formality", "Auto-detect formality", false)
@@ -92,7 +92,7 @@ program
   .description("Translate an API documentation markdown file")
   .argument("<input>", "Input markdown file")
   .option("--dialect <dialect>", "Spanish dialect (e.g., es-ES, es-MX, es-AR)", "es-ES")
-  .option("--provider <provider>", "Translation provider (deepl, libre, mymemory, or auto for automatic selection)", "auto")
+  .option("--provider <provider>", "Translation provider (llm, deepl, libre, mymemory, or auto for automatic selection)", "auto")
   .option("--output <path>", "Write translation to file instead of stdout")
   .option("--protect-tokens <file>", "JSON file with protected tokens")
   .option("--glossary-file <file>", "JSON glossary file with term mappings")
@@ -256,7 +256,7 @@ i18nCommand
   .argument("<base>", "Base locale file (e.g., ./locales/en.json)")
   .argument("<target>", "Target locale file (e.g., ./locales/es.json)")
   .option("--dialect <dialect>", "Spanish dialect (e.g., es-MX, es-AR, es-CO)", "es-ES")
-  .option("--provider <provider>", "Translation provider (deepl, libre, mymemory, or auto for automatic selection)", "auto")
+  .option("--provider <provider>", "Translation provider (llm, deepl, libre, mymemory, or auto for automatic selection)", "auto")
   .action(async (base, target, options) => {
     try {
       const registry = getDefaultProviderRegistry();
@@ -281,7 +281,7 @@ i18nCommand
   .argument("<directory>", "Directory containing locale files (e.g., ./locales)")
   .option("--base <locale>", "Base locale code (e.g., en)", "en")
   .option("--targets <dialects>", "Comma-separated target dialects (e.g., es-MX,es-AR,es-CO)", "es-ES")
-  .option("--provider <provider>", "Translation provider (deepl, libre, mymemory, or auto for automatic selection)", "auto")
+  .option("--provider <provider>", "Translation provider (llm, deepl, libre, mymemory, or auto for automatic selection)", "auto")
   .action(async (directory, options) => {
     try {
       const registry = getDefaultProviderRegistry();

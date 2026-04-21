@@ -66,6 +66,7 @@ vi.mock("@espanol/providers", () => ({
   DeepLProvider: vi.fn(),
   LibreTranslateProvider: vi.fn(),
   MyMemoryProvider: vi.fn(),
+  LLMProvider: vi.fn(),
 }));
 
 import {
