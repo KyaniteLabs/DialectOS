@@ -10,6 +10,7 @@ import type { SpanishDialect, ProviderName, FormalityLevel } from "@espanol/type
 import { DEFAULT_DIALECT, ALL_SPANISH_DIALECTS } from "@espanol/types";
 import { validateFilePath, validateContentLength } from "@espanol/security";
 import { writeOutput, writeError } from "../lib/output.js";
+import { buildSemanticTranslationContext } from "../lib/semantic-context.js";
 
 /**
  * Options for the translate command
@@ -148,10 +149,18 @@ export async function executeTranslate(
     // Get translation provider
     const translationProvider = getProvider(provider);
 
+    const context = buildSemanticTranslationContext({
+      text,
+      dialect,
+      formality,
+      documentKind: "plain",
+    });
+
     // Perform translation
     const result = await translationProvider.translate(text, "auto", "es", {
       formality,
       dialect,
+      context,
     });
 
     // Write output

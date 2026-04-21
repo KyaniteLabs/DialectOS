@@ -48,10 +48,11 @@ describe("translate command", () => {
     await executeTranslate("Hello world", {}, getProvider);
 
     expect(getProvider).toHaveBeenCalledWith(undefined);
-    expect(provider.translate).toHaveBeenCalledWith("Hello world", "auto", "es", {
+    expect(provider.translate).toHaveBeenCalledWith("Hello world", "auto", "es", expect.objectContaining({
       formality: "auto",
       dialect: "es-ES",
-    });
+      context: expect.stringContaining("do not translate literally word-by-word"),
+    }));
     expect(stdoutSpy).toHaveBeenCalledWith("Hola mundo");
   });
 
@@ -66,10 +67,11 @@ describe("translate command", () => {
     }, getProvider);
 
     expect(getProvider).toHaveBeenCalledWith("libre");
-    expect(provider.translate).toHaveBeenCalledWith("Hello", "auto", "es", {
+    expect(provider.translate).toHaveBeenCalledWith("Hello", "auto", "es", expect.objectContaining({
       formality: "formal",
       dialect: "es-MX",
-    });
+      context: expect.stringContaining("Mexican Spanish"),
+    }));
     expect(stdoutSpy).toHaveBeenCalledWith("[formal] Hello");
   });
 
@@ -79,10 +81,11 @@ describe("translate command", () => {
 
     await executeTranslate("Hello", { informal: true }, getProvider);
 
-    expect(provider.translate).toHaveBeenCalledWith("Hello", "auto", "es", {
+    expect(provider.translate).toHaveBeenCalledWith("Hello", "auto", "es", expect.objectContaining({
       formality: "informal",
       dialect: "es-ES",
-    });
+      context: expect.stringContaining("register: informal"),
+    }));
   });
 
   it("should read input from file and write output to file", async () => {

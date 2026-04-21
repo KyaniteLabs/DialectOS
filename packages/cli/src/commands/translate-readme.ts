@@ -51,6 +51,7 @@ import {
   type PolicyProfile,
 } from "../lib/translation-policy.js";
 import { TelemetryCollector, globalTelemetry } from "../lib/telemetry.js";
+import { buildSemanticTranslationContext } from "../lib/semantic-context.js";
 
 interface TranslateReadmeOptions {
   dialect: string;
@@ -268,13 +269,20 @@ async function translateReadme(
       const mergedTokens = Array.from(new Set([...protectedTokens, ...runtimeTokens]));
       const protectedChunk = protectTokensInText(glossaryChunk.text, mergedTokens);
       try {
+        const semanticContext = buildSemanticTranslationContext({
+          text: section.content,
+          dialect: options.dialect as SpanishDialect,
+          formality: translateOptions.formality,
+          documentKind: "readme",
+          sectionType: section.type,
+        });
         const result = await translateWithFallback(
           registry,
           options.provider,
           protectedChunk.text,
           "en",
           "es",
-          translateOptions,
+          { ...translateOptions, context: semanticContext },
           pacing
         );
 
