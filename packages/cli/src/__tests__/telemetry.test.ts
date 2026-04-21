@@ -150,6 +150,7 @@ function makeMetric(overrides: Partial<TranslationMetrics> = {}): TranslationMet
     tokenIntegrity: 1,
     glossaryFidelity: 1,
     structureIntegrity: 1,
+    semanticSimilarity: 1,
     durationMs: 500,
     dialect: "es-ES",
     timestamp: new Date().toISOString(),

@@ -1,8 +1,11 @@
+import { calculateSemanticSimilarity } from "./semantic-similarity.js";
+
 export interface QualityScore {
   score: number;
   tokenIntegrity: number;
   glossaryFidelity: number;
   structureIntegrity: number;
+  semanticSimilarity: number;
 }
 
 export function calculateQualityScore(
@@ -21,9 +24,17 @@ export function calculateQualityScore(
   const glossaryFidelity = glossaryChecks.length === 0 ? 1 : glossaryHits / glossaryChecks.length;
 
   const structureIntegrity = structureValid ? 1 : 0;
+
+  const semantic = calculateSemanticSimilarity(source, translated);
+  const semanticSimilarity = semantic.score;
+
   const score = Math.round(
-    (tokenIntegrity * 0.35 + glossaryFidelity * 0.4 + structureIntegrity * 0.25) * 100
+    (tokenIntegrity * 0.25 +
+      glossaryFidelity * 0.3 +
+      structureIntegrity * 0.2 +
+      semanticSimilarity * 0.25) *
+      100
   );
 
-  return { score, tokenIntegrity, glossaryFidelity, structureIntegrity };
+  return { score, tokenIntegrity, glossaryFidelity, structureIntegrity, semanticSimilarity };
 }

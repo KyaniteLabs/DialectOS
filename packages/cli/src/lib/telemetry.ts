@@ -28,6 +28,8 @@ export interface TranslationMetrics {
   glossaryFidelity: number;
   /** Structure integrity (1 = pass, 0 = fail) */
   structureIntegrity: number;
+  /** Semantic similarity score (0-1) */
+  semanticSimilarity: number;
   /** Duration in milliseconds */
   durationMs: number;
   /** Target dialect */

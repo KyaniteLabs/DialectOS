@@ -130,6 +130,7 @@ export function createTranslateReadmeCommand(
           tokenIntegrity: result.tokenIntegrity,
           glossaryFidelity: result.glossaryFidelity,
           structureIntegrity: result.structureIntegrity,
+          semanticSimilarity: result.semanticSimilarity,
           durationMs: result.durationMs,
           dialect: mergedOptions.dialect,
           timestamp: new Date().toISOString(),
@@ -152,6 +153,7 @@ export interface TranslateReadmeResult {
   tokenIntegrity: number;
   glossaryFidelity: number;
   structureIntegrity: number;
+  semanticSimilarity: number;
   providerUsed?: string;
   fallbackCount: number;
   retryCount: number;
@@ -198,6 +200,7 @@ async function translateReadme(
       tokenIntegrity: 1,
       glossaryFidelity: 1,
       structureIntegrity: 1,
+      semanticSimilarity: 1,
       fallbackCount: 0,
       retryCount: 0,
       failureCount: 0,
@@ -339,7 +342,7 @@ async function translateReadme(
       0
     )}% glossary=${(quality.glossaryFidelity * 100).toFixed(0)}% structure=${
       quality.structureIntegrity === 1 ? "pass" : "fail"
-    }`
+    } semantic=${(quality.semanticSimilarity * 100).toFixed(0)}%`
   );
 
   // 8. Write output
@@ -357,6 +360,7 @@ async function translateReadme(
     tokenIntegrity: quality.tokenIntegrity,
     glossaryFidelity: quality.glossaryFidelity,
     structureIntegrity: quality.structureIntegrity,
+    semanticSimilarity: quality.semanticSimilarity,
     providerUsed,
     fallbackCount,
     retryCount,
