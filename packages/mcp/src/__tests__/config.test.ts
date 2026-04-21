@@ -43,6 +43,20 @@ describe("Configuration System", () => {
   });
 
 
+
+  it("should not leak env overrides into later default config loads", async () => {
+    const { loadConfig } = await import("../lib/config.js");
+
+    vi.stubEnv("ESPANOL_RATE_LIMIT", "120,30000");
+    expect(loadConfig().rateLimit.maxRequests).toBe(120);
+
+    vi.unstubAllEnvs();
+    delete process.env.ESPANOL_RATE_LIMIT;
+
+    expect(loadConfig().rateLimit.maxRequests).toBe(60);
+    expect(loadConfig().rateLimit.windowMs).toBe(60000);
+  });
+
   it("should fail fast on invalid numeric env vars", async () => {
     vi.stubEnv("ESPANOL_RATE_LIMIT", "many,soon");
     const { loadConfig } = await import("../lib/config.js");

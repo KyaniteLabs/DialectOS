@@ -24,8 +24,6 @@ const configSchema = z.object({
 
 export type MCPConfig = z.infer<typeof configSchema>;
 
-const DEFAULT_CONFIG: MCPConfig = configSchema.parse({});
-
 function parsePositiveIntEnv(name: string, value: string, min: number): number {
   if (!/^\d+$/.test(value.trim())) {
     throw new Error(`Invalid MCP config env ${name}: expected integer >= ${min}`);
@@ -41,7 +39,7 @@ function parsePositiveIntEnv(name: string, value: string, min: number): number {
  * Load configuration with priority: env vars > config file > defaults
  */
 export function loadConfig(configPath?: string): MCPConfig {
-  const config = { ...DEFAULT_CONFIG };
+  const config = configSchema.parse({});
 
   // 1. Load from config file
   if (configPath && existsSync(configPath)) {
