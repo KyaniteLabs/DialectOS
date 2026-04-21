@@ -19,7 +19,6 @@ import type {
 import {
   parseMarkdown,
   reconstructMarkdown,
-  extractTranslatableText,
 } from "@espanol/markdown-parser";
 import {
   validateMarkdownPath,
@@ -192,9 +191,6 @@ async function handleExtractTranslatable(
 
     // Parse markdown
     const parsed = parseMarkdown(content);
-
-    // Extract translatable text
-    const translatableTexts = extractTranslatableText(parsed);
 
     // Build sections array
     const sections = parsed.sections
