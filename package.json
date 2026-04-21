@@ -2,13 +2,14 @@
   "name": "dialectos",
   "version": "0.1.0",
   "private": true,
-  "description": "DialectOS — Spanish dialect translation server (MCP + CLI)",
+  "description": "DialectOS \u2014 Spanish dialect translation server (MCP + CLI)",
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "test:coverage": "pnpm -r test:coverage",
-    "clean": "pnpm -r clean"
+    "clean": "pnpm -r clean",
+    "dialect:eval": "node scripts/dialect-eval.mjs"
   },
   "keywords": [
     "spanish",

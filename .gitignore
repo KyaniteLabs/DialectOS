@@ -13,3 +13,6 @@ coverage/
 
 # OMX runtime state
 .omx/
+
+# Dialect eval generated artifacts
+audits/dialect-eval-*
