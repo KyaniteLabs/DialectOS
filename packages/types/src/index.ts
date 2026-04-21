@@ -380,3 +380,5 @@ export const translationRequestSchema = z.object({
 export const batchTargetsSchema = z.array(dialectSchema).min(1, "At least one target dialect is required").max(25, "Cannot exceed 25 target dialects");
 
 export * from "./glossary-data.js";
+
+export * from "./dialect-profiles.js";

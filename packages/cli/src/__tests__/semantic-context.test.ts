@@ -29,4 +29,23 @@ describe("semantic translation context", () => {
     expect(context).toContain("Document kind: api-docs");
     expect(context).toContain("Preserve product names");
   });
+
+  it("includes deep per-dialect grammar guidance", () => {
+    const argentina = buildSemanticTranslationContext({
+      text: "Help users update their account settings.",
+      dialect: "es-AR",
+      formality: "informal",
+      documentKind: "plain",
+    });
+    expect(argentina).toContain("Use pronominal and verbal voseo");
+    expect(argentina).toContain("Use ustedes for plural address");
+
+    const spain = buildSemanticTranslationContext({
+      text: "Configure your password and account settings.",
+      dialect: "es-ES",
+      documentKind: "plain",
+    });
+    expect(spain).toContain("vosotros/vosotras");
+    expect(spain).toContain("coger is neutral in Spain");
+  });
 });

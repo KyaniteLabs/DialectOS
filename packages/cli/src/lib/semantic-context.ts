@@ -1,4 +1,5 @@
 import type { SpanishDialect, FormalityLevel } from "@espanol/types";
+import { getDialectGrammarProfile } from "@espanol/types";
 import { getDialectInfo } from "./dialect-info.js";
 
 export type SemanticDomain =
@@ -93,9 +94,20 @@ export function analyzeSemanticContext(
 export function buildSemanticTranslationContext(options: BuildSemanticContextOptions): string {
   const signals = analyzeSemanticContext(options.text, options.formality || "auto");
   const dialect = getDialectInfo(options.dialect);
+  const grammarProfile = getDialectGrammarProfile(options.dialect);
   const dialectTerms = dialect
     ? [...dialect.formalTerms.slice(0, 4), ...dialect.slangTerms.slice(0, 4)].join(", ")
     : options.dialect;
+  const grammarGuidance = grammarProfile
+    ? [
+        grammarProfile.pluralAddress,
+        ...grammarProfile.voseo.notes.slice(0, 2),
+        ...grammarProfile.leismoLaismoLoismoNotes.slice(0, 1),
+        ...grammarProfile.formalityNorms.slice(0, 2),
+        ...grammarProfile.tabooAndAmbiguityNotes.slice(0, 2),
+        ...grammarProfile.semanticPromptGuidance,
+      ].join(" ")
+    : undefined;
 
   return [
     "Translate by preserving meaning, intent, and reader expectations; do not translate literally word-by-word.",
@@ -104,6 +116,7 @@ export function buildSemanticTranslationContext(options: BuildSemanticContextOpt
     options.documentKind ? `Document kind: ${options.documentKind}.` : undefined,
     options.sectionType ? `Current section type: ${options.sectionType}.` : undefined,
     dialectTerms ? `Use regional vocabulary naturally where appropriate; examples/signals: ${dialectTerms}.` : undefined,
+    grammarGuidance ? `Dialect grammar and style profile: ${grammarGuidance}` : undefined,
     "Preserve product names, code identifiers, URLs, placeholders, markdown structure, and glossary-locked terms.",
     "Prefer idiomatic Spanish for the target audience over one-to-one lexical substitution.",
   ].filter(Boolean).join(" ");
