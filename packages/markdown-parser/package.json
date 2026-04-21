@@ -22,7 +22,7 @@
     "@espanol/security": "workspace:*",
     "@espanol/types": "workspace:*",
     "isomorphic-dompurify": "^2.2.0",
-    "marked": "^15.0.0",
+    "marked": "^18.0.2",
     "zod": "^3.25.0"
   },
   "devDependencies": {
