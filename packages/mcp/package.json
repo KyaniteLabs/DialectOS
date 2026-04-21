@@ -23,7 +23,7 @@
     "@espanol/providers": "workspace:*",
     "@espanol/security": "workspace:*",
     "@espanol/types": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.27.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^3.25.0"
   },
   "devDependencies": {
