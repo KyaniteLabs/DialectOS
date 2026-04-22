@@ -150,6 +150,28 @@ test("demo server exposes provider status for the browser UI", async () => {
   }
 });
 
+test("demo server handles favicon without a noisy 404", async () => {
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async () => {
+      throw new Error("not used");
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/favicon.ico`);
+    assert.equal(response.status, 204);
+  } finally {
+    server.close();
+  }
+});
+
 test("demo server rejects malformed JSON as a client error", async () => {
   const { server, baseUrl } = await startTestServer({
     status: () => ({
