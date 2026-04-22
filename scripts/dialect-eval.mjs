@@ -14,6 +14,7 @@ const fixtureDir = args.get("fixtures") || "packages/cli/src/__tests__/fixtures/
 const outDir = args.get("out") || `audits/dialect-eval-${new Date().toISOString().slice(0, 10)}`;
 const providerName = args.get("provider") || "mock-semantic";
 const live = args.get("live") === "true";
+const failOnWarnings = args.get("fail-on-warnings") === "true";
 const dialectFilter = new Set((args.get("dialects") || "").split(",").map((d) => d.trim()).filter(Boolean));
 
 const VOSEO_DIALECTS = new Set(["es-AR", "es-UY", "es-PY", "es-GT", "es-HN", "es-SV", "es-NI"]);
@@ -187,6 +188,6 @@ mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, "results.json"), `${JSON.stringify(summary, null, 2)}\n`);
 console.log(JSON.stringify({ outDir, total: summary.total, passed: summary.passed, failed: summary.failed, warnings: summary.warnings, live }, null, 2));
 
-if (summary.failed > 0) {
+if (summary.failed > 0 || (failOnWarnings && summary.warnings > 0)) {
   process.exit(1);
 }

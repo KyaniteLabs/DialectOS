@@ -154,14 +154,15 @@ describe("dialects command", () => {
       expect(output).toMatch(/formal|Register/);
     });
 
-    it("should return default dialect (es-ES) when no markers detected", async () => {
+    it("should return unknown when no markers are detected", async () => {
       const { executeDialectsDetect } = await import("../commands/dialects.js");
 
       await executeDialectsDetect("El texto es neutral y no tiene marcadores regionales obvios.");
 
       expect(writeOutput).toHaveBeenCalled();
       const output = vi.mocked(writeOutput).mock.calls[0][0];
-      expect(output).toContain("es-ES");
+      expect(output).toContain("unknown");
+      expect(output).toContain("not guessing a dialect");
     });
 
     it("should include confidence score in output", async () => {
@@ -186,7 +187,26 @@ describe("dialects command", () => {
       const parsed = JSON.parse(output);
       expect(parsed).toHaveProperty("dialect");
       expect(parsed).toHaveProperty("confidence");
+      expect(parsed).toHaveProperty("isReliable");
       expect(typeof parsed.confidence).toBe("number");
+      expect(typeof parsed.isReliable).toBe("boolean");
+    });
+
+
+
+    it("should format low-confidence detection as unknown JSON", async () => {
+      const { executeDialectsDetect } = await import("../commands/dialects.js");
+
+      await executeDialectsDetect("El texto es neutral y no tiene marcadores regionales obvios.", { format: "json" });
+
+      expect(writeOutput).toHaveBeenCalled();
+      const output = vi.mocked(writeOutput).mock.calls.at(-1)![0];
+      const parsed = JSON.parse(output);
+      expect(parsed.dialect).toBeNull();
+      expect(parsed.name).toBeNull();
+      expect(parsed.confidence).toBe(0);
+      expect(parsed.isReliable).toBe(false);
+      expect(parsed.reason).toBe("insufficient-dialect-markers");
     });
 
     it("should handle empty text gracefully", async () => {

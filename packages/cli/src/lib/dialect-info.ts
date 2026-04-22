@@ -496,11 +496,13 @@ export type RegisterPreference = "any" | "formal" | "slang";
  * Detection result with register awareness
  */
 export interface DetectionResult {
-  dialect: SpanishDialect;
+  dialect: SpanishDialect | null;
   confidence: number;
-  name: string;
+  name: string | null;
   matchedKeywords: string[];
   registerHint: "formal" | "slang" | "neutral";
+  isReliable: boolean;
+  reason?: "matched-dialect-markers" | "insufficient-dialect-markers";
 }
 
 function getWordBoundaries(text: string): Set<string> {
@@ -576,12 +578,16 @@ export function detectDialect(text: string, register: RegisterPreference = "any"
   else if (best.score === 3) confidence = 0.7;
   else if (best.score >= 4) confidence = 0.9;
 
+  const isReliable = best.score > 0;
+
   return {
-    dialect: best.dialect.code,
-    confidence,
-    name: best.dialect.name,
+    dialect: isReliable ? best.dialect.code : null,
+    confidence: isReliable ? confidence : 0,
+    name: isReliable ? best.dialect.name : null,
     matchedKeywords: best.matchedKeywords,
     registerHint: best.registerHint,
+    isReliable,
+    reason: isReliable ? "matched-dialect-markers" : "insufficient-dialect-markers",
   };
 }
 
@@ -620,16 +626,27 @@ export function formatDetectionResult(result: DetectionResult, format: "text" | 
       confidence: result.confidence,
       name: result.name,
       registerHint: result.registerHint,
+      isReliable: result.isReliable,
+      reason: result.reason,
     }, null, 2);
   }
 
   const confidencePercent = Math.round(result.confidence * 100);
+  if (!result.isReliable) {
+    return [
+      "Detected Dialect: unknown (insufficient dialect markers)",
+      "Confidence: 0%",
+      "Register: neutral",
+      "No specific keywords detected; not guessing a dialect"
+    ].join("\n");
+  }
+
   return [
     `Detected Dialect: ${result.dialect} (${result.name})`,
     `Confidence: ${confidencePercent}%`,
     `Register: ${result.registerHint}`,
     result.matchedKeywords.length > 0
       ? `Matched Keywords: ${result.matchedKeywords.join(", ")}`
-      : "No specific keywords detected (default dialect)"
+      : "No specific keywords detected"
   ].join("\n");
 }

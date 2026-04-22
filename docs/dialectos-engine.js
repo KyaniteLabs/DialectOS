@@ -523,12 +523,16 @@ function detectDialect(text, register = "any") {
   else if (best.score === 3) confidence = 0.7;
   else if (best.score >= 4) confidence = 0.9;
 
+  const isReliable = best.score > 0;
+
   return {
-    dialect: best.dialect.code,
-    confidence,
-    name: best.dialect.name,
+    dialect: isReliable ? best.dialect.code : null,
+    confidence: isReliable ? confidence : 0,
+    name: isReliable ? best.dialect.name : null,
     matchedKeywords: best.matchedKeywords,
     registerHint: best.registerHint,
+    isReliable,
+    reason: isReliable ? "matched-dialect-markers" : "insufficient-dialect-markers",
   };
 }
 

@@ -18,7 +18,7 @@ describe("Configuration System", () => {
   });
 
   afterEach(() => {
-    try { rmSync(tempDir, { recursive: true }); } catch {}
+    rmSync(tempDir, { recursive: true, force: true });
   });
 
   it("should return default config when no args or env", async () => {

@@ -32,6 +32,29 @@ describe("dialect eval script", () => {
 
     rmSync(outDir, { recursive: true, force: true });
   });
+
+  it("can fail launch-style evals when warnings are present", () => {
+    const outDir = join(tmpdir(), `dialect-eval-warnings-${process.pid}`);
+    rmSync(outDir, { recursive: true, force: true });
+
+    expect(() => execFileSync("node", [
+      "scripts/dialect-eval.mjs",
+      `--out=${outDir}`,
+      "--fixtures=packages/cli/src/__tests__/fixtures/dialect-adversarial",
+      "--dialects=es-AD",
+      "--fail-on-warnings=true",
+    ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe" })).toThrow();
+
+    const results = JSON.parse(readFileSync(join(outDir, "results.json"), "utf-8")) as {
+      failed: number;
+      warnings: number;
+    };
+    expect(results.failed).toBe(0);
+    expect(results.warnings).toBeGreaterThan(0);
+
+    rmSync(outDir, { recursive: true, force: true });
+  });
+
   it("reports a clear error when live mode has no configured provider", () => {
     const outDir = join(tmpdir(), `dialect-eval-live-${process.pid}`);
     rmSync(outDir, { recursive: true, force: true });

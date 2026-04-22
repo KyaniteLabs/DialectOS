@@ -18,6 +18,29 @@ const CONTENT_TYPES = {
   ".svg": "image/svg+xml",
 };
 
+function createRateLimiter(options = {}) {
+  const maxRequests = Number(options.maxRequests || process.env.DIALECTOS_DEMO_RATE_LIMIT || 60);
+  const windowMs = Number(options.windowMs || process.env.DIALECTOS_DEMO_RATE_WINDOW_MS || 60000);
+  const buckets = new Map();
+
+  return {
+    check(key) {
+      const now = Date.now();
+      const current = buckets.get(key);
+      if (!current || now >= current.resetAt) {
+        buckets.set(key, { count: 1, resetAt: now + windowMs });
+        return { allowed: true, remaining: Math.max(maxRequests - 1, 0), resetMs: windowMs };
+      }
+      current.count += 1;
+      return {
+        allowed: current.count <= maxRequests,
+        remaining: Math.max(maxRequests - current.count, 0),
+        resetMs: Math.max(current.resetAt - now, 0),
+      };
+    },
+  };
+}
+
 function sendJson(res, status, payload) {
   const body = JSON.stringify(payload, null, 2);
   res.writeHead(status, {
@@ -92,6 +115,7 @@ async function loadDefaultServices(rootDir) {
 
 export function createDemoServer(options = {}) {
   const rootDir = path.resolve(options.rootDir || DEFAULT_ROOT);
+  const rateLimiter = createRateLimiter(options.rateLimit);
   const servicesPromise = options.services
     ? Promise.resolve(options.services)
     : loadDefaultServices(rootDir);
@@ -108,8 +132,23 @@ export function createDemoServer(options = {}) {
       }
 
       if (method === "POST" && url.pathname === "/api/translate") {
+        const key = req.socket.remoteAddress || "unknown";
+        const rate = rateLimiter.check(key);
+        if (!rate.allowed) {
+          sendJson(res, 429, {
+            ok: false,
+            error: `Rate limit exceeded. Try again in ${Math.ceil(rate.resetMs / 1000)}s.`,
+          });
+          return;
+        }
         const services = await servicesPromise;
-        const body = await readJson(req);
+        let body;
+        try {
+          body = await readJson(req);
+        } catch (error) {
+          sendJson(res, 400, { ok: false, error: safeError(error) });
+          return;
+        }
         try {
           const result = await services.translate({
             text: String(body.text || ""),
@@ -166,4 +205,3 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     process.exit(1);
   });
 }
-

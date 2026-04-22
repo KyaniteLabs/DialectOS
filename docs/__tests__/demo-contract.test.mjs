@@ -25,3 +25,9 @@ test("static docs engine has common three-word regional terms", () => {
   assert.match(engine, /\bguagua\b/);
   assert.match(engine, /\bbus\b/);
 });
+
+test("static docs engine does not guess a dialect on low-confidence text", () => {
+  assert.match(engine, /insufficient-dialect-markers/);
+  assert.match(engine, /isReliable/);
+  assert.match(engine, /dialect: isReliable \? best\.dialect\.code : null/);
+});

@@ -15,6 +15,7 @@ const fixtureDir = args.get("fixtures") || "packages/cli/src/__tests__/fixtures/
 const outDir = args.get("out") || `audits/dialect-certify-${new Date().toISOString().slice(0, 10)}`;
 const providerName = args.get("provider") || "mock-semantic";
 const live = args.get("live") === "true";
+const failOnWarnings = args.get("fail-on-warnings") === "true";
 const sampleTimeoutMs = parsePositiveInt(args.get("sample-timeout-ms"), 300000);
 const sampleRetries = parseNonNegativeInt(args.get("sample-retries"), 1);
 const dialectFilter = new Set((args.get("dialects") || "").split(",").map((d) => d.trim()).filter(Boolean));
@@ -395,7 +396,7 @@ async function runParentMode() {
 
   const finalSummary = summarize(results, startedAt);
   console.log(JSON.stringify({ outDir: absoluteOutDir, total: finalSummary.total, passed: finalSummary.passed, failed: finalSummary.failed, warnings: finalSummary.warnings, live }, null, 2));
-  if (finalSummary.failed > 0) {
+  if (finalSummary.failed > 0 || (failOnWarnings && finalSummary.warnings > 0)) {
     process.exit(1);
   }
 }
