@@ -11,7 +11,7 @@
       "prefer-neutral-alternative",
       "Localize grammar",
       "Lexical ambiguity constraints",
-      "Do not use coger"
+      "Avoid coger in taboo-risk dialects"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
