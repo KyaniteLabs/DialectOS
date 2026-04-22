@@ -38,12 +38,13 @@ test("demo server translates through injected full-app service", async () => {
           matchedKeywords: [],
           registerHint: "neutral",
         },
-        semanticContext: "Translate by preserving meaning",
+        semanticPromptApplied: true,
         providerStatus: {
           configured: true,
+          ready: true,
           providers: ["llm"],
           semanticProviders: ["llm"],
-          message: "Configured providers: llm",
+          message: "Semantic providers ready: llm",
         },
       };
     },
@@ -65,6 +66,9 @@ test("demo server translates through injected full-app service", async () => {
     assert.equal(body.ok, true);
     assert.equal(body.translatedText, "Recoge el archivo antes de estacionar el carro.");
     assert.equal(body.providerUsed, "llm");
+    assert.equal(body.semanticPromptApplied, true);
+    assert.equal(body.semanticContext, undefined);
+    assert.equal(JSON.stringify(body).includes("Dialect quality contract"), false);
     assert.deepEqual(calls, [{
       text: "Pick up the file before you park the car.",
       dialect: "es-MX",
@@ -80,6 +84,7 @@ test("demo server returns provider errors instead of static fallback output", as
   const { server, baseUrl } = await startTestServer({
     status: () => ({
       configured: false,
+      ready: false,
       providers: [],
       semanticProviders: [],
       message: "No provider configured",
@@ -110,9 +115,10 @@ test("demo server exposes provider status for the browser UI", async () => {
   const { server, baseUrl } = await startTestServer({
     status: () => ({
       configured: true,
+      ready: true,
       providers: ["llm"],
       semanticProviders: ["llm"],
-      message: "Configured providers: llm",
+      message: "Semantic providers ready: llm",
     }),
     translate: async () => {
       throw new Error("not used");
@@ -126,9 +132,9 @@ test("demo server exposes provider status for the browser UI", async () => {
     assert.equal(response.status, 200);
     assert.equal(body.ok, true);
     assert.equal(body.configured, true);
+    assert.equal(body.ready, true);
     assert.deepEqual(body.providers, ["llm"]);
   } finally {
     server.close();
   }
 });
-

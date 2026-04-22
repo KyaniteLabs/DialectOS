@@ -4,7 +4,6 @@ import { ALL_SPANISH_DIALECTS } from "@espanol/types";
 import { validateContentLength } from "@espanol/security";
 import { detectDialect } from "./dialect-info.js";
 import { createProviderRegistry } from "./provider-factory.js";
-import { translateWithFallback } from "./resilient-translation.js";
 import { buildSemanticTranslationContext } from "./semantic-context.js";
 
 export interface WebDemoTranslateRequest {
@@ -16,6 +15,7 @@ export interface WebDemoTranslateRequest {
 
 export interface WebDemoProviderStatus {
   configured: boolean;
+  ready: boolean;
   providers: string[];
   semanticProviders: string[];
   message: string;
@@ -28,7 +28,7 @@ export interface WebDemoTranslateResult {
   fallbackCount: number;
   retryCount: number;
   sourceDetection: ReturnType<typeof detectDialect>;
-  semanticContext: string;
+  semanticPromptApplied: boolean;
   providerStatus: WebDemoProviderStatus;
 }
 
@@ -59,11 +59,14 @@ export function getWebDemoProviderStatus(
 
   return {
     configured: providers.length > 0,
+    ready: semanticProviders.length > 0,
     providers,
     semanticProviders,
-    message: providers.length > 0
-      ? `Configured providers: ${providers.join(", ")}`
-      : "No provider configured. Start a local OpenAI-compatible model or set LLM_API_URL + LLM_MODEL.",
+    message: semanticProviders.length > 0
+      ? `Semantic providers ready: ${semanticProviders.join(", ")}`
+      : providers.length > 0
+        ? `Configured providers are not semantic enough for the full-app demo: ${providers.join(", ")}. Start an LLM provider with LLM_API_URL + LLM_MODEL.`
+        : "No provider configured. Start a local OpenAI-compatible model or set LLM_API_URL + LLM_MODEL.",
   };
 }
 
@@ -84,6 +87,12 @@ export async function translateForWebDemo(
   if (!providerStatus.configured) {
     throw new Error(providerStatus.message);
   }
+  if (!providerStatus.ready) {
+    throw new Error(providerStatus.message);
+  }
+  if (provider && !providerStatus.semanticProviders.includes(provider)) {
+    throw new Error(`Provider ${provider} is not semantic enough for the full-app demo. Use one of: ${providerStatus.semanticProviders.join(", ")}`);
+  }
 
   const semanticContext = buildSemanticTranslationContext({
     text,
@@ -92,9 +101,9 @@ export async function translateForWebDemo(
     documentKind: "plain",
   });
 
-  const translated = await translateWithFallback(
+  const translated = await translateWithSemanticDemoProviders(
     registry,
-    provider,
+    provider ? [provider] : providerStatus.semanticProviders,
     text,
     "auto",
     "es",
@@ -103,7 +112,6 @@ export async function translateForWebDemo(
       formality,
       context: semanticContext,
     },
-    { delayMs: 0 }
   );
 
   return {
@@ -113,8 +121,51 @@ export async function translateForWebDemo(
     fallbackCount: translated.fallbackCount,
     retryCount: translated.retryCount,
     sourceDetection: detectDialect(text),
-    semanticContext,
+    semanticPromptApplied: true,
     providerStatus,
   };
 }
 
+async function translateWithSemanticDemoProviders(
+  registry: ProviderRegistry,
+  providers: string[],
+  text: string,
+  sourceLang: string,
+  targetLang: string,
+  options: {
+    dialect: SpanishDialect;
+    formality: FormalityLevel;
+    context: string;
+  }
+): Promise<{
+  translatedText: string;
+  providerUsed: string;
+  fallbackCount: number;
+  retryCount: number;
+}> {
+  const errors: string[] = [];
+  for (const [attemptIndex, name] of providers.entries()) {
+    try {
+      const provider = registry.get(name);
+      const prepared = registry.prepareRequest(name, text, sourceLang, targetLang, options);
+      const result = await provider.translate(
+        text,
+        prepared.sourceLang,
+        prepared.targetLang,
+        prepared.options
+      );
+      registry.recordSuccess(name);
+      return {
+        translatedText: result.translatedText,
+        providerUsed: provider.name,
+        fallbackCount: attemptIndex,
+        retryCount: 0,
+      };
+    } catch (error) {
+      registry.recordFailure(name);
+      errors.push(`${name}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  throw new Error(`All semantic demo providers failed (${providers.join(" -> ")}): ${errors.join(" | ")}`);
+}
