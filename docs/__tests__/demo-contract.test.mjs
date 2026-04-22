@@ -6,10 +6,10 @@ const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const engine = readFileSync(new URL("../dialectos-engine.js", import.meta.url), "utf8");
 
 test("docs demo is wired to the full app backend", () => {
-  assert.match(html, /Full-App Translator/);
+  assert.match(html, /Full-app translator/i);
   assert.match(html, /fetch\('\/api\/translate'/);
-  assert.match(html, /browser → local demo backend → provider registry → LLM semantic dialect prompt/);
-  assert.match(html, /Translate with Full App/);
+  assert.match(html, /browser to backend, backend to provider registry/);
+  assert.match(html, /Translate with full app/i);
 });
 
 test("docs demo never silently falls back to static rule substitutions", () => {

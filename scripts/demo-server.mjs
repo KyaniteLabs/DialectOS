@@ -125,6 +125,12 @@ export function createDemoServer(options = {}) {
       const method = req.method || "GET";
       const url = new URL(req.url || "/", "http://127.0.0.1");
 
+      if (method === "GET" && url.pathname === "/favicon.ico") {
+        res.writeHead(204, { "cache-control": "public, max-age=86400" });
+        res.end();
+        return;
+      }
+
       if (method === "GET" && url.pathname === "/api/status") {
         const services = await servicesPromise;
         sendJson(res, 200, { ok: true, ...(await services.status()) });
