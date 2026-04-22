@@ -81,6 +81,15 @@ function buildOutputConstraintPrompt(text: string, dialect: SpanishDialect): str
   if (dialect === "es-CL" && /\bavocado\b/.test(lower)) {
     constraints.push("For Chilean food-context avocado, the output must use palta, not aguacate.");
   }
+  if (dialect === "es-PR" && /\borange juice\b|\bjugo de naranja\b|\bjugo de china\b/.test(lower)) {
+    constraints.push("For Puerto Rican citrus-context orange juice, the output must use jugo de china; do not use jugo de naranja unless explicitly explaining non-Puerto-Rican usage.");
+  }
+  if (dialect !== "es-PR" && dialect !== "es-DO" && /\bjugo de china\b/.test(lower)) {
+    constraints.push("If the source says Puerto Rican jugo de china, preserve the orange-juice meaning for this target dialect with naranja, not China/china.");
+  }
+  if ((dialect === "es-PR" || dialect === "es-DO" || dialect === "es-CU") && /\b(baby|infant|newborn)\b/.test(lower)) {
+    constraints.push(`For ${dialect} baby/infant context, use bebé/niño/infante; do not use guagua because guagua is transit-coded in this dialect.`);
+  }
   if ((dialect === "es-CU" || dialect === "es-DO" || dialect === "es-PR") && /\bbus\b/.test(lower)) {
     constraints.push(`For ${dialect} transit-context bus, the output should use guagua, not bus/autobús, unless the source explicitly asks for generic Spanish.`);
   }

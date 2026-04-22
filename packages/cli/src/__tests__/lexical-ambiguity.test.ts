@@ -72,4 +72,36 @@ describe("lexical ambiguity constraints", () => {
       expect(buildLexicalAmbiguityExpectations("Pick up the room before guests arrive.", dialect).matchedRuleIds).toContain("tidy-room");
     }
   });
+
+  it("models Puerto Rican china as orange in the juice semantic field", () => {
+    const guidance = buildLexicalAmbiguityGuidance("Orange juice is ready.", "es-PR");
+    const pr = buildLexicalAmbiguityExpectations("Orange juice is ready.", "es-PR");
+    const mx = buildLexicalAmbiguityExpectations("Jugo de china is on the menu.", "es-MX");
+
+    expect(guidance).toContain("[citrus-orange-juice]");
+    expect(guidance).toContain("jugo de china");
+    expect(pr.requiredOutputGroups).toEqual(expect.arrayContaining([
+      expect.arrayContaining(["jugo", "zumo"]),
+      expect.arrayContaining(["china", "naranja"]),
+    ]));
+    expect(mx.requiredOutputGroups).toEqual(expect.arrayContaining([
+      expect.arrayContaining(["naranja"]),
+    ]));
+    expect(mx.forbiddenOutputTerms).toEqual(expect.arrayContaining(["china"]));
+  });
+
+  it("models guagua as bus in Puerto Rico but baby in Chilean/Andean contexts", () => {
+    const prBaby = buildLexicalAmbiguityExpectations("The baby is sleeping.", "es-PR");
+    const clBaby = buildLexicalAmbiguityExpectations("The baby is sleeping.", "es-CL");
+
+    expect(prBaby.matchedRuleIds).toContain("baby-guagua");
+    expect(prBaby.requiredOutputGroups).toEqual(expect.arrayContaining([
+      expect.arrayContaining(["bebé", "bebe", "niño", "niña", "infante"]),
+    ]));
+    expect(prBaby.forbiddenOutputTerms).toEqual(expect.arrayContaining(["guagua"]));
+    expect(clBaby.requiredOutputGroups).toEqual(expect.arrayContaining([
+      expect.arrayContaining(["guagua", "bebé", "bebe", "niño", "niña", "infante"]),
+    ]));
+  });
+
 });
