@@ -1,0 +1,118 @@
+[
+  {
+    "label": "GLM 5.1 basic cert",
+    "file": "/tmp/dialectos-zai-glm51-full/results.json",
+    "total": 27,
+    "dialects": 25,
+    "passed": 27,
+    "failed": 0,
+    "warnings": 0,
+    "failures": []
+  },
+  {
+    "label": "GLM 4.7 basic cert",
+    "file": "/tmp/dialectos-zai-glm47-full/results.json",
+    "total": 27,
+    "dialects": 25,
+    "passed": 27,
+    "failed": 0,
+    "warnings": 0,
+    "failures": []
+  },
+  {
+    "label": "GLM 4.5 Air basic cert",
+    "file": "/tmp/dialectos-zai-glm45air-full/results.json",
+    "total": 27,
+    "dialects": 25,
+    "passed": 27,
+    "failed": 0,
+    "warnings": 0,
+    "failures": []
+  },
+  {
+    "label": "GLM 4.5 Air expanded adversarial cert",
+    "file": "/tmp/dialectos-expanded-adversarial-glm45air-v2/results.json",
+    "total": 125,
+    "dialects": 25,
+    "passed": 125,
+    "failed": 0,
+    "warnings": 0,
+    "unstable": 0,
+    "outputVariance": 0,
+    "failures": []
+  },
+  {
+    "label": "GLM 4.5 Air long document cert",
+    "file": "/tmp/dialectos-doc-cert-cloud-glm45air-final/results.json",
+    "total": 7,
+    "dialects": 7,
+    "passed": 7,
+    "failed": 0,
+    "failures": []
+  },
+  {
+    "label": "qwen3.5-9b basic cert",
+    "file": "/tmp/dialectos-certify-qwen35-9b-final/results.json",
+    "total": 27,
+    "dialects": 25,
+    "passed": 27,
+    "failed": 0,
+    "warnings": 0,
+    "failures": []
+  },
+  {
+    "label": "qwen3.5-9b expanded adversarial cert",
+    "file": "/tmp/dialectos-expanded-adversarial-qwen35-9b-v2/results.json",
+    "total": 125,
+    "dialects": 25,
+    "passed": 125,
+    "failed": 0,
+    "warnings": 0,
+    "unstable": 0,
+    "outputVariance": 0,
+    "failures": []
+  },
+  {
+    "label": "qwen3.6-35b targeted fix cert",
+    "file": "/tmp/dialectos-certify-qwen36-gq-mx/results.json",
+    "total": 2,
+    "dialects": 2,
+    "passed": 2,
+    "failed": 0,
+    "warnings": 0,
+    "failures": []
+  },
+  {
+    "label": "qwen3.6-35b adversarial cert",
+    "file": "/tmp/dialectos-adversarial-qwen36/results.json",
+    "total": 11,
+    "dialects": 8,
+    "passed": 11,
+    "failed": 0,
+    "warnings": 0,
+    "unstable": 0,
+    "outputVariance": 0,
+    "failures": []
+  },
+  {
+    "label": "mock expanded adversarial cert on current main",
+    "file": "/tmp/dialectos-main-expanded-adversarial-final/results.json",
+    "total": 125,
+    "dialects": 25,
+    "passed": 125,
+    "failed": 0,
+    "warnings": 0,
+    "unstable": 0,
+    "outputVariance": 0,
+    "failures": []
+  },
+  {
+    "label": "mock document cert on current main",
+    "file": "/tmp/dialectos-main-doc-cert-final/results.json",
+    "total": 7,
+    "dialects": 7,
+    "passed": 7,
+    "failed": 0,
+    "failures": []
+  }
+]
