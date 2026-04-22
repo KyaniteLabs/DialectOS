@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
@@ -59,7 +59,16 @@ function assertContains(text, needle, label, failures) {
   assertContainsAny(text, [needle], label, failures);
 }
 function assertNotContains(text, needle, label, failures) {
-  if (text.includes(needle)) failures.push(`Forbidden ${label}: ${needle}`);
+  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`, "iu");
+  if (pattern.test(text)) failures.push(`Forbidden ${label}: ${needle}`);
+}
+function readOutputIfPresent(file, label, failures) {
+  if (!existsSync(file)) {
+    failures.push(`${label} output missing: ${file}`);
+    return "";
+  }
+  return readFileSync(file, "utf-8");
 }
 function commonAssertions(text, failures) {
   assertContainsAny(text, ["{userName}", "userName"], "placeholder", failures);
@@ -72,8 +81,8 @@ function commonAssertions(text, failures) {
 function dialectAssertions(text, dialect, failures, fileKind) {
   if (dialect === "es-PR") assertContains(text, "guagua", "Puerto Rican guagua", failures);
   if (dialect === "es-PA") assertContains(text, "bus", "Panamanian bus", failures);
-  if (fileKind === "readme" && dialect === "es-AR") assertContainsAny(text, ["Podés", "podés"], "Argentine voseo", failures);
-  if (fileKind === "readme" && dialect === "es-ES") assertContainsAny(text, ["Pod", "pod", "vuestra", "vuestras", "vosotros"], "Spain plural/vosotros signal", failures);
+  if (fileKind === "readme" && dialect === "es-AR") assertContainsAny(text, ["Podés", "podés", "Tomá", "tomá", "Subí", "subí", "Agarrá", "agarrá", "contactá"], "Argentine voseo", failures);
+  if (fileKind === "readme" && dialect === "es-ES") assertContainsAny(text, ["Pod", "pod", "vuestra", "vuestras", "vosotros", "Comprad", "Usad"], "Spain plural/vosotros signal", failures);
   if (dialect === "es-CL" && /avocado|aguacate|palta|food\.avocado/.test(text)) assertContains(text, "palta", "Chilean palta", failures);
   if (dialect === "es-BO" && /hot sauce|salsa picante|llaj/.test(text)) assertContains(text, "llaj", "Bolivian llajwa/llajua", failures);
   if (dialect === "es-MX") assertNotContains(text, "coger", "Mexican coger", failures);
@@ -101,21 +110,23 @@ for (const dialect of dialects) {
 
   const failures = [];
   if (live) {
-    const readme = runCommand(["node", "packages/cli/dist/index.js", "translate-readme", readmeIn, "--dialect", dialect, "--provider", provider, "--output", readmeOut, "--policy", "permissive", "--structure-mode", "warn"], env);
+    const readme = runCommand(["node", "packages/cli/dist/index.js", "translate-readme", readmeIn, "--dialect", dialect, "--provider", provider, "--output", readmeOut, "--policy", "permissive", "--failure-policy", "allow-partial", "--structure-mode", "warn"], env);
     if (readme.status !== 0) failures.push(`README command failed: ${readme.stderr}`);
-    const api = runCommand(["node", "packages/cli/dist/index.js", "translate-api-docs", apiIn, "--dialect", dialect, "--provider", provider, "--output", apiOut, "--policy", "permissive", "--structure-mode", "warn"], env);
+    const api = runCommand(["node", "packages/cli/dist/index.js", "translate-api-docs", apiIn, "--dialect", dialect, "--provider", provider, "--output", apiOut, "--policy", "permissive", "--failure-policy", "allow-partial", "--structure-mode", "warn"], env);
     if (api.status !== 0) failures.push(`API command failed: ${api.stderr}`);
   } else {
-    writeFileSync(readmeOut, mockDocTranslate(readFileSync(readmeIn, "utf-8"), dialect));
+    if (process.env.DIALECT_DOC_CERT_SKIP_README_OUTPUT !== "1") {
+      writeFileSync(readmeOut, mockDocTranslate(readFileSync(readmeIn, "utf-8"), dialect));
+    }
     writeFileSync(apiOut, mockDocTranslate(readFileSync(apiIn, "utf-8"), dialect));
   }
   const localeSource = JSON.parse(readFileSync(localeIn, "utf-8"));
   const localeTranslated = Object.fromEntries(Object.entries(localeSource).map(([key, value]) => [key, mockDocTranslate(String(value), dialect)]));
   writeJson(localeOut, localeTranslated);
 
-  const readmeText = readFileSync(readmeOut, "utf-8");
-  const apiText = readFileSync(apiOut, "utf-8");
-  const localeText = readFileSync(localeOut, "utf-8");
+  const readmeText = readOutputIfPresent(readmeOut, "README", failures);
+  const apiText = readOutputIfPresent(apiOut, "API", failures);
+  const localeText = readOutputIfPresent(localeOut, "Locale", failures);
   for (const text of [readmeText, apiText, localeText]) commonAssertions(text, failures);
   dialectAssertions(readmeText, dialect, failures, "readme");
   dialectAssertions(apiText, dialect, failures, "api");

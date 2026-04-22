@@ -33,4 +33,35 @@ describe("document adversarial certification", () => {
 
     rmSync(outDir, { recursive: true, force: true });
   });
+
+  it("records missing output files instead of crashing", () => {
+    const outDir = join(tmpdir(), `document-certify-live-failure-${process.pid}`);
+    rmSync(outDir, { recursive: true, force: true });
+
+    expect(() => execFileSync("node", [
+      "scripts/dialect-certify-documents.mjs",
+      `--out=${outDir}`,
+      "--dialects=es-MX",
+      "--sample-timeout-ms=10000",
+    ], {
+      cwd: join(import.meta.dirname, "../../../.."),
+      stdio: "pipe",
+      env: {
+        ...process.env,
+        DIALECT_DOC_CERT_SKIP_README_OUTPUT: "1",
+      },
+    })).toThrow();
+
+    const summary = JSON.parse(readFileSync(join(outDir, "results.json"), "utf-8")) as {
+      total: number;
+      failed: number;
+      results: Array<{ dialect: string; passes: boolean; failures: string[] }>;
+    };
+    expect(summary.total).toBe(1);
+    expect(summary.failed).toBe(1);
+    expect(summary.results[0].passes).toBe(false);
+    expect(summary.results[0].failures.join(" ")).toContain("README output missing");
+
+    rmSync(outDir, { recursive: true, force: true });
+  });
 });
