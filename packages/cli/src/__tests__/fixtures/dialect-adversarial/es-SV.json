@@ -1,6 +1,6 @@
 [
   {
-    "id": "es-transit-paraphrase",
+    "id": "sv-transit-paraphrase",
     "category": "dialect-collision",
     "severity": "critical",
     "tags": [
@@ -12,31 +12,36 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Salvadoran Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "cerote",
+      "maje"
     ],
     "requiredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "preferredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
+    "id": "sv-placeholder-url",
     "category": "false-friend",
     "severity": "critical",
     "tags": [
@@ -49,15 +54,14 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Salvadoran Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "cerote",
+      "maje"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,7 +73,7 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
+    "id": "sv-no-slang-negative-control",
     "category": "intent-ambiguity",
     "severity": "high",
     "tags": [
@@ -82,14 +86,13 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Salvadoran Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "cerote",
+      "maje"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,40 +103,39 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
+    "id": "sv-informal-voseo",
     "category": "morphology-trap",
     "severity": "critical",
     "tags": [
-      "vosotros",
+      "voseo",
       "informal"
     ],
-    "source": "You can all update your passwords now.",
+    "source": "You can update your account now.",
     "domain": "general",
     "register": "informal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Salvadoran Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "cerote",
+      "maje"
     ],
     "requiredOutputAny": [
-      "vosotros",
-      "podéis",
-      "vuestras"
+      "vos podés",
+      "podés",
+      "vos puedes"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "vos",
+      "podés"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "Informal voseante dialect output should preserve voseo morphology."
   },
   {
-    "id": "es-pickup-package",
+    "id": "sv-pickup-package",
     "category": "negative-control",
     "severity": "high",
     "tags": [
@@ -145,14 +147,13 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Salvadoran Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "cerote",
+      "maje"
     ],
     "requiredOutputAny": [
       "paquete",

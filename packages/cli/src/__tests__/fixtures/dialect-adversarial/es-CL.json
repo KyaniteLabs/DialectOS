@@ -1,18 +1,174 @@
 [
   {
-    "id": "cl-avocado-paraphrase",
-    "category": "under-localization",
+    "id": "cl-transit-paraphrase",
+    "category": "dialect-collision",
     "severity": "critical",
-    "tags": ["food", "palta"],
+    "tags": [
+      "transit",
+      "paraphrase"
+    ],
+    "source": "Catch the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Chilean Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "wea",
+      "hueón",
+      "aguacate"
+    ],
+    "requiredOutputAny": [
+      "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
+      "buseta",
+      "ómnibus"
+    ],
+    "preferredOutputAny": [
+      "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
+      "buseta",
+      "ómnibus"
+    ],
+    "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
+  },
+  {
+    "id": "cl-placeholder-url",
+    "category": "false-friend",
+    "severity": "critical",
+    "tags": [
+      "placeholder",
+      "url",
+      "technical"
+    ],
+    "source": "Hi {userName}, your %{count} files are ready at https://example.com/app.",
+    "domain": "technical",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Chilean Spanish",
+      "Preserve product names"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "wea",
+      "hueón",
+      "aguacate"
+    ],
+    "requiredOutputAny": [
+      "{userName}"
+    ],
+    "preferredOutputAny": [
+      "%{count}",
+      "https://example.com/app"
+    ],
+    "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
+  },
+  {
+    "id": "cl-no-slang-negative-control",
+    "category": "intent-ambiguity",
+    "severity": "high",
+    "tags": [
+      "taboo",
+      "support",
+      "formal"
+    ],
+    "source": "Do not use slang in this customer support message.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Chilean Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "wea",
+      "hueón",
+      "aguacate"
+    ],
+    "preferredOutputAny": [
+      "jerga",
+      "argot",
+      "soporte",
+      "atención al cliente"
+    ],
+    "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
+  },
+  {
+    "id": "cl-avocado-palta",
+    "category": "morphology-trap",
+    "severity": "critical",
+    "tags": [
+      "food",
+      "under-localization"
+    ],
     "source": "Buy avocado for lunch.",
     "domain": "general",
     "register": "auto",
     "documentKind": "plain",
-    "requiredContext": ["Chilean Spanish", "palta"],
+    "requiredContext": [
+      "Chilean Spanish"
+    ],
     "forbiddenContext": [],
-    "forbiddenOutputTerms": ["aguacate", "vosotros", "wea", "hueón"],
-    "requiredOutputAny": ["palta"],
-    "preferredOutputAny": ["palta"],
-    "notes": "Chilean food localization should use palta, not aguacate."
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "wea",
+      "hueón",
+      "aguacate"
+    ],
+    "requiredOutputAny": [
+      "palta"
+    ],
+    "preferredOutputAny": [
+      "palta"
+    ],
+    "notes": "Chilean food localization should use palta."
+  },
+  {
+    "id": "cl-pickup-package",
+    "category": "negative-control",
+    "severity": "high",
+    "tags": [
+      "pick-up",
+      "intent-ambiguity"
+    ],
+    "source": "Pick up the package from reception.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Chilean Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "wea",
+      "hueón",
+      "aguacate"
+    ],
+    "requiredOutputAny": [
+      "paquete",
+      "recepción",
+      "recoge",
+      "recoger",
+      "toma",
+      "agarra"
+    ],
+    "preferredOutputAny": [
+      "paquete",
+      "recepción"
+    ],
+    "notes": "Pick up package should preserve pickup/package intent and not become download."
   }
 ]

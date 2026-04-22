@@ -1,34 +1,173 @@
 [
   {
-    "id": "mx-pickup-package",
-    "category": "intent-ambiguity",
+    "id": "mx-transit-paraphrase",
+    "category": "over-localization",
     "severity": "critical",
-    "tags": ["pick-up", "coger", "package"],
-    "source": "Pick up the package from reception.",
-    "domain": "support",
+    "tags": [
+      "transit",
+      "paraphrase"
+    ],
+    "source": "Catch the bus to the office.",
+    "domain": "general",
     "register": "auto",
     "documentKind": "plain",
-    "requiredContext": ["Mexican Spanish", "Avoid literal coger"],
+    "requiredContext": [
+      "Mexican Spanish"
+    ],
     "forbiddenContext": [],
-    "forbiddenOutputTerms": ["coger", "vos", "vosotros", "descarga"],
-    "requiredOutputAny": ["recoge", "recoger", "toma", "agarra"],
-    "preferredOutputAny": ["recoge", "recoger"],
-    "notes": "Pick up package should preserve pickup intent, not become download or coger."
+    "forbiddenOutputTerms": [
+      "coger",
+      "vos",
+      "vosotros"
+    ],
+    "requiredOutputAny": [
+      "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
+      "buseta",
+      "ómnibus"
+    ],
+    "preferredOutputAny": [
+      "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
+      "buseta",
+      "ómnibus"
+    ],
+    "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
     "id": "mx-placeholder-url",
-    "category": "structure-preservation",
+    "category": "register-trap",
     "severity": "critical",
-    "tags": ["placeholder", "url"],
+    "tags": [
+      "placeholder",
+      "url",
+      "technical"
+    ],
     "source": "Hi {userName}, your %{count} files are ready at https://example.com/app.",
     "domain": "technical",
     "register": "auto",
     "documentKind": "plain",
-    "requiredContext": ["Mexican Spanish", "Preserve product names"],
+    "requiredContext": [
+      "Mexican Spanish",
+      "Preserve product names"
+    ],
     "forbiddenContext": [],
-    "forbiddenOutputTerms": ["coger", "vos", "vosotros"],
-    "requiredOutputAny": ["{userName}"],
-    "preferredOutputAny": ["%{count}", "https://example.com/app"],
-    "notes": "Placeholders and URLs must survive translation."
+    "forbiddenOutputTerms": [
+      "coger",
+      "vos",
+      "vosotros"
+    ],
+    "requiredOutputAny": [
+      "{userName}"
+    ],
+    "preferredOutputAny": [
+      "%{count}",
+      "https://example.com/app"
+    ],
+    "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
+  },
+  {
+    "id": "mx-no-slang-negative-control",
+    "category": "structure-preservation",
+    "severity": "high",
+    "tags": [
+      "taboo",
+      "support",
+      "formal"
+    ],
+    "source": "Do not use slang in this customer support message.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Mexican Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "coger",
+      "vos",
+      "vosotros"
+    ],
+    "preferredOutputAny": [
+      "jerga",
+      "argot",
+      "soporte",
+      "atención al cliente"
+    ],
+    "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
+  },
+  {
+    "id": "mx-pickup-file",
+    "category": "taboo-copy",
+    "severity": "critical",
+    "tags": [
+      "pick-up",
+      "technical"
+    ],
+    "source": "Pick up the file before deployment.",
+    "domain": "technical",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Mexican Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "coger",
+      "vos",
+      "vosotros"
+    ],
+    "requiredOutputAny": [
+      "recoge",
+      "recoger",
+      "toma",
+      "agarra"
+    ],
+    "preferredOutputAny": [
+      "recoge",
+      "recoger"
+    ],
+    "notes": "Mexican technical pickup should avoid coger and preserve pickup intent."
+  },
+  {
+    "id": "mx-pickup-package",
+    "category": "under-localization",
+    "severity": "high",
+    "tags": [
+      "pick-up",
+      "intent-ambiguity"
+    ],
+    "source": "Pick up the package from reception.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Mexican Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "coger",
+      "vos",
+      "vosotros"
+    ],
+    "requiredOutputAny": [
+      "paquete",
+      "recepción",
+      "recoge",
+      "recoger",
+      "toma",
+      "agarra"
+    ],
+    "preferredOutputAny": [
+      "paquete",
+      "recepción"
+    ],
+    "notes": "Pick up package should preserve pickup/package intent and not become download."
   }
 ]

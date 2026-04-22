@@ -1,18 +1,165 @@
 [
   {
-    "id": "cu-bus-paraphrase-get-on",
+    "id": "cu-transit-paraphrase",
     "category": "dialect-collision",
     "severity": "critical",
-    "tags": ["transit", "paraphrase"],
+    "tags": [
+      "transit",
+      "paraphrase"
+    ],
     "source": "Get on the bus to the office.",
     "domain": "general",
     "register": "auto",
     "documentKind": "plain",
-    "requiredContext": ["Cuban Spanish", "Caribbean/Cuban flavor"],
+    "requiredContext": [
+      "Cuban Spanish"
+    ],
     "forbiddenContext": [],
-    "forbiddenOutputTerms": ["vos", "vosotros", "asere", "yuma"],
-    "requiredOutputAny": ["guagua"],
-    "preferredOutputAny": ["guagua"],
-    "notes": "Cuba transit paraphrase should use guagua while avoiding relationship slang."
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "asere",
+      "yuma"
+    ],
+    "requiredOutputAny": [
+      "guagua"
+    ],
+    "preferredOutputAny": [
+      "guagua"
+    ],
+    "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
+  },
+  {
+    "id": "cu-placeholder-url",
+    "category": "false-friend",
+    "severity": "critical",
+    "tags": [
+      "placeholder",
+      "url",
+      "technical"
+    ],
+    "source": "Hi {userName}, your %{count} files are ready at https://example.com/app.",
+    "domain": "technical",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Cuban Spanish",
+      "Preserve product names"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "asere",
+      "yuma"
+    ],
+    "requiredOutputAny": [
+      "{userName}"
+    ],
+    "preferredOutputAny": [
+      "%{count}",
+      "https://example.com/app"
+    ],
+    "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
+  },
+  {
+    "id": "cu-no-slang-negative-control",
+    "category": "intent-ambiguity",
+    "severity": "high",
+    "tags": [
+      "taboo",
+      "support",
+      "formal"
+    ],
+    "source": "Do not use slang in this customer support message.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Cuban Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "asere",
+      "yuma"
+    ],
+    "preferredOutputAny": [
+      "jerga",
+      "argot",
+      "soporte",
+      "atención al cliente"
+    ],
+    "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
+  },
+  {
+    "id": "cu-formal-support",
+    "category": "morphology-trap",
+    "severity": "high",
+    "tags": [
+      "support",
+      "formal"
+    ],
+    "source": "Contact support if the payment fails.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Cuban Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "asere",
+      "yuma"
+    ],
+    "preferredOutputAny": [
+      "soporte",
+      "comuníquese",
+      "póngase",
+      "contáctenos",
+      "contacte",
+      "asistencia",
+      "atención al cliente"
+    ],
+    "notes": "Formal support copy should remain respectful and avoid slang while preserving support intent."
+  },
+  {
+    "id": "cu-pickup-package",
+    "category": "negative-control",
+    "severity": "high",
+    "tags": [
+      "pick-up",
+      "intent-ambiguity"
+    ],
+    "source": "Pick up the package from reception.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Cuban Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
+      "asere",
+      "yuma"
+    ],
+    "requiredOutputAny": [
+      "paquete",
+      "recepción",
+      "recoge",
+      "recoger",
+      "toma",
+      "agarra"
+    ],
+    "preferredOutputAny": [
+      "paquete",
+      "recepción"
+    ],
+    "notes": "Pick up package should preserve pickup/package intent and not become download."
   }
 ]

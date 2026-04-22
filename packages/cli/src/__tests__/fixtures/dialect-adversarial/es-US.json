@@ -1,7 +1,7 @@
 [
   {
-    "id": "es-transit-paraphrase",
-    "category": "dialect-collision",
+    "id": "us-transit-paraphrase",
+    "category": "over-localization",
     "severity": "critical",
     "tags": [
       "transit",
@@ -12,32 +12,39 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "U.S. Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vosotros",
       "güey",
       "parce",
       "boludo",
-      "guagua"
+      "aparcar"
     ],
     "requiredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "preferredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
-    "category": "false-friend",
+    "id": "us-placeholder-url",
+    "category": "register-trap",
     "severity": "critical",
     "tags": [
       "placeholder",
@@ -49,15 +56,16 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "U.S. Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vosotros",
       "güey",
       "parce",
       "boludo",
-      "guagua"
+      "aparcar"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,8 +77,8 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
-    "category": "intent-ambiguity",
+    "id": "us-no-slang-negative-control",
+    "category": "structure-preservation",
     "severity": "high",
     "tags": [
       "taboo",
@@ -82,14 +90,15 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "U.S. Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vosotros",
       "güey",
       "parce",
       "boludo",
-      "guagua"
+      "aparcar"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,41 +109,45 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
-    "category": "morphology-trap",
+    "id": "us-public-parking",
+    "category": "taboo-copy",
     "severity": "critical",
     "tags": [
-      "vosotros",
-      "informal"
+      "parking",
+      "formal"
     ],
-    "source": "You can all update your passwords now.",
+    "source": "Park the car near the office.",
     "domain": "general",
-    "register": "informal",
+    "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "U.S. Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vosotros",
       "güey",
       "parce",
       "boludo",
-      "guagua"
+      "aparcar"
     ],
     "requiredOutputAny": [
-      "vosotros",
-      "podéis",
-      "vuestras"
+      "estacione",
+      "estaciona",
+      "parquee",
+      "parquea"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "estacione",
+      "estaciona",
+      "parquee",
+      "parquea"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "U.S. public-service parking should avoid Spain-only aparcar and use accessible wording."
   },
   {
-    "id": "es-pickup-package",
-    "category": "negative-control",
+    "id": "us-pickup-package",
+    "category": "under-localization",
     "severity": "high",
     "tags": [
       "pick-up",
@@ -145,14 +158,15 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "U.S. Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vosotros",
       "güey",
       "parce",
       "boludo",
-      "guagua"
+      "aparcar"
     ],
     "requiredOutputAny": [
       "paquete",

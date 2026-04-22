@@ -1,7 +1,7 @@
 [
   {
-    "id": "es-transit-paraphrase",
-    "category": "dialect-collision",
+    "id": "co-transit-paraphrase",
+    "category": "over-localization",
     "severity": "critical",
     "tags": [
       "transit",
@@ -12,32 +12,37 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Colombian Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "marica",
+      "parce"
     ],
     "requiredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "preferredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
-    "category": "false-friend",
+    "id": "co-placeholder-url",
+    "category": "register-trap",
     "severity": "critical",
     "tags": [
       "placeholder",
@@ -49,15 +54,14 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Colombian Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "marica",
+      "parce"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,8 +73,8 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
-    "category": "intent-ambiguity",
+    "id": "co-no-slang-negative-control",
+    "category": "structure-preservation",
     "severity": "high",
     "tags": [
       "taboo",
@@ -82,14 +86,13 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Colombian Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "marica",
+      "parce"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,41 +103,37 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
-    "category": "morphology-trap",
-    "severity": "critical",
+    "id": "co-computer-computador",
+    "category": "taboo-copy",
+    "severity": "high",
     "tags": [
-      "vosotros",
-      "informal"
+      "technical",
+      "lexical"
     ],
-    "source": "You can all update your passwords now.",
-    "domain": "general",
-    "register": "informal",
+    "source": "Use the computer to open the file.",
+    "domain": "technical",
+    "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Colombian Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "marica",
+      "parce"
     ],
     "requiredOutputAny": [
-      "vosotros",
-      "podéis",
-      "vuestras"
+      "computador"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "computador"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "Andean/Colombian technical vocabulary should prefer computador."
   },
   {
-    "id": "es-pickup-package",
-    "category": "negative-control",
+    "id": "co-pickup-package",
+    "category": "under-localization",
     "severity": "high",
     "tags": [
       "pick-up",
@@ -145,14 +144,13 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Colombian Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "marica",
+      "parce"
     ],
     "requiredOutputAny": [
       "paquete",

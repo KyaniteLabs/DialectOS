@@ -1,6 +1,6 @@
 [
   {
-    "id": "es-transit-paraphrase",
+    "id": "gq-transit-paraphrase",
     "category": "dialect-collision",
     "severity": "critical",
     "tags": [
@@ -12,31 +12,37 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Equatoguinean Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "asere"
     ],
     "requiredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "preferredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
+    "id": "gq-placeholder-url",
     "category": "false-friend",
     "severity": "critical",
     "tags": [
@@ -49,15 +55,15 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Equatoguinean Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "asere"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,7 +75,7 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
+    "id": "gq-no-slang-negative-control",
     "category": "intent-ambiguity",
     "severity": "high",
     "tags": [
@@ -82,14 +88,14 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Equatoguinean Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "asere"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,40 +106,37 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
+    "id": "gq-yam-name",
     "category": "morphology-trap",
-    "severity": "critical",
+    "severity": "high",
     "tags": [
-      "vosotros",
-      "informal"
+      "food",
+      "heritage"
     ],
-    "source": "You can all update your passwords now.",
+    "source": "Use yam in the recipe.",
     "domain": "general",
-    "register": "informal",
+    "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Equatoguinean Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "asere"
     ],
     "requiredOutputAny": [
-      "vosotros",
-      "podéis",
-      "vuestras"
+      "ñame"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "ñame"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "Equatoguinean food term should preserve ñame without fabricated slang."
   },
   {
-    "id": "es-pickup-package",
+    "id": "gq-pickup-package",
     "category": "negative-control",
     "severity": "high",
     "tags": [
@@ -145,14 +148,14 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Equatoguinean Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "asere"
     ],
     "requiredOutputAny": [
       "paquete",

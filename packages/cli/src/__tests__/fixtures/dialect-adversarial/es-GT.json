@@ -1,18 +1,172 @@
 [
   {
-    "id": "gt-informal-voseo-paraphrase",
+    "id": "gt-transit-paraphrase",
+    "category": "dialect-collision",
+    "severity": "critical",
+    "tags": [
+      "transit",
+      "paraphrase"
+    ],
+    "source": "Catch the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Guatemalan Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cerote",
+      "culero"
+    ],
+    "requiredOutputAny": [
+      "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
+      "buseta",
+      "ómnibus"
+    ],
+    "preferredOutputAny": [
+      "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
+      "buseta",
+      "ómnibus"
+    ],
+    "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
+  },
+  {
+    "id": "gt-placeholder-url",
+    "category": "false-friend",
+    "severity": "critical",
+    "tags": [
+      "placeholder",
+      "url",
+      "technical"
+    ],
+    "source": "Hi {userName}, your %{count} files are ready at https://example.com/app.",
+    "domain": "technical",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Guatemalan Spanish",
+      "Preserve product names"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cerote",
+      "culero"
+    ],
+    "requiredOutputAny": [
+      "{userName}"
+    ],
+    "preferredOutputAny": [
+      "%{count}",
+      "https://example.com/app"
+    ],
+    "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
+  },
+  {
+    "id": "gt-no-slang-negative-control",
+    "category": "intent-ambiguity",
+    "severity": "high",
+    "tags": [
+      "taboo",
+      "support",
+      "formal"
+    ],
+    "source": "Do not use slang in this customer support message.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Guatemalan Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cerote",
+      "culero"
+    ],
+    "preferredOutputAny": [
+      "jerga",
+      "argot",
+      "soporte",
+      "atención al cliente"
+    ],
+    "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
+  },
+  {
+    "id": "gt-informal-voseo",
     "category": "morphology-trap",
     "severity": "critical",
-    "tags": ["voseo", "central-america"],
+    "tags": [
+      "voseo",
+      "informal"
+    ],
     "source": "You can update your account now.",
-    "domain": "support",
+    "domain": "general",
     "register": "informal",
     "documentKind": "plain",
-    "requiredContext": ["Guatemalan Spanish", "Use vos"],
+    "requiredContext": [
+      "Guatemalan Spanish"
+    ],
     "forbiddenContext": [],
-    "forbiddenOutputTerms": ["vosotros", "cerote", "culero"],
-    "requiredOutputAny": ["vos podés", "podés", "vos puedes"],
-    "preferredOutputAny": ["vos", "podés"],
-    "notes": "Central American informal output should preserve voseo."
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cerote",
+      "culero"
+    ],
+    "requiredOutputAny": [
+      "vos podés",
+      "podés",
+      "vos puedes"
+    ],
+    "preferredOutputAny": [
+      "vos",
+      "podés"
+    ],
+    "notes": "Informal voseante dialect output should preserve voseo morphology."
+  },
+  {
+    "id": "gt-pickup-package",
+    "category": "negative-control",
+    "severity": "high",
+    "tags": [
+      "pick-up",
+      "intent-ambiguity"
+    ],
+    "source": "Pick up the package from reception.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Guatemalan Spanish"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "vosotros",
+      "cerote",
+      "culero"
+    ],
+    "requiredOutputAny": [
+      "paquete",
+      "recepción",
+      "recoge",
+      "recoger",
+      "toma",
+      "agarra"
+    ],
+    "preferredOutputAny": [
+      "paquete",
+      "recepción"
+    ],
+    "notes": "Pick up package should preserve pickup/package intent and not become download."
   }
 ]

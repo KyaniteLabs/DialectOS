@@ -1,6 +1,6 @@
 [
   {
-    "id": "es-transit-paraphrase",
+    "id": "do-transit-paraphrase",
     "category": "dialect-collision",
     "severity": "critical",
     "tags": [
@@ -12,31 +12,26 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Dominican Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vos",
+      "vosotros",
+      "tiguere",
+      "vaina",
+      "que lo que"
     ],
     "requiredOutputAny": [
-      "autobús",
-      "bus",
-      "buseta",
-      "ómnibus"
+      "guagua"
     ],
     "preferredOutputAny": [
-      "autobús",
-      "bus",
-      "buseta",
-      "ómnibus"
+      "guagua"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
+    "id": "do-placeholder-url",
     "category": "false-friend",
     "severity": "critical",
     "tags": [
@@ -49,15 +44,16 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Dominican Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vos",
+      "vosotros",
+      "tiguere",
+      "vaina",
+      "que lo que"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,7 +65,7 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
+    "id": "do-no-slang-negative-control",
     "category": "intent-ambiguity",
     "severity": "high",
     "tags": [
@@ -82,14 +78,15 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Dominican Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vos",
+      "vosotros",
+      "tiguere",
+      "vaina",
+      "que lo que"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,40 +97,41 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
+    "id": "do-formal-support",
     "category": "morphology-trap",
-    "severity": "critical",
+    "severity": "high",
     "tags": [
-      "vosotros",
-      "informal"
+      "support",
+      "formal"
     ],
-    "source": "You can all update your passwords now.",
-    "domain": "general",
-    "register": "informal",
+    "source": "Contact support if the payment fails.",
+    "domain": "support",
+    "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Dominican Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
-    ],
-    "requiredOutputAny": [
+      "vos",
       "vosotros",
-      "podéis",
-      "vuestras"
+      "tiguere",
+      "vaina",
+      "que lo que"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "soporte",
+      "comuníquese",
+      "póngase",
+      "contáctenos",
+      "contacte",
+      "asistencia",
+      "atención al cliente"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "Formal support copy should remain respectful and avoid slang while preserving support intent."
   },
   {
-    "id": "es-pickup-package",
+    "id": "do-pickup-package",
     "category": "negative-control",
     "severity": "high",
     "tags": [
@@ -145,14 +143,15 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Dominican Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vos",
+      "vosotros",
+      "tiguere",
+      "vaina",
+      "que lo que"
     ],
     "requiredOutputAny": [
       "paquete",

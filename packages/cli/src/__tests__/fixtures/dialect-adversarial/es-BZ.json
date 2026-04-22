@@ -1,7 +1,7 @@
 [
   {
-    "id": "es-transit-paraphrase",
-    "category": "dialect-collision",
+    "id": "bz-transit-paraphrase",
+    "category": "over-localization",
     "severity": "critical",
     "tags": [
       "transit",
@@ -12,32 +12,37 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Belizean Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "kriol",
+      "bway"
     ],
     "requiredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "preferredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
-    "category": "false-friend",
+    "id": "bz-placeholder-url",
+    "category": "register-trap",
     "severity": "critical",
     "tags": [
       "placeholder",
@@ -49,15 +54,14 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Belizean Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "kriol",
+      "bway"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,8 +73,8 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
-    "category": "intent-ambiguity",
+    "id": "bz-no-slang-negative-control",
+    "category": "structure-preservation",
     "severity": "high",
     "tags": [
       "taboo",
@@ -82,14 +86,13 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Belizean Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "kriol",
+      "bway"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,41 +103,40 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
-    "category": "morphology-trap",
-    "severity": "critical",
+    "id": "bz-formal-support",
+    "category": "taboo-copy",
+    "severity": "high",
     "tags": [
-      "vosotros",
-      "informal"
+      "support",
+      "formal"
     ],
-    "source": "You can all update your passwords now.",
-    "domain": "general",
-    "register": "informal",
+    "source": "Contact support if the payment fails.",
+    "domain": "support",
+    "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Belizean Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
-    ],
-    "requiredOutputAny": [
       "vosotros",
-      "podéis",
-      "vuestras"
+      "kriol",
+      "bway"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "soporte",
+      "comuníquese",
+      "póngase",
+      "contáctenos",
+      "contacte",
+      "asistencia",
+      "atención al cliente"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "Formal support copy should remain respectful and avoid slang while preserving support intent."
   },
   {
-    "id": "es-pickup-package",
-    "category": "negative-control",
+    "id": "bz-pickup-package",
+    "category": "under-localization",
     "severity": "high",
     "tags": [
       "pick-up",
@@ -145,14 +147,13 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Belizean Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "kriol",
+      "bway"
     ],
     "requiredOutputAny": [
       "paquete",

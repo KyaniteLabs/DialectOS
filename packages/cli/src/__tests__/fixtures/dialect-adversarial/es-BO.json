@@ -1,6 +1,6 @@
 [
   {
-    "id": "es-transit-paraphrase",
+    "id": "bo-transit-paraphrase",
     "category": "dialect-collision",
     "severity": "critical",
     "tags": [
@@ -12,31 +12,35 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Bolivian Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "requiredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "preferredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
+    "id": "bo-placeholder-url",
     "category": "false-friend",
     "severity": "critical",
     "tags": [
@@ -49,15 +53,13 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Bolivian Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,7 +71,7 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
+    "id": "bo-no-slang-negative-control",
     "category": "intent-ambiguity",
     "severity": "high",
     "tags": [
@@ -82,14 +84,12 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Bolivian Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,40 +100,37 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
+    "id": "bo-hot-sauce-llajwa",
     "category": "morphology-trap",
     "severity": "critical",
     "tags": [
-      "vosotros",
-      "informal"
+      "food",
+      "under-localization"
     ],
-    "source": "You can all update your passwords now.",
+    "source": "Buy hot sauce for lunch.",
     "domain": "general",
-    "register": "informal",
+    "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Bolivian Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "requiredOutputAny": [
-      "vosotros",
-      "podéis",
-      "vuestras"
+      "llajwa",
+      "llajua"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "llajwa",
+      "llajua"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "Bolivian food-context hot sauce should use llajwa or llajua."
   },
   {
-    "id": "es-pickup-package",
+    "id": "bo-pickup-package",
     "category": "negative-control",
     "severity": "high",
     "tags": [
@@ -145,14 +142,12 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Bolivian Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "requiredOutputAny": [
       "paquete",

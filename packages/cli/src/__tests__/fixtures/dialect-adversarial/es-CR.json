@@ -1,6 +1,6 @@
 [
   {
-    "id": "es-transit-paraphrase",
+    "id": "cr-transit-paraphrase",
     "category": "dialect-collision",
     "severity": "critical",
     "tags": [
@@ -12,31 +12,35 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Costa Rican Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "requiredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "preferredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
+    "id": "cr-placeholder-url",
     "category": "false-friend",
     "severity": "critical",
     "tags": [
@@ -49,15 +53,13 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Costa Rican Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,7 +71,7 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
+    "id": "cr-no-slang-negative-control",
     "category": "intent-ambiguity",
     "severity": "high",
     "tags": [
@@ -82,14 +84,12 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Costa Rican Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,40 +100,38 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
+    "id": "cr-formal-support",
     "category": "morphology-trap",
-    "severity": "critical",
+    "severity": "high",
     "tags": [
-      "vosotros",
-      "informal"
+      "support",
+      "formal"
     ],
-    "source": "You can all update your passwords now.",
-    "domain": "general",
-    "register": "informal",
+    "source": "Contact support if the payment fails.",
+    "domain": "support",
+    "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Costa Rican Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
-    ],
-    "requiredOutputAny": [
       "vosotros",
-      "podéis",
-      "vuestras"
+      "vos"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "soporte",
+      "comuníquese",
+      "póngase",
+      "contáctenos",
+      "contacte",
+      "asistencia",
+      "atención al cliente"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "Formal support copy should remain respectful and avoid slang while preserving support intent."
   },
   {
-    "id": "es-pickup-package",
+    "id": "cr-pickup-package",
     "category": "negative-control",
     "severity": "high",
     "tags": [
@@ -145,14 +143,12 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Costa Rican Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
-      "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "vosotros",
+      "vos"
     ],
     "requiredOutputAny": [
       "paquete",

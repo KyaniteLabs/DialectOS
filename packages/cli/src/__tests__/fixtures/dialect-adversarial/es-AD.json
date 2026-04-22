@@ -1,6 +1,6 @@
 [
   {
-    "id": "es-transit-paraphrase",
+    "id": "ad-transit-paraphrase",
     "category": "dialect-collision",
     "severity": "critical",
     "tags": [
@@ -12,7 +12,7 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Andorran Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
@@ -36,7 +36,7 @@
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
+    "id": "ad-placeholder-url",
     "category": "false-friend",
     "severity": "critical",
     "tags": [
@@ -49,7 +49,7 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Andorran Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
@@ -69,7 +69,7 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
+    "id": "ad-no-slang-negative-control",
     "category": "intent-ambiguity",
     "severity": "high",
     "tags": [
@@ -82,7 +82,7 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Andorran Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
@@ -100,7 +100,7 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
+    "id": "ad-plural-vosotros",
     "category": "morphology-trap",
     "severity": "critical",
     "tags": [
@@ -112,7 +112,7 @@
     "register": "informal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Andorran Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
@@ -133,7 +133,7 @@
     "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
   },
   {
-    "id": "es-pickup-package",
+    "id": "ad-pickup-package",
     "category": "negative-control",
     "severity": "high",
     "tags": [
@@ -145,7 +145,7 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Andorran Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [

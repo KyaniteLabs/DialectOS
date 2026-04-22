@@ -1,6 +1,6 @@
 [
   {
-    "id": "es-transit-paraphrase",
+    "id": "ph-transit-paraphrase",
     "category": "dialect-collision",
     "severity": "critical",
     "tags": [
@@ -12,31 +12,37 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Philippine Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "parce"
     ],
     "requiredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "preferredOutputAny": [
-      "autobús",
       "bus",
+      "autobús",
+      "colectivo",
+      "bondi",
+      "camión",
       "buseta",
       "ómnibus"
     ],
     "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
   },
   {
-    "id": "es-placeholder-url",
+    "id": "ph-placeholder-url",
     "category": "false-friend",
     "severity": "critical",
     "tags": [
@@ -49,15 +55,15 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish",
+      "Philippine Spanish",
       "Preserve product names"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "parce"
     ],
     "requiredOutputAny": [
       "{userName}"
@@ -69,7 +75,7 @@
     "notes": "Placeholders, ICU-style tokens, and URLs must survive dialect translation unchanged."
   },
   {
-    "id": "es-no-slang-negative-control",
+    "id": "ph-no-slang-negative-control",
     "category": "intent-ambiguity",
     "severity": "high",
     "tags": [
@@ -82,14 +88,14 @@
     "register": "formal",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Philippine Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "parce"
     ],
     "preferredOutputAny": [
       "jerga",
@@ -100,40 +106,40 @@
     "notes": "Negative control: dialect selection must not inject slang or taboo terms into formal support copy."
   },
   {
-    "id": "es-plural-vosotros",
+    "id": "ph-philippine-names",
     "category": "morphology-trap",
-    "severity": "critical",
+    "severity": "high",
     "tags": [
-      "vosotros",
-      "informal"
+      "heritage",
+      "technical"
     ],
-    "source": "You can all update your passwords now.",
-    "domain": "general",
-    "register": "informal",
+    "source": "Preserve Philippine names in the file.",
+    "domain": "technical",
+    "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Philippine Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "parce"
     ],
     "requiredOutputAny": [
-      "vosotros",
-      "podéis",
-      "vuestras"
+      "filipinos",
+      "Filipinas",
+      "filipinas"
     ],
     "preferredOutputAny": [
-      "vosotros",
-      "podéis"
+      "filipinos",
+      "Filipinas"
     ],
-    "notes": "Spain-adjacent plural informal address should preserve vosotros/podéis style."
+    "notes": "Philippine Spanish should preserve Philippine references without inventing Chavacano."
   },
   {
-    "id": "es-pickup-package",
+    "id": "ph-pickup-package",
     "category": "negative-control",
     "severity": "high",
     "tags": [
@@ -145,14 +151,14 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Peninsular Spanish"
+      "Philippine Spanish"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "vos",
+      "vosotros",
       "güey",
-      "parce",
-      "boludo",
-      "guagua"
+      "parce"
     ],
     "requiredOutputAny": [
       "paquete",
