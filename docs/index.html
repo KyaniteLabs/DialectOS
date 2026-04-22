@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DialectOS — Spanish Dialect Rule Explorer and Certification</title>
-  <meta name="description" content="Explore deterministic Spanish dialect substitutions in the static browser demo, then use the certified CLI/MCP/LLM workflow for semantic translation QA.">
+  <title>DialectOS — Full-App Spanish Dialect Translation Demo</title>
+  <meta name="description" content="Run the full DialectOS translation stack from the browser through a local backend and configured LLM/provider.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -30,16 +30,15 @@
     <div class="relative max-w-5xl mx-auto px-6 pt-16 pb-10 text-center">
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-sm font-medium mb-6">
         <span class="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-        701 tests passing · BSL 1.1 · GitHub Pages
+        707 tests passing · BSL 1.1 · Full-app demo
       </div>
       <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-5">
         <span class="gradient-text">DialectOS</span>
       </h1>
       <p class="text-lg text-slate-400 max-w-2xl mx-auto mb-8 leading-relaxed">
-        This page is a <strong class="text-slate-200">static rule explorer</strong>, not a full AI translation service.
-        It shows deterministic substitutions such as <em>coche</em> → <em>carro</em>,
-        <em>vosotros</em> → <em>ustedes</em>, and <em>zumo</em> → <em>jugo</em>.
-        For semantic translation and launch decisions, use the certified CLI/MCP/LLM workflow.
+        This page now drives the <strong class="text-slate-200">full DialectOS app path</strong>:
+        browser → local demo backend → provider registry → LLM semantic dialect prompt.
+        Start it with <code class="text-sky-300">pnpm demo</code> or the Docker Compose demo, then test real translations without exposing model keys in the browser.
       </p>
       <div class="flex flex-wrap justify-center gap-3">
         <a href="https://github.com/Pastorsimon1798/DialectOS" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl font-semibold text-sm transition-colors flex items-center gap-2">
@@ -47,7 +46,7 @@
           Star on GitHub
         </a>
         <a href="#translate" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-500 rounded-xl font-semibold text-sm text-white transition-colors">
-          Explore Rules →
+          Run Full Demo →
         </a>
       </div>
     </div>
@@ -58,27 +57,25 @@
     <div class="glass rounded-2xl p-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
       <div><div class="text-3xl font-bold text-sky-400">25</div><div class="text-sm text-slate-500 mt-1">Dialects</div></div>
       <div><div class="text-3xl font-bold text-violet-400">200+</div><div class="text-sm text-slate-500 mt-1">Vocabulary Rules</div></div>
-      <div><div class="text-3xl font-bold text-emerald-400">701</div><div class="text-sm text-slate-500 mt-1">Tests</div></div>
+      <div><div class="text-3xl font-bold text-emerald-400">707</div><div class="text-sm text-slate-500 mt-1">Tests</div></div>
       <div><div class="text-3xl font-bold text-amber-400">3</div><div class="text-sm text-slate-500 mt-1">Registers</div></div>
     </div>
   </section>
 
-  <!-- Main Rule Explorer -->
+  <!-- Main Full-App Demo -->
   <section id="translate" class="max-w-5xl mx-auto px-6 mb-14">
     <div class="glass rounded-2xl p-6 md:p-8">
-      <div class="mb-5 rounded-xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-100">
-        <strong class="text-amber-200">Important:</strong>
-        this browser demo only applies known rule-table substitutions from a static JavaScript file.
-        It does not infer meaning, fill missing words, or certify that unchanged text is valid for a dialect.
-        <a href="https://github.com/Pastorsimon1798/DialectOS#readme" class="text-sky-300 hover:text-sky-200 underline">For certified translation</a>,
-        run the CLI/MCP/LLM evaluation and MQM reporting flow instead.
+      <div id="backendStatus" class="mb-5 rounded-xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-100">
+        <strong class="text-amber-200">Backend status:</strong>
+        checking <code>/api/status</code>… If you opened this on static GitHub Pages, start the full app locally with
+        <code class="text-sky-300">pnpm demo</code> or use the Docker Compose instructions.
       </div>
 
       <!-- Toolbar -->
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-5">
         <div>
-          <h2 class="text-xl font-semibold text-slate-200">Dialect Rule Explorer</h2>
-          <p class="text-sm text-slate-500 mt-0.5">Type Spanish text to inspect deterministic substitutions; this is not semantic translation.</p>
+          <h2 class="text-xl font-semibold text-slate-200">Full-App Translator</h2>
+          <p class="text-sm text-slate-500 mt-0.5">Type text, pick a dialect, then call the backend that uses the real provider stack and semantic dialect prompts.</p>
         </div>
         <div class="flex gap-2 flex-wrap">
           <button onclick="loadPreset('es-mx')" class="px-3 py-1.5 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors">🇲🇽 → Mexico</button>
@@ -131,15 +128,18 @@
             <option value="es-AD">🇦🇩 Andorra (es-AD)</option>
             <option value="es-ES">🇪🇸 Spain (es-ES)</option>
           </select>
+          <button id="translateButton" onclick="translate()" class="w-full mb-3 px-4 py-3 bg-sky-600 hover:bg-sky-500 rounded-xl font-semibold text-sm text-white transition-colors">
+            Translate with Full App
+          </button>
           <div id="outputBox" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 text-slate-300 text-sm leading-relaxed min-h-[160px] font-mono">
-            <span class="text-slate-600 italic">Type Spanish text to explore deterministic rule substitutions...</span>
+            <span class="text-slate-600 italic">Start the full app demo backend, type text, then click Translate with Full App...</span>
           </div>
         </div>
       </div>
 
       <!-- Changes panel -->
       <div id="changesPanel" class="mt-5 hidden">
-        <div class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Substitutions Applied</div>
+        <div class="text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Full-App Execution</div>
         <div id="changesList" class="flex flex-wrap gap-2"></div>
       </div>
 
@@ -229,75 +229,14 @@
       return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
-    function computeChanges(text, dialect) {
-      const adaptations = DIALECT_ADAPTATIONS[dialect] || [];
-      const changes = [];
-      const seen = new Set();
-      for (const rule of adaptations) {
-        const matches = text.match(rule.from);
-        if (matches) {
-          for (const m of matches) {
-            const adapted = m.replace(rule.from, rule.to);
-            if (adapted !== m && !seen.has(m.toLowerCase())) {
-              seen.add(m.toLowerCase());
-              changes.push({ original: m, replacement: adapted, label: rule.description });
-            }
-          }
-        }
-      }
-      return changes;
-    }
+    let translateRequestId = 0;
 
-    function renderDiff(adapted, changes) {
-      if (changes.length === 0) return escapeHtml(adapted);
-      let html = escapeHtml(adapted);
-      const seen = new Set();
-      for (const c of changes) {
-        const r = c.replacement;
-        if (seen.has(r.toLowerCase())) continue;
-        seen.add(r.toLowerCase());
-        const escaped = escapeHtml(r);
-        const re = new RegExp('\\b' + escaped.replace(/[.*+?^${}()|[\]\\\\]/g, '\\$&') + '\\b', 'gi');
-        html = html.replace(re, '<span class="change">$&</span>');
-      }
-      return html;
-    }
-
-    function translate() {
-      const text = document.getElementById('sourceText').value.trim();
-      const target = document.getElementById('targetDialect').value;
-      const outputBox = document.getElementById('outputBox');
-      const changesPanel = document.getElementById('changesPanel');
-      const changesList = document.getElementById('changesList');
+    function renderDetection(result) {
       const detectPanel = document.getElementById('detectPanel');
-
-      if (!text) {
-        outputBox.innerHTML = '<span class="text-slate-600 italic">Type Spanish text to explore deterministic rule substitutions...</span>';
-        changesPanel.classList.add('hidden');
-        detectPanel.classList.add('hidden');
-        document.getElementById('detectedSource').textContent = '—';
-        return;
-      }
-
-      const adapted = applyAdaptations(text, target);
-      const changes = computeChanges(text, target);
-
-      if (changes.length === 0) {
-        outputBox.innerHTML = '<span class="text-slate-500">No rule-based substitutions fired for ' + DIALECT_INFO[target] + ' Spanish. This does not certify the text; use the CLI/MCP/LLM workflow for semantic translation.</span>';
-        changesPanel.classList.add('hidden');
-      } else {
-        outputBox.innerHTML = renderDiff(adapted, changes);
-        changesPanel.classList.remove('hidden');
-        changesList.innerHTML = changes.map(c =>
-          '<span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">' + escapeHtml(c.original) + ' → ' + escapeHtml(c.replacement) + '</span>'
-        ).join('');
-      }
-
-      const result = detectDialect(text);
-      const best = result.dialect ? DIALECT_METADATA.find(d => d.code === result.dialect) : null;
+      const best = result && result.dialect ? DIALECT_METADATA.find(d => d.code === result.dialect) : null;
       const detectedLabel = best && result.confidence > 0.2
         ? FLAGS[best.code] + ' ' + best.code + ' · ' + result.registerHint
-        : 'no high-confidence demo marker';
+        : 'no high-confidence marker';
       document.getElementById('detectedSource').textContent = detectedLabel;
 
       if (best) {
@@ -317,6 +256,74 @@
       }
     }
 
+    async function refreshBackendStatus() {
+      const statusBox = document.getElementById('backendStatus');
+      try {
+        const response = await fetch('/api/status', { headers: { accept: 'application/json' } });
+        if (!response.ok) throw new Error('status endpoint returned ' + response.status);
+        const status = await response.json();
+        const color = status.configured ? 'emerald' : 'amber';
+        statusBox.className = 'mb-5 rounded-xl border border-' + color + '-400/30 bg-' + color + '-500/10 p-4 text-sm text-' + color + '-100';
+        statusBox.innerHTML = '<strong class="text-' + color + '-200">Backend status:</strong> ' +
+          escapeHtml(status.message || 'connected') +
+          ' <span class="text-slate-400">Providers: ' + escapeHtml((status.providers || []).join(', ') || 'none') + '</span>';
+      } catch (error) {
+        statusBox.className = 'mb-5 rounded-xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm text-amber-100';
+        statusBox.innerHTML = '<strong class="text-amber-200">Backend status:</strong> full-app backend is not reachable. Run <code class="text-sky-300">pnpm demo</code> and open the local URL. Static GitHub Pages cannot call your local model.';
+      }
+    }
+
+    async function translate() {
+      const requestId = ++translateRequestId;
+      const text = document.getElementById('sourceText').value.trim();
+      const target = document.getElementById('targetDialect').value;
+      const outputBox = document.getElementById('outputBox');
+      const changesPanel = document.getElementById('changesPanel');
+      const changesList = document.getElementById('changesList');
+      const detectPanel = document.getElementById('detectPanel');
+
+      if (!text) {
+        outputBox.innerHTML = '<span class="text-slate-600 italic">Start the full app demo backend, type text, then click Translate with Full App...</span>';
+        changesPanel.classList.add('hidden');
+        detectPanel.classList.add('hidden');
+        document.getElementById('detectedSource').textContent = '—';
+        return;
+      }
+
+      outputBox.innerHTML = '<span class="text-sky-300">Calling /api/translate through the full DialectOS backend…</span>';
+      changesPanel.classList.add('hidden');
+
+      try {
+        const response = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', accept: 'application/json' },
+          body: JSON.stringify({ text, dialect: target, provider: 'auto', formality: 'auto' }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (requestId !== translateRequestId) return;
+        if (!response.ok || result.ok === false) {
+          throw new Error(result.error || ('backend returned ' + response.status));
+        }
+
+        outputBox.innerHTML = escapeHtml(result.translatedText || '');
+        changesPanel.classList.remove('hidden');
+        changesList.innerHTML = [
+          '<span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-xs font-medium border border-emerald-500/20">provider: ' + escapeHtml(result.providerUsed || 'unknown') + '</span>',
+          '<span class="px-2.5 py-1 rounded-lg bg-sky-500/10 text-sky-300 text-xs font-medium border border-sky-500/20">target: ' + escapeHtml(target) + '</span>',
+          '<span class="px-2.5 py-1 rounded-lg bg-violet-500/10 text-violet-300 text-xs font-medium border border-violet-500/20">fallbacks: ' + escapeHtml(String(result.fallbackCount || 0)) + '</span>',
+        ].join('');
+        renderDetection(result.sourceDetection);
+        refreshBackendStatus();
+      } catch (error) {
+        if (requestId !== translateRequestId) return;
+        outputBox.innerHTML = '<span class="text-amber-300">Full-app backend error:</span> ' +
+          escapeHtml(error.message || String(error)) +
+          '<br><br><span class="text-slate-500">Start a provider-backed backend with <code>pnpm demo</code>. No static translation fallback was used.</span>';
+        changesPanel.classList.add('hidden');
+        detectPanel.classList.add('hidden');
+      }
+    }
+
     const PRESETS = {
       'es-mx': { text: 'Vosotros lleváis el ordenador en el coche para ir al piso y comer patatas.', target: 'es-MX' },
       'es-ar': { text: 'Vosotros lleváis gafas y escribís con bolígrafo en el piso. Después compráis fresas y cacahuetes.', target: 'es-AR' },
@@ -328,7 +335,6 @@
       const p = PRESETS[key];
       document.getElementById('sourceText').value = p.text;
       document.getElementById('targetDialect').value = p.target;
-      translate();
     }
 
     function renderGrid() {
@@ -337,15 +343,14 @@
         const div = document.createElement('div');
         div.className = 'glass rounded-xl p-3 text-center dialect-card';
         div.innerHTML = '<div class="text-2xl mb-1">' + FLAGS[code] + '</div><div class="text-sm font-medium text-slate-300">' + code + '</div><div class="text-xs text-slate-500">' + name + '</div>';
-        div.onclick = () => { document.getElementById('targetDialect').value = code; translate(); };
+        div.onclick = () => { document.getElementById('targetDialect').value = code; };
         grid.appendChild(div);
       }
     }
 
-    document.getElementById('sourceText').addEventListener('input', translate);
-    document.getElementById('targetDialect').addEventListener('change', translate);
     renderGrid();
     loadPreset('es-mx');
+    refreshBackendStatus();
   </script>
 </body>
 </html>

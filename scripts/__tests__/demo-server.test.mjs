@@ -1,0 +1,134 @@
+import { once } from "node:events";
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { createDemoServer } from "../demo-server.mjs";
+
+async function startTestServer(services) {
+  const server = createDemoServer({ services });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  const address = server.address();
+  return {
+    server,
+    baseUrl: `http://127.0.0.1:${address.port}`,
+  };
+}
+
+test("demo server translates through injected full-app service", async () => {
+  const calls = [];
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Configured providers: llm",
+    }),
+    translate: async (request) => {
+      calls.push(request);
+      return {
+        translatedText: "Recoge el archivo antes de estacionar el carro.",
+        dialect: request.dialect,
+        providerUsed: "llm",
+        fallbackCount: 0,
+        retryCount: 0,
+        sourceDetection: {
+          dialect: "es-ES",
+          confidence: 0.1,
+          name: "Peninsular Spanish",
+          matchedKeywords: [],
+          registerHint: "neutral",
+        },
+        semanticContext: "Translate by preserving meaning",
+        providerStatus: {
+          configured: true,
+          providers: ["llm"],
+          semanticProviders: ["llm"],
+          message: "Configured providers: llm",
+        },
+      };
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        text: "Pick up the file before you park the car.",
+        dialect: "es-MX",
+        provider: "auto",
+      }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.ok, true);
+    assert.equal(body.translatedText, "Recoge el archivo antes de estacionar el carro.");
+    assert.equal(body.providerUsed, "llm");
+    assert.deepEqual(calls, [{
+      text: "Pick up the file before you park the car.",
+      dialect: "es-MX",
+      provider: "auto",
+      formality: "auto",
+    }]);
+  } finally {
+    server.close();
+  }
+});
+
+test("demo server returns provider errors instead of static fallback output", async () => {
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: false,
+      providers: [],
+      semanticProviders: [],
+      message: "No provider configured",
+    }),
+    translate: async () => {
+      throw new Error("No provider configured. Start a local model.");
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text: "hola", dialect: "es-PR" }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 503);
+    assert.equal(body.ok, false);
+    assert.match(body.error, /No provider configured/);
+    assert.notEqual(body.translatedText, "hola");
+  } finally {
+    server.close();
+  }
+});
+
+test("demo server exposes provider status for the browser UI", async () => {
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Configured providers: llm",
+    }),
+    translate: async () => {
+      throw new Error("not used");
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/status`);
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.ok, true);
+    assert.equal(body.configured, true);
+    assert.deepEqual(body.providers, ["llm"]);
+  } finally {
+    server.close();
+  }
+});
+

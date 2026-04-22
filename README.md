@@ -7,7 +7,7 @@
 Translate, detect, and adapt content across **25 regional Spanish variants** while preserving markdown structure, code comments, and locale file formatting.
 
 [![CI](https://github.com/Pastorsimon1798/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Pastorsimon1798/DialectOS/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-701%20passing-brightgreen)](https://github.com/Pastorsimon1798/DialectOS/actions)
+[![Tests](https://img.shields.io/badge/tests-707%20passing-brightgreen)](https://github.com/Pastorsimon1798/DialectOS/actions)
 [![License](https://img.shields.io/badge/license-BSL%201.1-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
 [![pnpm](https://img.shields.io/badge/pnpm-9.15.0-orange)](package.json)
@@ -67,6 +67,24 @@ Spanish is not one language — it's **25 regional variants** with different voc
 ---
 
 ## 🚀 Quick Start
+
+### Full-app browser demo
+
+The browser demo is no longer a fake/static rule replacer. It calls a local
+DialectOS backend, and that backend calls the configured provider stack.
+
+```bash
+LLM_API_URL="http://127.0.0.1:1234/v1/chat/completions" \
+LLM_API_FORMAT="openai" \
+LLM_MODEL="your-local-model-name" \
+LLM_ALLOW_LOCAL=1 \
+pnpm demo
+```
+
+Open `http://127.0.0.1:8080`.
+
+For the beginner container walkthrough, see
+[`docs/full-app-demo.md`](docs/full-app-demo.md).
 
 ### 30-second MCP setup
 
@@ -173,7 +191,7 @@ git clone https://github.com/Pastorsimon1798/DialectOS.git
 cd DialectOS
 pnpm install
 pnpm build
-pnpm test        # 701 tests passing
+pnpm test        # 707 tests passing
 ```
 
 ---
@@ -215,14 +233,14 @@ pnpm test        # 701 tests passing
 | Package | Version | Description | Tests |
 |---------|---------|-------------|-------|
 | [`@espanol/mcp`](packages/mcp) | `0.1.0` | 16 MCP tools (stdio server) | 85 |
-| [`@espanol/cli`](packages/cli) | `0.1.0` | CLI commands for semantic translation workflows | 293 |
+| [`@espanol/cli`](packages/cli) | `0.1.0` | CLI commands for semantic translation workflows | 296 |
 | [`@espanol/providers`](packages/providers) | `0.1.0` | LLM, DeepL, LibreTranslate, MyMemory with circuit breaker | 71 |
 | [`@espanol/security`](packages/security) | `0.1.0` | Rate limiting, SSRF protection, sanitization | 66 |
 | [`@espanol/types`](packages/types) | `0.1.0` | Shared TypeScript types + glossary, profile, certification, and quality data | 54 |
 | [`@espanol/locale-utils`](packages/locale-utils) | `0.1.0` | Locale file diff/merge utilities | 55 |
 | [`@espanol/markdown-parser`](packages/markdown-parser) | `0.1.0` | Structure-preserving markdown parser | 74 |
 
-**Total: 701 tests across 7 packages plus the static docs contract**
+**Total: 707 tests across 7 packages plus the full-app docs and demo-server contracts**
 
 ---
 
