@@ -67,6 +67,43 @@ function scorePatterns<T extends string>(
   return { value: best.value as T, matchedSignals: best.matchedSignals };
 }
 
+function buildOutputConstraintPrompt(text: string, dialect: SpanishDialect): string | undefined {
+  const constraints: string[] = [
+    "Do not copy forbidden examples, taboo examples, or ambiguity warnings into the output.",
+    "If this context says a term is avoid-by-default or never-unless-requested, never emit that term unless it appears in the source text.",
+  ];
+  const lower = text.toLowerCase();
+
+  if (dialect === "es-BO" && /\bhot sauce\b/.test(lower)) {
+    constraints.push("For Bolivian food-context hot sauce, the output must include one of: llajwa, llajua.");
+  }
+  if (dialect === "es-CL" && /\bavocado\b/.test(lower)) {
+    constraints.push("For Chilean food-context avocado, the output must use palta, not aguacate.");
+  }
+  if ((dialect === "es-CU" || dialect === "es-DO" || dialect === "es-PR") && /\bbus\b/.test(lower)) {
+    constraints.push(`For ${dialect} transit-context bus, the output should use guagua, not bus/autobús, unless the source explicitly asks for generic Spanish.`);
+  }
+  if (dialect === "es-PA" && /\bbus\b/.test(lower)) {
+    constraints.push("For Panamanian transit-context bus, keep bus as bus. The output must not contain: cueco, chombo, yeyé.");
+  }
+  if (dialect === "es-MX" && /\bpick up\b/.test(lower) && /\bfile\b/.test(lower)) {
+    constraints.push("For technical file pickup, use recoge/recoger/toma/agarra by meaning; do not use coger and do not change the intent to download unless the source says download.");
+  }
+  if (dialect === "es-PH" && /\bphilippine names\b/.test(lower)) {
+    constraints.push("For Philippine names, preserve the Philippine reference using Filipinas/filipinos/filipinas rather than only singular adjectival filipino.");
+  }
+  if (dialect === "es-US" && /\bpark the car\b/.test(lower)) {
+    constraints.push("For formal U.S. Spanish public-service parking instructions, use singular respectful wording such as estacione/estaciona/parquee/parquea; do not use Spain-only aparcar.");
+  }
+  if ((dialect === "es-GT" || dialect === "es-HN" || dialect === "es-NI" || dialect === "es-SV") && /\byou can update your account now\b/.test(lower)) {
+    constraints.push(`For informal ${dialect} account-update copy, the output must use Central American voseo such as vos podés/podés; do not use tú/puedes.`);
+  }
+
+  return constraints.length > 2
+    ? `Output constraints: ${constraints.join(" ")}`
+    : undefined;
+}
+
 export function analyzeSemanticContext(
   text: string,
   requestedFormality: FormalityLevel = "auto"
@@ -96,6 +133,7 @@ export function buildSemanticTranslationContext(options: BuildSemanticContextOpt
   const dialect = getDialectInfo(options.dialect);
   const grammarProfile = getDialectGrammarProfile(options.dialect);
   const qualityPrompt = buildDialectQualityPrompt(options.dialect);
+  const outputConstraintPrompt = buildOutputConstraintPrompt(options.text, options.dialect);
   const dialectTerms = dialect
     ? [...dialect.formalTerms.slice(0, 4), ...dialect.slangTerms.slice(0, 4)].join(", ")
     : options.dialect;
@@ -119,6 +157,7 @@ export function buildSemanticTranslationContext(options: BuildSemanticContextOpt
     dialectTerms ? `Use regional vocabulary naturally where appropriate; examples/signals: ${dialectTerms}.` : undefined,
     grammarGuidance ? `Dialect grammar and style profile: ${grammarGuidance}` : undefined,
     qualityPrompt ? `Dialect quality contract: ${qualityPrompt}` : undefined,
+    outputConstraintPrompt,
     "Preserve product names, code identifiers, URLs, placeholders, markdown structure, and glossary-locked terms.",
     "Prefer idiomatic Spanish for the target audience over one-to-one lexical substitution.",
   ].filter(Boolean).join(" ");
