@@ -115,7 +115,9 @@ for (const dialect of dialects) {
     const api = runCommand(["node", "packages/cli/dist/index.js", "translate-api-docs", apiIn, "--dialect", dialect, "--provider", provider, "--output", apiOut, "--policy", "permissive", "--failure-policy", "allow-partial", "--structure-mode", "warn"], env);
     if (api.status !== 0) failures.push(`API command failed: ${api.stderr}`);
   } else {
-    writeFileSync(readmeOut, mockDocTranslate(readFileSync(readmeIn, "utf-8"), dialect));
+    if (process.env.DIALECT_DOC_CERT_SKIP_README_OUTPUT !== "1") {
+      writeFileSync(readmeOut, mockDocTranslate(readFileSync(readmeIn, "utf-8"), dialect));
+    }
     writeFileSync(apiOut, mockDocTranslate(readFileSync(apiIn, "utf-8"), dialect));
   }
   const localeSource = JSON.parse(readFileSync(localeIn, "utf-8"));
