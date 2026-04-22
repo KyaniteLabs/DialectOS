@@ -28,6 +28,8 @@ describe("dialect report script", () => {
     expect(report).toContain("DialectOS Certification Report: Acme SaaS");
     expect(report).toContain("Overall grade: **Pass**");
     expect(report).toContain("Launch candidate is certified");
+    expect(report).toContain("MQM-aligned issue summary");
+    expect(report).toContain("Dialect validation status");
     expect(report).toContain("Basic cert");
     expect(report).toContain("Adversarial cert");
 
@@ -58,6 +60,8 @@ describe("dialect report script", () => {
     const report = readFileSync(out, "utf-8");
     expect(report).toContain("Overall grade: **No-Go**");
     expect(report).toContain("Do not launch");
+    expect(report).toContain("taboo-safety");
+    expect(report).toContain("critical");
     expect(report).toContain("Forbidden output term present: chombo");
 
     rmSync(dir, { recursive: true, force: true });

@@ -384,3 +384,5 @@ export * from "./glossary-data.js";
 export * from "./dialect-profiles.js";
 
 export * from "./dialect-quality.js";
+
+export * from "./certification.js";

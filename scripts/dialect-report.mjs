@@ -14,6 +14,37 @@ const out = args.get("out") || "audits/dialect-report.md";
 const customer = args.get("customer") || "Customer";
 const product = args.get("product") || "Spanish localization";
 const generatedAt = new Date().toISOString();
+const issueCategoryByPattern = [
+  [/Forbidden output term|taboo|chombo|cabrón|bicho|puñeta|coger/i, "taboo-safety"],
+  [/placeholder|ICU|URL|code fence|markdown|structure/i, "markup-placeholder"],
+  [/Missing required output trait|dialect|guagua|voseo|vosotros|palta|llajwa|llajua/i, "locale-convention"],
+  [/formality|formal|informal|usted|tú|vos/i, "style-register"],
+  [/glossary|terminology/i, "terminology"],
+  [/grammar|invalid form|recoga/i, "grammar"],
+  [/meaning|intent|download|pickup/i, "accuracy"],
+];
+
+const severityByPattern = [
+  [/Forbidden output term|Missing required output trait|placeholder|ICU|URL|structure|Provider error|timed out/i, "critical"],
+  [/Missing preferred dialect trait|quality warning|unstable/i, "major"],
+];
+
+const validationStatus = {
+  "es-PA": { status: "native-reviewed", level: "silver" },
+  "es-PR": { status: "native-reviewed", level: "silver" },
+  "es-PH": { status: "experimental", level: "bronze" },
+};
+
+function classifyIssue(message) {
+  const category = issueCategoryByPattern.find(([pattern]) => pattern.test(message))?.[1] || "accuracy";
+  const severity = severityByPattern.find(([pattern]) => pattern.test(message))?.[1] || "minor";
+  return { category, severity };
+}
+
+function dialectStatus(dialect) {
+  return validationStatus[dialect] || { status: "automated-certified", level: "bronze" };
+}
+
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, "utf-8"));
@@ -33,6 +64,7 @@ function normalizeResult(result, label = "Certification") {
     failures: result.failures || result.results?.filter((row) => row.passes === false).map((row) => ({
       dialect: row.dialect,
       fixture: row.fixture,
+      source: row.source,
       output: row.output,
       failures: row.failures || [],
       qualityWarnings: row.qualityWarnings || [],
@@ -83,6 +115,30 @@ function recommendedAction(summary) {
   return "Launch candidate is certified for the tested scope.";
 }
 
+function issueRows(results) {
+  return results.flatMap((result) => result.failures.flatMap((failure) => {
+    const messages = [...(failure.failures || []), ...(failure.qualityWarnings || [])];
+    return messages.map((message) => ({
+      certification: result.label,
+      dialect: failure.dialect,
+      fixture: failure.fixture,
+      source: failure.source,
+      output: failure.output,
+      message,
+      ...classifyIssue(message),
+    }));
+  }));
+}
+
+function issueSummary(issues) {
+  const summary = {};
+  for (const issue of issues) {
+    summary[issue.severity] = (summary[issue.severity] || 0) + 1;
+    summary[issue.category] = (summary[issue.category] || 0) + 1;
+  }
+  return summary;
+}
+
 function render(results) {
   const summary = collectSummary(results);
   const lines = [];
@@ -102,6 +158,33 @@ function render(results) {
   lines.push(`- Output-variance notes: ${summary.outputVariance}`);
   lines.push(`- Recommendation: ${recommendedAction(summary)}`);
   lines.push("");
+  lines.push("## MQM-aligned issue summary");
+  lines.push("");
+  const issues = issueRows(results);
+  const mqm = issueSummary(issues);
+  lines.push(`- Critical: ${mqm.critical || 0}`);
+  lines.push(`- Major: ${mqm.major || 0}`);
+  lines.push(`- Minor: ${mqm.minor || 0}`);
+  lines.push(`- Locale convention: ${mqm["locale-convention"] || 0}`);
+  lines.push(`- Taboo/safety: ${mqm["taboo-safety"] || 0}`);
+  lines.push(`- Markup/placeholder: ${mqm["markup-placeholder"] || 0}`);
+  lines.push("");
+  lines.push("## Dialect validation status");
+  lines.push("");
+  lines.push("| Dialect | Status | Level |");
+  lines.push("| --- | --- | --- |");
+  const dialects = Array.from(new Set(results.flatMap((result) => result.failures.map((failure) => failure.dialect)).filter(Boolean))).sort();
+  if (dialects.length === 0) {
+    lines.push("| Certified scope | automated-certified | bronze |");
+    lines.push("| es-PA | native-reviewed | silver |");
+    lines.push("| es-PR | native-reviewed | silver |");
+  } else {
+    for (const dialect of dialects) {
+      const status = dialectStatus(dialect);
+      lines.push(`| ${dialect} | ${status.status} | ${status.level} |`);
+    }
+  }
+  lines.push("");
   lines.push("## Certification matrix");
   lines.push("");
   lines.push("| Certification | Grade | Passed | Failed | Warnings | Dialects | Notes |");
@@ -112,14 +195,13 @@ function render(results) {
   lines.push("");
   lines.push("## Failure details");
   lines.push("");
-  const failures = results.flatMap((result) => result.failures.map((failure) => ({ ...failure, certification: result.label })));
-  if (failures.length === 0) {
+  if (issues.length === 0) {
     lines.push("No failed certification rows in the supplied artifacts.");
   } else {
-    lines.push("| Certification | Dialect | Fixture | Failures | Output |");
-    lines.push("| --- | --- | --- | --- | --- |");
-    for (const failure of failures) {
-      lines.push(`| ${escapePipes(failure.certification)} | ${escapePipes(failure.dialect)} | ${escapePipes(failure.fixture)} | ${escapePipes([...(failure.failures || []), ...(failure.qualityWarnings || [])].join("; "))} | ${escapePipes(failure.output)} |`);
+    lines.push("| Certification | Dialect | Fixture | Severity | MQM category | Message | Output |");
+    lines.push("| --- | --- | --- | --- | --- | --- | --- |");
+    for (const issue of issues) {
+      lines.push(`| ${escapePipes(issue.certification)} | ${escapePipes(issue.dialect)} | ${escapePipes(issue.fixture)} | ${issue.severity} | ${issue.category} | ${escapePipes(issue.message)} | ${escapePipes(issue.output)} |`);
     }
   }
   lines.push("");
