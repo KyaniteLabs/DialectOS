@@ -1,0 +1,9 @@
+{
+  "welcome": "Hi {userName}, your %{count} files are ready at https://example.com/app.",
+  "security.update": "Please update your password before continuing.",
+  "transit.office": "Take the bus to the office.",
+  "pickup.file": "Pick up the file before deployment.",
+  "support.payment": "Contact support if the payment fails.",
+  "food.avocado": "Buy avocado for lunch.",
+  "negative.noSlang": "Do not use slang in this customer support message."
+}
