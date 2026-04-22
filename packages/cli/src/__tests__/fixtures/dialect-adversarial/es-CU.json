@@ -1,0 +1,18 @@
+[
+  {
+    "id": "cu-bus-paraphrase-get-on",
+    "category": "dialect-collision",
+    "severity": "critical",
+    "tags": ["transit", "paraphrase"],
+    "source": "Get on the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": ["Cuban Spanish", "Caribbean/Cuban flavor"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["vos", "vosotros", "asere", "yuma"],
+    "requiredOutputAny": ["guagua"],
+    "preferredOutputAny": ["guagua"],
+    "notes": "Cuba transit paraphrase should use guagua while avoiding relationship slang."
+  }
+]

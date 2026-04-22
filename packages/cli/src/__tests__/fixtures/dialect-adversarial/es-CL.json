@@ -1,0 +1,18 @@
+[
+  {
+    "id": "cl-avocado-paraphrase",
+    "category": "under-localization",
+    "severity": "critical",
+    "tags": ["food", "palta"],
+    "source": "Buy avocado for lunch.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": ["Chilean Spanish", "palta"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["aguacate", "vosotros", "wea", "hueón"],
+    "requiredOutputAny": ["palta"],
+    "preferredOutputAny": ["palta"],
+    "notes": "Chilean food localization should use palta, not aguacate."
+  }
+]

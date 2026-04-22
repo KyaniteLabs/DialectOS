@@ -1,0 +1,18 @@
+[
+  {
+    "id": "gt-informal-voseo-paraphrase",
+    "category": "morphology-trap",
+    "severity": "critical",
+    "tags": ["voseo", "central-america"],
+    "source": "You can update your account now.",
+    "domain": "support",
+    "register": "informal",
+    "documentKind": "plain",
+    "requiredContext": ["Guatemalan Spanish", "Use vos"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["vosotros", "cerote", "culero"],
+    "requiredOutputAny": ["vos podés", "podés", "vos puedes"],
+    "preferredOutputAny": ["vos", "podés"],
+    "notes": "Central American informal output should preserve voseo."
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "es-bus-paraphrase-catch",
+    "category": "dialect-collision",
+    "severity": "high",
+    "tags": ["transit", "negative-control"],
+    "source": "Catch the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": ["Peninsular Spanish", "vosotros/vosotras"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["guagua", "güey", "parce", "boludo"],
+    "requiredOutputAny": ["autobús", "bus"],
+    "preferredOutputAny": ["autobús", "bus"],
+    "notes": "Spain transit should not be Caribbean-localized to guagua."
+  }
+]

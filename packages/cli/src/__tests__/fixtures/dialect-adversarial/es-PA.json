@@ -1,0 +1,33 @@
+[
+  {
+    "id": "pa-bus-paraphrase-catch",
+    "category": "dialect-collision",
+    "severity": "critical",
+    "tags": ["transit", "paraphrase", "taboo-copy"],
+    "source": "Catch the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": ["Panamanian", "Use neutral Panamanian Spanish"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["vosotros", "cueco", "chombo", "yeyé", "guagua"],
+    "preferredOutputAny": ["bus"],
+    "notes": "Panama transit paraphrase should keep bus and must not copy taboo examples or PR/Cuba/DR guagua."
+  },
+  {
+    "id": "pa-placeholder-support",
+    "category": "structure-preservation",
+    "severity": "critical",
+    "tags": ["placeholder", "url", "support"],
+    "source": "Hi {userName}, your %{count} files are ready at https://example.com/app.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": ["Panamanian", "Preserve product names"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["cueco", "chombo", "yeyé"],
+    "requiredOutputAny": ["{userName}"],
+    "preferredOutputAny": ["%{count}", "https://example.com/app"],
+    "notes": "Provider must preserve placeholders and URLs under dialect prompting."
+  }
+]

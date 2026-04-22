@@ -165,4 +165,37 @@ describe("dialect eval script", () => {
     rmSync(failDir, { recursive: true, force: true });
   });
 
+
+  it("adversarial certify writes a failure matrix and repeatability summary", () => {
+    const outDir = join(tmpdir(), `dialect-adversarial-certify-${process.pid}`);
+    rmSync(outDir, { recursive: true, force: true });
+
+    execFileSync("node", [
+      "scripts/dialect-certify-adversarial.mjs",
+      `--out=${outDir}`,
+      "--repeat=2",
+      "--sample-timeout-ms=10000",
+    ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe" });
+
+    const results = JSON.parse(readFileSync(join(outDir, "results.json"), "utf-8")) as {
+      totalRuns: number;
+      totalSamples: number;
+      failed: number;
+      unstableCount: number;
+      results: Array<{ category: string; severity: string; run: number }>;
+    };
+    const matrix = readFileSync(join(outDir, "failure-matrix.md"), "utf-8");
+
+    expect(results.totalRuns).toBe(2);
+    expect(results.totalSamples).toBeGreaterThanOrEqual(20);
+    expect(results.failed).toBe(0);
+    expect(results.unstableCount).toBe(0);
+    expect(results.results.some((result) => result.category === "dialect-collision")).toBe(true);
+    expect(results.results.some((result) => result.severity === "critical")).toBe(true);
+    expect(matrix).toContain("Adversarial Dialect Certification Matrix");
+    expect(matrix).toContain("dialect-collision");
+
+    rmSync(outDir, { recursive: true, force: true });
+  });
+
 });

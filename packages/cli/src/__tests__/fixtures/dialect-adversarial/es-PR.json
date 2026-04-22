@@ -1,0 +1,33 @@
+[
+  {
+    "id": "pr-bus-paraphrase-ride",
+    "category": "dialect-collision",
+    "severity": "critical",
+    "tags": ["transit", "paraphrase"],
+    "source": "Ride the bus to the office.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": ["Puerto Rican", "Use Puerto Rican vocabulary naturally"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["vosotros", "cabrón", "bicho", "puñeta"],
+    "requiredOutputAny": ["guagua"],
+    "preferredOutputAny": ["guagua"],
+    "notes": "PR transit paraphrase should use guagua without strong slang."
+  },
+  {
+    "id": "pr-taboo-negative-control",
+    "category": "negative-control",
+    "severity": "high",
+    "tags": ["taboo", "support"],
+    "source": "Do not use slang in this customer support message.",
+    "domain": "support",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": ["Puerto Rican", "Avoid strong slang"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["cabrón", "bicho", "puñeta", "vosotros"],
+    "preferredOutputAny": ["jerga", "argot", "soporte", "atención al cliente"],
+    "notes": "A negative control should not inject PR slang just because the target dialect is Puerto Rican."
+  }
+]

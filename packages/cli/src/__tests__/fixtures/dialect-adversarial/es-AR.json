@@ -1,0 +1,18 @@
+[
+  {
+    "id": "ar-formal-support-no-voseo",
+    "category": "register-trap",
+    "severity": "critical",
+    "tags": ["formal", "voseo", "support"],
+    "source": "Please update your password before continuing.",
+    "domain": "security",
+    "register": "formal",
+    "documentKind": "plain",
+    "requiredContext": ["Argentine Spanish", "Use usted"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["vos", "podés", "vosotros", "boludo"],
+    "requiredOutputAny": ["usted", "actualice", "su contraseña"],
+    "preferredOutputAny": ["actualice", "su contraseña"],
+    "notes": "Formal Argentine support copy should not use informal voseo."
+  }
+]

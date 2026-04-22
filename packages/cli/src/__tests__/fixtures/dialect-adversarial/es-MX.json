@@ -1,0 +1,34 @@
+[
+  {
+    "id": "mx-pickup-package",
+    "category": "intent-ambiguity",
+    "severity": "critical",
+    "tags": ["pick-up", "coger", "package"],
+    "source": "Pick up the package from reception.",
+    "domain": "support",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": ["Mexican Spanish", "Avoid literal coger"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["coger", "vos", "vosotros", "descarga"],
+    "requiredOutputAny": ["recoge", "recoger", "toma", "agarra"],
+    "preferredOutputAny": ["recoge", "recoger"],
+    "notes": "Pick up package should preserve pickup intent, not become download or coger."
+  },
+  {
+    "id": "mx-placeholder-url",
+    "category": "structure-preservation",
+    "severity": "critical",
+    "tags": ["placeholder", "url"],
+    "source": "Hi {userName}, your %{count} files are ready at https://example.com/app.",
+    "domain": "technical",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": ["Mexican Spanish", "Preserve product names"],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": ["coger", "vos", "vosotros"],
+    "requiredOutputAny": ["{userName}"],
+    "preferredOutputAny": ["%{count}", "https://example.com/app"],
+    "notes": "Placeholders and URLs must survive translation."
+  }
+]

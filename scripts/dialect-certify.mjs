@@ -53,19 +53,24 @@ function mockTranslate(source, dialect, sample = {}) {
     .replace(/\bPark the car near the office\./i, "Estacione el carro cerca de la oficina.")
     .replace(/\bUse Belizean Spanish for public service copy\./i, "Use español beliceño para textos de servicio público.")
     .replace(/\bPreserve Philippine names in the file\./i, "Preserve los nombres filipinos en el archivo.")
+    .replace(/\bDo not use slang in this customer support message\./i, "No use jerga en este mensaje de soporte al cliente.")
     .replace(/\bUse yam in the recipe\./i, dialect === "es-GQ" ? "Use ñame en la receta." : "Use yam en la receta.")
     .replace(/\bBuy hot sauce for lunch\./i, dialect === "es-BO" ? "Compre llajwa para el almuerzo." : "Compre salsa picante para el almuerzo.")
     .replace(/\bBuy avocado for lunch\./i, dialect === "es-CL" ? "Compra palta para el almuerzo." : "Compra aguacate para el almuerzo.")
     .replace(/\bUse the computer to open the file\./i, ["es-CO", "es-EC"].includes(dialect) ? "Usa el computador para abrir el archivo." : "Usa la computadora para abrir el archivo.")
+    .replace(/\b(Catch|Ride|Get on)\b/i, "Toma")
     .replace(/\bTake\b/i, "Toma")
     .replace(/\bbus\b/i, GUAGUA_BUS_DIALECTS.has(dialect) ? "guagua" : "bus")
     .replace(/\boffice\b/i, "oficina")
+    .replace(/\bpackage\b/i, "paquete")
+    .replace(/\breception\b/i, "recepción")
     .replace(/\bpassword\b/i, "contraseña")
     .replace(/\baccount settings\b/i, "configuración de la cuenta")
     .replace(/\bPlease update your contraseña before continuing\./i, formalSupport ? "Por favor, actualice su contraseña antes de continuar." : "Actualiza tu contraseña antes de continuar.")
     .replace(/\bContact support\b/i, formalSupport ? "Comuníquese con soporte" : "Contacta a soporte")
     .replace(/\bpayment fails\b/i, "pago falla")
     .replace(/\bPick up\b/i, "Recoge")
+    .replace(/\bfiles\b/i, "archivos")
     .replace(/\bfile\b/i, "archivo")
     .replace(/\bdeployment\b/i, "despliegue")
     .replace(/\bYou can update\b/i, VOSEO_DIALECTS.has(dialect) ? "Vos podés actualizar" : "Puedes actualizar")
@@ -148,6 +153,9 @@ async function evaluate(sample, dialect, translate) {
   return {
     dialect,
     fixture: sample.id,
+    category: sample.category,
+    severity: sample.severity,
+    tags: sample.tags || [],
     provider: live ? providerName : "mock-semantic",
     live,
     source: sample.source,
