@@ -1,6 +1,7 @@
 import type { SpanishDialect, FormalityLevel } from "@espanol/types";
 import { buildDialectQualityPrompt, getDialectGrammarProfile } from "@espanol/types";
 import { getDialectInfo } from "./dialect-info.js";
+import { buildLexicalAmbiguityGuidance } from "./lexical-ambiguity.js";
 
 export type SemanticDomain =
   | "technical"
@@ -134,6 +135,7 @@ export function buildSemanticTranslationContext(options: BuildSemanticContextOpt
   const grammarProfile = getDialectGrammarProfile(options.dialect);
   const qualityPrompt = buildDialectQualityPrompt(options.dialect);
   const outputConstraintPrompt = buildOutputConstraintPrompt(options.text, options.dialect);
+  const lexicalAmbiguityGuidance = buildLexicalAmbiguityGuidance(options.text, options.dialect);
   const dialectTerms = dialect
     ? [...dialect.formalTerms.slice(0, 4), ...dialect.slangTerms.slice(0, 4)].join(", ")
     : options.dialect;
@@ -157,6 +159,7 @@ export function buildSemanticTranslationContext(options: BuildSemanticContextOpt
     dialectTerms ? `Use regional vocabulary naturally where appropriate; examples/signals: ${dialectTerms}.` : undefined,
     grammarGuidance ? `Dialect grammar and style profile: ${grammarGuidance}` : undefined,
     qualityPrompt ? `Dialect quality contract: ${qualityPrompt}` : undefined,
+    lexicalAmbiguityGuidance,
     outputConstraintPrompt,
     "Preserve product names, code identifiers, URLs, placeholders, markdown structure, and glossary-locked terms.",
     "Prefer idiomatic Spanish for the target audience over one-to-one lexical substitution.",

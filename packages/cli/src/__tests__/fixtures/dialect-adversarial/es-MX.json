@@ -12,10 +12,15 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Mexican Spanish"
+      "Mexican Spanish",
+      "Lexical ambiguity constraints",
+      "tomar/toma"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "agarra",
+      "agarrar",
+      "coge",
       "coger",
       "vos",
       "vosotros"
@@ -38,7 +43,20 @@
       "buseta",
       "ómnibus"
     ],
-    "notes": "Transit paraphrase should preserve the dialect-specific public transport term without copying unrelated slang."
+    "notes": "Mexican transit take/catch must use tomar/abordar plus a Mexican-intelligible bus term; do not use coger/agarrar.",
+    "requiredOutputGroups": [
+      [
+        "bus",
+        "autobús",
+        "camión"
+      ],
+      [
+        "toma",
+        "tomar",
+        "aborda",
+        "abordar"
+      ]
+    ]
   },
   {
     "id": "mx-placeholder-url",
@@ -115,11 +133,16 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Mexican Spanish"
+      "Mexican Spanish",
+      "Lexical ambiguity constraints",
+      "Do not use coger"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "bajar",
       "coger",
+      "descarga",
+      "descargar",
       "vos",
       "vosotros"
     ],
@@ -133,7 +156,18 @@
       "recoge",
       "recoger"
     ],
-    "notes": "Mexican technical pickup should avoid coger and preserve pickup intent."
+    "notes": "Mexican file pickup must preserve retrieval intent: archivo plus recoger/recuperar; it must not become download or coger.",
+    "requiredOutputGroups": [
+      [
+        "archivo"
+      ],
+      [
+        "recoge",
+        "recoger",
+        "recupera",
+        "recuperar"
+      ]
+    ]
   },
   {
     "id": "mx-pickup-package",
@@ -148,11 +182,15 @@
     "register": "auto",
     "documentKind": "plain",
     "requiredContext": [
-      "Mexican Spanish"
+      "Mexican Spanish",
+      "Lexical ambiguity constraints",
+      "Do not use coger"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
       "coger",
+      "descarga",
+      "descargar",
       "vos",
       "vosotros"
     ],
@@ -168,6 +206,20 @@
       "paquete",
       "recepción"
     ],
-    "notes": "Pick up package should preserve pickup/package intent and not become download."
+    "notes": "Physical pickup of a package requires item + place + pickup verb; not download and not coger.",
+    "requiredOutputGroups": [
+      [
+        "paquete"
+      ],
+      [
+        "recepción"
+      ],
+      [
+        "recoge",
+        "recoger",
+        "retira",
+        "retirar"
+      ]
+    ]
   }
 ]

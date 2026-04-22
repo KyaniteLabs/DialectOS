@@ -9,15 +9,20 @@
       "Mexican Spanish",
       "Avoid literal coger",
       "prefer-neutral-alternative",
-      "Localize grammar"
+      "Localize grammar",
+      "Lexical ambiguity constraints",
+      "Do not use coger"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
+      "bajar",
       "coger",
+      "descarga",
+      "descargar",
       "vos",
       "vosotros"
     ],
-    "notes": "Mexico should avoid literal coger for pick up/take.",
+    "notes": "Mexican file pickup must preserve retrieval intent: archivo plus recoger/recuperar; it must not become download or coger.",
     "requiredOutputAny": [
       "recoge",
       "recoger",
@@ -27,6 +32,17 @@
     "preferredOutputAny": [
       "recoge",
       "recoger"
+    ],
+    "requiredOutputGroups": [
+      [
+        "archivo"
+      ],
+      [
+        "recoge",
+        "recoger",
+        "recupera",
+        "recuperar"
+      ]
     ]
   }
 ]

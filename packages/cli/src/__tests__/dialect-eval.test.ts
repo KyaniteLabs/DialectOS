@@ -14,6 +14,7 @@ interface DialectEvalSample {
   forbiddenContext: string[];
   forbiddenOutputTerms: string[];
   requiredOutputAny?: string[];
+  requiredOutputGroups?: string[][];
   preferredOutputAny?: string[];
   notes: string;
 }
@@ -53,7 +54,7 @@ describe("dialect evaluation harness", () => {
           expect(context, `${sample.id} should not contain ${forbidden}`).not.toContain(forbidden);
         }
         expect(sample.forbiddenOutputTerms.length).toBeGreaterThan(0);
-        expect(sample.requiredOutputAny || sample.preferredOutputAny).toBeDefined();
+        expect(sample.requiredOutputAny || sample.requiredOutputGroups || sample.preferredOutputAny).toBeDefined();
         expect(sample.notes.length).toBeGreaterThan(10);
       }
     });
