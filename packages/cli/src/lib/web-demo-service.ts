@@ -3,6 +3,8 @@ import type { FormalityLevel, SpanishDialect } from "@espanol/types";
 import { ALL_SPANISH_DIALECTS } from "@espanol/types";
 import { validateContentLength } from "@espanol/security";
 import { detectDialect } from "./dialect-info.js";
+import { buildLexicalAmbiguityExpectations } from "./lexical-ambiguity.js";
+import { judgeTranslationOutput } from "./output-judge.js";
 import { createProviderRegistry } from "./provider-factory.js";
 import { buildSemanticTranslationContext } from "./semantic-context.js";
 
@@ -113,6 +115,21 @@ export async function translateForWebDemo(
       context: semanticContext,
     },
   );
+  const lexicalExpectations = buildLexicalAmbiguityExpectations(text, dialect);
+  const judge = judgeTranslationOutput({
+    source: text,
+    register: formality,
+    documentKind: "plain",
+    requiredOutputGroups: lexicalExpectations.requiredOutputGroups,
+    forbiddenOutputTerms: lexicalExpectations.forbiddenOutputTerms,
+  }, dialect, translated.translatedText);
+  if (judge.blockingIssues.length > 0) {
+    throw new Error(
+      `Provider output failed quality judge: ${
+        judge.blockingIssues.map((issue) => `${issue.category}/${issue.severity}: ${issue.message}`).join("; ")
+      }`
+    );
+  }
 
   return {
     translatedText: translated.translatedText,

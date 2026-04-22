@@ -14,7 +14,7 @@ function makeProvider(
   return {
     name,
     translate: vi.fn(async (text: string, sourceLang: string, targetLang: string, options) => ({
-      translatedText: `[${options?.dialect}] ${text}`,
+      translatedText: options?.dialect === "es-MX" && text.includes("file") ? "Recoge el archivo antes del despliegue." : `[${options?.dialect}] ${text}`,
       sourceLang,
       targetLang,
       provider: name as never,
@@ -47,7 +47,7 @@ describe("web demo service", () => {
       provider: "auto",
     }, registry);
 
-    expect(result.translatedText).toBe("[es-MX] Pick up the file before you park the car.");
+    expect(result.translatedText).toBe("Recoge el archivo antes del despliegue.");
     expect(result.providerUsed).toBe("llm");
     expect(result.semanticPromptApplied).toBe(true);
     expect(result.providerStatus.semanticProviders).toEqual(["llm"]);
@@ -115,6 +115,21 @@ describe("web demo service", () => {
       dialect: "es-MX",
     }, registry)).rejects.toThrow(/All semantic demo providers failed/);
     expect(generic.translate).not.toHaveBeenCalled();
+  });
+
+  it("rejects provider output that fails the quality judge", async () => {
+    const registry = new ProviderRegistry();
+    const provider = makeProvider("llm");
+    vi.mocked(provider.translate).mockResolvedValue({
+      translatedText: "Recoger the file before deploying.",
+      provider: "llm" as never,
+    });
+    registry.register(provider);
+
+    await expect(translateForWebDemo({
+      text: "Pick up the file before deployment.",
+      dialect: "es-MX",
+    }, registry)).rejects.toThrow(/Provider output failed quality judge/);
   });
 
   it("reports missing providers instead of falling back to static rule substitutions", async () => {
