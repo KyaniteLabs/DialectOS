@@ -16,6 +16,7 @@ interface AdversarialDialectSample {
   forbiddenContext: string[];
   forbiddenOutputTerms: string[];
   requiredOutputAny?: string[];
+  requiredOutputGroups?: string[][];
   preferredOutputAny?: string[];
   notes: string;
 }
@@ -68,7 +69,7 @@ describe("adversarial dialect fixtures", () => {
         expect(sample.source.length).toBeGreaterThan(5);
         expect(sample.requiredContext.length).toBeGreaterThan(0);
         expect(sample.forbiddenOutputTerms.length).toBeGreaterThan(0);
-        expect(sample.requiredOutputAny || sample.preferredOutputAny).toBeDefined();
+        expect(sample.requiredOutputAny || sample.requiredOutputGroups || sample.preferredOutputAny).toBeDefined();
         expect(sample.notes.length).toBeGreaterThan(10);
       }
     });

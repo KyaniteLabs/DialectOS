@@ -106,6 +106,15 @@ async function evaluate(sample, dialect, translate) {
     }
   }
 
+  if (output && sample.requiredOutputGroups?.length) {
+    for (const group of sample.requiredOutputGroups) {
+      const matched = group.some((term) => hasForbiddenTerm(output, term));
+      if (!matched) {
+        failures.push(`Missing required output group; expected one of: ${group.join(", ")}`);
+      }
+    }
+  }
+
   if (output && sample.preferredOutputAny?.length) {
     const matched = sample.preferredOutputAny.some((term) => hasForbiddenTerm(output, term));
     if (!matched) {
