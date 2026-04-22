@@ -5,6 +5,19 @@ export interface LexicalAmbiguityRule {
   dialects: readonly SpanishDialect[] | "all";
   sourcePattern: RegExp;
   guidance: string;
+  expectations?: {
+    requiredOutputGroups?: readonly (readonly string[])[];
+    forbiddenOutputTerms?: readonly string[];
+  } | ((dialect: SpanishDialect) => {
+    requiredOutputGroups?: readonly (readonly string[])[];
+    forbiddenOutputTerms?: readonly string[];
+  });
+}
+
+export interface LexicalAmbiguityExpectations {
+  matchedRuleIds: string[];
+  requiredOutputGroups: string[][];
+  forbiddenOutputTerms: string[];
 }
 
 const TABOO_RISK_COGER_DIALECTS: readonly SpanishDialect[] = [
@@ -18,39 +31,113 @@ const TABOO_RISK_COGER_DIALECTS: readonly SpanishDialect[] = [
 export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
   {
     id: "pickup-file",
-    dialects: TABOO_RISK_COGER_DIALECTS,
+    dialects: "all",
     sourcePattern: /\b(pick up|grab|get|take)\b.{0,40}\b(file|files|document|documents|attachment|attachments)\b/i,
-    guidance: "For retrieving files/documents, use recoger/recoge/recuperar as appropriate. Do not use coger. Do not change the action to descargar/download unless the source explicitly says download.",
+    guidance: "For retrieving files/documents, use recoger/recoge, recuperar/recupera, obtener/obtén, or buscar/busca according to context. Do not change the action to descargar/download unless the source explicitly says download. Avoid coger in taboo-risk dialects.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["archivo", "archivos", "documento", "documentos", "adjunto", "adjuntos"],
+        ["recoge", "recoger", "recupera", "recuperar", "obtén", "obtener", "busca", "buscar"],
+      ],
+      forbiddenOutputTerms: [
+        "descarga",
+        "descargar",
+        "bajar",
+        ...(TABOO_RISK_COGER_DIALECTS.includes(dialect) ? ["coge", "coger"] : []),
+      ],
+    }),
   },
   {
     id: "pickup-package",
-    dialects: TABOO_RISK_COGER_DIALECTS,
+    dialects: "all",
     sourcePattern: /\b(pick up|grab|get|take)\b.{0,40}\b(package|packages|parcel|order|badge|ticket)\b/i,
-    guidance: "For physical pickup of an item, use recoger/recoge or retirar/retira according to register. Agarrar can work in casual physical-grab contexts. Do not use coger in taboo-risk dialects.",
+    guidance: "For physical pickup of an item, use recoger/recoge or retirar/retira according to register. Agarrar can work only in casual physical-grab contexts. Do not change pickup into download. Avoid coger in taboo-risk dialects.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["paquete", "paquetes", "pedido", "boleto", "ticket", "credencial"],
+        ["recoge", "recoger", "retira", "retirar"],
+      ],
+      forbiddenOutputTerms: [
+        "descarga",
+        "descargar",
+        ...(TABOO_RISK_COGER_DIALECTS.includes(dialect) ? ["coge", "coger"] : []),
+      ],
+    }),
   },
   {
     id: "take-bus",
     dialects: "all",
     sourcePattern: /\b(take|catch|ride|get on|board)\b.{0,30}\b(bus|train|metro|subway|taxi|cab|shuttle)\b/i,
     guidance: "For taking transportation, use tomar/toma or abordar/aborda by register and dialect. Do not use coger outside Spain/Andorra. Preserve dialect-specific vehicle terms such as guagua where the dialect contract requires them.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-CU" || dialect === "es-DO" || dialect === "es-PR"
+          ? ["guagua", "autobús", "bus"]
+          : dialect === "es-MX"
+            ? ["bus", "autobús", "camión"]
+            : ["bus", "autobús", "ómnibus", "colectivo", "guagua", "camión"],
+        dialect === "es-ES" || dialect === "es-AD"
+          ? ["coge", "coger", "toma", "tomar", "aborda", "abordar"]
+          : ["toma", "tomar", "aborda", "abordar"],
+      ],
+      forbiddenOutputTerms: dialect === "es-ES" || dialect === "es-AD"
+        ? []
+        : ["coge", "coger", "agarra", "agarrar"],
+    }),
   },
   {
     id: "take-photo",
     dialects: "all",
     sourcePattern: /\b(take|snap|capture)\b.{0,30}\b(photo|picture|screenshot|screen shot|image)\b/i,
     guidance: "For taking a photo/screenshot, use tomar or sacar/capturar according to dialect and UI register. Never literalize this as coger.",
+    expectations: {
+      requiredOutputGroups: [
+        ["foto", "fotografía", "captura", "imagen", "pantalla"],
+        ["toma", "tomar", "saca", "sacar", "captura", "capturar", "haz", "hacer"],
+      ],
+      forbiddenOutputTerms: ["coge", "coger", "agarra", "agarrar", "recoge", "recoger"],
+    },
   },
   {
     id: "take-medicine",
     dialects: "all",
     sourcePattern: /\b(take)\b.{0,30}\b(medicine|medication|pill|dose|tablet)\b/i,
     guidance: "For taking medicine, use tomar. Do not use coger/agarrar/recoger.",
+    expectations: {
+      requiredOutputGroups: [
+        ["medicina", "medicamento", "pastilla", "dosis", "tableta"],
+        ["toma", "tomar", "tómate", "tomarse"],
+      ],
+      forbiddenOutputTerms: ["coge", "coger", "agarra", "agarrar", "recoge", "recoger"],
+    },
   },
   {
     id: "grab-bag",
     dialects: TABOO_RISK_COGER_DIALECTS,
     sourcePattern: /\b(grab|take)\b.{0,30}\b(bag|keys|phone|laptop|backpack)\b/i,
     guidance: "For physically grabbing a personal object, use agarrar/tomar depending on register. Do not use coger in taboo-risk dialects.",
+    expectations: {
+      requiredOutputGroups: [
+        ["bolsa", "llaves", "teléfono", "celular", "laptop", "mochila"],
+        ["agarra", "agarrar", "toma", "tomar"],
+      ],
+      forbiddenOutputTerms: ["coge", "coger", "recoge", "recoger"],
+    },
+  },
+  {
+    id: "tidy-room",
+    dialects: "all",
+    sourcePattern: /\b(pick up|clean up|tidy up|straighten up)\b.{0,40}\b(room|bedroom)\b/i,
+    guidance: "For tidying a room, translate the household-cleanup sense, not physical pickup. In Puerto Rican Spanish, recoger el cuarto is natural for tidying the room. Elsewhere, ordenar/arreglar/recoger la habitación/el cuarto may fit by dialect and register.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-PR" ? ["cuarto", "habitación"] : ["cuarto", "habitación", "pieza", "recámara"],
+        dialect === "es-PR"
+          ? ["recoge", "recoger", "ordena", "ordenar", "arregla", "arreglar"]
+          : ["ordena", "ordenar", "arregla", "arreglar", "recoge", "recoger"],
+      ],
+      forbiddenOutputTerms: ["coge", "coger", "levanta", "levantar"],
+    }),
   },
 ];
 
@@ -59,9 +146,7 @@ function appliesToDialect(rule: LexicalAmbiguityRule, dialect: SpanishDialect): 
 }
 
 export function buildLexicalAmbiguityGuidance(text: string, dialect: SpanishDialect): string | undefined {
-  const matched = LEXICAL_AMBIGUITY_RULES.filter((rule) =>
-    appliesToDialect(rule, dialect) && rule.sourcePattern.test(text)
-  );
+  const matched = findMatchedLexicalAmbiguityRules(text, dialect);
 
   if (matched.length === 0) {
     return undefined;
@@ -73,3 +158,38 @@ export function buildLexicalAmbiguityGuidance(text: string, dialect: SpanishDial
   ].join(" ");
 }
 
+export function findMatchedLexicalAmbiguityRules(
+  text: string,
+  dialect: SpanishDialect
+): readonly LexicalAmbiguityRule[] {
+  return LEXICAL_AMBIGUITY_RULES.filter((rule) =>
+    appliesToDialect(rule, dialect) && rule.sourcePattern.test(text)
+  );
+}
+
+export function buildLexicalAmbiguityExpectations(
+  text: string,
+  dialect: SpanishDialect
+): LexicalAmbiguityExpectations {
+  const matched = findMatchedLexicalAmbiguityRules(text, dialect);
+  const requiredOutputGroups: string[][] = [];
+  const forbiddenOutputTerms = new Set<string>();
+
+  for (const rule of matched) {
+    const expectations = typeof rule.expectations === "function"
+      ? rule.expectations(dialect)
+      : rule.expectations;
+    for (const group of expectations?.requiredOutputGroups || []) {
+      requiredOutputGroups.push([...group]);
+    }
+    for (const term of expectations?.forbiddenOutputTerms || []) {
+      forbiddenOutputTerms.add(term);
+    }
+  }
+
+  return {
+    matchedRuleIds: matched.map((rule) => rule.id),
+    requiredOutputGroups,
+    forbiddenOutputTerms: [...forbiddenOutputTerms],
+  };
+}

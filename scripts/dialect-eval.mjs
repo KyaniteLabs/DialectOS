@@ -20,6 +20,10 @@ const VOSEO_DIALECTS = new Set(["es-AR", "es-UY", "es-PY", "es-GT", "es-HN", "es
 const VOSOTROS_DIALECTS = new Set(["es-ES", "es-AD"]);
 const GUAGUA_BUS_DIALECTS = new Set(["es-CU", "es-DO", "es-PR"]);
 
+const { buildLexicalAmbiguityExpectations } = await import(
+  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/lexical-ambiguity.js`).href
+);
+
 function mockTranslate(source, dialect, sample = {}) {
   const formalSupport = sample.register === "formal" && /\b(password|support|payment)\b/i.test(source);
 
@@ -31,6 +35,7 @@ function mockTranslate(source, dialect, sample = {}) {
     .replace(/\bBuy hot sauce for lunch\./i, dialect === "es-BO" ? "Compre llajwa para el almuerzo." : "Compre salsa picante para el almuerzo.")
     .replace(/\bBuy avocado for lunch\./i, dialect === "es-CL" ? "Compra palta para el almuerzo." : "Compra aguacate para el almuerzo.")
     .replace(/\bUse the computer to open the file\./i, ["es-CO", "es-EC"].includes(dialect) ? "Usa el computador para abrir el archivo." : "Usa la computadora para abrir el archivo.")
+    .replace(/\b(Catch|Ride|Get on)\b/i, "Toma")
     .replace(/\bTake\b/i, "Toma")
     .replace(/\bbus\b/i, GUAGUA_BUS_DIALECTS.has(dialect) ? "guagua" : "bus")
     .replace(/\boffice\b/i, "oficina")
@@ -39,7 +44,10 @@ function mockTranslate(source, dialect, sample = {}) {
     .replace(/\bPlease update your contraseña before continuing\./i, formalSupport ? "Por favor, actualice su contraseña antes de continuar." : "Actualiza tu contraseña antes de continuar.")
     .replace(/\bContact support\b/i, formalSupport ? "Comuníquese con soporte" : "Contacta a soporte")
     .replace(/\bpayment fails\b/i, "pago falla")
+    .replace(/\bPick up the room before guests arrive\./i, dialect === "es-PR" ? "Recoge el cuarto antes de que lleguen los invitados." : "Ordena la habitación antes de que lleguen los invitados.")
     .replace(/\bPick up\b/i, "Recoge")
+    .replace(/\bpackage\b/i, "paquete")
+    .replace(/\breception\b/i, "recepción")
     .replace(/\bfile\b/i, "archivo")
     .replace(/\bdeployment\b/i, "despliegue")
     .replace(/\bYou can update\b/i, VOSEO_DIALECTS.has(dialect) ? "Vos podés actualizar" : "Puedes actualizar")
@@ -93,7 +101,9 @@ async function evaluate(sample, dialect, translate) {
     failures.push(`Provider error: ${error instanceof Error ? error.message : String(error)}`);
   }
 
-  for (const term of sample.forbiddenOutputTerms || []) {
+  const lexicalExpectations = buildLexicalAmbiguityExpectations(sample.source, dialect);
+
+  for (const term of [...(sample.forbiddenOutputTerms || []), ...lexicalExpectations.forbiddenOutputTerms]) {
     if (output && hasForbiddenTerm(output, term)) {
       failures.push(`Forbidden output term present: ${term}`);
     }
@@ -106,8 +116,12 @@ async function evaluate(sample, dialect, translate) {
     }
   }
 
-  if (output && sample.requiredOutputGroups?.length) {
-    for (const group of sample.requiredOutputGroups) {
+  const requiredOutputGroups = [
+    ...(sample.requiredOutputGroups || []),
+    ...lexicalExpectations.requiredOutputGroups,
+  ];
+  if (output && requiredOutputGroups.length) {
+    for (const group of requiredOutputGroups) {
       const matched = group.some((term) => hasForbiddenTerm(output, term));
       if (!matched) {
         failures.push(`Missing required output group; expected one of: ${group.join(", ")}`);

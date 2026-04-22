@@ -23,6 +23,10 @@ const VOSEO_DIALECTS = new Set(["es-AR", "es-UY", "es-PY", "es-GT", "es-HN", "es
 const VOSOTROS_DIALECTS = new Set(["es-ES", "es-AD"]);
 const GUAGUA_BUS_DIALECTS = new Set(["es-CU", "es-DO", "es-PR"]);
 
+const { buildLexicalAmbiguityExpectations } = await import(
+  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/lexical-ambiguity.js`).href
+);
+
 function parsePositiveInt(value, fallback) {
   const parsed = parseInt(value || "", 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
@@ -69,6 +73,7 @@ function mockTranslate(source, dialect, sample = {}) {
     .replace(/\bPlease update your contraseña before continuing\./i, formalSupport ? "Por favor, actualice su contraseña antes de continuar." : "Actualiza tu contraseña antes de continuar.")
     .replace(/\bContact support\b/i, formalSupport ? "Comuníquese con soporte" : "Contacta a soporte")
     .replace(/\bpayment fails\b/i, "pago falla")
+    .replace(/\bPick up the room before guests arrive\./i, dialect === "es-PR" ? "Recoge el cuarto antes de que lleguen los invitados." : "Ordena la habitación antes de que lleguen los invitados.")
     .replace(/\bPick up\b/i, "Recoge")
     .replace(/\bfiles\b/i, "archivos")
     .replace(/\bfile\b/i, "archivo")
@@ -123,7 +128,9 @@ async function evaluate(sample, dialect, translate) {
     failures.push(`Provider error: ${error instanceof Error ? error.message : String(error)}`);
   }
 
-  for (const term of sample.forbiddenOutputTerms || []) {
+  const lexicalExpectations = buildLexicalAmbiguityExpectations(sample.source, dialect);
+
+  for (const term of [...(sample.forbiddenOutputTerms || []), ...lexicalExpectations.forbiddenOutputTerms]) {
     if (output && hasForbiddenTerm(output, term)) {
       failures.push(`Forbidden output term present: ${term}`);
     }
@@ -136,8 +143,12 @@ async function evaluate(sample, dialect, translate) {
     }
   }
 
-  if (output && sample.requiredOutputGroups?.length) {
-    for (const group of sample.requiredOutputGroups) {
+  const requiredOutputGroups = [
+    ...(sample.requiredOutputGroups || []),
+    ...lexicalExpectations.requiredOutputGroups,
+  ];
+  if (output && requiredOutputGroups.length) {
+    for (const group of requiredOutputGroups) {
       const matched = group.some((term) => hasForbiddenTerm(output, term));
       if (!matched) {
         failures.push(`Missing required output group; expected one of: ${group.join(", ")}`);

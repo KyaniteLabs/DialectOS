@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildLexicalAmbiguityGuidance } from "../lib/lexical-ambiguity.js";
+import { ALL_SPANISH_DIALECTS } from "@espanol/types";
+import {
+  buildLexicalAmbiguityExpectations,
+  buildLexicalAmbiguityGuidance
+} from "../lib/lexical-ambiguity.js";
 import { buildSemanticTranslationContext } from "../lib/semantic-context.js";
 
 describe("lexical ambiguity constraints", () => {
@@ -10,8 +14,8 @@ describe("lexical ambiguity constraints", () => {
     );
 
     expect(guidance).toContain("[pickup-file]");
-    expect(guidance).toContain("recoger/recoge/recuperar");
-    expect(guidance).toContain("Do not use coger");
+    expect(guidance).toContain("recoger/recoge, recuperar/recupera");
+    expect(guidance).toContain("Avoid coger in taboo-risk dialects");
     expect(guidance).toContain("Do not change the action to descargar/download");
   });
 
@@ -36,7 +40,7 @@ describe("lexical ambiguity constraints", () => {
 
     expect(spain).toContain("coger is neutral in Spain");
     expect(spain).toContain("[take-bus]");
-    expect(spain).not.toContain("[pickup-package]");
+    expect(spain).toContain("[pickup-package]");
   });
 
   it("separates photo, medicine, and physical grab senses", () => {
@@ -44,5 +48,28 @@ describe("lexical ambiguity constraints", () => {
     expect(buildLexicalAmbiguityGuidance("Take the medicine after lunch.", "es-MX")).toContain("[take-medicine]");
     expect(buildLexicalAmbiguityGuidance("Grab your backpack before leaving.", "es-MX")).toContain("[grab-bag]");
   });
-});
 
+  it("models Puerto Rican recoger el cuarto as tidying the room", () => {
+    const guidance = buildLexicalAmbiguityGuidance("Pick up the room before guests arrive.", "es-PR");
+    const expectations = buildLexicalAmbiguityExpectations("Pick up the room before guests arrive.", "es-PR");
+
+    expect(guidance).toContain("[tidy-room]");
+    expect(guidance).toContain("In Puerto Rican Spanish, recoger el cuarto is natural");
+    expect(expectations.requiredOutputGroups).toEqual(expect.arrayContaining([
+      expect.arrayContaining(["cuarto", "habitación"]),
+      expect.arrayContaining(["recoge", "recoger", "ordena", "ordenar", "arregla", "arreglar"]),
+    ]));
+    expect(expectations.forbiddenOutputTerms).toEqual(expect.arrayContaining(["coge", "coger", "levanta", "levantar"]));
+  });
+
+  it("builds category expectations for every dialect instead of one-off examples", () => {
+    for (const dialect of ALL_SPANISH_DIALECTS) {
+      expect(buildLexicalAmbiguityExpectations("Pick up the file before deployment.", dialect).matchedRuleIds).toContain("pickup-file");
+      expect(buildLexicalAmbiguityExpectations("Pick up the package from reception.", dialect).matchedRuleIds).toContain("pickup-package");
+      expect(buildLexicalAmbiguityExpectations("Take the bus to the office.", dialect).matchedRuleIds).toContain("take-bus");
+      expect(buildLexicalAmbiguityExpectations("Take a screenshot.", dialect).matchedRuleIds).toContain("take-photo");
+      expect(buildLexicalAmbiguityExpectations("Take the medicine after lunch.", dialect).matchedRuleIds).toContain("take-medicine");
+      expect(buildLexicalAmbiguityExpectations("Pick up the room before guests arrive.", dialect).matchedRuleIds).toContain("tidy-room");
+    }
+  });
+});

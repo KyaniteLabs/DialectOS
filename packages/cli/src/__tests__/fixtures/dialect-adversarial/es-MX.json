@@ -135,7 +135,7 @@
     "requiredContext": [
       "Mexican Spanish",
       "Lexical ambiguity constraints",
-      "Do not use coger"
+      "Avoid coger in taboo-risk dialects"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [
@@ -184,7 +184,7 @@
     "requiredContext": [
       "Mexican Spanish",
       "Lexical ambiguity constraints",
-      "Do not use coger"
+      "Avoid coger in taboo-risk dialects"
     ],
     "forbiddenContext": [],
     "forbiddenOutputTerms": [

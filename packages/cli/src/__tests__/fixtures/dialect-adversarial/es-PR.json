@@ -161,5 +161,50 @@
       "recepción"
     ],
     "notes": "Pick up package should preserve pickup/package intent and not become download."
+  },
+  {
+    "id": "pr-tidy-room",
+    "category": "intent-ambiguity",
+    "severity": "critical",
+    "tags": [
+      "pick-up",
+      "room",
+      "household",
+      "semantic-ambiguity"
+    ],
+    "source": "Pick up the room before guests arrive.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Puerto Rican Spanish",
+      "Lexical ambiguity constraints",
+      "recoger el cuarto"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "coger",
+      "levantar"
+    ],
+    "requiredOutputGroups": [
+      [
+        "cuarto",
+        "habitación"
+      ],
+      [
+        "recoge",
+        "recoger",
+        "ordena",
+        "ordenar",
+        "arregla",
+        "arreglar"
+      ]
+    ],
+    "preferredOutputAny": [
+      "recoge",
+      "recoger",
+      "cuarto"
+    ],
+    "notes": "Puerto Rican pick up the room means tidy the room; recoger el cuarto is acceptable and should not be treated as package/file pickup."
   }
 ]
