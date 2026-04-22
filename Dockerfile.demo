@@ -1,0 +1,20 @@
+FROM node:24-bookworm-slim
+
+WORKDIR /app
+
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json vitest.workspace.ts ./
+COPY packages ./packages
+COPY scripts ./scripts
+COPY docs ./docs
+COPY README.md LICENSE ./
+
+RUN pnpm install --frozen-lockfile && pnpm build
+
+ENV DIALECTOS_DEMO_HOST=0.0.0.0
+ENV DIALECTOS_DEMO_PORT=8080
+EXPOSE 8080
+
+CMD ["node", "scripts/demo-server.mjs"]
+

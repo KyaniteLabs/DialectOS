@@ -5,15 +5,18 @@ import assert from "node:assert/strict";
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const engine = readFileSync(new URL("../dialectos-engine.js", import.meta.url), "utf8");
 
-test("static docs demo is honestly labeled as a rule explorer", () => {
-  assert.match(html, /Dialect Rule Explorer/);
-  assert.match(html, /not a full AI translation service/i);
-  assert.match(html, /For certified translation/i);
+test("docs demo is wired to the full app backend", () => {
+  assert.match(html, /Full-App Translator/);
+  assert.match(html, /fetch\('\/api\/translate'/);
+  assert.match(html, /browser → local demo backend → provider registry → LLM semantic dialect prompt/);
+  assert.match(html, /Translate with Full App/);
 });
 
-test("static docs demo never claims unchanged text is already compatible", () => {
+test("docs demo never silently falls back to static rule substitutions", () => {
   assert.doesNotMatch(html, /already compatible/);
-  assert.match(html, /No rule-based substitutions fired/);
+  assert.doesNotMatch(html, /applyAdaptations\(text, target\)/);
+  assert.match(html, /No static translation fallback was used/);
+  assert.match(html, /\/api\/status/);
 });
 
 test("static docs engine has common three-word regional terms", () => {

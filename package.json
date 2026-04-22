@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
-    "test": "node --test docs/__tests__/*.test.mjs && pnpm -r test",
+    "test": "node --test docs/__tests__/*.test.mjs scripts/__tests__/*.test.mjs && pnpm -r test",
+    "demo": "pnpm build && node scripts/demo-server.mjs",
     "test:coverage": "pnpm -r test:coverage",
     "clean": "pnpm -r clean",
     "dialect:eval": "node scripts/dialect-eval.mjs",

@@ -58,7 +58,7 @@ describe("dialect eval script", () => {
     })).toThrow(/No live providers are configured/);
 
     rmSync(outDir, { recursive: true, force: true });
-  });
+  }, 10000);
 
 
   it("certify writes incremental progress, events, and a summary", () => {

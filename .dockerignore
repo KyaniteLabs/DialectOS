@@ -1,0 +1,10 @@
+node_modules
+.git
+.worktrees
+dist
+coverage
+*.tgz
+.env
+.env.*
+!.env.example
+

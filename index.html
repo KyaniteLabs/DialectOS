@@ -264,7 +264,7 @@
                     <div class="stat-label">Packages</div>
                 </div>
                 <div class="stat">
-                    <div class="stat-value">701</div>
+                    <div class="stat-value">707</div>
                     <div class="stat-label">Tests</div>
                 </div>
                 <div class="stat">
@@ -476,14 +476,15 @@
         </section>
 
         <section>
-            <h2>Static Browser Demo</h2>
+            <h2>Full-App Browser Demo</h2>
             <p>
-                The GitHub Pages demo is a rule explorer for deterministic vocabulary substitutions,
-                not the certified semantic translation engine. Use the CLI/MCP/LLM workflow for
-                production certification and MQM-aligned launch reports.
+                The browser demo now calls the real DialectOS backend API instead of doing static
+                substitutions in the page. Run <code>pnpm demo</code> locally or use Docker Compose
+                to connect the page to a configured LLM/provider.
             </p>
             <p>
-                <a href="docs/index.html" class="link">Open the rule explorer</a> ·
+                <a href="docs/index.html" class="link">Open the full-app demo</a> ·
+                <a href="docs/full-app-demo.md" class="link">Container walkthrough</a> ·
                 <a href="docs/spanish-launch-certification.md" class="link">Read the launch certification offer</a>
             </p>
         </section>
@@ -493,13 +494,14 @@
             <div class="code-block">
                 <code><span class="command">pnpm install</span><br>
 <span class="command">pnpm test</span><br>
-<span class="command">pnpm build</span></code>
+<span class="command">pnpm build</span><br>
+<span class="command">pnpm demo</span></code>
             </div>
         </section>
 
         <footer>
             <p>DialectOS — Spanish Dialect Translation Server • BSL 1.1</p>
-            <p style="margin-top: 0.5rem;">701 tests • 7 packages • 16 MCP tools • 25 dialects</p>
+            <p style="margin-top: 0.5rem;">707 tests • 7 packages • 16 MCP tools • 25 dialects</p>
         </footer>
     </div>
 </body>
