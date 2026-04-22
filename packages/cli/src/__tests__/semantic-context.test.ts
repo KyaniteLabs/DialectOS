@@ -68,4 +68,45 @@ describe("semantic translation context", () => {
     expect(philippines).toContain("do not fake local fluency");
   });
 
+
+  it("adds hard output constraints for local LLM certification fixtures", () => {
+    const bolivia = buildSemanticTranslationContext({
+      text: "Buy hot sauce for lunch.",
+      dialect: "es-BO",
+      documentKind: "plain",
+    });
+    expect(bolivia).toContain("Output constraints");
+    expect(bolivia).toContain("must include one of: llajwa, llajua");
+
+    const panama = buildSemanticTranslationContext({
+      text: "Take the bus to the office.",
+      dialect: "es-PA",
+      documentKind: "plain",
+    });
+    expect(panama).toContain("must not contain: cueco, chombo, yeyé");
+
+    const mexico = buildSemanticTranslationContext({
+      text: "Pick up the file before deployment.",
+      dialect: "es-MX",
+      documentKind: "plain",
+    });
+    expect(mexico).toContain("For technical file pickup, use recoge/recoger/toma/agarra");
+
+    const chile = buildSemanticTranslationContext({
+      text: "Buy avocado for lunch.",
+      dialect: "es-CL",
+      documentKind: "plain",
+    });
+    expect(chile).toContain("must use palta");
+
+    const guatemala = buildSemanticTranslationContext({
+      text: "You can update your account now.",
+      dialect: "es-GT",
+      formality: "informal",
+      documentKind: "plain",
+    });
+    expect(guatemala).toContain("must use Central American voseo");
+    expect(guatemala).toContain("do not use tú/puedes");
+  });
+
 });
