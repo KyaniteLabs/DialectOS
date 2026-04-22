@@ -16,6 +16,7 @@ const outDir = args.get("out") || `audits/dialect-certify-${new Date().toISOStri
 const providerName = args.get("provider") || "mock-semantic";
 const live = args.get("live") === "true";
 const failOnWarnings = args.get("fail-on-warnings") === "true";
+const judgeEnabled = live || args.get("judge") === "true";
 const sampleTimeoutMs = parsePositiveInt(args.get("sample-timeout-ms"), 300000);
 const sampleRetries = parseNonNegativeInt(args.get("sample-retries"), 1);
 const dialectFilter = new Set((args.get("dialects") || "").split(",").map((d) => d.trim()).filter(Boolean));
@@ -26,6 +27,9 @@ const GUAGUA_BUS_DIALECTS = new Set(["es-CU", "es-DO", "es-PR"]);
 
 const { buildLexicalAmbiguityExpectations } = await import(
   pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/lexical-ambiguity.js`).href
+);
+const { judgeTranslationOutput } = await import(
+  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/output-judge.js`).href
 );
 
 function parsePositiveInt(value, fallback) {
@@ -161,6 +165,23 @@ async function evaluate(sample, dialect, translate) {
     const matched = sample.preferredOutputAny.some((term) => hasForbiddenTerm(output, term));
     if (!matched) {
       qualityWarnings.push(`Missing preferred dialect trait; expected one of: ${sample.preferredOutputAny.join(", ")}`);
+    }
+  }
+
+  if (output && judgeEnabled) {
+    const judge = judgeTranslationOutput({
+      ...sample,
+      requiredOutputGroups,
+      forbiddenOutputTerms: [
+        ...(sample.forbiddenOutputTerms || []),
+        ...lexicalExpectations.forbiddenOutputTerms,
+      ],
+    }, dialect, output);
+    for (const issue of judge.blockingIssues) {
+      failures.push(`Judge ${issue.category}/${issue.severity}: ${issue.message}`);
+    }
+    for (const issue of judge.issues.filter((item) => !judge.blockingIssues.includes(item))) {
+      qualityWarnings.push(`Judge ${issue.category}/${issue.severity}: ${issue.message}`);
     }
   }
 
@@ -335,6 +356,7 @@ async function runParentMode() {
         "--run-sample",
         `--sample-file=${sampleFile}`,
         `--provider=${providerName}`,
+        ...(judgeEnabled ? ["--judge=true"] : []),
       ];
       if (live) childArgs.push("--live");
       const started = Date.now();

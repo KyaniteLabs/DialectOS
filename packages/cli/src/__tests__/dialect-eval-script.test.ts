@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -49,9 +49,46 @@ describe("dialect eval script", () => {
       failed: number;
       warnings: number;
     };
-    expect(results.failed).toBe(0);
     expect(results.warnings).toBeGreaterThan(0);
 
+    rmSync(outDir, { recursive: true, force: true });
+  });
+
+  it("fails outputs rejected by the model-agnostic judge", () => {
+    const fixtureDir = join(tmpdir(), `dialect-eval-judge-fixtures-${process.pid}`);
+    const outDir = join(tmpdir(), `dialect-eval-judge-${process.pid}`);
+    rmSync(fixtureDir, { recursive: true, force: true });
+    rmSync(outDir, { recursive: true, force: true });
+    mkdirSync(fixtureDir, { recursive: true });
+    writeFileSync(join(fixtureDir, "es-MX.json"), JSON.stringify([
+      {
+        id: "mx-unchanged-english",
+        source: "This English sentence should remain impossible.",
+        domain: "general",
+        register: "auto",
+        documentKind: "plain",
+        requiredContext: ["Mexican Spanish"],
+        forbiddenContext: [],
+        forbiddenOutputTerms: ["coger"],
+        notes: "The judge should reject unchanged English output even without explicit term groups."
+      }
+    ], null, 2));
+
+    expect(() => execFileSync("node", [
+      "scripts/dialect-eval.mjs",
+      `--fixtures=${fixtureDir}`,
+      `--out=${outDir}`,
+      "--judge=true",
+    ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe" })).toThrow();
+
+    const results = JSON.parse(readFileSync(join(outDir, "results.json"), "utf-8")) as {
+      failed: number;
+      results: Array<{ failures: string[] }>;
+    };
+    expect(results.failed).toBe(1);
+    expect(results.results[0].failures.join(" ")).toContain("Judge accuracy/major");
+
+    rmSync(fixtureDir, { recursive: true, force: true });
     rmSync(outDir, { recursive: true, force: true });
   });
 

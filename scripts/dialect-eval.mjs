@@ -15,6 +15,7 @@ const outDir = args.get("out") || `audits/dialect-eval-${new Date().toISOString(
 const providerName = args.get("provider") || "mock-semantic";
 const live = args.get("live") === "true";
 const failOnWarnings = args.get("fail-on-warnings") === "true";
+const judgeEnabled = live || args.get("judge") === "true";
 const dialectFilter = new Set((args.get("dialects") || "").split(",").map((d) => d.trim()).filter(Boolean));
 
 const VOSEO_DIALECTS = new Set(["es-AR", "es-UY", "es-PY", "es-GT", "es-HN", "es-SV", "es-NI"]);
@@ -23,6 +24,9 @@ const GUAGUA_BUS_DIALECTS = new Set(["es-CU", "es-DO", "es-PR"]);
 
 const { buildLexicalAmbiguityExpectations } = await import(
   pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/lexical-ambiguity.js`).href
+);
+const { judgeTranslationOutput } = await import(
+  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/output-judge.js`).href
 );
 
 function mockTranslate(source, dialect, sample = {}) {
@@ -134,6 +138,23 @@ async function evaluate(sample, dialect, translate) {
     const matched = sample.preferredOutputAny.some((term) => hasForbiddenTerm(output, term));
     if (!matched) {
       qualityWarnings.push(`Missing preferred dialect trait; expected one of: ${sample.preferredOutputAny.join(", ")}`);
+    }
+  }
+
+  if (output && judgeEnabled) {
+    const judge = judgeTranslationOutput({
+      ...sample,
+      requiredOutputGroups,
+      forbiddenOutputTerms: [
+        ...(sample.forbiddenOutputTerms || []),
+        ...lexicalExpectations.forbiddenOutputTerms,
+      ],
+    }, dialect, output);
+    for (const issue of judge.blockingIssues) {
+      failures.push(`Judge ${issue.category}/${issue.severity}: ${issue.message}`);
+    }
+    for (const issue of judge.issues.filter((item) => !judge.blockingIssues.includes(item))) {
+      qualityWarnings.push(`Judge ${issue.category}/${issue.severity}: ${issue.message}`);
     }
   }
 
