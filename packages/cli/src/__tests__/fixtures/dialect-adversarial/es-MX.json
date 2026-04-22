@@ -221,5 +221,42 @@
         "retirar"
       ]
     ]
+  },
+  {
+    "id": "mx-pr-china-orange-normalization",
+    "category": "false-friend",
+    "severity": "critical",
+    "tags": [
+      "citrus",
+      "semantic-field",
+      "polysemy",
+      "normalization"
+    ],
+    "source": "Jugo de china is on the Puerto Rican menu.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Mexican Spanish",
+      "citrus/orange-juice semantic field",
+      "naranja"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "china"
+    ],
+    "requiredOutputGroups": [
+      [
+        "jugo"
+      ],
+      [
+        "naranja"
+      ]
+    ],
+    "preferredOutputAny": [
+      "jugo de naranja",
+      "naranja"
+    ],
+    "notes": "When localizing a Puerto Rican china/orange menu item for Mexican users, preserve the orange-juice meaning as naranja and do not leave china as if it were the country."
   }
 ]

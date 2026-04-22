@@ -29,6 +29,48 @@ const TABOO_RISK_COGER_DIALECTS: readonly SpanishDialect[] = [
 ];
 
 export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
+
+  {
+    id: "citrus-orange-juice",
+    dialects: "all",
+    sourcePattern: /\b(orange juice|jugo de naranja|zumo de naranja|jugo de china)\b/i,
+    guidance: "For the citrus/orange-juice semantic field, resolve regional polysemy instead of translating china literally. In Puerto Rican Spanish, jugo de china is the natural orange juice expression. In Dominican Spanish, china may also refer to orange in this field. For other dialects, use naranja/anaranjado according to fruit/color context and do not leave china unless quoting a Puerto Rican/Dominican expression.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["jugo", "zumo"],
+        dialect === "es-PR" || dialect === "es-DO"
+          ? ["china", "naranja"]
+          : ["naranja"],
+      ],
+      forbiddenOutputTerms: dialect === "es-PR" || dialect === "es-DO" ? [] : ["china"],
+    }),
+  },
+  {
+    id: "citrus-orange-color",
+    dialects: "all",
+    sourcePattern: /\b(orange color|color naranja|color china|chinita)\b/i,
+    guidance: "For the orange color semantic field, Puerto Rican Spanish may use china/chinita colloquially, while most dialects prefer naranja or anaranjado. Do not confuse the color with the country China.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-PR" ? ["china", "chinita", "naranja", "anaranjado"] : ["naranja", "anaranjado"],
+      ],
+      forbiddenOutputTerms: dialect === "es-PR" ? [] : ["china", "chinita"],
+    }),
+  },
+  {
+    id: "baby-guagua",
+    dialects: "all",
+    sourcePattern: /\b(baby|infant|newborn|beb[eé]|guagua)\b/i,
+    guidance: "For the baby/infant semantic field, guagua is natural in Chilean and some Andean varieties, but in Puerto Rican, Dominican, and Cuban Spanish guagua strongly points to bus in transit contexts. Use bebé/niño/infante for babies in Caribbean Spanish; do not use guagua there unless the source is about a bus.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-CL" || dialect === "es-EC" || dialect === "es-BO" || dialect === "es-PE"
+          ? ["guagua", "bebé", "bebe", "niño", "niña", "infante"]
+          : ["bebé", "bebe", "niño", "niña", "infante"],
+      ],
+      forbiddenOutputTerms: dialect === "es-PR" || dialect === "es-DO" || dialect === "es-CU" ? ["guagua"] : [],
+    }),
+  },
   {
     id: "pickup-file",
     dialects: "all",

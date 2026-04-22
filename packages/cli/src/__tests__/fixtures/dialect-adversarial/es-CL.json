@@ -170,5 +170,43 @@
       "recepción"
     ],
     "notes": "Pick up package should preserve pickup/package intent and not become download."
+  },
+  {
+    "id": "cl-baby-guagua",
+    "category": "false-friend",
+    "severity": "high",
+    "tags": [
+      "baby",
+      "semantic-field",
+      "guagua"
+    ],
+    "source": "The baby is sleeping.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Chilean Spanish",
+      "baby/infant semantic field",
+      "guagua"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "bus",
+      "autobús"
+    ],
+    "requiredOutputGroups": [
+      [
+        "guagua",
+        "bebé",
+        "bebe",
+        "niño",
+        "niña",
+        "infante"
+      ]
+    ],
+    "preferredOutputAny": [
+      "guagua"
+    ],
+    "notes": "Chilean Spanish commonly uses guagua for baby; this catches the opposite sense from Caribbean transit guagua."
   }
 ]

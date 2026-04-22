@@ -110,4 +110,22 @@ describe("semantic translation context", () => {
     expect(guatemala).toContain("do not use tú/puedes");
   });
 
+
+  it("adds regional semantic-field constraints for Puerto Rican orange juice and guagua", () => {
+    const orange = buildSemanticTranslationContext({
+      text: "Orange juice is ready.",
+      dialect: "es-PR",
+      documentKind: "plain",
+    });
+    const baby = buildSemanticTranslationContext({
+      text: "The baby is sleeping.",
+      dialect: "es-PR",
+      documentKind: "plain",
+    });
+
+    expect(orange).toContain("jugo de china");
+    expect(orange).toContain("do not use jugo de naranja");
+    expect(baby).toContain("do not use guagua");
+  });
+
 });

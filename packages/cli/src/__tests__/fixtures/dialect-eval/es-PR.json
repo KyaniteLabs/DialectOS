@@ -97,5 +97,80 @@
       "cuarto"
     ],
     "notes": "Puerto Rican pick up the room means tidy the room; recoger el cuarto is acceptable and should not be treated as package/file pickup."
+  },
+  {
+    "id": "pr-orange-juice-china",
+    "category": "false-friend",
+    "severity": "critical",
+    "tags": [
+      "citrus",
+      "semantic-field",
+      "polysemy",
+      "food"
+    ],
+    "source": "Orange juice is ready.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Puerto Rican Spanish",
+      "citrus/orange-juice semantic field",
+      "jugo de china"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "zumo"
+    ],
+    "requiredOutputGroups": [
+      [
+        "jugo"
+      ],
+      [
+        "china"
+      ]
+    ],
+    "preferredOutputAny": [
+      "jugo de china",
+      "china"
+    ],
+    "notes": "Puerto Rican Spanish commonly uses china for orange in citrus/juice contexts; orange juice should be jugo de china, not literal China-country handling."
+  },
+  {
+    "id": "pr-baby-not-guagua",
+    "category": "false-friend",
+    "severity": "critical",
+    "tags": [
+      "baby",
+      "semantic-field",
+      "guagua",
+      "false-friend"
+    ],
+    "source": "The baby is sleeping.",
+    "domain": "general",
+    "register": "auto",
+    "documentKind": "plain",
+    "requiredContext": [
+      "Puerto Rican Spanish",
+      "baby/infant semantic field",
+      "do not use guagua"
+    ],
+    "forbiddenContext": [],
+    "forbiddenOutputTerms": [
+      "guagua"
+    ],
+    "requiredOutputGroups": [
+      [
+        "bebé",
+        "bebe",
+        "niño",
+        "niña",
+        "infante"
+      ]
+    ],
+    "preferredOutputAny": [
+      "bebé",
+      "bebe"
+    ],
+    "notes": "In Puerto Rican Spanish guagua strongly signals bus, so baby/infant should use bebé/niño/infante rather than guagua."
   }
 ]

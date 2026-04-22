@@ -1,9 +1,8 @@
 /**
  * DeepL translation provider
- * Uses deepl-node SDK with built-in retries and timeout handling
+ * Uses DeepL's HTTP API directly to avoid SDK transitive dependency risk.
  */
 
-import * as deepl from "deepl-node";
 import type { TranslationProvider, TranslationResult, ProviderCapability } from "../types.js";
 import { CircuitBreaker } from "../circuit-breaker.js";
 import { RateLimiter, sanitizeErrorMessage, HTTP_TIMEOUT, validateContentLength, SecurityError, ErrorCode } from "@espanol/security";
@@ -21,16 +20,91 @@ const DEEPL_SUPPORTED_LANGS = [
   "sl", "sv", "tr", "uk", "zh",
 ];
 
+type DeepLFormality = "more" | "less" | "default";
+type DeepLTranslateOptions = { formality?: DeepLFormality; context?: string };
+type DeepLTranslation = { text: string; detectedSourceLang?: string };
+type DeepLClientLike = {
+  translateText(
+    text: string,
+    sourceLang: string | null,
+    targetLang: string,
+    options: DeepLTranslateOptions
+  ): Promise<DeepLTranslation>;
+};
+
+class FetchDeepLClient implements DeepLClientLike {
+  constructor(
+    private readonly authKey: string,
+    private readonly timeoutMs: number,
+    private readonly endpoint = process.env.DEEPL_API_URL || (
+      authKey.endsWith(":fx")
+        ? "https://api-free.deepl.com/v2/translate"
+        : "https://api.deepl.com/v2/translate"
+    )
+  ) {}
+
+  async translateText(
+    text: string,
+    sourceLang: string | null,
+    targetLang: string,
+    options: DeepLTranslateOptions
+  ): Promise<DeepLTranslation> {
+    const body = new URLSearchParams();
+    body.set("text", text);
+    body.set("target_lang", targetLang);
+    if (sourceLang) body.set("source_lang", sourceLang);
+    if (options.formality && options.formality !== "default") body.set("formality", options.formality);
+    if (options.context) body.set("context", options.context);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
+    try {
+      const response = await fetch(this.endpoint, {
+        method: "POST",
+        headers: {
+          authorization: `DeepL-Auth-Key ${this.authKey}`,
+          "content-type": "application/x-www-form-urlencoded",
+        },
+        body,
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        throw new Error(`DeepL API error: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json() as {
+        translations?: Array<{ text?: unknown; detected_source_language?: unknown }>;
+      };
+      const first = data.translations?.[0];
+      if (!first || typeof first.text !== "string") {
+        throw new Error("DeepL API response did not include translated text");
+      }
+      return {
+        text: first.text,
+        detectedSourceLang: typeof first.detected_source_language === "string"
+          ? first.detected_source_language
+          : undefined,
+      };
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("DeepL request timed out");
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+}
+
 export class DeepLProvider implements TranslationProvider {
   readonly name = "deepl";
-  private client: deepl.DeepLClient;
+  private client: DeepLClientLike;
   private authKey: string;
   private breaker: CircuitBreaker;
   private rateLimiter: RateLimiter;
 
   constructor(
     apiKey?: string,
-    mockClient?: deepl.DeepLClient,
+    mockClient?: DeepLClientLike,
     options?: {
       timeout?: number;
       failureThreshold?: number;
@@ -45,22 +119,13 @@ export class DeepLProvider implements TranslationProvider {
     }
     this.authKey = authKey;
 
-    // Use mock client if provided (for testing), otherwise create real client
-    // minTimeout controls axios request timeout — when it fires, the underlying
-    // HTTP request is aborted, preventing dangling promises.
-    this.client =
-      mockClient ||
-      new deepl.DeepLClient(authKey, {
-        minTimeout: options?.timeout || HTTP_TIMEOUT,
-      });
+    this.client = mockClient || new FetchDeepLClient(authKey, options?.timeout || HTTP_TIMEOUT);
 
-    // Initialize circuit breaker
     this.breaker = new CircuitBreaker(
       options?.failureThreshold || 5,
       options?.resetTimeoutMs || 60000
     );
 
-    // Initialize rate limiter (DeepL free tier: 500K chars/month)
     this.rateLimiter = new RateLimiter(
       options?.maxRequests || 60,
       options?.windowMs || 60000
@@ -93,44 +158,30 @@ export class DeepLProvider implements TranslationProvider {
       dialect?: string;
     }
   ): Promise<TranslationResult> {
-    // Validate input length before processing
     validateContentLength(text);
 
-    // Validate language codes
     const sourceResult = languageCodeSchema.safeParse(sourceLang === "auto" ? "en" : sourceLang);
     const targetResult = languageCodeSchema.safeParse(targetLang);
     if (!sourceResult.success || !targetResult.success) {
       throw new SecurityError("Invalid language code", ErrorCode.INVALID_INPUT);
     }
 
-    // Check circuit breaker
     if (!this.breaker.canExecute()) {
       throw new Error("DeepL provider is temporarily unavailable (circuit open)");
     }
 
-    // Check rate limit
     await this.rateLimiter.acquire();
 
     try {
-      // Map formality to DeepL format
       const formality = DEEPL_FORMALITY_MAP[options?.formality || "auto"] || "default";
-
-      // Build translate options
-      const translateOptions: deepl.TranslateTextOptions = {
-        formality,
-      };
-
+      const translateOptions: DeepLTranslateOptions = { formality };
       if (options?.context) {
         translateOptions.context = options.context;
       }
 
-      // DeepL uses uppercase language codes
-      const targetLangUpper = targetLang.toUpperCase() as deepl.TargetLanguageCode;
-      const sourceLangUpper: deepl.SourceLanguageCode | null =
-        sourceLang === "auto" ? null : (sourceLang.toUpperCase() as deepl.SourceLanguageCode);
+      const targetLangUpper = targetLang.toUpperCase();
+      const sourceLangUpper = sourceLang === "auto" ? null : sourceLang.toUpperCase();
 
-      // Execute translation — axios timeout (minTimeout) aborts the underlying
-      // HTTP request automatically, avoiding dangling promises from Promise.race.
       const result = await this.client.translateText(
         text,
         sourceLangUpper,
@@ -138,7 +189,6 @@ export class DeepLProvider implements TranslationProvider {
         translateOptions
       );
 
-      // Record success
       this.breaker.recordSuccess();
 
       return {
@@ -146,11 +196,8 @@ export class DeepLProvider implements TranslationProvider {
         detectedSourceLang: result.detectedSourceLang?.toUpperCase(),
       };
     } catch (error) {
-      // Record failure
       this.breaker.recordFailure();
 
-      // Sanitize error message
-      // Pre-sanitize with known authKey to catch any format edge cases
       let message = error instanceof Error ? error.message : String(error);
       if (message.includes(this.authKey)) {
         message = message.replaceAll(this.authKey, "[REDACTED]");
