@@ -191,7 +191,7 @@ git clone https://github.com/Pastorsimon1798/DialectOS.git
 cd DialectOS
 pnpm install
 pnpm build
-pnpm test        # 737 tests passing
+pnpm test        # 739 tests passing
 ```
 
 ---
@@ -216,7 +216,7 @@ pnpm test        # 737 tests passing
 | `check_formality` | Check tú vs usted consistency |
 | `apply_gender_neutral` | Apply gender-neutral language |
 
-### Translation (6 tools)
+### Translation (7 tools)
 | Tool | Description |
 |------|-------------|
 | `translate_text` | Translate with semantic context, grammar profiles, and quality contracts |
@@ -226,7 +226,6 @@ pnpm test        # 737 tests passing
 | `search_glossary` | Search 300+ source-attributed glossary terms |
 | `list_dialects` | List all 25 supported dialects |
 | `research_regional_term` | Research source-backed regional lexeme proposals without mutating runtime data |
-| `research_regional_term` | Research source-backed regional lexeme proposals without mutating runtime data |
 
 ---
 
@@ -234,15 +233,15 @@ pnpm test        # 737 tests passing
 
 | Package | Version | Description | Tests |
 |---------|---------|-------------|-------|
-| [`@espanol/mcp`](packages/mcp) | `0.1.0` | 17 MCP tools (stdio server) | 85 |
-| [`@espanol/cli`](packages/cli) | `0.1.0` | CLI commands for semantic translation workflows | 317 |
+| [`@espanol/mcp`](packages/mcp) | `0.1.0` | 17 MCP tools (stdio server) | 86 |
+| [`@espanol/cli`](packages/cli) | `0.1.0` | CLI commands for semantic translation workflows | 320 |
 | [`@espanol/providers`](packages/providers) | `0.1.0` | LLM, DeepL, LibreTranslate, MyMemory with circuit breaker | 71 |
 | [`@espanol/security`](packages/security) | `0.1.0` | Rate limiting, SSRF protection, sanitization | 66 |
 | [`@espanol/types`](packages/types) | `0.1.0` | Shared TypeScript types + glossary, profile, certification, and quality data | 54 |
 | [`@espanol/locale-utils`](packages/locale-utils) | `0.1.0` | Locale file diff/merge utilities | 55 |
 | [`@espanol/markdown-parser`](packages/markdown-parser) | `0.1.0` | Structure-preserving markdown parser | 74 |
 
-**Total: 737 tests across 7 packages plus the full-app docs, demo-server, and static-hardening contracts**
+**Total: 739 tests across 7 packages plus the full-app docs, demo-server, and static-hardening contracts**
 
 ---
 
@@ -295,7 +294,7 @@ See [`SECURITY.md`](SECURITY.md) for details.
                        │ stdio
 ┌──────────────────────▼──────────────────────────────────────┐
 │                   @espanol/mcp                               │
-│              16 tools • JSON-RPC over stdio                  │
+│              17 tools • JSON-RPC over stdio                  │
 └──────────────────────┬──────────────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────────────┐

@@ -91,6 +91,98 @@ test("demo server translates through injected full-app service", async () => {
   }
 });
 
+test("demo server accepts targetLocale alias instead of silently defaulting to es-MX", async () => {
+  const calls = [];
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async (request) => {
+      calls.push(request);
+      return {
+        translatedText: "El jugo de china ya está listo.",
+        dialect: request.dialect,
+        providerUsed: "llm",
+        fallbackCount: 0,
+        retryCount: 0,
+        sourceDetection: {
+          dialect: null,
+          confidence: 0,
+          name: null,
+          matchedKeywords: [],
+          registerHint: "neutral",
+          isReliable: false,
+        },
+        semanticPromptApplied: true,
+        providerStatus: {
+          configured: true,
+          ready: true,
+          providers: ["llm"],
+          semanticProviders: ["llm"],
+          message: "Semantic providers ready: llm",
+        },
+      };
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        text: "Orange juice is ready.",
+        targetLocale: "es-PR",
+        provider: "auto",
+      }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.dialect, "es-PR");
+    assert.equal(body.translatedText, "El jugo de china ya está listo.");
+    assert.deepEqual(calls.map((call) => call.dialect), ["es-PR"]);
+  } finally {
+    server.close();
+  }
+});
+
+test("demo server rejects requests with no target dialect instead of silently using es-MX", async () => {
+  let called = false;
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async () => {
+      called = true;
+      throw new Error("should not be called");
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ text: "Orange juice is ready.", provider: "auto" }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.ok, false);
+    assert.match(body.error, /Target dialect is required/);
+    assert.equal(called, false);
+  } finally {
+    server.close();
+  }
+});
+
 test("demo server returns provider errors instead of static fallback output", async () => {
   const { server, baseUrl } = await startTestServer({
     status: () => ({
