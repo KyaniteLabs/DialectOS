@@ -3,242 +3,424 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DialectOS — Spanish Dialect Translation QA</title>
-  <meta name="description" content="Test full-stack, provider-backed Spanish dialect translation across regional variants with quality gates and provider receipts.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Cpath d='M14 40c10-22 26-22 36 0' fill='none' stroke='%2338bdf8' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='32' r='8' fill='%23818cf8'/%3E%3C/svg%3E">
+  <title>DialectOS — Spanish dialect translation with receipts</title>
+  <meta name="description" content="A full-stack Spanish dialect translation demo with provider-backed inference, regional semantic prompts, and visible quality receipts.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23171614'/%3E%3Cpath d='M16 43V20h14c11 0 18 6 18 15s-7 8-18 8H16z' fill='none' stroke='%23E6B35A' stroke-width='5' stroke-linejoin='round'/%3E%3Ccircle cx='31' cy='32' r='4' fill='%23F7F1E3'/%3E%3C/svg%3E">
   <style>
     :root {
-      color-scheme: dark;
-      --bg: #060914;
-      --panel: rgba(15, 23, 42, 0.78);
-      --panel-strong: rgba(15, 23, 42, 0.94);
-      --line: rgba(148, 163, 184, 0.18);
-      --muted: #94a3b8;
-      --text: #e5eefb;
-      --text-soft: #cbd5e1;
-      --sky: #38bdf8;
-      --violet: #8b5cf6;
-      --emerald: #34d399;
-      --amber: #f59e0b;
-      --rose: #fb7185;
-      --shadow: 0 24px 80px rgba(2, 6, 23, 0.55);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: light;
+      --paper: #f4efe4;
+      --paper-2: #ece3d4;
+      --ink: #171614;
+      --ink-2: #2a2722;
+      --muted: #6f675c;
+      --line: rgba(23, 22, 20, 0.14);
+      --line-strong: rgba(23, 22, 20, 0.28);
+      --panel: #fbf7ee;
+      --charcoal: #191817;
+      --charcoal-2: #24211d;
+      --cream: #f7f1e3;
+      --gold: #d89b2b;
+      --gold-2: #f0c873;
+      --green: #2f6f4f;
+      --green-soft: #dbe8d6;
+      --red: #8f302f;
+      --blue: #213e60;
+      --shadow: 0 30px 80px rgba(23, 22, 20, 0.14);
+      --mono: ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: var(--sans);
     }
 
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      min-height: 100vh;
       margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
       background:
-        radial-gradient(circle at 14% 8%, rgba(56, 189, 248, 0.22), transparent 32rem),
-        radial-gradient(circle at 86% 4%, rgba(139, 92, 246, 0.26), transparent 30rem),
-        linear-gradient(180deg, #070b18 0%, #0f172a 50%, #050814 100%);
-      color: var(--text);
+        linear-gradient(90deg, rgba(23,22,20,.055) 1px, transparent 1px) 0 0 / 72px 72px,
+        linear-gradient(180deg, var(--paper) 0%, #f8f3e9 42%, #efe7d9 100%);
+      text-rendering: optimizeLegibility;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(216,155,43,.18), transparent 32rem),
+        radial-gradient(circle at 86% 18%, rgba(47,111,79,.11), transparent 30rem),
+        radial-gradient(circle at 52% 110%, rgba(33,62,96,.12), transparent 34rem);
+      z-index: -1;
     }
 
     a { color: inherit; }
-    button, select, textarea { font: inherit; }
+    button, textarea, select { font: inherit; }
     button { cursor: pointer; }
-    code { color: #7dd3fc; }
+    code { font-family: var(--mono); }
+    .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
+    .mono { font-family: var(--mono); letter-spacing: -.02em; }
 
-    .shell { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
-    .nav { display: flex; align-items: center; justify-content: space-between; padding: 24px 0; }
-    .brand { display: flex; gap: 12px; align-items: center; font-weight: 800; letter-spacing: -0.03em; }
-    .mark { width: 38px; height: 38px; border-radius: 13px; background: linear-gradient(135deg, var(--sky), var(--violet)); display: grid; place-items: center; box-shadow: 0 12px 36px rgba(56, 189, 248, .24); }
-    .mark::after { content: "D"; color: white; font-weight: 800; }
-    .navlinks { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 14px; }
-    .navlinks a { text-decoration: none; padding: 9px 12px; border: 1px solid transparent; border-radius: 999px; }
-    .navlinks a:hover { border-color: var(--line); color: white; background: rgba(255,255,255,.04); }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 22px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; font-weight: 760; letter-spacing: -.035em; }
+    .mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--charcoal);
+      color: var(--gold-2);
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+    }
+    .brand small { display: block; color: var(--muted); font-weight: 620; letter-spacing: .01em; margin-top: 2px; }
+    .navlinks { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; font-weight: 650; }
+    .navlinks a { text-decoration: none; padding: 10px 12px; border-radius: 999px; }
+    .navlinks a:hover { color: var(--ink); background: rgba(23,22,20,.055); }
+    .nav-cta { color: var(--cream) !important; background: var(--charcoal); }
+    .nav-cta:hover { background: #000 !important; }
 
-    .hero { padding: 52px 0 32px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 34px; align-items: center; }
-    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: #bae6fd; border: 1px solid rgba(56, 189, 248, .28); background: rgba(14, 165, 233, .09); padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 700; }
-    .pulse { width: 8px; height: 8px; border-radius: 999px; background: var(--emerald); box-shadow: 0 0 0 6px rgba(52,211,153,.12); }
-    h1 { font-size: clamp(46px, 8vw, 86px); line-height: .9; letter-spacing: -0.08em; margin: 22px 0 20px; }
-    .gradient { background: linear-gradient(135deg, #e0f2fe 0%, #38bdf8 38%, #a78bfa 78%, #f0abfc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .lede { color: var(--text-soft); font-size: clamp(17px, 2vw, 21px); line-height: 1.7; max-width: 720px; }
-    .ctaRow { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-    .btn { border: 0; border-radius: 16px; padding: 13px 18px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform .18s ease, background .18s ease, border-color .18s ease; }
+    .hero { padding: 72px 0 46px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(320px, .74fr); gap: 42px; align-items: end; }
+    .kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-weight: 760; text-transform: uppercase; letter-spacing: .12em; }
+    .live-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--green); box-shadow: 0 0 0 6px rgba(47,111,79,.13); }
+    h1 { margin: 18px 0 20px; max-width: 900px; font-size: clamp(52px, 8vw, 104px); line-height: .89; letter-spacing: -.082em; font-weight: 820; }
+    .lede { margin: 0; max-width: 760px; color: #3b352d; font-size: clamp(18px, 2vw, 23px); line-height: 1.56; letter-spacing: -.018em; }
+    .subproof { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .proof-chip { border: 1px solid var(--line); background: rgba(251,247,238,.74); border-radius: 999px; padding: 9px 12px; color: var(--ink-2); font-size: 13px; font-weight: 720; }
+
+    .hero-receipt {
+      background: var(--charcoal);
+      color: var(--cream);
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .receipt-top { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    .receipt-title { font-weight: 760; letter-spacing: -.02em; }
+    .receipt-title span { color: var(--gold-2); }
+    .receipt-stamp { font: 760 12px/1 var(--mono); color: var(--gold-2); border: 1px solid rgba(240,200,115,.35); border-radius: 999px; padding: 8px 9px; height: fit-content; }
+    .receipt-grid { display: grid; gap: 10px; }
+    .receipt-row { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-top: 1px solid rgba(247,241,227,.12); }
+    .receipt-label { color: rgba(247,241,227,.58); font-size: 12px; text-transform: uppercase; letter-spacing: .12em; }
+    .receipt-value { text-align: right; font-weight: 760; }
+    .ok { color: #9ad3a7; } .warn { color: var(--gold-2); } .bad { color: #f1a19d; }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--line); background: rgba(251,247,238,.72); border-radius: 28px; overflow: hidden; box-shadow: 0 16px 60px rgba(23,22,20,.07); }
+    .metric { padding: 22px; border-right: 1px solid var(--line); min-height: 128px; }
+    .metric:last-child { border-right: 0; }
+    .metric strong { display: block; font-size: 36px; letter-spacing: -.055em; line-height: 1; }
+    .metric span { display: block; margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.35; font-weight: 650; }
+
+    main { padding: 38px 0 76px; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .demo-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: start;
+      padding: 30px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fffaf0, #f8f1e5);
+    }
+    .section-label { color: var(--red); font-family: var(--mono); font-size: 12px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
+    .demo-head h2, .section-title h2 { margin: 8px 0 8px; font-size: clamp(30px, 4vw, 48px); line-height: .98; letter-spacing: -.065em; }
+    .demo-head p, .section-title p { margin: 0; max-width: 720px; color: var(--muted); font-size: 16px; line-height: 1.55; }
+    .status {
+      min-width: 280px;
+      border-radius: 18px;
+      padding: 14px 15px;
+      background: #f0e6d5;
+      border: 1px solid var(--line-strong);
+      color: var(--ink-2);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .status.ready { background: var(--green-soft); border-color: rgba(47,111,79,.25); }
+    .status.error { background: #f1d8d3; border-color: rgba(143,48,47,.26); }
+    .status strong { display: block; margin-bottom: 5px; }
+
+    .demo-body { display: grid; grid-template-columns: 250px 1fr; min-height: 540px; }
+    .preset-rail { padding: 22px; background: #eee3d2; border-right: 1px solid var(--line); }
+    .rail-title { margin: 0 0 12px; font: 800 12px/1.2 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+    .chip { width: 100%; text-align: left; border: 1px solid var(--line); background: #faf4e9; color: var(--ink); border-radius: 18px; padding: 14px; margin-bottom: 10px; font-weight: 760; transition: transform .16s ease, border-color .16s ease, background .16s ease; }
+    .chip small { display: block; margin-top: 5px; color: var(--muted); font-weight: 650; line-height: 1.35; }
+    .chip:hover { transform: translateY(-1px); border-color: rgba(216,155,43,.55); background: #fff9ef; }
+    .pipeline-note { margin-top: 20px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .pipeline-note strong { color: var(--ink); }
+
+    .translator { padding: 24px; display: grid; gap: 18px; }
+    .translator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: stretch; }
+    label { display: block; margin-bottom: 9px; color: var(--muted); font: 800 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+    .field-head { display: flex; justify-content: space-between; gap: 14px; align-items: center; }
+    textarea, select {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 18px;
+      background: #fffbf3;
+      color: var(--ink);
+      outline: none;
+    }
+    textarea { min-height: 248px; resize: vertical; padding: 17px; line-height: 1.58; font-size: 16px; }
+    select { padding: 14px; margin-bottom: 12px; }
+    textarea:focus, select:focus { border-color: rgba(33,62,96,.55); box-shadow: 0 0 0 4px rgba(33,62,96,.10); }
+    .actions { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .btn {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 18px;
+      font-weight: 780;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform .16s ease, background .16s ease;
+    }
     .btn:hover { transform: translateY(-1px); }
-    .btn-primary { background: linear-gradient(135deg, #0284c7, #7c3aed); color: white; box-shadow: 0 16px 48px rgba(56, 189, 248, .2); }
-    .btn-ghost { background: rgba(15, 23, 42, .65); border: 1px solid var(--line); color: var(--text-soft); }
+    .btn-primary { background: var(--charcoal); color: var(--cream); }
+    .btn-primary:hover { background: #050505; }
+    .btn-secondary { background: #eadcc8; color: var(--ink); border: 1px solid var(--line); }
+    .btn[disabled] { opacity: .62; cursor: wait; transform: none; }
+    .output {
+      min-height: 181px;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      background: var(--charcoal);
+      color: var(--cream);
+      border-radius: 18px;
+      padding: 17px;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.035);
+    }
+    .placeholder { color: #9c9488; font-style: italic; }
 
-    .hero-card { border: 1px solid var(--line); background: linear-gradient(180deg, rgba(15,23,42,.78), rgba(15,23,42,.5)); border-radius: 28px; padding: 20px; box-shadow: var(--shadow); backdrop-filter: blur(18px); }
-    .receipt { display: grid; gap: 12px; }
-    .receipt-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-radius: 18px; background: rgba(2, 6, 23, .42); border: 1px solid rgba(148,163,184,.1); }
-    .receipt-label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
-    .receipt-value { font-weight: 800; text-align: right; }
-    .ok { color: var(--emerald); } .warn { color: var(--amber); } .bad { color: var(--rose); }
-
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 28px 0 44px; }
-    .stat { border: 1px solid var(--line); background: rgba(15, 23, 42, .56); border-radius: 22px; padding: 20px; text-align: center; }
-    .stat strong { display: block; font-size: 32px; letter-spacing: -0.04em; }
-    .stat span { color: var(--muted); font-size: 13px; }
-
-    .panel { border: 1px solid var(--line); background: var(--panel); border-radius: 30px; padding: clamp(18px, 3vw, 30px); box-shadow: var(--shadow); backdrop-filter: blur(18px); }
-    .status { border-radius: 20px; padding: 16px 18px; margin-bottom: 22px; border: 1px solid rgba(245,158,11,.28); background: rgba(245,158,11,.1); color: #fde68a; }
-    .status.ready { border-color: rgba(52,211,153,.3); background: rgba(52,211,153,.1); color: #bbf7d0; }
-    .status.error { border-color: rgba(251,113,133,.36); background: rgba(251,113,133,.1); color: #fecdd3; }
-
-    .toolbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 22px; }
-    .toolbar h2 { margin: 0 0 6px; font-size: 26px; letter-spacing: -0.04em; }
-    .toolbar p { margin: 0; color: var(--muted); }
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
-    .chip { border: 1px solid var(--line); background: rgba(15, 23, 42, .78); color: var(--text-soft); border-radius: 999px; padding: 8px 11px; font-size: 12px; font-weight: 700; }
-    .chip:hover { border-color: rgba(56,189,248,.42); color: white; }
-
-    .translator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
-    label { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .09em; font-weight: 800; margin: 0 0 9px; }
-    .field-head { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
-    textarea, select { width: 100%; color: var(--text); background: rgba(2, 6, 23, .7); border: 1px solid rgba(148,163,184,.22); border-radius: 18px; outline: 0; }
-    textarea { min-height: 210px; padding: 16px; resize: vertical; line-height: 1.6; }
-    select { padding: 13px 14px; margin-bottom: 12px; }
-    textarea:focus, select:focus { border-color: rgba(56,189,248,.6); box-shadow: 0 0 0 4px rgba(56,189,248,.12); }
-    .translate-btn { width: 100%; margin-bottom: 12px; }
-    .output { min-height: 148px; white-space: pre-wrap; line-height: 1.65; color: #dbeafe; background: rgba(2, 6, 23, .54); border: 1px solid rgba(148,163,184,.18); border-radius: 18px; padding: 16px; }
-    .placeholder { color: #64748b; font-style: italic; }
-
-    .execution { margin-top: 18px; display: none; }
+    .execution { display: none; border-top: 1px solid var(--line); padding-top: 18px; }
     .execution.show { display: block; }
     .receipt-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pill { border-radius: 999px; border: 1px solid rgba(56,189,248,.22); background: rgba(14,165,233,.08); color: #bae6fd; font-weight: 800; font-size: 12px; padding: 8px 10px; }
-
-    .detect { display: none; margin-top: 18px; border: 1px solid var(--line); background: rgba(2,6,23,.35); border-radius: 20px; padding: 16px; align-items: center; gap: 14px; }
+    .pill { background: #eadcc8; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 8px 10px; font: 800 12px/1 var(--mono); }
+    .detect { display: none; align-items: center; gap: 12px; border: 1px solid var(--line); background: #f7efe1; border-radius: 20px; padding: 14px; }
     .detect.show { display: flex; }
-    .flag { font-size: 34px; } .detect-code { font-weight: 900; } .detect-name { color: var(--muted); font-size: 13px; }
+    .flag { font-size: 30px; }
+    .detect-code { font-weight: 850; }
+    .detect-name { color: var(--muted); font-size: 13px; }
 
-    .vocab, .dialects { margin: 40px 0; }
-    .section-title { text-align: center; margin-bottom: 18px; }
-    .section-title h2 { margin: 0 0 8px; font-size: 30px; letter-spacing: -0.05em; }
-    .section-title p { margin: 0; color: var(--muted); }
-    .table-wrap { overflow-x: auto; border-radius: 24px; border: 1px solid var(--line); background: rgba(15,23,42,.58); }
-    table { width: 100%; border-collapse: collapse; min-width: 800px; }
-    th, td { padding: 13px 14px; border-bottom: 1px solid rgba(148,163,184,.1); text-align: left; }
-    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
-    td:first-child { color: #7dd3fc; font-weight: 900; }
-    .dialect-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-    .dialect-card { border: 1px solid var(--line); background: rgba(15,23,42,.52); border-radius: 20px; padding: 15px; text-align: center; cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
-    .dialect-card:hover { transform: translateY(-2px); border-color: rgba(56,189,248,.5); }
-    .dialect-card .emoji { font-size: 26px; display: block; margin-bottom: 5px; }
-    .dialect-card strong { display: block; } .dialect-card small { color: var(--muted); }
+    .section { margin-top: 56px; }
+    .section-title { display: flex; justify-content: space-between; gap: 30px; align-items: end; margin-bottom: 18px; }
+    .section-title p { max-width: 560px; }
+    .matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .trap-card { background: rgba(251,247,238,.75); border: 1px solid var(--line); border-radius: 24px; padding: 20px; }
+    .trap-card h3 { margin: 0 0 10px; font-size: 22px; letter-spacing: -.035em; }
+    .trap-card p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .trap-card .example { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 13px; color: var(--blue); }
 
-    footer { color: var(--muted); padding: 44px 0 60px; text-align: center; }
-    footer a { color: #7dd3fc; text-decoration: none; }
+    .dialect-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .dialect-card {
+      border: 1px solid var(--line);
+      background: rgba(251,247,238,.74);
+      border-radius: 18px;
+      padding: 14px 10px;
+      color: var(--ink);
+      text-align: left;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+    .dialect-card:hover { transform: translateY(-1px); border-color: rgba(47,111,79,.42); background: #fff9ef; }
+    .dialect-card .emoji { display: block; font-size: 22px; margin-bottom: 8px; }
+    .dialect-card strong { display: block; font-family: var(--mono); font-size: 13px; }
+    .dialect-card small { color: var(--muted); display: block; margin-top: 4px; }
 
-    @media (max-width: 900px) {
-      .hero, .translator-grid { grid-template-columns: 1fr; }
-      .stats { grid-template-columns: repeat(2, 1fr); }
-      .toolbar { flex-direction: column; }
-      .chips { justify-content: flex-start; }
-      .dialect-grid { grid-template-columns: repeat(2, 1fr); }
+    .audit-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .audit-item { background: var(--charcoal); color: var(--cream); border-radius: 24px; padding: 20px; border: 1px solid rgba(255,255,255,.08); }
+    .audit-item strong { display: block; color: var(--gold-2); margin-bottom: 10px; }
+    .audit-item span { color: rgba(247,241,227,.72); line-height: 1.52; }
+
+    footer { padding: 46px 0 70px; color: var(--muted); border-top: 1px solid var(--line); }
+    .footer-inner { display: flex; justify-content: space-between; gap: 20px; align-items: center; }
+    footer a { text-decoration: none; color: var(--ink); font-weight: 750; }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; padding-top: 44px; }
+      .metrics, .matrix, .audit-strip { grid-template-columns: 1fr 1fr; }
+      .demo-head, .demo-body, .translator-grid { grid-template-columns: 1fr; }
+      .preset-rail { border-right: 0; border-bottom: 1px solid var(--line); }
+      .dialect-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 22px, 1160px); }
+      .nav { align-items: flex-start; }
       .navlinks { display: none; }
+      h1 { font-size: clamp(44px, 16vw, 66px); }
+      .metrics, .matrix, .audit-strip, .dialect-grid { grid-template-columns: 1fr; }
+      .metric { border-right: 0; border-bottom: 1px solid var(--line); }
+      .metric:last-child { border-bottom: 0; }
+      .section-title, .footer-inner { display: block; }
+      .demo-head, .translator { padding: 18px; }
+      .preset-rail { padding: 16px; }
     }
   </style>
 </head>
 <body>
-  <nav class="shell nav">
-    <div class="brand"><span class="mark"></span><span>DialectOS</span></div>
+  <nav class="shell nav" aria-label="Primary navigation">
+    <a class="brand" href="#top" aria-label="DialectOS home">
+      <span class="mark">D</span>
+      <span>DialectOS<small>regional Spanish translation</small></span>
+    </a>
     <div class="navlinks">
-      <a href="#translate">Demo</a>
-      <a href="https://github.com/Pastorsimon1798/DialectOS">GitHub</a>
+      <a href="#translate">Live demo</a>
+      <a href="#stress-matrix">Stress matrix</a>
       <a href="docs/full-app-demo.md">Container guide</a>
+      <a class="nav-cta" href="https://github.com/Pastorsimon1798/DialectOS">GitHub</a>
     </div>
   </nav>
 
-  <header class="shell hero">
+  <header id="top" class="shell hero">
     <div>
-      <div class="eyebrow"><span class="pulse"></span>742 tests · semantic provider demo · no static fallback</div>
-      <h1><span class="gradient">Spanish that knows where it is going.</span></h1>
-      <p class="lede">DialectOS routes your text through the real app path: browser to backend, backend to provider registry, provider to a semantic dialect prompt, and output through deterministic quality gates before anything reaches the page.</p>
-      <div class="ctaRow">
-        <a class="btn btn-primary" href="#translate">Test a dialect</a>
-        <a class="btn btn-ghost" href="https://github.com/Pastorsimon1798/DialectOS">View source</a>
+      <div class="kicker"><span class="live-dot"></span><span>742 tests</span><span>·</span><span>provider-backed</span><span>·</span><span>no static fallback</span></div>
+      <h1>Spanish that can defend where it came from.</h1>
+      <p class="lede">DialectOS is a full-stack dialect translation surface for Spanish regional meaning: Puerto Rican <em>jugo de china</em>, Caribbean <em>guagua</em>, voseo, taboo verbs, and semantic traps that generic translation demos flatten.</p>
+      <div class="subproof" aria-label="Product proof points">
+        <span class="proof-chip">browser to backend, backend to provider registry</span>
+        <span class="proof-chip">semantic prompt applied</span>
+        <span class="proof-chip">output judge visible</span>
       </div>
     </div>
-    <aside class="hero-card" aria-label="Runtime receipt">
-      <div class="receipt">
-        <div class="receipt-row"><span class="receipt-label">Inference</span><span class="receipt-value">Tailscale LM Studio</span></div>
-        <div class="receipt-row"><span class="receipt-label">Quality gate</span><span class="receipt-value ok">Output judge enabled</span></div>
-        <div class="receipt-row"><span class="receipt-label">Fallback policy</span><span class="receipt-value">No static fallback</span></div>
-        <div class="receipt-row"><span class="receipt-label">Demo status</span><span id="heroStatus" class="receipt-value warn">checking…</span></div>
+    <aside class="hero-receipt" aria-label="Runtime receipt">
+      <div class="receipt-top">
+        <div class="receipt-title"><span>Runtime receipt</span><br>not a mock translation widget</div>
+        <div class="receipt-stamp">LIVE</div>
+      </div>
+      <div class="receipt-grid">
+        <div class="receipt-row"><span class="receipt-label">Inference</span><span class="receipt-value">Model provider stack</span></div>
+        <div class="receipt-row"><span class="receipt-label">Quality</span><span class="receipt-value ok">judge enforced</span></div>
+        <div class="receipt-row"><span class="receipt-label">Fallback</span><span class="receipt-value">none to static rules</span></div>
+        <div class="receipt-row"><span class="receipt-label">Status</span><span id="heroStatus" class="receipt-value warn">checking…</span></div>
       </div>
     </aside>
   </header>
 
-  <section class="shell stats" aria-label="Project stats">
-    <div class="stat"><strong>25</strong><span>regional variants</span></div>
-    <div class="stat"><strong>737</strong><span>repo tests</span></div>
-    <div class="stat"><strong>LLM</strong><span>semantic provider required</span></div>
-    <div class="stat"><strong>MQM</strong><span>launch-audit framing</span></div>
+  <section class="shell metrics" aria-label="Project metrics">
+    <div class="metric"><strong>25</strong><span>Spanish regional variants covered by the app surface</span></div>
+    <div class="metric"><strong>742</strong><span>tests across runtime, docs, dialect fixtures, and safety checks</span></div>
+    <div class="metric"><strong>17</strong><span>MCP tools for translation, glossary, and research workflows</span></div>
+    <div class="metric"><strong>0</strong><span>silent static fallback paths in the public demo</span></div>
   </section>
 
   <main class="shell">
-    <section id="translate" class="panel">
-      <div id="backendStatus" class="status"><strong>Backend status:</strong> checking /api/status…</div>
-
-      <div class="toolbar">
+    <section id="translate" class="panel" aria-label="Full-app translator demo">
+      <div class="demo-head">
         <div>
-          <h2>Full-app translator</h2>
-          <p>Use short, adversarial inputs. If the provider output is weak, the judge rejects it visibly.</p>
+          <div class="section-label">Full-app translator</div>
+          <h2>Try the path we actually ship.</h2>
+          <p>The browser calls <code>/api/translate</code>, the backend calls the provider registry, and the provider receives regional semantic constraints before the output judge approves or rejects the result.</p>
         </div>
-        <div class="chips">
-          <button class="chip" data-preset="es-mx">Mexico stress</button>
-          <button class="chip" data-preset="es-pr">Puerto Rico pickup</button>
-          <button class="chip" data-preset="es-cl">Chile food</button>
-          <button class="chip" data-preset="es-ar">Argentina voseo</button>
-        </div>
+        <div id="backendStatus" class="status"><strong>Backend status</strong> checking /api/status…</div>
       </div>
 
-      <div class="translator-grid">
-        <div>
-          <div class="field-head"><label for="sourceText">Source</label><span id="detectedSource" class="detect-name">—</span></div>
-          <textarea id="sourceText" placeholder="Try: Pick up the package from reception."></textarea>
-        </div>
-        <div>
-          <label for="targetDialect">Target dialect</label>
-          <select id="targetDialect"></select>
-          <button id="translateButton" class="btn btn-primary translate-btn">Translate with full app</button>
-          <div id="outputBox" class="output"><span class="placeholder">Type text and run a provider-backed translation.</span></div>
-        </div>
-      </div>
+      <div class="demo-body">
+        <aside class="preset-rail" aria-label="Stress presets">
+          <p class="rail-title">Stress presets</p>
+          <button class="chip" data-preset="es-pr-orange">Puerto Rico orange<small>Orange juice should become jugo de china.</small></button>
+          <button class="chip" data-preset="es-pr-room">Puerto Rico room<small>Tidying should become recoger el cuarto.</small></button>
+          <button class="chip" data-preset="es-mx-file">Mexico file pickup<small>Retrieve a file without accidental download/coger.</small></button>
+          <button class="chip" data-preset="es-cl-food">Chile food<small>Avocado should prefer palta.</small></button>
+          <button class="chip" data-preset="es-ar-voseo">Argentina voseo<small>Account copy should sound local, not neutral.</small></button>
+          <p class="pipeline-note"><strong>No static translation fallback was used.</strong> If the provider is down or weak, the page shows the failure instead of pretending.</p>
+        </aside>
 
-      <div id="changesPanel" class="execution">
-        <label>Execution receipt</label>
-        <div id="changesList" class="receipt-pills"></div>
-      </div>
+        <div class="translator">
+          <div class="translator-grid">
+            <div>
+              <div class="field-head"><label for="sourceText">Source text</label><span id="detectedSource" class="detect-name">unknown · insufficient markers</span></div>
+              <textarea id="sourceText" placeholder="Try: Orange juice is ready."></textarea>
+            </div>
+            <div>
+              <label for="targetDialect">Target dialect</label>
+              <select id="targetDialect"></select>
+              <div class="actions">
+                <button id="translateButton" class="btn btn-primary">Translate with full app</button>
+                <div id="outputBox" class="output"><span class="placeholder">Run a provider-backed translation. The receipt below will show what happened.</span></div>
+              </div>
+            </div>
+          </div>
 
-      <div id="detectPanel" class="detect">
-        <span id="detectFlag" class="flag">🌐</span>
-        <div><div id="detectCode" class="detect-code">unknown</div><div id="detectName" class="detect-name">insufficient markers</div></div>
+          <div id="changesPanel" class="execution">
+            <label>Execution receipt</label>
+            <div id="changesList" class="receipt-pills"></div>
+          </div>
+
+          <div id="detectPanel" class="detect">
+            <span id="detectFlag" class="flag">🌐</span>
+            <div><div id="detectCode" class="detect-code">unknown</div><div id="detectName" class="detect-name">insufficient markers</div></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="vocab">
-      <div class="section-title"><h2>Same concept, different Spanish</h2><p>Examples are orientation aids; production output is provider-backed and judged.</p></div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Concept</th><th>Spain</th><th>Mexico</th><th>Argentina</th><th>Colombia</th><th>Chile</th><th>Puerto Rico</th></tr></thead>
-          <tbody>
-            <tr><td>Computer</td><td>ordenador</td><td>computadora</td><td>computadora</td><td>computador</td><td>computadora</td><td>computadora</td></tr>
-            <tr><td>Car</td><td>coche</td><td>carro</td><td>auto</td><td>carro</td><td>auto</td><td>carro</td></tr>
-            <tr><td>Bus</td><td>autobús</td><td>autobús/camión</td><td>colectivo</td><td>bus</td><td>micro</td><td>guagua</td></tr>
-            <tr><td>Pick up package</td><td>recoger/retirar</td><td>recoger</td><td>retirar</td><td>recoger</td><td>retirar</td><td>recoger</td></tr>
-            <tr><td>Tidy room</td><td>ordenar la habitación</td><td>ordenar el cuarto</td><td>ordenar la pieza</td><td>arreglar el cuarto</td><td>ordenar la pieza</td><td>recoger el cuarto</td></tr>
-          </tbody>
-        </table>
+    <section id="stress-matrix" class="section">
+      <div class="section-title">
+        <div>
+          <div class="section-label">Semantic traps</div>
+          <h2>The words are not the product. The judgment is.</h2>
+        </div>
+        <p>These are the categories that exposed thin translation behavior: regional polysemy, phrase sense, taboo verbs, and grammar norms. The live demo is built to make those failures visible.</p>
+      </div>
+      <div class="matrix">
+        <article class="trap-card"><h3>Regional names</h3><p>Food and everyday terms vary by country and can invert meaning if translated literally.</p><div class="example">PR: orange juice → jugo de china</div></article>
+        <article class="trap-card"><h3>Phrase sense</h3><p>Short English phrases like “pick up” require semantic interpretation before Spanish wording.</p><div class="example">PR: tidy room → recoger el cuarto</div></article>
+        <article class="trap-card"><h3>Taboo verbs</h3><p><em>Coger</em>, <em>tomar</em>, and <em>agarrar</em> are not interchangeable across dialects.</p><div class="example">MX/PR/PA: avoid coger by default</div></article>
+        <article class="trap-card"><h3>Pronouns</h3><p>Voseo, ustedes/vosotros, and formality norms change how instructions should address users.</p><div class="example">AR: vos podés, not generic puedes</div></article>
+        <article class="trap-card"><h3>False friends</h3><p>Words like <em>guagua</em> can mean bus in one place and baby in another.</p><div class="example">PR: take the bus → toma la guagua</div></article>
+        <article class="trap-card"><h3>Receipts</h3><p>Every public demo response shows provider, target, fallback count, and quality status.</p><div class="example">provider: llm · quality: judge passed</div></article>
       </div>
     </section>
 
-    <section class="dialects">
-      <div class="section-title"><h2>Covered dialects</h2><p>Click any dialect to set the target.</p></div>
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <div class="section-label">Coverage</div>
+          <h2>Set a dialect. Break the demo on purpose.</h2>
+        </div>
+        <p>Click a target and try adversarial phrases. The point of this page is not to look impressive; it is to make bad translations impossible to hide.</p>
+      </div>
       <div id="dialectGrid" class="dialect-grid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <div class="section-label">Launch posture</div>
+          <h2>Built for audits, not vibes.</h2>
+        </div>
+      </div>
+      <div class="audit-strip">
+        <div class="audit-item"><strong>Provider-backed</strong><span>The public page calls the same backend/provider path used by the app, not browser-side substitutions.</span></div>
+        <div class="audit-item"><strong>Failure-visible</strong><span>Provider errors, missing model config, quality rejections, and malformed requests surface as explicit errors.</span></div>
+        <div class="audit-item"><strong>Research-ready</strong><span>Regional gaps can flow into proposal-only research tooling before data or prompts are changed.</span></div>
+      </div>
     </section>
   </main>
 
   <footer class="shell">
-    <p><a href="https://github.com/Pastorsimon1798/DialectOS">DialectOS</a> — BSL 1.1, Apache-2.0 on 2030-04-20</p>
+    <div class="footer-inner">
+      <p><a href="https://github.com/Pastorsimon1798/DialectOS">DialectOS</a> — BSL 1.1, Apache-2.0 on 2030-04-20</p>
+      <p class="mono">742 tests · 17 MCP tools · 25 dialects</p>
+    </div>
   </footer>
 
   <script>
@@ -251,10 +433,11 @@
     };
     const FLAGS = { 'es-ES':'🇪🇸','es-MX':'🇲🇽','es-AR':'🇦🇷','es-CO':'🇨🇴','es-CU':'🇨🇺','es-PE':'🇵🇪','es-CL':'🇨🇱','es-VE':'🇻🇪','es-UY':'🇺🇾','es-PY':'🇵🇾','es-BO':'🇧🇴','es-EC':'🇪🇨','es-GT':'🇬🇹','es-HN':'🇭🇳','es-SV':'🇸🇻','es-NI':'🇳🇮','es-CR':'🇨🇷','es-PA':'🇵🇦','es-DO':'🇩🇴','es-PR':'🇵🇷','es-GQ':'🇬🇶','es-US':'🇺🇸','es-PH':'🇵🇭','es-BZ':'🇧🇿','es-AD':'🇦🇩' };
     const PRESETS = {
-      'es-mx': { text: 'Pick up the file before deployment.', target: 'es-MX' },
-      'es-pr': { text: 'Pick up the package from reception.', target: 'es-PR' },
-      'es-cl': { text: 'Buy avocado for lunch.', target: 'es-CL' },
-      'es-ar': { text: 'You can update your account now.', target: 'es-AR' }
+      'es-pr-orange': { text: 'Orange juice is ready.', target: 'es-PR' },
+      'es-pr-room': { text: 'Pick up the room before guests arrive.', target: 'es-PR' },
+      'es-mx-file': { text: 'Pick up the file before deployment.', target: 'es-MX' },
+      'es-cl-food': { text: 'Buy avocado for lunch.', target: 'es-CL' },
+      'es-ar-voseo': { text: 'You can update your account now.', target: 'es-AR' }
     };
 
     let translateRequestId = 0;
@@ -266,8 +449,8 @@
       $('heroStatus').textContent = ready ? 'ready' : 'not ready';
       $('heroStatus').className = 'receipt-value ' + (ready ? 'ok' : 'warn');
       $('backendStatus').className = 'status ' + (ready ? 'ready' : 'error');
-      $('backendStatus').innerHTML = '<strong>Backend status:</strong> ' + escapeHtml(status.message || 'unknown') +
-        ' <span style="color:var(--muted)">Providers: ' + escapeHtml((status.providers || []).join(', ') || 'none') + '</span>';
+      $('backendStatus').innerHTML = '<strong>Backend status</strong>' + escapeHtml(status.message || 'unknown') +
+        '<br><span style="color:var(--muted)">Providers: ' + escapeHtml((status.providers || []).join(', ') || 'none') + '</span>';
     }
 
     async function refreshBackendStatus() {
@@ -301,7 +484,7 @@
       const text = $('sourceText').value.trim();
       const dialect = $('targetDialect').value;
       if (!text) {
-        $('outputBox').innerHTML = '<span class="placeholder">Type text and run a provider-backed translation.</span>';
+        $('outputBox').innerHTML = '<span class="placeholder">Run a provider-backed translation. The receipt below will show what happened.</span>';
         return;
       }
       $('translateButton').disabled = true;
@@ -352,14 +535,14 @@
         const card = document.createElement('button');
         card.className = 'dialect-card';
         card.innerHTML = `<span class="emoji">${FLAGS[code] || '🌐'}</span><strong>${code}</strong><small>${escapeHtml(name)}</small>`;
-        card.addEventListener('click', () => { select.value = code; });
+        card.addEventListener('click', () => { select.value = code; document.getElementById('translate').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
         grid.appendChild(card);
       }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       renderDialects();
-      loadPreset('es-mx');
+      loadPreset('es-pr-orange');
       $('translateButton').addEventListener('click', runTranslation);
       document.querySelectorAll('[data-preset]').forEach((button) => button.addEventListener('click', () => loadPreset(button.dataset.preset)));
       refreshBackendStatus();
