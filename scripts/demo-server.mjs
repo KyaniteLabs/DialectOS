@@ -18,6 +18,19 @@ const CONTENT_TYPES = {
   ".svg": "image/svg+xml",
 };
 
+const COMMON_HEADERS = {
+  "x-content-type-options": "nosniff",
+  "referrer-policy": "strict-origin-when-cross-origin",
+};
+
+const PUBLIC_STATIC_FILES = new Map([
+  ["/", "docs/index.html"],
+  ["/index.html", "docs/index.html"],
+  ["/docs/index.html", "docs/index.html"],
+  ["/docs/full-app-demo.md", "docs/full-app-demo.md"],
+  ["/docs/dialectos-engine.js", "docs/dialectos-engine.js"],
+]);
+
 function createRateLimiter(options = {}) {
   const maxRequests = Number(options.maxRequests || process.env.DIALECTOS_DEMO_RATE_LIMIT || 60);
   const windowMs = Number(options.windowMs || process.env.DIALECTOS_DEMO_RATE_WINDOW_MS || 60000);
@@ -46,6 +59,7 @@ function sendJson(res, status, payload) {
   res.writeHead(status, {
     "content-type": "application/json; charset=utf-8",
     "cache-control": "no-store",
+    ...COMMON_HEADERS,
   });
   res.end(body);
 }
@@ -56,6 +70,12 @@ function safeError(error) {
 
 class ClientInputError extends Error {}
 
+function assertRequestObject(body) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    throw new ClientInputError("JSON body must be an object.");
+  }
+}
+
 function readDialect(body) {
   for (const value of [body?.dialect, body?.targetDialect, body?.targetLocale, body?.locale]) {
     if (value === undefined || value === null) continue;
@@ -64,6 +84,40 @@ function readDialect(body) {
     if (candidate) return candidate;
   }
   throw new ClientInputError("Target dialect is required. Send dialect, targetDialect, or targetLocale, for example es-PR.");
+}
+
+function readRequiredString(body, key, label) {
+  const value = body?.[key];
+  if (typeof value !== "string") {
+    throw new ClientInputError(`${label} must be a string.`);
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    throw new ClientInputError(`${label} must be a non-empty string.`);
+  }
+  return trimmed;
+}
+
+function readOptionalString(body, key, label, fallback) {
+  const value = body?.[key];
+  if (value === undefined || value === null || value === "") {
+    return fallback;
+  }
+  if (typeof value !== "string") {
+    throw new ClientInputError(`${label} must be a string.`);
+  }
+  const trimmed = value.trim();
+  return trimmed || fallback;
+}
+
+function readTranslateRequest(body) {
+  assertRequestObject(body);
+  return {
+    text: readRequiredString(body, "text", "Text"),
+    dialect: readDialect(body),
+    provider: readOptionalString(body, "provider", "Provider", "auto"),
+    formality: readOptionalString(body, "formality", "Formality", "auto"),
+  };
 }
 
 async function readJson(req) {
@@ -81,10 +135,16 @@ async function readJson(req) {
 }
 
 function staticPathFor(urlPath, rootDir) {
-  const pathname = decodeURIComponent(urlPath.split("?")[0] || "/");
-  const relative = pathname === "/"
-    ? "docs/index.html"
-    : pathname.replace(/^\/+/, "");
+  let pathname;
+  try {
+    pathname = decodeURIComponent(urlPath.split("?")[0] || "/");
+  } catch {
+    throw new ClientInputError("Malformed URL path.");
+  }
+  const relative = PUBLIC_STATIC_FILES.get(pathname);
+  if (!relative) {
+    return undefined;
+  }
   const absolute = path.resolve(rootDir, relative);
   if (!absolute.startsWith(rootDir + path.sep) && absolute !== rootDir) {
     return undefined;
@@ -93,26 +153,40 @@ function staticPathFor(urlPath, rootDir) {
 }
 
 async function serveStatic(req, res, rootDir) {
-  const absolute = staticPathFor(req.url || "/", rootDir);
+  let absolute;
+  try {
+    absolute = staticPathFor(req.url || "/", rootDir);
+  } catch (error) {
+    if (error instanceof ClientInputError) {
+      sendJson(res, 400, { ok: false, error: error.message });
+      return;
+    }
+    throw error;
+  }
   if (!absolute) {
-    sendJson(res, 403, { error: "Forbidden" });
+    sendJson(res, 404, { ok: false, error: "Not found" });
     return;
   }
 
   try {
     const info = await stat(absolute);
     if (!info.isFile()) {
-      sendJson(res, 404, { error: "Not found" });
+      sendJson(res, 404, { ok: false, error: "Not found" });
       return;
     }
     const ext = path.extname(absolute);
     res.writeHead(200, {
       "content-type": CONTENT_TYPES[ext] || "application/octet-stream",
       "cache-control": "no-store",
+      ...COMMON_HEADERS,
     });
+    if ((req.method || "GET") === "HEAD") {
+      res.end();
+      return;
+    }
     createReadStream(absolute).pipe(res);
   } catch {
-    sendJson(res, 404, { error: "Not found" });
+    sendJson(res, 404, { ok: false, error: "Not found" });
   }
 }
 
@@ -159,7 +233,6 @@ export function createDemoServer(options = {}) {
           });
           return;
         }
-        const services = await servicesPromise;
         let body;
         try {
           body = await readJson(req);
@@ -168,12 +241,9 @@ export function createDemoServer(options = {}) {
           return;
         }
         try {
-          const result = await services.translate({
-            text: String(body.text || ""),
-            dialect: readDialect(body),
-            provider: body.provider ? String(body.provider) : "auto",
-            formality: body.formality ? String(body.formality) : "auto",
-          });
+          const request = readTranslateRequest(body);
+          const services = await servicesPromise;
+          const result = await services.translate(request);
           sendJson(res, 200, { ok: true, ...result });
         } catch (error) {
           const message = safeError(error);
