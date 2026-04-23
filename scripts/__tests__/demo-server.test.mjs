@@ -150,6 +150,125 @@ test("demo server accepts targetLocale alias instead of silently defaulting to e
   }
 });
 
+test("demo server ignores blank earlier dialect aliases and uses the first non-blank target", async () => {
+  const calls = [];
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async (request) => {
+      calls.push(request);
+      return {
+        translatedText: "El jugo de china ya está listo.",
+        dialect: request.dialect,
+        providerUsed: "llm",
+        fallbackCount: 0,
+        retryCount: 0,
+        sourceDetection: {
+          dialect: null,
+          confidence: 0,
+          name: null,
+          matchedKeywords: [],
+          registerHint: "neutral",
+          isReliable: false,
+        },
+        semanticPromptApplied: true,
+        providerStatus: {
+          configured: true,
+          ready: true,
+          providers: ["llm"],
+          semanticProviders: ["llm"],
+          message: "Semantic providers ready: llm",
+        },
+      };
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        text: "Orange juice is ready.",
+        dialect: " ",
+        targetLocale: "es-PR",
+        provider: "auto",
+      }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.dialect, "es-PR");
+    assert.deepEqual(calls.map((call) => call.dialect), ["es-PR"]);
+  } finally {
+    server.close();
+  }
+});
+
+test("demo server short-circuits dialect aliases before malformed trailing values", async () => {
+  const calls = [];
+  const malformedTrailingLocale = { toString: "not-callable" };
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async (request) => {
+      calls.push(request);
+      return {
+        translatedText: "El jugo de china ya está listo.",
+        dialect: request.dialect,
+        providerUsed: "llm",
+        fallbackCount: 0,
+        retryCount: 0,
+        sourceDetection: {
+          dialect: null,
+          confidence: 0,
+          name: null,
+          matchedKeywords: [],
+          registerHint: "neutral",
+          isReliable: false,
+        },
+        semanticPromptApplied: true,
+        providerStatus: {
+          configured: true,
+          ready: true,
+          providers: ["llm"],
+          semanticProviders: ["llm"],
+          message: "Semantic providers ready: llm",
+        },
+      };
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        text: "Orange juice is ready.",
+        targetLocale: "es-PR",
+        locale: malformedTrailingLocale,
+        provider: "auto",
+      }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.dialect, "es-PR");
+    assert.deepEqual(calls.map((call) => call.dialect), ["es-PR"]);
+  } finally {
+    server.close();
+  }
+});
+
 test("demo server rejects requests with no target dialect instead of silently using es-MX", async () => {
   let called = false;
   const { server, baseUrl } = await startTestServer({
@@ -178,6 +297,40 @@ test("demo server rejects requests with no target dialect instead of silently us
     assert.equal(body.ok, false);
     assert.match(body.error, /Target dialect is required/);
     assert.equal(called, false);
+  } finally {
+    server.close();
+  }
+});
+
+test("demo server does not classify quality-judge required-trait failures as client input errors", async () => {
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async () => {
+      throw new Error("Provider output failed quality judge: semantic/critical: Missing required semantic trait for es-PR; expected one of: china");
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        text: "Orange juice is ready.",
+        targetLocale: "es-PR",
+        provider: "auto",
+      }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 500);
+    assert.equal(body.ok, false);
+    assert.match(body.error, /Missing required semantic trait/);
   } finally {
     server.close();
   }

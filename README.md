@@ -191,7 +191,7 @@ git clone https://github.com/Pastorsimon1798/DialectOS.git
 cd DialectOS
 pnpm install
 pnpm build
-pnpm test        # 739 tests passing
+pnpm test        # 742 tests passing
 ```
 
 ---
@@ -241,7 +241,7 @@ pnpm test        # 739 tests passing
 | [`@espanol/locale-utils`](packages/locale-utils) | `0.1.0` | Locale file diff/merge utilities | 55 |
 | [`@espanol/markdown-parser`](packages/markdown-parser) | `0.1.0` | Structure-preserving markdown parser | 74 |
 
-**Total: 739 tests across 7 packages plus the full-app docs, demo-server, and static-hardening contracts**
+**Total: 742 tests across 7 packages plus the full-app docs, demo-server, and static-hardening contracts**
 
 ---
 
