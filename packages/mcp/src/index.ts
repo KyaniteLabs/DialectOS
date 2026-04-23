@@ -45,7 +45,7 @@ function createServer(config: MCPConfig = loadConfig()): McpServer {
     config.rateLimit.windowMs
   );
 
-  // Register all tool categories (16 tools total)
+  // Register all tool categories (17 tools total)
   registerDocsTools(server, { registry, rateLimiter });
   registerI18nTools(server, { registry, rateLimiter });
   registerTranslatorTools(server, { registry, rateLimiter });

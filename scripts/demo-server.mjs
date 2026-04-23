@@ -54,6 +54,14 @@ function safeError(error) {
   return error instanceof Error ? error.message : String(error);
 }
 
+function readDialect(body) {
+  const candidate = body?.dialect ?? body?.targetDialect ?? body?.targetLocale ?? body?.locale;
+  if (candidate === undefined || candidate === null || String(candidate).trim() === "") {
+    throw new Error("Target dialect is required. Send dialect, targetDialect, or targetLocale, for example es-PR.");
+  }
+  return String(candidate).trim();
+}
+
 async function readJson(req) {
   const chunks = [];
   let size = 0;
@@ -158,7 +166,7 @@ export function createDemoServer(options = {}) {
         try {
           const result = await services.translate({
             text: String(body.text || ""),
-            dialect: String(body.dialect || "es-MX"),
+            dialect: readDialect(body),
             provider: body.provider ? String(body.provider) : "auto",
             formality: body.formality ? String(body.formality) : "auto",
           });
@@ -167,7 +175,7 @@ export function createDemoServer(options = {}) {
           const message = safeError(error);
           const status = /No provider configured|No translation providers|Provider not available/i.test(message)
             ? 503
-            : /Invalid|No input|too large/i.test(message)
+            : /Invalid|No input|required|too large/i.test(message)
               ? 400
               : 500;
           sendJson(res, status, { ok: false, error: message });
