@@ -417,6 +417,68 @@ test("demo server handles favicon without a noisy 404", async () => {
   }
 });
 
+test("demo server does not expose repo implementation files as public assets", async () => {
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async () => {
+      throw new Error("not used");
+    },
+  });
+
+  try {
+    for (const path of [
+      "/package.json",
+      "/scripts/demo-server.mjs",
+      "/packages/cli/src/lib/web-demo-service.ts",
+      "/docs/../package.json",
+      "/%2e%2e/package.json",
+    ]) {
+      const response = await fetch(`${baseUrl}${path}`);
+      const body = await response.text();
+      assert.equal(response.status, 404, `${path} should not be public`);
+      assert.doesNotMatch(body, /@espanol|createDemoServer|ProviderRegistry|DialectOS full-app demo/);
+    }
+
+    const guide = await fetch(`${baseUrl}/docs/full-app-demo.md`);
+    assert.equal(guide.status, 200);
+    assert.match(await guide.text(), /DialectOS full-app demo/);
+  } finally {
+    server.close();
+  }
+});
+
+test("demo server treats malformed encoded static paths as bad requests", async () => {
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async () => {
+      throw new Error("not used");
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/%E0%A4%A`);
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.ok, false);
+    assert.match(body.error, /Malformed URL path/);
+  } finally {
+    server.close();
+  }
+});
+
 test("demo server rejects malformed JSON as a client error", async () => {
   const { server, baseUrl } = await startTestServer({
     status: () => ({
@@ -442,6 +504,78 @@ test("demo server rejects malformed JSON as a client error", async () => {
     assert.equal(response.status, 400);
     assert.equal(body.ok, false);
     assert.match(body.error, /JSON|Unexpected|position|Expected/i);
+  } finally {
+    server.close();
+  }
+});
+
+test("demo server rejects non-object JSON bodies before translation", async () => {
+  let called = false;
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async () => {
+      called = true;
+      throw new Error("should not be called");
+    },
+  });
+
+  try {
+    const response = await fetch(`${baseUrl}/api/translate`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: "null",
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.ok, false);
+    assert.match(body.error, /JSON body must be an object/);
+    assert.equal(called, false);
+  } finally {
+    server.close();
+  }
+});
+
+test("demo server rejects non-string translation fields before translation", async () => {
+  let called = false;
+  const { server, baseUrl } = await startTestServer({
+    status: () => ({
+      configured: true,
+      ready: true,
+      providers: ["llm"],
+      semanticProviders: ["llm"],
+      message: "Semantic providers ready: llm",
+    }),
+    translate: async () => {
+      called = true;
+      throw new Error("should not be called");
+    },
+  });
+
+  try {
+    for (const payload of [
+      { text: { value: "Orange juice is ready." }, targetLocale: "es-PR" },
+      { text: "Orange juice is ready.", targetLocale: "es-PR", provider: { name: "auto" } },
+      { text: "Orange juice is ready.", targetLocale: "es-PR", formality: ["auto"] },
+    ]) {
+      const response = await fetch(`${baseUrl}/api/translate`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const body = await response.json();
+
+      assert.equal(response.status, 400);
+      assert.equal(body.ok, false);
+      assert.match(body.error, /must be a string/);
+    }
+    assert.equal(called, false);
   } finally {
     server.close();
   }
