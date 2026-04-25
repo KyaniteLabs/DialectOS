@@ -51,6 +51,7 @@ export class TranslationMemory {
   private readonly data = new Map<string, CacheEntry>();
   private persistPromise: Promise<void> | null = null;
   private pendingPersist = false;
+  private persistGeneration = 0;
 
   constructor(options: TranslationMemoryOptions = {}) {
     const cacheDir = this.resolveCacheDir(options.cacheDir);
@@ -87,9 +88,19 @@ export class TranslationMemory {
       if (parsed.version !== CACHE_VERSION) {
         return;
       }
+      if (!parsed.entries || typeof parsed.entries !== "object" || Array.isArray(parsed.entries)) {
+        return;
+      }
       const now = Date.now();
       for (const [key, entry] of Object.entries(parsed.entries)) {
-        if (entry.expiresAt > now) {
+        if (
+          entry &&
+          typeof entry === "object" &&
+          typeof entry.expiresAt === "number" &&
+          entry.expiresAt > now &&
+          entry.result &&
+          typeof entry.result === "object"
+        ) {
           this.data.set(key, entry);
         }
       }
@@ -99,6 +110,8 @@ export class TranslationMemory {
   }
 
   private async doPersist(): Promise<void> {
+    const generation = this.persistGeneration;
+
     try {
       await fs.promises.mkdir(path.dirname(this.cachePath), { recursive: true });
     } catch {
@@ -112,7 +125,17 @@ export class TranslationMemory {
 
     const tempPath = createSecureTempPath(this.cachePath);
     await fs.promises.writeFile(tempPath, JSON.stringify(payload), "utf-8");
-    await fs.promises.rename(tempPath, this.cachePath);
+
+    // Only rename if generation hasn't changed (clear() wasn't called during persist)
+    if (generation === this.persistGeneration) {
+      await fs.promises.rename(tempPath, this.cachePath);
+    } else {
+      try {
+        await fs.promises.unlink(tempPath);
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
   }
 
   /**
@@ -126,11 +149,11 @@ export class TranslationMemory {
     targetLang: string,
     options?: TranslateOptions
   ): string {
-    const normalizedText = text.trim().replace(/\s+/g, " ");
+    const normalizedText = (text ?? "").trim().replace(/\s+/g, " ");
     const payload = JSON.stringify({
       text: normalizedText,
-      sourceLang: sourceLang.toLowerCase(),
-      targetLang: targetLang.toLowerCase(),
+      sourceLang: (sourceLang ?? "").toLowerCase(),
+      targetLang: (targetLang ?? "").toLowerCase(),
       dialect: options?.dialect,
       formality: options?.formality,
       context: options?.context,
@@ -155,7 +178,8 @@ export class TranslationMemory {
     }
 
     entry.lastAccessedAt = Date.now();
-    return { result: entry.result, expiresAt: entry.expiresAt };
+    // Return a shallow copy to prevent callers from mutating the cached object
+    return { result: { ...entry.result }, expiresAt: entry.expiresAt };
   }
 
   /**
@@ -179,8 +203,8 @@ export class TranslationMemory {
       }
     }
 
-    // LRU eviction if at capacity
-    if (this.data.size >= this.maxSize && !this.data.has(key)) {
+    // LRU eviction if at capacity (maxSize <= 0 disables eviction / allows unbounded)
+    if (this.maxSize > 0 && this.data.size >= this.maxSize && !this.data.has(key)) {
       let lruKey: string | null = null;
       let lruTime = Infinity;
       for (const [k, v] of this.data) {
@@ -209,16 +233,24 @@ export class TranslationMemory {
       return;
     }
 
-    this.persistPromise = this.doPersist();
+    this.persistPromise = this.runPersistLoop();
     await this.persistPromise;
+  }
 
-    while (this.pendingPersist) {
+  private async runPersistLoop(): Promise<void> {
+    try {
+      await this.doPersist();
+      while (this.pendingPersist) {
+        this.pendingPersist = false;
+        await this.doPersist();
+      }
+    } catch {
+      // Persist failure should not deadlock future writes.
+      // In-memory cache continues to work; disk will retry on next write.
+    } finally {
       this.pendingPersist = false;
-      this.persistPromise = this.doPersist();
-      await this.persistPromise;
+      this.persistPromise = null;
     }
-
-    this.persistPromise = null;
   }
 
   /**
@@ -226,6 +258,7 @@ export class TranslationMemory {
    */
   async clear(): Promise<void> {
     this.data.clear();
+    this.persistGeneration++;
     try {
       await fs.promises.unlink(this.cachePath);
     } catch {

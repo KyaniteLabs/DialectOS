@@ -29,11 +29,11 @@ export interface BackstopResult {
 const NEGATION_WORDS_EN = new Set([
   "not", "no", "never", "nothing", "nobody", "nowhere", "neither", "nor",
   "none", "without", "lack", "absent", "refuse", "deny", "decline",
-  "reject", "prevent", "avoid", "stop", "cease",
+  "reject", "prevent", "avoid", "stop", "cease", "cannot",
 ]);
 
 const NEGATION_WORDS_ES = new Set([
-  "no", "nunca", "jamás", "nada", "nadie", "ninguno", "ninguna",
+  "no", "nunca", "jamás", "nada", "nadie", "ninguno", "ninguna", "ningún",
   "ni", "sin", "falta", "ausente", "rechazar", "negar", "rehusar",
   "evitar", "impedir", "detener", "parar", "carecer",
 ]);
@@ -79,6 +79,10 @@ const STOP_WORDS_ES = new Set([
   "después", "antes", "luego", "pronto", "siempre", "nunca",
 ]);
 
+function normalizeText(text: string): string {
+  return (text ?? "").normalize("NFC");
+}
+
 function isNegationWord(word: string, lang: "en" | "es"): boolean {
   const set = lang === "en" ? NEGATION_WORDS_EN : NEGATION_WORDS_ES;
   return set.has(word.toLowerCase());
@@ -86,21 +90,52 @@ function isNegationWord(word: string, lang: "en" | "es"): boolean {
 
 function extractContentWords(text: string, lang: "en" | "es"): string[] {
   const stopWords = lang === "en" ? STOP_WORDS_EN : STOP_WORDS_ES;
-  return text
+  return normalizeText(text)
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .split(/\s+/)
     .filter((w) => w.length >= 3 && !stopWords.has(w));
 }
 
+function expandContractions(text: string): string {
+  // Expand common English negation contractions BEFORE stripping punctuation
+  return text
+    .replace(/\bcan't\b/gi, "can not")
+    .replace(/\bwon't\b/gi, "will not")
+    .replace(/\bdon't\b/gi, "do not")
+    .replace(/\bdoesn't\b/gi, "does not")
+    .replace(/\bdidn't\b/gi, "did not")
+    .replace(/\bisn't\b/gi, "is not")
+    .replace(/\baren't\b/gi, "are not")
+    .replace(/\bwasn't\b/gi, "was not")
+    .replace(/\bweren't\b/gi, "were not")
+    .replace(/\bhaven't\b/gi, "have not")
+    .replace(/\bhasn't\b/gi, "has not")
+    .replace(/\bhadn't\b/gi, "had not")
+    .replace(/\bwouldn't\b/gi, "would not")
+    .replace(/\bcouldn't\b/gi, "could not")
+    .replace(/\bshouldn't\b/gi, "should not")
+    .replace(/\bmightn't\b/gi, "might not")
+    .replace(/\bmustn't\b/gi, "must not")
+    .replace(/\bshan't\b/gi, "shall not")
+    .replace(/\bneedn't\b/gi, "need not");
+}
+
 function countNegations(text: string, lang: "en" | "es"): number {
-  const words = text.toLowerCase().split(/\s+/);
+  let processed = normalizeText(text).toLowerCase();
+  if (lang === "en") {
+    processed = expandContractions(processed);
+  }
+  const words = processed
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 0);
   return words.filter((w) => isNegationWord(w, lang)).length;
 }
 
 function computeKeywordOverlap(sourceWords: string[], translatedWords: string[]): number {
-  if (sourceWords.length === 0) return 1;
-  if (translatedWords.length === 0) return 0;
+  if (sourceWords.length === 0 && translatedWords.length === 0) return 1;
+  if (sourceWords.length === 0 || translatedWords.length === 0) return 0;
 
   const sourceSet = new Set(sourceWords);
   const translatedSet = new Set(translatedWords);
@@ -117,14 +152,52 @@ function computeKeywordOverlap(sourceWords: string[], translatedWords: string[])
   return matches / union.size;
 }
 
+const ABBREVIATIONS = new Set([
+  "mr", "mrs", "ms", "dr", "prof", "sr", "sra", "st", "jr",
+  "etc", "eg", "ie", "vs", "vol", "vols", "inc", "ltd", "corp",
+  "am", "pm", "ej",
+]);
+
+const PROTECT = "\uE000";
+
+function protectAbbreviations(text: string): string {
+  return normalizeText(text)
+    .replace(/\bp\.\s*ej\./gi, `p${PROTECT} ej${PROTECT}`)
+    .replace(/\be\.g\./gi, `e${PROTECT}g${PROTECT}`)
+    .replace(/\bi\.e\./gi, `i${PROTECT}e${PROTECT}`)
+    .replace(/\ba\.m\./gi, `a${PROTECT}m${PROTECT}`)
+    .replace(/\bp\.m\./gi, `p${PROTECT}m${PROTECT}`);
+}
+
+function restoreAbbreviations(text: string): string {
+  return text.replace(new RegExp(PROTECT, "g"), ".");
+}
+
+function splitSentences(text: string): string[] {
+  let protectedText = protectAbbreviations(text);
+  for (const abbr of ABBREVIATIONS) {
+    const regex = new RegExp(`\\b${abbr.replace(/\./g, "\\.")}\\.`, "giu");
+    protectedText = protectedText.replace(regex, (match) => match.replace(/\./g, PROTECT));
+  }
+  return protectedText
+    .split(/[.!?]+/)
+    .map((s) => restoreAbbreviations(s).trim())
+    .filter((s) => s.length > 0);
+}
+
 function computeStructuralParity(source: string, translated: string): number {
-  // Split on sentence terminators, but don't split on abbreviations (e.g., "Mr.", "Dr.", "e.g.")
-  const sentencePattern = /(?<!\b(?:Mr|Mrs|Ms|Dr|Prof|Sr|Sra|St|vs|vol|vols|inc|ltd|Jr|Sr|e\.g|i\.e|etc|a\.m|p\.m))(?:[.!?]+)(?:\s+|$)/i;
-  const sourceSentences = source.split(sentencePattern).filter((s) => s.trim().length > 0);
-  const translatedSentences = translated.split(sentencePattern).filter((s) => s.trim().length > 0);
+  const sourceSentences = splitSentences(source);
+  const translatedSentences = splitSentences(translated);
 
   const sourceParagraphs = source.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
   const translatedParagraphs = translated.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
+
+  // If one side is empty and the other is not, structural parity is 0
+  const sourceEmpty = sourceSentences.length === 0 && sourceParagraphs.length === 0;
+  const translatedEmpty = translatedSentences.length === 0 && translatedParagraphs.length === 0;
+  if ((sourceEmpty && !translatedEmpty) || (!sourceEmpty && translatedEmpty)) {
+    return 0;
+  }
 
   const sentenceRatio = sourceSentences.length > 0
     ? translatedSentences.length / sourceSentences.length
@@ -153,9 +226,13 @@ export function runSemanticBackstop(
   translated: string,
   heuristicScore: number
 ): BackstopResult {
+  // Guard against null/undefined inputs
+  const safeSource = source ?? "";
+  const safeTranslated = translated ?? "";
+
   // Negation preservation: compare negation counts
-  const sourceNegations = countNegations(source, "en");
-  const translatedNegations = countNegations(translated, "es");
+  const sourceNegations = countNegations(safeSource, "en");
+  const translatedNegations = countNegations(safeTranslated, "es");
   // If source has negations, translated should too. Allow for some variation.
   let negationPreservation: number;
   if (sourceNegations === 0 && translatedNegations === 0) {
@@ -170,12 +247,12 @@ export function runSemanticBackstop(
   }
 
   // Keyword overlap on content words
-  const sourceWords = extractContentWords(source, "en");
-  const translatedWords = extractContentWords(translated, "es");
+  const sourceWords = extractContentWords(safeSource, "en");
+  const translatedWords = extractContentWords(safeTranslated, "es");
   const keywordOverlap = computeKeywordOverlap(sourceWords, translatedWords);
 
   // Structural parity
-  const structuralParity = computeStructuralParity(source, translated);
+  const structuralParity = computeStructuralParity(safeSource, safeTranslated);
 
   // Weighted backstop score
   // Negation is critical (40%), keywords matter (40%), structure is a signal (20%)
@@ -225,16 +302,25 @@ export function combinedSemanticCheck(
   passed: boolean;
   negationDropped?: boolean;
 } {
-  const primary = calculateSemanticSimilarity(source, translated);
+  const safeSource = source ?? "";
+  const safeTranslated = translated ?? "";
+
+  let primary: { score: number };
+  try {
+    primary = calculateSemanticSimilarity(safeSource, safeTranslated);
+  } catch {
+    // Primary scorer failed — fall back to safe defaults
+    primary = { score: 0 };
+  }
 
   // Mandatory negation check: source has negation but translation doesn't = fail
-  const sourceNegations = countNegations(source, "en");
-  const translatedNegations = countNegations(translated, "es");
+  const sourceNegations = countNegations(safeSource, "en");
+  const translatedNegations = countNegations(safeTranslated, "es");
   const negationDropped = sourceNegations > 0 && translatedNegations === 0;
 
   if (negationDropped) {
     // Run backstop anyway to get detailed diagnostics
-    const backstop = runSemanticBackstop(source, translated, primary.score);
+    const backstop = runSemanticBackstop(safeSource, safeTranslated, primary.score);
     return {
       finalScore: 0.1,
       primaryScore: primary.score,
@@ -253,7 +339,7 @@ export function combinedSemanticCheck(
     };
   }
 
-  const backstop = runSemanticBackstop(source, translated, primary.score);
+  const backstop = runSemanticBackstop(safeSource, safeTranslated, primary.score);
   const finalScore = backstop.adequate
     ? Math.max(primary.score, 0.45) // Boost to passing if backstop confirms
     : primary.score;
