@@ -69,9 +69,9 @@ export function detectGrammarFeatures(text: string): GrammarFeatures {
 
   // Leísmo: "le/les" used with direct-object verbs (masculine animate)
   // This is a heuristic — we look for "le/les" before common person-directed verbs
-  const leismoTriggers = [
+  const leismoTriggers = new Set([
     "vi", "veo", "viendo", "visto",
-    "encontré", "encontré", "saludé", "llamé", "conocí", "visité",
+    "encontré", "saludé", "llamé", "conocí", "visité",
     "ayudé", "invité", "besé", "abrazé", "quiero", "amo", "respeto",
     "escuché", "esperé", "busqué", "perdí", "gané", "vencí",
     "tomé", "llevé", "doy", "daré",
@@ -88,23 +88,23 @@ export function detectGrammarFeatures(text: string): GrammarFeatures {
     "puse", "metí", "tiré", "arrojé", "lancé", "disparé",
     "acerté", "erré", "equivogué", "fallé", "fracasé",
     "triunfé", "vencí", "gané", "perdí",
-  ];
+  ]);
   const hasLeismo = /\b(le|les)\b/.test(lower) &&
-    leismoTriggers.some((verb) => lower.includes("le " + verb) || lower.includes("les " + verb));
+    Array.from(leismoTriggers).some((verb) => lower.includes("le " + verb) || lower.includes("les " + verb));
 
   // Laísmo: "la/las" used with indirect-object verbs
-  const laismoVerbs = [
+  const laismoVerbs = new Set([
     "di", "dio", "da", "dan", "dando", "dado", "doy", "dieron",
     "pregunté", "contesté", "respondí", "expliqué", "dije",
     "conté", "repetí", "grité", "susurré", "confesé",
     "revelé", "oculté", "escondí",
-  ];
+  ]);
   const hasLaismo = /\b(la|las)\b/.test(lower) &&
-    laismoVerbs.some((verb) => lower.includes("la " + verb) || lower.includes("las " + verb));
+    Array.from(laismoVerbs).some((verb) => lower.includes("la " + verb) || lower.includes("las " + verb));
 
   // Loísmo: "lo/los" used with indirect-object verbs
   const hasLoismo = /\b(lo|los)\b/.test(lower) &&
-    laismoVerbs.some((verb) => lower.includes("lo " + verb) || lower.includes("los " + verb));
+    Array.from(laismoVerbs).some((verb) => lower.includes("lo " + verb) || lower.includes("los " + verb));
 
   return {
     hasVoseo,

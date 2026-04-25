@@ -118,8 +118,10 @@ function computeKeywordOverlap(sourceWords: string[], translatedWords: string[])
 }
 
 function computeStructuralParity(source: string, translated: string): number {
-  const sourceSentences = source.split(/[.!?]+/).filter((s) => s.trim().length > 0);
-  const translatedSentences = translated.split(/[.!?]+/).filter((s) => s.trim().length > 0);
+  // Split on sentence terminators, but don't split on abbreviations (e.g., "Mr.", "Dr.", "e.g.")
+  const sentencePattern = /(?<!\b(?:Mr|Mrs|Ms|Dr|Prof|Sr|Sra|St|vs|vol|vols|inc|ltd|Jr|Sr|e\.g|i\.e|etc|a\.m|p\.m))(?:[.!?]+)(?:\s+|$)/i;
+  const sourceSentences = source.split(sentencePattern).filter((s) => s.trim().length > 0);
+  const translatedSentences = translated.split(sentencePattern).filter((s) => s.trim().length > 0);
 
   const sourceParagraphs = source.split(/\n\s*\n/).filter((p) => p.trim().length > 0);
   const translatedParagraphs = translated.split(/\n\s*\n/).filter((p) => p.trim().length > 0);

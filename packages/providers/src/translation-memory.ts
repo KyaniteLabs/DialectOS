@@ -49,6 +49,8 @@ export class TranslationMemory {
   private readonly maxSize: number;
   private readonly defaultTtlMs: number;
   private readonly data = new Map<string, CacheEntry>();
+  private persistPromise: Promise<void> | null = null;
+  private pendingPersist = false;
 
   constructor(options: TranslationMemoryOptions = {}) {
     const cacheDir = this.resolveCacheDir(options.cacheDir);
@@ -96,7 +98,7 @@ export class TranslationMemory {
     }
   }
 
-  private async persist(): Promise<void> {
+  private async doPersist(): Promise<void> {
     try {
       await fs.promises.mkdir(path.dirname(this.cachePath), { recursive: true });
     } catch {
@@ -116,6 +118,7 @@ export class TranslationMemory {
   /**
    * Compute a SHA-256 cache key from request parameters.
    * Includes text, sourceLang, targetLang, dialect, formality, and context.
+   * Text is normalized (trimmed, whitespace collapsed) before hashing.
    */
   computeKey(
     text: string,
@@ -123,8 +126,9 @@ export class TranslationMemory {
     targetLang: string,
     options?: TranslateOptions
   ): string {
+    const normalizedText = text.trim().replace(/\s+/g, " ");
     const payload = JSON.stringify({
-      text,
+      text: normalizedText,
       sourceLang: sourceLang.toLowerCase(),
       targetLang: targetLang.toLowerCase(),
       dialect: options?.dialect,
@@ -137,6 +141,7 @@ export class TranslationMemory {
   /**
    * Retrieve a cached translation by key.
    * Returns null if missing or expired.
+   * Expired entries are removed lazily (no immediate disk write).
    */
   async get(key: string): Promise<CachedTranslation | null> {
     const entry = this.data.get(key);
@@ -146,7 +151,6 @@ export class TranslationMemory {
 
     if (entry.expiresAt <= Date.now()) {
       this.data.delete(key);
-      await this.persist();
       return null;
     }
 
@@ -156,16 +160,22 @@ export class TranslationMemory {
 
   /**
    * Store a translation result in the cache.
-   * Evicts expired entries first, then LRU if still at capacity.
+   * Evicts expired entries periodically (every 100 writes), then LRU if at capacity.
+   * Serializes disk writes to prevent race condition corruption.
    */
+  private writeCount = 0;
+
   async set(key: string, result: TranslationResult, ttlMs?: number): Promise<void> {
     const now = Date.now();
     const expiresAt = now + (ttlMs ?? this.defaultTtlMs);
 
-    // Evict expired entries first
-    for (const [k, v] of this.data) {
-      if (v.expiresAt <= now) {
-        this.data.delete(k);
+    // Evict expired entries periodically (every 100 writes) to amortize cost
+    this.writeCount++;
+    if (this.writeCount % 100 === 0) {
+      for (const [k, v] of this.data) {
+        if (v.expiresAt <= now) {
+          this.data.delete(k);
+        }
       }
     }
 
@@ -190,7 +200,25 @@ export class TranslationMemory {
       lastAccessedAt: now,
     });
 
-    await this.persist();
+    await this.enqueuePersist();
+  }
+
+  private async enqueuePersist(): Promise<void> {
+    if (this.persistPromise) {
+      this.pendingPersist = true;
+      return;
+    }
+
+    this.persistPromise = this.doPersist();
+    await this.persistPromise;
+
+    while (this.pendingPersist) {
+      this.pendingPersist = false;
+      this.persistPromise = this.doPersist();
+      await this.persistPromise;
+    }
+
+    this.persistPromise = null;
   }
 
   /**

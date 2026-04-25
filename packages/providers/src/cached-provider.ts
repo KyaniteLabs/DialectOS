@@ -48,7 +48,7 @@ export class CachedProvider implements TranslationProvider {
         supportsDialect: false,
         supportedSourceLangs: [],
         supportedTargetLangs: [],
-        maxPayloadChars: 0,
+        maxPayloadChars: 50_000, // generous default; unknown capability should not block
         dialectHandling: "none",
       }
     );
