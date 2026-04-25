@@ -248,10 +248,13 @@ describe("detectGrammarFeatures", () => {
 
   describe("mixed features", () => {
     it("detects multiple features simultaneously", () => {
-      const result = detectGrammarFeatures("Vosotros le visteis y vos le querés");
+      const result = detectGrammarFeatures("Vosotros le vi, vos la di, ustedes lo dio");
       expect(result.hasVoseo).toBe(true);
       expect(result.hasVosotros).toBe(true);
+      expect(result.hasUstedes).toBe(true);
       expect(result.hasLeismo).toBe(true);
+      expect(result.hasLaismo).toBe(true);
+      expect(result.hasLoismo).toBe(true);
     });
 
     it("detects voseo + leísmo when both features present", () => {

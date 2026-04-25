@@ -21,7 +21,8 @@ export interface SemanticScore {
  * Extract simple word-like tokens from text.
  */
 function tokenize(text: string): string[] {
-  return text
+  return (text ?? "")
+    .normalize("NFC")
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .split(/\s+/)
@@ -32,12 +33,13 @@ function tokenize(text: string): string[] {
  * Extract potential named entities (capitalized words, numbers, codes).
  */
 function extractEntities(text: string): string[] {
+  const safe = (text ?? "").normalize("NFC");
   const entities = new Set<string>();
   // Multi-word capitalized phrases (proper nouns like "Kyanite Labs")
-  const phrases = text.match(/\b[A-Z][a-zA-Z0-9]*(?:\s+[A-Z][a-zA-Z0-9]*)+\b/g);
+  const phrases = safe.match(/\b[A-Z][a-zA-Z0-9]*(?:\s+[A-Z][a-zA-Z0-9]*)+\b/g);
   if (phrases) phrases.forEach((e) => entities.add(e.toLowerCase().replace(/\s+/g, "_")));
   // Single capitalized words (exclude sentence-initial common words)
-  const capitalized = text.match(/\b[A-Z][a-zA-Z0-9]{2,}\b/g);
+  const capitalized = safe.match(/\b[A-Z][a-zA-Z0-9]{2,}\b/g);
   if (capitalized) {
     const commonWords = new Set(["the", "and", "for", "are", "but", "not", "you", "all", "can", "had", "her", "was", "one", "our", "out", "day", "get", "has", "him", "his", "how", "its", "may", "new", "now", "old", "see", "two", "way", "who", "boy", "did", "she", "use", "her", "man", "men", "run", "say", "too", "ago", "air", "art", "bad", "big", "bit", "car", "dog", "eat", "far", "few", "fun", "got", "guy", "hit", "hot", "job", "kid", "law", "let", "lot", "low", "mom", "mud", "nod", "own", "pay", "pen", "pie", "pop", "put", "red", "sad", "sat", "set", "sin", "sir", "sit", "six", "sky", "son", "sun", "tab", "tag", "tan", "ten", "tie", "tin", "tip", "toe", "ton", "top", "toy", "try", "tub", "tug", "van", "vet", "via", "war", "wet", "win", "won", "wow", "yes", "yet", "zip", "el", "la", "los", "las", "un", "una", "de", "del", "al", "en", "es", "son", "por", "con", "para", "pero", "más", "muy", "sus", "les", "nos", "sin", "sobre", "entre", "desde", "todo", "todos", "esta", "este", "esto", "estos", "estas", "ese", "eso", "esos", "esas", "cada", "otro", "otra", "otros", "otras", "mismo", "misma", "mismos", "mismas", "tan", "tanto", "tanta", "tantos", "tantas", "cómo", "qué", "quién", "cuál", "cuándo", "dónde", "por_qué"]);
     capitalized.forEach((e) => {
@@ -46,7 +48,7 @@ function extractEntities(text: string): string[] {
     });
   }
   // Mixed alphanumeric codes and acronyms (API, JSON, MCP, v2, etc.)
-  const codes = text.match(/\b[A-Z]{2,}\b|\b[A-Za-z]+[0-9][A-Za-z0-9]*\b/g);
+  const codes = safe.match(/\b[A-Z]{2,}\b|\b[A-Za-z]+[0-9][A-Za-z0-9]*\b/g);
   if (codes) codes.forEach((e) => entities.add(e.toLowerCase()));
   return Array.from(entities);
 }
@@ -84,6 +86,11 @@ function calculateCrossLingualPresence(source: string, translated: string): numb
 
   // Empty translation is a total failure
   if (trimmedTranslated.length === 0) {
+    return 0;
+  }
+
+  // Empty source with non-empty translation is also suspicious
+  if (trimmedSource.length === 0) {
     return 0;
   }
 
@@ -131,7 +138,9 @@ export function calculateSemanticSimilarity(
   source: string,
   translated: string
 ): SemanticScore {
-  const crossLingualPresence = calculateCrossLingualPresence(source, translated);
+  const safeSource = (source ?? "").normalize("NFC");
+  const safeTranslated = (translated ?? "").normalize("NFC");
+  const crossLingualPresence = calculateCrossLingualPresence(safeSource, safeTranslated);
 
   // If source and target are identical (common LLM failure), nuke the score.
   if (crossLingualPresence === 0) {
@@ -145,8 +154,8 @@ export function calculateSemanticSimilarity(
 
   // Length ratio: penalize translations that are very short or very long.
   // Spanish is typically ~15% longer than English; allow 0.5x to 2.0x range.
-  const sourceLen = source.trim().length;
-  const translatedLen = translated.trim().length;
+  const sourceLen = safeSource.trim().length;
+  const translatedLen = safeTranslated.trim().length;
   const rawRatio = sourceLen > 0 ? translatedLen / sourceLen : 1;
   // Map ratio to score: 1.0 = perfect, 0.4 or 2.5 = poor
   const lengthRatio =
@@ -155,8 +164,8 @@ export function calculateSemanticSimilarity(
       : clamp(rawRatio * 2, 0, 1);
 
   // Entity preservation
-  const sourceEntities = extractEntities(source);
-  const translatedEntities = extractEntities(translated);
+  const sourceEntities = extractEntities(safeSource);
+  const translatedEntities = extractEntities(safeTranslated);
   const entityPreservation =
     sourceEntities.length === 0
       ? 1
