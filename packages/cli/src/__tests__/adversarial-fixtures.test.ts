@@ -10,6 +10,7 @@ import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createTranslateReadmeCommand } from "../commands/translate-readme.js";
+import { restoreProtectedTokens } from "../lib/token-protection.js";
 import type { TranslationProvider } from "@espanol/types";
 import type { ProviderRegistry } from "@espanol/providers";
 
@@ -308,6 +309,64 @@ describe("adversarial fixture corpus", () => {
           "permissive",
         ])
       ).resolves.not.toThrow();
+    });
+  });
+
+  describe("checkpoint path traversal protection", () => {
+    it("blocks auto-generated checkpoint path traversal via --output", async () => {
+      const content = "# Hello\n\nWorld.";
+      const inputFile = path.join(testDir, "traversal-input.md");
+      await fs.writeFile(inputFile, content);
+
+      const registry = new MockRegistry(
+        new AdversarialProvider("normal")
+      ) as ProviderRegistry;
+
+      // --output with traversal should cause validateFilePath to reject the checkpoint
+      await expect(
+        executeCommand(registry, [
+          inputFile,
+          "--output",
+          "../../../etc/passwd.txt",
+          "--dialect",
+          "es-ES",
+        ])
+      ).rejects.toThrow();
+    });
+  });
+
+  describe("token protection ReDoS resistance", () => {
+    it("completes quickly with adversarial long placeholders", () => {
+      const longPlaceholder = "__ESPANOL_TOKEN_0__" + "_".repeat(5000);
+      const replacements = new Map<string, string>([
+        [longPlaceholder, "safe-token"],
+      ]);
+      const text = "some translated text with " + longPlaceholder;
+
+      const start = Date.now();
+      const result = restoreProtectedTokens(text, replacements);
+      const elapsed = Date.now() - start;
+
+      expect(elapsed).toBeLessThan(500);
+      expect(result).toContain("safe-token");
+    });
+
+    it("is safe with regex metacharacters in placeholders", () => {
+      const maliciousPlaceholder = "__ESPANOL_TOKEN_(a+)+__";
+      const replacements = new Map<string, string>([
+        [maliciousPlaceholder, "safe-token"],
+      ]);
+      // Exact match is handled by split/join; regex path is exercised but
+      // word boundaries may prevent matching normalized forms with non-word
+      // trailing chars. The critical property is that it does not hang.
+      const text = "translated text containing " + maliciousPlaceholder;
+
+      const start = Date.now();
+      const result = restoreProtectedTokens(text, replacements);
+      const elapsed = Date.now() - start;
+
+      expect(elapsed).toBeLessThan(500);
+      expect(result).toContain("safe-token");
     });
   });
 });
