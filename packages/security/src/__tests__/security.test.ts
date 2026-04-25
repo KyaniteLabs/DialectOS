@@ -552,6 +552,48 @@ describe("createSecureTempPath", () => {
   });
 });
 
+describe("RateLimiter memory bounds", () => {
+  it("caps internal array size to prevent unbounded growth", async () => {
+    const limiter = new RateLimiter(5, 1000);
+    // Rapid-fire acquires that exceed the limit — the internal array
+    // must not grow beyond the hard cap.
+    for (let i = 0; i < 5000; i++) {
+      try {
+        await limiter.acquire();
+      } catch {
+        // expected after the first 5
+      }
+    }
+    const bucket = (limiter as any).buckets.get("default");
+    expect(bucket.requests.length).toBeLessThanOrEqual(1000);
+  });
+
+  it("performs lazy cleanup of stale buckets when map grows large", async () => {
+    const limiter = new RateLimiter(5, 100);
+    // Create many distinct bucket keys
+    for (let i = 0; i < 1100; i++) {
+      try {
+        await limiter.acquire(`key-${i}`);
+      } catch {
+        // ignore
+      }
+    }
+    expect((limiter as any).buckets.size).toBeLessThanOrEqual(1100);
+
+    // Wait for window to expire
+    await new Promise((r) => setTimeout(r, 250));
+
+    // Trigger cleanup path
+    try {
+      await limiter.acquire("trigger");
+    } catch {
+      // ignore
+    }
+
+    expect((limiter as any).buckets.size).toBeLessThan(1100);
+  });
+});
+
 describe("Constants", () => {
   it("should export MAX_FILE_SIZE as 512KB", () => {
     expect(MAX_FILE_SIZE).toBe(512 * 1024);

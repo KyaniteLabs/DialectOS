@@ -168,7 +168,7 @@ export class MyMemoryProvider implements TranslationProvider {
         splitAt = segments.slice(0, graphemeIdx).reduce((sum, s) => sum + s.segment.length, 0);
       }
 
-      const cut = window.slice(0, splitAt).length;
+      const cut = splitAt;
       chunks.push(remaining.slice(0, cut));
       remaining = remaining.slice(cut);
     }

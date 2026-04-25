@@ -5,6 +5,8 @@
 
 import type { TranslationProvider, ProviderCapability, TranslateOptions } from "./types.js";
 import { CircuitBreaker } from "./circuit-breaker.js";
+import { TranslationMemory } from "./translation-memory.js";
+import { CachedProvider } from "./cached-provider.js";
 
 interface ProviderEntry {
   provider: TranslationProvider;
@@ -26,6 +28,7 @@ export interface PreparedProviderRequest {
 export class ProviderRegistry {
   private providers = new Map<string, ProviderEntry>();
   private roundRobinIndex = new Map<string, number>();
+  private cache?: TranslationMemory;
 
   private canonicalName(name: string): string {
     if (name === "libre") return "libretranslate";
@@ -34,21 +37,33 @@ export class ProviderRegistry {
 
   constructor(
     private readonly failureThreshold: number = 5,
-    private readonly resetTimeoutMs: number = 60000
-  ) {}
+    private readonly resetTimeoutMs: number = 60000,
+    useCache: boolean = false,
+    cache?: TranslationMemory
+  ) {
+    if (useCache || cache) {
+      this.cache = cache ?? new TranslationMemory();
+    }
+  }
 
   /**
    * Register a translation provider
    */
-  register(provider: TranslationProvider): void {
+  register(provider: TranslationProvider, useCache?: boolean): void {
+    let wrappedProvider = provider;
+    const shouldCache = useCache ?? (this.cache !== undefined);
+    if (shouldCache && this.cache) {
+      wrappedProvider = new CachedProvider(provider, this.cache);
+    }
+
     // Use the provider's own circuit breaker if available to avoid
     // the double-breaker anti-pattern where registry and provider
     // maintain separate, desynchronized breakers.
     const breaker =
-      (provider as unknown as { getCircuitBreaker?(): CircuitBreaker }).getCircuitBreaker?.() ??
+      (wrappedProvider as unknown as { getCircuitBreaker?(): CircuitBreaker }).getCircuitBreaker?.() ??
       new CircuitBreaker(this.failureThreshold, this.resetTimeoutMs);
 
-    this.providers.set(provider.name, { provider, breaker });
+    this.providers.set(provider.name, { provider: wrappedProvider, breaker });
   }
 
   /**

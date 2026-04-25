@@ -1375,6 +1375,212 @@ describe("Provider capabilities", () => {
   });
 });
 
+describe("Adversarial security boundaries", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(global.fetch).mockClear();
+  });
+
+  describe("LibreTranslate endpoint validation (SSRF prevention)", () => {
+    const originalEnv = process.env.LIBRETRANSLATE_URL;
+
+    afterEach(() => {
+      if (originalEnv !== undefined) {
+        process.env.LIBRETRANSLATE_URL = originalEnv;
+      } else {
+        delete process.env.LIBRETRANSLATE_URL;
+      }
+    });
+
+    it.each([
+      ["http://169.254.169.254/latest/meta-data/", "AWS IMDS"],
+      ["http://localhost:8080/translate", "localhost"],
+      ["http://127.0.0.1:8080/translate", "127.0.0.1"],
+      ["http://10.0.0.1/translate", "10.x private"],
+      ["http://192.168.1.1/translate", "192.168.x private"],
+      ["http://172.16.0.1/translate", "172.16.x private"],
+      ["ftp://evil.com/translate", "non-HTTP(S) protocol"],
+      ["file:///etc/passwd", "file protocol"],
+    ])("rejects %s (%s)", (endpoint, _label) => {
+      delete process.env.LIBRETRANSLATE_URL;
+      expect(() => new LibreTranslateProvider({ endpoint })).toThrow();
+    });
+
+    it("accepts public HTTP and HTTPS endpoints", () => {
+      delete process.env.LIBRETRANSLATE_URL;
+      expect(() => new LibreTranslateProvider({ endpoint: "https://libretranslate.com" })).not.toThrow();
+      expect(() => new LibreTranslateProvider({ endpoint: "http://libretranslate.de" })).not.toThrow();
+    });
+  });
+
+  describe("DeepL key redaction in errors", () => {
+    it("redacts DeepL free-tier keys (UUID:fx) via sanitizeErrorMessage", () => {
+      const key = "a1b2c3d4-e5f6-7890-abcd-ef1234567890:fx";
+      const message = `DeepL auth failed for key ${key}`;
+      const result = sanitizeErrorMessage(message);
+      expect(result).not.toContain(key);
+      expect(result).toContain("[REDACTED]");
+    });
+
+    it("redacts bare DeepL UUID keys without :fx suffix", () => {
+      const key = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+      const message = `DeepL auth failed for key ${key}`;
+      const result = sanitizeErrorMessage(message);
+      expect(result).not.toContain(key);
+      expect(result).toContain("[REDACTED]");
+    });
+
+    it("redacts DeepL keys in provider error output", async () => {
+      const key = "deadbeef-1234-5678-9abc-def012345678:fx";
+      const mockClient = {
+        translateText: vi.fn().mockRejectedValue(
+          new Error(`Authorization failed for ${key}`)
+        ),
+      };
+
+      const provider = new DeepLProvider(key, mockClient as any);
+      await expect(provider.translate("Hello", "en", "es")).rejects.toThrow();
+      try {
+        await provider.translate("Hello", "en", "es");
+      } catch (error) {
+        expect((error as Error).message).not.toContain(key);
+        expect((error as Error).message).toContain("[REDACTED]");
+      }
+    });
+  });
+
+  describe("MyMemory 4xx behavior", () => {
+    it("does not retry on 400 Bad Request", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        headers: { get: () => null },
+      } as any);
+
+      const provider = new MyMemoryProvider({ maxRetries: 3, retryDelayMs: 1 });
+      await expect(provider.translate("Hello", "en", "es")).rejects.toThrow();
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not retry on 403 Forbidden", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: false,
+        status: 403,
+        statusText: "Forbidden",
+        headers: { get: () => null },
+      } as any);
+
+      const provider = new MyMemoryProvider({ maxRetries: 3, retryDelayMs: 1 });
+      await expect(provider.translate("Hello", "en", "es")).rejects.toThrow();
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("MyMemory Unicode chunking", () => {
+    it("preserves emoji surrogate pairs at chunk boundaries", async () => {
+      // Identity mock — returns the exact chunk that was sent
+      vi.mocked(global.fetch).mockImplementation((url: string | Request | URL) => {
+        const q = new URL(url as string).searchParams.get("q") || "";
+        return Promise.resolve({
+          ok: true,
+          headers: {
+            get: (name: string) => {
+              if (name === "content-type") return "application/json";
+              return null;
+            },
+          },
+          json: async () => ({
+            responseData: { translatedText: q },
+            responseStatus: 200,
+          }),
+        } as any);
+      });
+
+      const provider = new MyMemoryProvider({
+        maxRequests: 1000,
+        maxRetries: 0,
+        retryDelayMs: 1,
+      });
+
+      // Place emoji so it straddles the 450-code-unit boundary
+      const text = "a".repeat(449) + "😀" + "b".repeat(200);
+      const result = await provider.translate(text, "en", "es");
+
+      // If surrogate pairs were split, URL encoding would corrupt them and
+      // the reconstructed text would not match the original.
+      expect(result.translatedText).toBe(text);
+
+      const calls = vi.mocked(global.fetch).mock.calls;
+      expect(calls.length).toBeGreaterThan(1);
+    });
+  });
+
+  describe("Response body timeout race", () => {
+    it("times out when response.json() hangs (MyMemory)", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        headers: {
+          get: (name: string) => {
+            if (name === "content-type") return "application/json";
+            return null;
+          },
+        },
+        json: () => new Promise(() => {}), // hangs forever
+      } as any);
+
+      const provider = new MyMemoryProvider({
+        timeoutMs: 50,
+        maxRetries: 0,
+        retryDelayMs: 1,
+      });
+
+      await expect(provider.translate("Hello", "en", "es")).rejects.toThrow(
+        "Response body timed out"
+      );
+    });
+  });
+
+  describe("Malformed JSON handling", () => {
+    it("handles JSON parse errors gracefully (MyMemory)", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        headers: {
+          get: (name: string) => {
+            if (name === "content-type") return "application/json";
+            return null;
+          },
+        },
+        json: async () => {
+          throw new SyntaxError("Unexpected token < in JSON");
+        },
+      } as any);
+
+      const provider = new MyMemoryProvider({ maxRetries: 0, retryDelayMs: 1 });
+      await expect(provider.translate("Hello", "en", "es")).rejects.toThrow();
+    });
+
+    it("handles JSON parse errors gracefully (LibreTranslate)", async () => {
+      vi.mocked(global.fetch).mockResolvedValue({
+        ok: true,
+        headers: {
+          get: (name: string) => {
+            if (name === "content-type") return "application/json";
+            return null;
+          },
+        },
+        json: async () => {
+          throw new SyntaxError("Unexpected token < in JSON");
+        },
+      } as any);
+
+      process.env.LIBRETRANSLATE_URL = "https://libretranslate.com";
+      const provider = new LibreTranslateProvider();
+      await expect(provider.translate("Hello", "en", "es")).rejects.toThrow();
+    });
+  });
+});
+
 describe("ChaosProvider", () => {
   it("should inject timeout errors", async () => {
     const inner: TranslationProvider = {
