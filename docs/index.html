@@ -301,7 +301,9 @@
       </div>
       <div class="receipt-grid">
         <div class="receipt-row"><span class="receipt-label">Inference</span><span class="receipt-value">Model provider stack</span></div>
-        <div class="receipt-row"><span class="receipt-label">Quality</span><span class="receipt-value ok">judge enforced</span></div>
+        <div class="receipt-row"><span class="receipt-label">Quality</span><span class="receipt-value ok">judge + backstop + negation gate</span></div>
+        <div class="receipt-row"><span class="receipt-label">Grammar</span><span class="receipt-value ok">voseo / leísmo / laísmo detection</span></div>
+        <div class="receipt-row"><span class="receipt-label">Cache</span><span class="receipt-value">translation memory (SHA-256 + TTL)</span></div>
         <div class="receipt-row"><span class="receipt-label">Fallback</span><span class="receipt-value">none to static rules</span></div>
         <div class="receipt-row"><span class="receipt-label">Status</span><span id="heroStatus" class="receipt-value warn">checking…</span></div>
       </div>
@@ -372,7 +374,7 @@
           <div class="section-label">Semantic traps</div>
           <h2>The words are not the product. The judgment is.</h2>
         </div>
-        <p>These are the categories that exposed thin translation behavior: regional polysemy, phrase sense, taboo verbs, and grammar norms. The live demo is built to make those failures visible.</p>
+        <p>These are the categories that exposed thin translation behavior: regional polysemy, phrase sense, taboo verbs, grammar norms, and quality drift. The live demo is built to make those failures visible.</p>
       </div>
       <div class="matrix">
         <article class="trap-card"><h3>Regional names</h3><p>Food and everyday terms vary by country and can invert meaning if translated literally.</p><div class="example">PR: orange juice → jugo de china</div></article>
@@ -380,7 +382,10 @@
         <article class="trap-card"><h3>Taboo verbs</h3><p><em>Coger</em>, <em>tomar</em>, and <em>agarrar</em> are not interchangeable across dialects.</p><div class="example">MX/PR/PA: avoid coger by default</div></article>
         <article class="trap-card"><h3>Pronouns</h3><p>Voseo, ustedes/vosotros, and formality norms change how instructions should address users.</p><div class="example">AR: vos podés, not generic puedes</div></article>
         <article class="trap-card"><h3>False friends</h3><p>Words like <em>guagua</em> can mean bus in one place and baby in another.</p><div class="example">PR: take the bus → toma la guagua</div></article>
-        <article class="trap-card"><h3>Receipts</h3><p>Every public demo response shows provider, target, fallback count, and quality status.</p><div class="example">provider: llm · quality: judge passed</div></article>
+        <article class="trap-card"><h3>Grammar detection</h3><p>Automatic detection of voseo, leísmo, laísmo, and loísmo flags translations that mismatch their claimed dialect.</p><div class="example">ES: le vi → leísmo flagged in non-Spain target</div></article>
+        <article class="trap-card"><h3>Semantic backstop</h3><p>Heuristic scores in the borderline zone trigger a second gate: negation preservation, keyword overlap, and structural parity.</p><div class="example">"Do not click" → "Haz clic" = negation dropped, auto-rejected</div></article>
+        <article class="trap-card"><h3>Translation memory</h3><p>Provider calls are cached by SHA-256 key of (text, dialect, register) with TTL eviction and max-entry caps.</p><div class="example">cache hit → no provider call, instant return</div></article>
+        <article class="trap-card"><h3>Receipts</h3><p>Every public demo response shows provider, target, fallback count, quality status, and backstop verdict.</p><div class="example">provider: llm · quality: judge passed · backstop: ok</div></article>
       </div>
     </section>
 
@@ -404,8 +409,9 @@
       </div>
       <div class="audit-strip">
         <div class="audit-item"><strong>Provider-backed</strong><span>The public page calls the same backend/provider path used by the app, not browser-side substitutions.</span></div>
-        <div class="audit-item"><strong>Failure-visible</strong><span>Provider errors, missing model config, quality rejections, and malformed requests surface as explicit errors.</span></div>
+        <div class="audit-item"><strong>Failure-visible</strong><span>Provider errors, missing model config, quality rejections, negation drops, and malformed requests surface as explicit errors.</span></div>
         <div class="audit-item"><strong>Research-ready</strong><span>Regional gaps can flow into proposal-only research tooling before data or prompts are changed.</span></div>
+        <div class="audit-item"><strong>Cache-auditable</strong><span>Translation memory hits, misses, and TTL evictions are observable in the execution receipt.</span></div>
       </div>
     </section>
   </main>
@@ -413,7 +419,7 @@
   <footer class="shell">
     <div class="footer-inner">
       <p><a href="https://github.com/Pastorsimon1798/DialectOS">DialectOS</a> — BSL 1.1, Apache-2.0 on 2030-04-20</p>
-      <p class="mono">746 tests · 17 MCP tools · 25 dialects</p>
+      <p class="mono">876 tests · 17 MCP tools · 25 dialects</p>
     </div>
   </footer>
 
