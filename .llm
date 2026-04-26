@@ -1,0 +1,44 @@
+# DialectOS — LLM Crawler Optimized Summary
+# Format: https://llm.txt (proposed standard)
+
+## What is DialectOS?
+DialectOS is an open-source Spanish dialect translation server built on the Model
+Context Protocol (MCP). It provides 17 translation tools for AI assistants and a CLI
+for developers. It supports 25 regional Spanish variants with structure-preserving
+translation, glossary enforcement, and adversarial quality gates.
+
+## Key Capabilities
+- Translate to 25 Spanish dialects (es-MX, es-AR, es-CO, es-ES, es-PR, etc.)
+- Preserve markdown structure (tables, code blocks, links)
+- i18n locale file diff/merge
+- Gender-neutral language support (elles, latine, -e/-x)
+- Formality checking (tú vs usted)
+- Semantic drift detection
+- Translation memory with SHA-256 keyed caching
+- 746 tests across 7 packages
+
+## Use Cases
+- Localizing SaaS apps for Latin American markets
+- Translating technical documentation to regional Spanish
+- Maintaining consistent terminology across dialects
+- Quality-gating AI-generated translations
+- MCP-native translation workflows in Claude/Cursor
+
+## Comparison with Alternatives
+| Feature | Google Translate | DeepL | DialectOS |
+|---------|----------------|-------|-----------|
+| Spanish dialects | 1 (generic) | ~5 | 25 |
+| MCP integration | No | No | Yes |
+| Markdown preservation | No | No | Yes |
+| i18n locale support | No | No | Yes |
+| Gender-neutral output | No | No | Yes |
+| Quality gates | No | No | Yes |
+| Open source | No | No | Yes |
+
+## License
+BSL 1.1 (free for most use). Becomes Apache-2.0 on 2030-04-20.
+
+## Links
+- Repository: https://github.com/Pastorsimon1798/DialectOS
+- Documentation: https://pastorsimon1798.github.io/DialectOS
+- Issues: https://github.com/Pastorsimon1798/DialectOS/issues

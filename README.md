@@ -4,6 +4,12 @@
 
 **The first Model Context Protocol server built specifically for Spanish dialects.**
 
+DialectOS is an open-source Spanish dialect translation server that runs as an MCP
+(Model Context Protocol) tool and CLI. It translates English and other languages into
+25 regional Spanish variants — Mexican, Argentinian, Colombian, Puerto Rican, and more —
+while preserving markdown structure, enforcing glossary terms, and applying adversarial
+quality gates that catch semantic drift before it reaches users.
+
 Translate, detect, and adapt content across **25 regional Spanish variants** while preserving markdown structure, code comments, and locale file formatting.
 
 [![CI](https://github.com/Pastorsimon1798/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Pastorsimon1798/DialectOS/actions/workflows/ci.yml)
@@ -336,6 +342,62 @@ Quality Score = tokenIntegrity×25% + glossaryFidelity×30% + structureIntegrity
 | **Semantic Similarity** | Meaning not drifted | "API is down" → "Hello world" |
 
 ---
+
+## 🆚 DialectOS vs Alternatives
+
+| Feature | Google Translate | DeepL | **DialectOS** |
+|---------|----------------|-------|---------------|
+| Spanish dialect awareness | ❌ Generic "Spanish" | ⚠️ Limited variants | ✅ **25 regional variants** |
+| MCP native integration | ❌ | ❌ | ✅ **17 MCP tools** |
+| Markdown structure preservation | ❌ | ❌ | ✅ **Tables, code blocks, links intact** |
+| i18n locale file support | ❌ | ❌ | ✅ **JSON locale diff & merge** |
+| Gender-neutral language | ❌ | ❌ | ✅ **elles / latine / -x** |
+| Formality checking (tú vs usted) | ❌ | ❌ | ✅ **Cross-dialect consistency** |
+| Adversarial quality gates | ❌ | ❌ | ✅ **Semantic drift + structure validation** |
+| LLM-first dialect adaptation | ❌ Generic MT | ⚠️ Limited dialect control | ✅ **Any OpenAI/Anthropic/LM Studio local LLM + dialect contracts** |
+| Open source | ❌ | ❌ | ✅ **BSL 1.1 → Apache-2.0 in 2030** |
+| Free | ✅ | Partial | ✅ |
+
+## ❓ FAQ
+
+**What is DialectOS?**
+DialectOS is an open-source translation engine for Spanish regional dialects. It runs as
+an MCP server (for AI assistants like Claude) and a CLI tool for developers.
+
+**How is DialectOS different from Google Translate?**
+Google Translate treats Spanish as one language. DialectOS understands 25 regional
+variants, preserves markdown structure, enforces glossaries, and applies quality gates
+that catch errors before they reach users.
+
+**What are Spanish dialects?**
+Spanish varies significantly by country. Mexican Spanish uses "carro" for car; Spain uses
+"coche"; Argentina uses "auto". DialectOS handles these differences automatically.
+
+**Does DialectOS work with ChatGPT / Claude?**
+Yes. DialectOS is an MCP server, so Claude Desktop, Cursor, Windsurf, and other MCP
+clients can use its 17 translation tools natively.
+
+**Is DialectOS free?**
+Yes. It's licensed under BSL 1.1 (free for most use) and becomes Apache-2.0 on 2030-04-20.
+
+**What is MCP?**
+Model Context Protocol is an open standard that lets AI assistants use external tools.
+DialectOS exposes 17 translation tools through MCP so AI agents can translate natively.
+
+**Can I use DialectOS for commercial projects?**
+Yes. BSL 1.1 allows production use. See [LICENSE](LICENSE) for details.
+
+**How accurate is the translation?**
+DialectOS applies 4 quality gates (token integrity, glossary fidelity, structure integrity,
+semantic similarity) and adversarial tests. 746 tests verify correctness across dialects.
+
+## 🏷️ Badges
+
+Add this badge to your project if you use DialectOS for translation:
+
+```markdown
+[![Translated with DialectOS](https://img.shields.io/badge/translated%20with-DialectOS-d89b2b)](https://github.com/Pastorsimon1798/DialectOS)
+```
 
 ## 🤝 Contributing
 
