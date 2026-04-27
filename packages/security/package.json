@@ -1,7 +1,7 @@
 {
   "name": "@dialectos/security",
   "version": "0.2.0",
-  "description": "Unified security module for Espanol — path validation, sanitization, rate limiting",
+  "description": "Unified security module for DialectOS — path validation, sanitization, rate limiting",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

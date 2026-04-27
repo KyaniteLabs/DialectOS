@@ -1,11 +1,11 @@
 {
   "name": "@dialectos/mcp",
   "version": "0.2.0",
-  "description": "MCP adapter for Espanol — thin wrapper around CLI/core",
+  "description": "MCP adapter for DialectOS — thin wrapper around CLI/core",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "espanol-mcp": "dist/index.js"
+    "dialectos-mcp": "dist/index.js"
   },
   "exports": {
     ".": {
