@@ -362,9 +362,9 @@
       <h1>Spanish that can defend where it came from.</h1>
       <p class="lede">DialectOS is a full-stack dialect translation surface for Spanish regional meaning: Puerto Rican <em>jugo de china</em>, Caribbean <em>guagua</em>, voseo, taboo verbs, and semantic traps that generic translation demos flatten.</p>
       <div class="subproof" aria-label="Product proof points">
-        <span class="proof-chip">browser to backend, backend to provider registry</span>
+        <span class="proof-chip">live backend → LLM, static page → vocabulary engine</span>
         <span class="proof-chip">semantic prompt applied</span>
-        <span class="proof-chip">output judge visible</span>
+        <span class="proof-chip">receipt on every mode</span>
       </div>
     </div>
     <aside class="hero-receipt" aria-label="Runtime receipt">
@@ -387,7 +387,7 @@
     <div class="metric"><strong>25</strong><span>Spanish regional variants covered by the app surface</span></div>
     <div class="metric"><strong>1034</strong><span>tests across runtime, docs, dialect fixtures, and safety checks</span></div>
     <div class="metric"><strong>17</strong><span>MCP tools for translation, glossary, and research workflows</span></div>
-    <div class="metric"><strong>0</strong><span>silent static fallback paths in the public demo</span></div>
+    <div class="metric"><strong>0</strong><span>hidden fallbacks — client mode is receipt-visible</span></div>
   </section>
 
   <main class="shell">
@@ -396,7 +396,7 @@
         <div>
           <div class="section-label">Full-app translator</div>
           <h2>Try the path we actually ship.</h2>
-          <p>The browser calls <code>/api/translate</code>, the backend calls the provider registry, and the provider receives regional semantic constraints before the output judge approves or rejects the result.</p>
+          <p>The browser calls <code>/api/translate</code> when a backend is running, otherwise the client engine detects dialects and applies vocabulary adaptations for all 25 variants — with a visible receipt either way.</p>
         </div>
         <div id="backendStatus" class="status"><strong>Backend status</strong> checking /api/status…</div>
       </div>
@@ -409,7 +409,7 @@
           <button class="chip" data-preset="es-mx-file">Mexico file pickup<small>Retrieve a file without accidental download/coger.</small></button>
           <button class="chip" data-preset="es-cl-food">Chile food<small>Avocado should prefer palta.</small></button>
           <button class="chip" data-preset="es-ar-voseo">Argentina voseo<small>Account copy should sound local, not neutral.</small></button>
-          <p class="pipeline-note"><strong>No static translation fallback was used.</strong> If the provider is down or weak, the page shows the failure instead of pretending.</p>
+          <p class="pipeline-note"><strong>Works on GitHub Pages.</strong> Without a backend, the client engine applies dialect vocabulary adaptations with a full receipt. With a backend, the full LLM pipeline runs instead.</p>
         </aside>
 
         <div class="translator">
@@ -481,7 +481,7 @@
         </div>
       </div>
       <div class="audit-strip">
-        <div class="audit-item"><strong>Provider-backed</strong><span>The public page calls the same backend/provider path used by the app, not browser-side substitutions.</span></div>
+        <div class="audit-item"><strong>Dual-mode</strong><span>Live backend gets LLM-powered translation. Static pages get client-side dialect detection and vocabulary adaptation with a visible receipt.</span></div>
         <div class="audit-item"><strong>Failure-visible</strong><span>Provider errors, missing model config, quality rejections, negation drops, and malformed requests surface as explicit errors.</span></div>
         <div class="audit-item"><strong>Research-ready</strong><span>Regional gaps can flow into proposal-only research tooling before data or prompts are changed.</span></div>
         <div class="audit-item"><strong>Cache-auditable</strong><span>Translation memory hits, misses, and TTL evictions are observable in the execution receipt.</span></div>
@@ -496,6 +496,7 @@
     </div>
   </footer>
 
+  <script src="dialectos-engine.js"></script>
   <script>
     const DIALECT_INFO = {
       'es-ES': 'Spain', 'es-MX': 'Mexico', 'es-AR': 'Argentina', 'es-CO': 'Colombia', 'es-CU': 'Cuba',
@@ -506,24 +507,31 @@
     };
     const FLAGS = { 'es-ES':'🇪🇸','es-MX':'🇲🇽','es-AR':'🇦🇷','es-CO':'🇨🇴','es-CU':'🇨🇺','es-PE':'🇵🇪','es-CL':'🇨🇱','es-VE':'🇻🇪','es-UY':'🇺🇾','es-PY':'🇵🇾','es-BO':'🇧🇴','es-EC':'🇪🇨','es-GT':'🇬🇹','es-HN':'🇭🇳','es-SV':'🇸🇻','es-NI':'🇳🇮','es-CR':'🇨🇷','es-PA':'🇵🇦','es-DO':'🇩🇴','es-PR':'🇵🇷','es-GQ':'🇬🇶','es-US':'🇺🇸','es-PH':'🇵🇭','es-BZ':'🇧🇿','es-AD':'🇦🇩' };
     const PRESETS = {
-      'es-pr-orange': { text: 'Orange juice is ready.', target: 'es-PR' },
-      'es-pr-room': { text: 'Pick up the room before guests arrive.', target: 'es-PR' },
-      'es-mx-file': { text: 'Pick up the file before deployment.', target: 'es-MX' },
-      'es-cl-food': { text: 'Buy avocado for lunch.', target: 'es-CL' },
-      'es-ar-voseo': { text: 'You can update your account now.', target: 'es-AR' }
+      'es-pr-orange': { text: 'El zumo de naranja está listo y el ordenador está en el autobús.', target: 'es-PR' },
+      'es-pr-room': { text: 'Recoge el piso antes de que lleguen los invitados. Vosotros podéis ayudar.', target: 'es-PR' },
+      'es-mx-file': { text: 'El ordenador tiene el archivo listo y el coche está afuera con las gafas.', target: 'es-MX' },
+      'es-cl-food': { text: 'Compra aguacate y fresas para el almuerzo. El coche necesita gasolina.', target: 'es-CL' },
+      'es-ar-voseo': { text: 'Vosotros podéis actualizar vuestra cuenta ahora. El móvil tiene el archivo.', target: 'es-AR' }
     };
 
+    let backendAvailable = false;
     let translateRequestId = 0;
     const $ = (id) => document.getElementById(id);
     function escapeHtml(value) { return String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
     function setStatus(status) {
       const ready = Boolean(status.ready);
-      $('heroStatus').textContent = ready ? 'ready' : 'not ready';
+      backendAvailable = ready;
+      $('heroStatus').textContent = ready ? 'live · LLM-powered' : 'client mode · vocabulary engine';
       $('heroStatus').className = 'receipt-value ' + (ready ? 'ok' : 'warn');
       $('backendStatus').className = 'status ' + (ready ? 'ready' : 'error');
-      $('backendStatus').innerHTML = '<strong>Backend status</strong>' + escapeHtml(status.message || 'unknown') +
-        '<br><span style="color:var(--text-3)">Providers: ' + escapeHtml((status.providers || []).join(', ') || 'none') + '</span>';
+      if (ready) {
+        $('backendStatus').innerHTML = '<strong>Live mode</strong> ' + escapeHtml(status.message || 'unknown') +
+          '<br><span style="color:var(--text-3)">Providers: ' + escapeHtml((status.providers || []).join(', ') || 'none') + '</span>';
+      } else {
+        $('backendStatus').innerHTML = '<strong>Client mode</strong> dialect detection + vocabulary adaptation (25 dialects)' +
+          '<br><span style="color:var(--text-3)">Start the backend for LLM-powered translation</span>';
+      }
     }
 
     async function refreshBackendStatus() {
@@ -552,45 +560,79 @@
       }
     }
 
+    function runClientTranslation(text, dialect) {
+      const detection = window.detectDialect(text);
+      const adapted = window.applyAdaptations(text, dialect);
+      const adaptations = window.DIALECT_ADAPTATIONS[dialect] || [];
+      const changes = [];
+      for (const rule of adaptations) {
+        const match = text.match(rule.from);
+        if (match) changes.push({ from: match[0], to: rule.to.replace(/\$1/g, match[1] || ''), desc: rule.description });
+      }
+      return { detection, adapted, changes };
+    }
+
     async function runTranslation() {
       const requestId = ++translateRequestId;
       const text = $('sourceText').value.trim();
       const dialect = $('targetDialect').value;
       if (!text) {
-        $('outputBox').innerHTML = '<span class="placeholder">Run a provider-backed translation. The receipt below will show what happened.</span>';
+        $('outputBox').innerHTML = '<span class="placeholder">Enter Spanish text and pick a target dialect to see the adaptation.</span>';
         return;
       }
       $('translateButton').disabled = true;
-      $('translateButton').textContent = 'Judging provider output…';
-      $('outputBox').innerHTML = '<span class="placeholder">Calling /api/translate through the full DialectOS backend…</span>';
+      $('translateButton').textContent = 'Translating…';
+      $('outputBox').innerHTML = '<span class="placeholder">Processing…</span>';
       $('changesPanel').classList.remove('show');
-      try {
-        const response = await fetch('/api/translate', {
-          method: 'POST',
-          headers: { 'content-type': 'application/json', accept: 'application/json' },
-          body: JSON.stringify({ text, dialect, provider: 'auto', formality: 'auto' })
-        });
-        const result = await response.json().catch(() => ({}));
-        if (requestId !== translateRequestId) return;
-        if (!response.ok || result.ok === false) throw new Error(result.error || `backend returned ${response.status}`);
-        $('outputBox').innerHTML = escapeHtml(result.translatedText || '');
-        $('changesList').innerHTML = [
-          ['provider', result.providerUsed || 'unknown'],
-          ['target', dialect],
-          ['fallbacks', String(result.fallbackCount || 0)],
-          ['quality', 'judge passed']
-        ].map(([k,v]) => `<span class="pill">${escapeHtml(k)}: ${escapeHtml(v)}</span>`).join('');
-        $('changesPanel').classList.add('show');
-        renderDetection(result.sourceDetection);
-        refreshBackendStatus();
-      } catch (error) {
-        $('outputBox').innerHTML = '<span class="bad">Full-app backend error:</span> ' + escapeHtml(error.message || String(error)) +
-          '<br><br><span class="placeholder">No static translation fallback was used. Fix the provider/model or source text and retry.</span>';
-      } finally {
-        if (requestId === translateRequestId) {
-          $('translateButton').disabled = false;
-          $('translateButton').textContent = 'Translate with full app';
+
+      if (backendAvailable) {
+        try {
+          const response = await fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', accept: 'application/json' },
+            body: JSON.stringify({ text, dialect, provider: 'auto', formality: 'auto' })
+          });
+          const result = await response.json().catch(() => ({}));
+          if (requestId !== translateRequestId) return;
+          if (!response.ok || result.ok === false) throw new Error(result.error || `backend returned ${response.status}`);
+          $('outputBox').innerHTML = escapeHtml(result.translatedText || '');
+          $('changesList').innerHTML = [
+            ['mode', 'live · LLM-powered'],
+            ['provider', result.providerUsed || 'unknown'],
+            ['target', dialect],
+            ['fallbacks', String(result.fallbackCount || 0)],
+            ['quality', 'judge passed']
+          ].map(([k,v]) => `<span class="pill">${escapeHtml(k)}: ${escapeHtml(v)}</span>`).join('');
+          $('changesPanel').classList.add('show');
+          renderDetection(result.sourceDetection);
+          refreshBackendStatus();
+          return;
+        } catch (error) {
+          backendAvailable = false;
+          setStatus({ ready: false, providers: [], message: 'backend lost, falling back to client engine' });
         }
+      }
+
+      // Client-side mode: dialect detection + vocabulary adaptation
+      if (requestId !== translateRequestId) return;
+      const { detection, adapted, changes } = runClientTranslation(text, dialect);
+      renderDetection(detection);
+
+      $('outputBox').innerHTML = escapeHtml(adapted);
+      const pills = [['mode', 'client · vocabulary engine'], ['target', dialect]];
+      if (detection.isReliable) {
+        pills.push(['detected', `${FLAGS[detection.dialect] || '🌐'} ${detection.dialect} (${Math.round(detection.confidence * 100)}%)`]);
+      }
+      pills.push(['adaptations', String(changes.length)]);
+      if (changes.length > 0) {
+        pills.push(...changes.map(c => [c.from, '→ ' + c.to]));
+      }
+      $('changesList').innerHTML = pills.map(([k,v]) => `<span class="pill">${escapeHtml(k)}: ${escapeHtml(v)}</span>`).join('');
+      $('changesPanel').classList.add('show');
+
+      if (requestId === translateRequestId) {
+        $('translateButton').disabled = false;
+        $('translateButton').textContent = 'Translate with full app';
       }
     }
 

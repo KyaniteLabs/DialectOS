@@ -8,15 +8,17 @@ const engine = readFileSync(new URL("../dialectos-engine.js", import.meta.url), 
 test("docs demo is wired to the full app backend", () => {
   assert.match(html, /Full-app translator/i);
   assert.match(html, /fetch\('\/api\/translate'/);
-  assert.match(html, /browser to backend, backend to provider registry/);
+  assert.match(html, /live backend → LLM, static page → vocabulary engine/);
   assert.match(html, /Translate with full app/i);
 });
 
-test("docs demo never silently falls back to static rule substitutions", () => {
-  assert.doesNotMatch(html, /already compatible/);
-  assert.doesNotMatch(html, /applyAdaptations\(text, target\)/);
-  assert.match(html, /No static translation fallback was used/);
+test("docs demo uses the client engine when backend is unreachable", () => {
+  assert.match(html, /dialectos-engine\.js/);
+  assert.match(html, /backendAvailable/);
+  assert.match(html, /window\.detectDialect/);
+  assert.match(html, /window\.applyAdaptations/);
   assert.match(html, /\/api\/status/);
+  assert.doesNotMatch(html, /already compatible/);
 });
 
 test("static docs engine has common three-word regional terms", () => {
