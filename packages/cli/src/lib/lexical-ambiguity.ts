@@ -1,4 +1,5 @@
 import type { SpanishDialect } from "@dialectos/types";
+import { COGER_TABOO_DIALECTS, isDialectInRegion, isDialectInList } from "@dialectos/types";
 
 export interface LexicalAmbiguityRule {
   id: string;
@@ -57,13 +58,8 @@ export function checkLexicalCompliance(
   return { passed: violations.length === 0, score, violations };
 }
 
-const TABOO_RISK_COGER_DIALECTS: readonly SpanishDialect[] = [
-  "es-MX", "es-AR", "es-CL", "es-CO", "es-VE",
-  "es-US", "es-PA", "es-PR", "es-DO", "es-CU",
-  "es-PE", "es-EC", "es-BO", "es-PY", "es-UY",
-  "es-GT", "es-HN", "es-SV", "es-NI", "es-CR",
-  "es-BZ",
-];
+// "coger" is taboo in all American dialects except GQ and PH — see dialect-regions.ts
+const TABOO_RISK_COGER_DIALECTS = COGER_TABOO_DIALECTS;
 
 export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
 
@@ -218,6 +214,282 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
       forbiddenOutputTerms: ["coge", "coger", "levanta", "levantar"],
     }),
   },
+  {
+    id: "bicho-insect",
+    dialects: "all",
+    sourcePattern: /\b(bug|insect|pest|creepy.?crawl|beetle|critter|bite)\b/i,
+    guidance: "For insect/bug references, bicho is standard in Spain, Colombia, Venezuela, and most of South America but is vulgar (penis) in Puerto Rican and Dominican Spanish. Use insecto, error, or problema for PR/DO; bicho is safe elsewhere. In IT context, translate 'bug' as error/problema/defecto, not bicho.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["insecto", "error", "problema", "defecto", "plaga"],
+      ],
+      forbiddenOutputTerms: dialect === "es-PR" || dialect === "es-DO" ? ["bicho"] : [],
+    }),
+  },
+
+  {
+    id: "concha-shell",
+    dialects: "all",
+    sourcePattern: /\b(seashell|shell|clam|scallop|mussel|oyster)\b/i,
+    guidance: "For shell/seashell references, concha is standard in Spain but is vulgar (vagina) in Argentine, Uruguayan, Chilean, and Peruvian Spanish. Use caracol (for snail shells), caparazón (for turtle/animal shells), or valva (for bivalve shells) in those dialects. Concha is safe in ES, MX, CO, and Central America.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["concha", "caracol", "caparazón", "valva", "cáscara", "cobertura"],
+      ],
+      forbiddenOutputTerms: dialect === "es-AR" || dialect === "es-UY" || dialect === "es-CL" || dialect === "es-PE" ? ["concha"] : [],
+    }),
+  },
+
+  {
+    id: "coger-take-generic",
+    dialects: "all",
+    sourcePattern: /\b(take|grab|get|pick up|catch)\b(?!.{0,40}(file|package|photo|medicine|bag|room|bus|train))\b/i,
+    guidance: "For generic 'take/grab/get', coger is standard in Spain and Andorra but is vulgar (fuck) in most of Latin America. Use tomar, agarrar, or recoger in American dialects. Only use coger for es-ES and es-AD.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["toma", "tomar", "agarra", "agarrar", "recoge", "recoger", "obtiene", "obtener"],
+      ],
+      forbiddenOutputTerms: TABOO_RISK_COGER_DIALECTS.includes(dialect) ? ["coger", "coge"] : [],
+    }),
+  },
+
+  {
+    id: "paja-straw",
+    dialects: "all",
+    sourcePattern: /\b(drinking straw|straw|sorbete|pitillo|pajita)\b/i,
+    guidance: "For drinking straw, paja is standard in Spain (pajita) but in much of Latin America paja colloquially means masturbation. Use sorbete (AR, UY), pajita (ES), pitillo (CO, VE, EC), popote (MX, GT, HN, SV), calimate (DO), or pajilla (PR, DO).",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-ES" || dialect === "es-AD"
+          ? ["pajita", "paja"]
+          : dialect === "es-MX" || dialect === "es-GT" || dialect === "es-HN" || dialect === "es-SV"
+            ? ["popote"]
+            : dialect === "es-AR" || dialect === "es-UY" || dialect === "es-PY"
+              ? ["sorbete"]
+              : dialect === "es-CO" || dialect === "es-VE" || dialect === "es-EC"
+                ? ["pitillo"]
+                : dialect === "es-PR" || dialect === "es-DO"
+                  ? ["pajilla"]
+                  : ["pajita", "sorbete", "pitillo", "popote"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "papaya-fruit",
+    dialects: "all",
+    sourcePattern: /\b(papaya|papayas|fruta bomba|lechosa)\b/i,
+    guidance: "For the papaya fruit, papaya is vulgar (vagina) in Cuban Spanish. Use frutabomba in Cuban context, lechosa in Dominican and some Venezuelan contexts. Papaya is safe in all other dialects.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-CU"
+          ? ["frutabomba", "fruta bomba"]
+          : dialect === "es-DO" || dialect === "es-VE"
+            ? ["lechosa", "papaya"]
+            : ["papaya", "lechosa", "frutabomba"],
+      ],
+      forbiddenOutputTerms: dialect === "es-CU" ? ["papaya"] : [],
+    }),
+  },
+
+  {
+    id: "pito-whistle",
+    dialects: "all",
+    sourcePattern: /\b(whistle|referee|blow the whistle|whistling)\b/i,
+    guidance: "For whistle references, pito is standard in some regions but is vulgar (penis) in Colombian and Venezuelan Spanish. Use silbato or silbido for CO/VE. Pito is safe in ES, MX, AR, and most other dialects.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-CO" || dialect === "es-VE"
+          ? ["silbato", "silbido", "pito"]
+          : ["pito", "silbato", "silbido"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "bola-ball",
+    dialects: "all",
+    sourcePattern: /\b(bouncy ball|beach ball|disco ball|ball game|ballroom|ball bearing|pitching|catching a ball|throwing a ball)\b/i,
+    guidance: "For ball/sphere references, bola/bolo is standard but can carry vulgar connotations (scrotum/testicles) in some informal contexts. In formal/technical text, bola is universally acceptable. In CO/VE, bola can also mean 'lie'. Use pelota for sports contexts. Avoid boludo/boluda (vulgar intensifier in AR/UY).",
+    expectations: {
+      requiredOutputGroups: [
+        ["bola", "pelota", "esfera", "balón"],
+      ],
+      forbiddenOutputTerms: ["boludo", "boluda"],
+    },
+  },
+
+  {
+    id: "polla-chicken",
+    dialects: "all",
+    sourcePattern: /\b(chicken|hen|poultry|rooster)\b(?!.?valve|.?pit|.?fight)/i,
+    guidance: "For chicken/hen references, polla is vulgar (penis) in Spain and several other dialects. Use pollo/polla carefully: pollo for the meat/animal is safe; polla specifically means hen but should be avoided in ES due to vulgar connotation. Use gallina for hen, pollo for chicken meat/animal.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["pollo", "gallina", "ave", "carne de pollo"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "bollo-bread",
+    dialects: "all",
+    sourcePattern: /\b(bun|bread roll|muffin|pastry|croissant|doughnut|pastry roll)\b/i,
+    guidance: "For bread/pastry references, bollo is standard for a bread roll in CO, VE, and Caribbean Spanish but can carry sexual connotations in some informal contexts. Use pan, panecillo, or rollo for safe alternatives. In CU, 'hacer un bollo' is slang for making a mistake.",
+    expectations: {
+      requiredOutputGroups: [
+        ["bollo", "pan", "panecillo", "rollo", "pastelito"],
+      ],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "huevos-eggs",
+    dialects: "all",
+    sourcePattern: /\b(eggs?|scrambled|fried eggs|boiled eggs|omelet)\b/i,
+    guidance: "For egg references, huevos is standard but in Mexican, Colombian, and several other dialects it colloquially means testicles. In formal food/recipe context, huevos is perfectly acceptable. Only avoid in deliberately informal/casual registers where double meaning could cause offense. In formal text, huevos is always correct.",
+    expectations: {
+      requiredOutputGroups: [
+        ["huevos", "huevo"],
+      ],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "chingar-bother",
+    dialects: "all",
+    sourcePattern: /\b(pester|harass|mess with|piss off)\b/i,
+    guidance: "For 'bother/annoy', chingar is extremely vulgar in Mexican Spanish (equivalent to 'to fuck'). In GT/HN/SV it can mean 'to bother' but is still coarse. Use molestar, fastidiar, or incomodar in all formal contexts. Never use chingar in professional translation.",
+    expectations: {
+      requiredOutputGroups: [
+        ["molestar", "molesta", "molestia", "molestias", "fastidiar", "fastidia", "incomodar", "incomoda"],
+      ],
+      forbiddenOutputTerms: ["chingar", "chinga"],
+    },
+  },
+
+  {
+    id: "madrazo-hit",
+    dialects: ["es-MX"],
+    sourcePattern: /\b(punch|smack|slap|blow to the|struck|biff|whack|thump)\b/i,
+    guidance: "For 'hit/blow', madrazo is Mexican slang for a strong blow/hit. It is informal and potentially vulgar. Use golpe, puñetazo, or bofetada in formal Mexican Spanish. Madrazo should not appear in professional translations.",
+    expectations: {
+      requiredOutputGroups: [
+        ["golpe", "puñetazo", "bofetada", "golpear", "pegar"],
+      ],
+      forbiddenOutputTerms: ["madrazo", "madrazos"],
+    },
+  },
+
+  {
+    id: "pinga-vulgar",
+    dialects: ["es-CU", "es-DO", "es-PR"],
+    sourcePattern: /\b(damn|fuck|shit|dick|prick|cock)\b/i,
+    guidance: "Pinga is an extremely vulgar term (penis) used as a general intensifier in Cuban, Dominican, and Puerto Rican Spanish. Never translate any English term into pinga. Use maldición, demonio, or other register-appropriate intensifiers.",
+    expectations: {
+      requiredOutputGroups: [
+        ["maldición", "demonio", "diablos"],
+      ],
+      forbiddenOutputTerms: ["pinga"],
+    },
+  },
+
+  {
+    id: "chucha-dog",
+    dialects: "all",
+    sourcePattern: /\b(bitch|female dog|dog|puppy)\b/i,
+    guidance: "For 'female dog/bitch', chucha is a common word for dog in Salvadoran Spanish but is vulgar in Chilean Spanish and means 'cold' in Ecuadorian slang. Use perra for female dog universally, or perro/ Perrito for dogs in general. Avoid chucha in formal text.",
+    expectations: {
+      requiredOutputGroups: [
+        ["perra", "perro", "perrito", "can"],
+      ],
+      forbiddenOutputTerms: ["chucha"],
+    },
+  },
+
+  {
+    id: "carepicha-vulgar",
+    dialects: ["es-NI"],
+    sourcePattern: /\b(awesome|amazing|cool|great|badass)\b/i,
+    guidance: "Carepicha and carechimba are Nicaraguan vulgar intensifiers. Never use them in professional translation. Use increíble, fantástico, genial, or excelente.",
+    expectations: {
+      requiredOutputGroups: [
+        ["increíble", "fantástico", "genial", "excelente", "impresionante"],
+      ],
+      forbiddenOutputTerms: ["carepicha", "carechimba"],
+    },
+  },
+
+  {
+    id: "chocha-satisfied",
+    dialects: "all",
+    sourcePattern: /\b(satisfied|happy|pleased|content|glad)\b/i,
+    guidance: "Chocha/chocho can mean 'satisfied/happy' informally in Spain and some regions, but in other dialects chocha is vulgar. Use contento, satisfecho, feliz, or alegre for formal translation. Avoid chocho/chocha in all formal output.",
+    expectations: {
+      requiredOutputGroups: [
+        ["contento", "satisfecho", "feliz", "alegre", "complacido"],
+      ],
+      forbiddenOutputTerms: ["chocha", "chocho"],
+    },
+  },
+
+  {
+    id: "leche-milk",
+    dialects: "all",
+    sourcePattern: /\b(milk|dairy|cream|creamy)\b/i,
+    guidance: "For milk/dairy references, leche is standard and universally correct in food context. In informal contexts, leche can have sexual connotations in some dialects, but in formal food/product documentation, leche is always appropriate.",
+    expectations: {
+      requiredOutputGroups: [
+        ["leche", "lácteo", "crema"],
+      ],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "fajar-beat",
+    dialects: ["es-CO", "es-VE", "es-EC"],
+    sourcePattern: /\b(spank|punish|whip|cane|corporal punishment)\b/i,
+    guidance: "For 'beat/defeat/spank', fajar can mean 'to beat' in CO/VE but also has vulgar connotations. Use vencer, derrotar, or golpear in formal contexts.",
+    expectations: {
+      requiredOutputGroups: [
+        ["vencer", "derrotar", "golpear", "ganar"],
+      ],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "teta-breast",
+    dialects: "all",
+    sourcePattern: /\b(breast|chest|bosom|nipple)\b/i,
+    guidance: "For breast/chest references, teta is informal/vulgar in many dialects. Use pecho, seno, or mama in formal and medical contexts. Teta should only appear in deliberately informal register.",
+    expectations: {
+      requiredOutputGroups: [
+        ["pecho", "seno", "mama", "torso"],
+      ],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "pirobo-vulgar",
+    dialects: ["es-CO"],
+    sourcePattern: /\b(asshole|jerk|idiot|moron|dumb|stupid)\b/i,
+    guidance: "Pirobo is an extremely vulgar Colombian insult. Never use it in professional translation. Use idiota, tonto, or estúpido if the register calls for it.",
+    expectations: {
+      requiredOutputGroups: [
+        ["idiota", "tonto", "estúpido", "necio"],
+      ],
+      forbiddenOutputTerms: ["pirobo"],
+    },
+  },
+
 ];
 
 function appliesToDialect(rule: LexicalAmbiguityRule, dialect: SpanishDialect): boolean {
