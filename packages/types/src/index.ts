@@ -388,3 +388,11 @@ export * from "./dialect-quality.js";
 export * from "./certification.js";
 
 export * from "./validation.js";
+
+export * from "./dialectal-dictionary.js";
+
+export * from "./dialect-regions.js";
+
+export * from "./verb-conjugations.js";
+
+export * from "./dialectal-vocabulary.js";

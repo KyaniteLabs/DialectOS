@@ -1,4 +1,5 @@
 import type { SpanishDialect, ValidateTranslationOptions, ValidationReport } from "@dialectos/types";
+import { validateDialectCompliance } from "@dialectos/types";
 import { validateMarkdownStructure } from "./structure-validator.js";
 import { buildLexicalAmbiguityExpectations, checkLexicalCompliance } from "./lexical-ambiguity.js";
 import type { LexicalComplianceResult } from "./lexical-ambiguity.js";
@@ -20,7 +21,10 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
   const lexicalExpectations = buildLexicalAmbiguityExpectations(source, dialect);
   const lexicalCompliance: LexicalComplianceResult = checkLexicalCompliance(translated, lexicalExpectations);
 
-  // 3. Quality score
+  // 3. Dialect vocabulary compliance
+  const dialectCompliance = validateDialectCompliance(source, translated, dialect);
+
+  // 4. Quality score
   const qualityScore: QualityScore = calculateQualityScore(
     source,
     translated,
@@ -30,10 +34,10 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
     lexicalCompliance.score
   );
 
-  // 4. Semantic backstop
+  // 5. Semantic backstop
   const semanticCheck = combinedSemanticCheck(source, translated);
 
-  // 5. Output judge
+  // 6. Output judge
   const judge: OutputJudgeResult = judgeTranslationOutput(
     {
       source,
@@ -55,6 +59,12 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
 
   if (!lexicalCompliance.passed) {
     blockingIssues.push(...lexicalCompliance.violations);
+  }
+
+  for (const violation of dialectCompliance.violations) {
+    if (violation.severity === "error") {
+      blockingIssues.push(violation.message);
+    }
   }
 
   if (!semanticCheck.passed) {
@@ -80,6 +90,7 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
       negationDropped: semanticCheck.negationDropped ?? false,
     },
     lexicalCompliance,
+    dialectCompliance,
     outputJudge: {
       issues: judge.issues.map((i) => ({ category: i.category, severity: i.severity, message: i.message })),
       blockingIssues: judge.blockingIssues.map((i) => ({ category: i.category, severity: i.severity, message: i.message })),

@@ -22,6 +22,18 @@ export interface ValidationReport {
     score: number;
     violations: string[];
   };
+  dialectCompliance: {
+    passed: boolean;
+    score: number;
+    violations: Array<{
+      concept: string;
+      expectedTerm: string;
+      foundTerm: string;
+      severity: string;
+      message: string;
+    }>;
+    checkedConcepts: number;
+  };
   outputJudge: {
     issues: Array<{
       category: string;
