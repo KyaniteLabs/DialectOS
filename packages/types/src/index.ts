@@ -318,6 +318,8 @@ export interface GlossaryEntry {
   sourceUrl?: string;
   confidence?: "low" | "medium" | "high";
   notes?: string;
+  /** Dialect-specific translation overrides. When set, takes precedence over `translation` for matching dialects. */
+  dialectPreferences?: Partial<Record<SpanishDialect, string>>;
 }
 
 // ============================================================================

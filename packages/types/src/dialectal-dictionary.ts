@@ -3,7 +3,7 @@ import type { SpanishDialect } from "./index.js";
 export type SemanticField =
   | "technology" | "transport" | "food" | "household" | "clothing"
   | "actions" | "social" | "people" | "education" | "body_parts" | "nature"
-  | "medicine_health" | "family_kinship" | "finance_banking";
+  | "medicine_health" | "family_kinship" | "finance_banking" | "accessibility";
 
 export interface Variant {
   term: string;
@@ -5790,6 +5790,63 @@ export const DICTIONARY: readonly DictionaryEntry[] = [
   panHispanic: "pijama",
   variants: {
     "es-ES": { term: "pijama", frequency: 1, register: "universal" },
-  } }
+  } },
+
+// --- accessibility ---
+
+{ field: "accessibility", concept: "disabled_person", englishGloss: "person with a disability",
+  panHispanic: "persona con discapacidad",
+  variants: {
+    "es-ES": { term: "persona con discapacidad", frequency: 1, register: "formal", notes: "person-first language preferred" },
+  }},
+
+{ field: "accessibility", concept: "blind_person", englishGloss: "person who cannot see",
+  panHispanic: "persona ciega",
+  variants: {
+    "es-ES": { term: "persona ciega", frequency: 1, register: "formal", notes: "person-first; ciego alone is informal" },
+  }},
+
+{ field: "accessibility", concept: "deaf_person", englishGloss: "person who cannot hear",
+  panHispanic: "persona sorda",
+  variants: {
+    "es-ES": { term: "persona sorda", frequency: 1, register: "formal", notes: "person-first; sordo alone is informal" },
+  }},
+
+{ field: "accessibility", concept: "braille", englishGloss: "tactile writing system for blind people",
+  panHispanic: "braille",
+  variants: {
+    "es-ES": { term: "braille", frequency: 1, register: "universal" },
+  }},
+
+{ field: "accessibility", concept: "sign_language", englishGloss: "visual language using hand movements",
+  panHispanic: "lengua de signos",
+  variants: {
+    "es-ES": { term: "lengua de signos", frequency: 1, register: "universal" },
+    "es-MX": { term: "lengua de señas", frequency: 1, register: "universal" },
+    "es-AR": { term: "lengua de señas", frequency: 1, register: "universal" },
+    "es-CO": { term: "lengua de señas", frequency: 1, register: "universal" },
+  }},
+
+{ field: "accessibility", concept: "service_animal", englishGloss: "animal trained to assist a person with disabilities",
+  panHispanic: "perro guía",
+  variants: {
+    "es-ES": { term: "perro guía", frequency: 1, register: "universal" },
+    "es-MX": { term: "perro de asistencia", frequency: 1, register: "universal" },
+    "es-AR": { term: "perro guía", frequency: 1, register: "universal" },
+  }},
+
+{ field: "accessibility", concept: "ramp", englishGloss: "sloping surface for wheelchair access",
+  panHispanic: "rampa",
+  variants: {
+    "es-ES": { term: "rampa", frequency: 1, register: "universal" },
+  }},
+
+{ field: "accessibility", concept: "captioning", englishGloss: "text display of spoken words for deaf viewers",
+  panHispanic: "subtítulos",
+  variants: {
+    "es-ES": { term: "subtítulos", frequency: 1, register: "universal" },
+    "es-MX": { term: "subtítulos", frequency: 1, register: "universal" },
+    "es-AR": { term: "subtítulos", frequency: 1, register: "universal" },
+  }},
 
 ];

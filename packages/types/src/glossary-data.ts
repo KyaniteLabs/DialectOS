@@ -1,4 +1,5 @@
-import type { GlossaryEntry } from "./index.js";
+import type { GlossaryEntry, SpanishDialect } from "./index.js";
+import { DICTIONARY } from "./dialectal-dictionary.js";
 
 export type GlossaryCategory =
   | "programming"
@@ -527,4 +528,36 @@ export function getGlossaryByCategory(category?: string): GlossaryEntry[] {
   return GLOSSARY_DATA.filter((entry) =>
     entry.category?.toLowerCase() === lowerCategory
   );
+}
+
+/**
+ * Return glossary entries with dialect-aware translation overrides.
+ * When a dictionary concept matches a glossary term, the dictionary's
+ * dialect-specific preferred term takes precedence over the glossary translation.
+ */
+export function getDialectAwareGlossary(dialect: SpanishDialect): GlossaryEntry[] {
+  // Build a lookup: lowercase glossary term → dictionary entry
+  const dictByTerm = new Map<string, { preferredTerm: string; concept: string }>();
+  for (const entry of DICTIONARY) {
+    const variants = entry.variants as Record<string, { term: string; frequency: number; register: string }> | undefined;
+    const dialectVariant = variants?.[dialect];
+    const panHispanic = entry.panHispanic;
+    if (dialectVariant && dialectVariant.term !== panHispanic) {
+      // This concept has a dialect-specific term that differs from panHispanic
+      if (panHispanic) {
+        dictByTerm.set(panHispanic.toLowerCase(), { preferredTerm: dialectVariant.term, concept: entry.concept });
+      }
+    }
+  }
+
+  return GLOSSARY_DATA.map((entry) => {
+    const override = dictByTerm.get(entry.translation.toLowerCase());
+    if (override) {
+      return {
+        ...entry,
+        dialectPreferences: { [dialect]: override.preferredTerm },
+      };
+    }
+    return entry;
+  });
 }

@@ -370,6 +370,12 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
     rule: "Andean Spanish can use pretérito perfecto compuesto for recent past actions (hoy he comido) due to Quechua substrate influence, similar to Peninsular Spanish but for different linguistic reasons. This is NOT an error — it is a legitimate Andean feature.",
     enforcement: "prompt-only",
   },
+  {
+    id: "person-first-language",
+    dialects: "all",
+    rule: "In formal registers, prefer person-first language for disability references: 'persona con discapacidad' (not 'discapacitado'), 'persona sorda' (not 'sorda' as noun), 'persona ciega' (not 'ciega' as noun), 'persona con movilidad reducida' (not 'minusválido'). In informal registers, adjective forms are acceptable but noun forms (el ciego, el sordo) are stigmatized in most dialects. Always prefer 'persona con X' over 'X-person' constructions.",
+    enforcement: "prompt-only",
+  },
 ];
 
 export function getSyntacticRules(dialect: SpanishDialect): SyntacticRule[] {

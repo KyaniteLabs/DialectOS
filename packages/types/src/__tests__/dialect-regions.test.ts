@@ -20,8 +20,8 @@ import {
 // ============================================================================
 
 describe("DIALECT_REGIONS", () => {
-  it("has 10 regions", () => {
-    expect(Object.keys(DIALECT_REGIONS).length).toBe(10);
+  it("has 11 regions", () => {
+    expect(Object.keys(DIALECT_REGIONS).length).toBe(11);
   });
 
   it("every region has required fields", () => {
