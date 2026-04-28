@@ -1289,6 +1289,17 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
     }),
   },
 
+  {
+    id: "papa-potato",
+    dialects: "all",
+    sourcePattern: /\b(potato|patata|papa)\b/i,
+    guidance: "'Papa' is the universal term for potato in Latin America and the Canary Islands. 'Patata' is used in peninsular Spain. This is a clear dialect marker: use 'papa' for all American dialects, 'patata' for es-ES and es-AD. The word 'papa' also means 'pope' (el Papa) — context determines meaning.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [dialect === "es-ES" || dialect === "es-AD" ? ["patata"] : ["papa"]],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
 ];
 
 function appliesToDialect(rule: LexicalAmbiguityRule, dialect: SpanishDialect): boolean {

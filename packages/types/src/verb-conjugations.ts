@@ -1051,4 +1051,223 @@ export const VERB_CONJUGATIONS: VerbConjugation[] = [
   forms: buildForms(túForms("googleas", "googlea"), vosForms("googleás", "googleá")),
 },
 
+// --- Missing top-100 verbs (added by frequency rank) ---
+
+{
+  infinitive: "estar",
+  meaning: "to be (location, state, condition)",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("estás", "está"), vosForms("estás", "está")),
+},
+
+{
+  infinitive: "haber",
+  meaning: "to have (auxiliary); there is/are",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("has", "he"), vosForms("habés", "habé")),
+},
+
+{
+  infinitive: "ver",
+  meaning: "to see",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("ves", "ve"), vosForms("ves", "ve")),
+},
+
+{
+  infinitive: "pasar",
+  meaning: "to pass, to happen",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("pasas", "pasa"), vosForms("pasás", "pasá")),
+},
+
+{
+  infinitive: "parecer",
+  meaning: "to seem, to appear",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("pareces", "parece"), vosForms("parecés", "parecé")),
+},
+
+{
+  infinitive: "quedar",
+  meaning: "to remain, to stay, to agree to meet",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("quedas", "queda"), vosForms("quedás", "quedá")),
+},
+
+{
+  infinitive: "creer",
+  meaning: "to believe, to think",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("crees", "cree"), vosForms("creés", "creé")),
+},
+
+{
+  infinitive: "llevar",
+  meaning: "to carry, to wear, to take",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("llevas", "lleva"), vosForms("llevás", "llevá")),
+},
+
+{
+  infinitive: "encontrar",
+  meaning: "to find, to encounter",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("encuentras", "encuentra"), vosForms("encontrás", "encontrá")),
+},
+
+{
+  infinitive: "contar",
+  meaning: "to count, to tell/narrate",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("cuentas", "cuenta"), vosForms("contás", "contá")),
+},
+
+{
+  infinitive: "conocer",
+  meaning: "to know (a person/place), to be acquainted with",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("conoces", "conoce"), vosForms("conocés", "conocé")),
+},
+
+{
+  infinitive: "llamar",
+  meaning: "to call, to name",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("llamas", "llama"), vosForms("llamás", "llamá")),
+},
+
+{
+  infinitive: "deber",
+  meaning: "to must, to should, to owe",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("debes", "debe"), vosForms("debés", "debé")),
+},
+
+{
+  infinitive: "comenzar",
+  meaning: "to begin, to start",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("comienzas", "comienza"), vosForms("comenzás", "comenzá")),
+},
+
+{
+  infinitive: "esperar",
+  meaning: "to wait, to hope, to expect",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("esperas", "espera"), vosForms("esperás", "esperá")),
+},
+
+{
+  infinitive: "tomar",
+  meaning: "to take, to drink",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("tomas", "toma"), vosForms("tomás", "tomá")),
+},
+
+{
+  infinitive: "partir",
+  meaning: "to leave, to split, to depart",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("partes", "parte"), vosForms("partís", "partí")),
+},
+
+{
+  infinitive: "valer",
+  meaning: "to be worth, to be valid",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("vales", "vale"), vosForms("valés", "valé")),
+},
+
+{
+  infinitive: "obtener",
+  meaning: "to obtain, to get",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("obtienes", "obtiene"), vosForms("obtenés", "obtené")),
+},
+
+{
+  infinitive: "aparecer",
+  meaning: "to appear, to show up",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("apareces", "aparece"), vosForms("aparecés", "aparecé")),
+},
+
+{
+  infinitive: "mover",
+  meaning: "to move, to shift",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("mueves", "mueve"), vosForms("movés", "mové")),
+},
+
+{
+  infinitive: "utilizar",
+  meaning: "to use, to utilize",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("utilizas", "utiliza"), vosForms("utilizás", "utilizá")),
+},
+
+{
+  infinitive: "ganar",
+  meaning: "to win, to earn",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("ganas", "gana"), vosForms("ganás", "ganá")),
+},
+
+{
+  infinitive: "interesar",
+  meaning: "to interest, to matter",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("interesas", "interesa"), vosForms("interesanás", "interesá")),
+},
+
+{
+  infinitive: "comprender",
+  meaning: "to understand, to comprehend",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("comprendes", "comprende"), vosForms("comprendés", "comprendé")),
+},
+
+{
+  infinitive: "influir",
+  meaning: "to influence",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("influyes", "influye"), vosForms("influís", "influí")),
+},
+
+{
+  infinitive: "causar",
+  meaning: "to cause, to bring about",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("causas", "causa"), vosForms("causás", "causá")),
+},
+
+{
+  infinitive: "aconsejar",
+  meaning: "to advise, to counsel",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("aconsejas", "aconseja"), vosForms("aconsejás", "aconsejá")),
+},
+
+{
+  infinitive: "reunir",
+  meaning: "to gather, to meet, to assemble",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("reúnes", "reúne"), vosForms("reunís", "reuní")),
+},
+
+{
+  infinitive: "cubrir",
+  meaning: "to cover",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("cubres", "cubre"), vosForms("cubrís", "cubrí")),
+},
+
+{
+  infinitive: "caer",
+  meaning: "to fall, to drop",
+  category: "conjugation-pattern",
+  forms: buildForms(túForms("caes", "cae"), vosForms("caés", "caé")),
+},
+
 ];
