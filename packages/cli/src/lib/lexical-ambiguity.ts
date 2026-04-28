@@ -594,6 +594,415 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
     },
   },
 
+  // --- Phase 3D: Additional high-priority ambiguity rules ---
+
+  {
+    id: "mono-chango-monkey",
+    dialects: ["es-MX"],
+    sourcePattern: /\b(monkey|ape|chimp)\b/i,
+    guidance: "In Mexican Spanish, 'chango' means monkey and is widely used. 'Mono' is understood but less colloquial. Do not use 'chango' outside MX/GT/HN contexts where it may confuse.",
+    expectations: {
+      requiredOutputGroups: [["chango", "mono", "simio"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "chiva-goat-pr",
+    dialects: ["es-PR", "es-HN", "es-NI"],
+    sourcePattern: /\b(goat|kid)\b/i,
+    guidance: "'Chiva' is common for goat in PR, HN, NI. In CO slang, 'chiva' means a cool thing/party. In Argentina, 'chiva' can mean angry. Context matters.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [["chiva", "cabra", "chivo"]],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "gonorrea-insult-co",
+    dialects: ["es-CO"],
+    sourcePattern: /\b(gonorrea|gonorrhea|insult|idiot|jerk)\b/i,
+    guidance: "In Colombian Spanish, 'gonorrea' is an extremely offensive insult completely divorced from its medical meaning. NEVER use it as an insult in translation. For medical contexts, use 'gonorrea' clinically with appropriate framing. For insults, use 'idiota', 'imbecil', 'tonto'.",
+    expectations: {
+      requiredOutputGroups: [["idiota", "imbécil", "tonto", "estúpido"]],
+      forbiddenOutputTerms: ["gonorrea"],
+    },
+  },
+
+  {
+    id: "hijueputa-insult-co-ve",
+    dialects: ["es-CO", "es-VE"],
+    sourcePattern: /\b(son of a bitch|motherfucker|SOB|bastard)\b/i,
+    guidance: "'Hijueputa' (contraction of hijo de puta) is the most common strong insult in CO and VE. It is extremely vulgar. Use 'hijo de puta' (standard vulgarity) or 'maldito' (milder) in translation unless the source demands extreme register.",
+    expectations: {
+      requiredOutputGroups: [["hijo de puta", "maldito", "condenado"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "pirobo-insult-co",
+    dialects: ["es-CO"],
+    sourcePattern: /\b(faggot|gay slur|homophobic slur)\b/i,
+    guidance: "'Pirobo' is a homophobic slur in Colombian Spanish. Do not use it in any translation context. Use neutral terminology or omit depending on translation goals.",
+    expectations: {
+      requiredOutputGroups: [[]],
+      forbiddenOutputTerms: ["pirobo"],
+    },
+  },
+
+  {
+    id: "arrecho-angry-ve",
+    dialects: ["es-VE", "es-CO"],
+    sourcePattern: /\b(angry|furious|pissed off|horny|aroused)\b/i,
+    guidance: "'Arrecho' in Venezuela means angry/furious colloquially, but in parts of CO and VE it can mean sexually aroused (vulgar). In VE it is extremely common for 'angry'. In formal translation, use 'enojado', 'furioso', or 'enfadado'.",
+    expectations: {
+      requiredOutputGroups: [["enojado", "furioso", "enfadado", "bravo"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "vaina-thing-do-ve",
+    dialects: ["es-VE", "es-DO"],
+    sourcePattern: /\b(thing|stuff|whatchamacallit|thingamajig)\b/i,
+    guidance: "'Vaina' is extremely common in VE and DO for 'thing/stuff' — it is perhaps the most versatile word in Venezuelan Spanish. It can be neutral or vulgar depending on context and accompanying words. In formal translation, use 'cosa', 'asunto', or 'tema'.",
+    expectations: {
+      requiredOutputGroups: [["cosa", "asunto", "tema", "vaina"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "chevere-cool-ve-dr",
+    dialects: ["es-VE", "es-DO", "es-PR", "es-CO", "es-PA"],
+    sourcePattern: /\b(cool|awesome|great|neat|nice)\b/i,
+    guidance: "'Chévere' is the standard 'cool/awesome' in VE, CO, DO, PR, PA. It originated in Venezuela. In other dialects, 'genial', 'bárbaro' (AR), 'padre' (MX), 'guay' (ES) are preferred.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["chévere", "chévere", "bueno", "genial"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "bobo-fool-caribbean",
+    dialects: ["es-CO", "es-VE", "es-CU", "es-DO", "es-PR"],
+    sourcePattern: /\b(fool|silly|stupid|dumb)\b/i,
+    guidance: "'Bobo/boba' means fool/silly in most dialects, but in CO and VE it can have stronger connotations. In Caribbean Spanish it is mild. Use 'tonto' for neutral, 'bobo' for mild colloquial.",
+    expectations: {
+      requiredOutputGroups: [["tonto", "bobo", "necio"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "gaveta-drawer-pr-do",
+    dialects: ["es-PR", "es-DO", "es-CU"],
+    sourcePattern: /\b(drawer|cabinet|dresser)\b/i,
+    guidance: "'Gaveta' is standard for drawer in PR, DO, CU. In most other dialects, 'cajón' is standard. 'Gaveta' may sound regional outside Caribbean.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-PR" || dialect === "es-DO" || dialect === "es-CU"
+          ? ["gaveta", "cajón"]
+          : ["cajón", "gaveta"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "pico-spout-chile",
+    dialects: ["es-CL", "es-CO", "es-VE"],
+    sourcePattern: /\b(spout|nozzle|beak|bill|peak)\b/i,
+    guidance: "'Pico' means beak/spout/peak in standard Spanish, but in CL, CO, and parts of VE it is vulgar slang for penis. Use 'boquilla' or 'pitorro' for spout in these dialects.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [["boquilla", "pitorro", "apéndice"]],
+      forbiddenOutputTerms: dialect === "es-CL" ? ["pico"] : [],
+    }),
+  },
+
+  {
+    id: "pajita-straw-spain",
+    dialects: ["es-ES", "es-AD"],
+    sourcePattern: /\b(straw|drinking straw)\b/i,
+    guidance: "'Pajita' is the standard term for drinking straw in Spain, but in many Latin American dialects 'paja' and 'pajita' have masturbatory connotations. Use 'pajita' only for es-ES/es-AD.",
+    expectations: {
+      requiredOutputGroups: [["pajita", "pajita", "pajilla"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "paja-masturbation",
+    dialects: ["es-AR", "es-UY", "es-PY", "es-CO", "es-VE", "es-CL", "es-PE", "es-EC", "es-BO"],
+    sourcePattern: /\b(masturbat|jerking off|handjob)\b/i,
+    guidance: "'Hacerse una paja' or 'paja' alone means masturbation in most LatAm dialects. 'Paja' also means straw/hay literally. Avoid 'paja' for straw in these dialects — use 'pajilla', 'pitillo', 'sorbete', 'popote' etc. instead.",
+    expectations: {
+      requiredOutputGroups: [["masturbación", "masturbarse"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "tortilla-bread-mx",
+    dialects: ["es-MX", "es-GT", "es-HN", "es-SV", "es-NI"],
+    sourcePattern: /\b(tortilla|flatbread|wrap)\b/i,
+    guidance: "In Mexico and Central America, 'tortilla' refers to the corn/wheat flatbread staple. In Spain, 'tortilla' means an omelette (tortilla española). Context determines meaning — clarify when ambiguous.",
+    expectations: {
+      requiredOutputGroups: [["tortilla"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "tortilla-omelette-es",
+    dialects: ["es-ES", "es-AD"],
+    sourcePattern: /\b(omelette|omelet|tortilla española)\b/i,
+    guidance: "In Spain, 'tortilla' means omelette (typically potato omelette = tortilla española). The flatbread is 'tortilla mexicana'. Do not translate omelette as 'omelette' (French loanword) when 'tortilla' is the standard Spanish term.",
+    expectations: {
+      requiredOutputGroups: [["tortilla", "tortilla francesa"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "carro-car-vs-cart",
+    dialects: "all",
+    sourcePattern: /\b(car|automobile|vehicle|cart|wagon)\b/i,
+    guidance: "'Carro' means car in most LatAm, but in parts of rural Spain/Andorra it can mean cart/wagon. 'Coche' is the standard term for car in ES. In CO, 'carro' is universal. Context matters for transport vs cart.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-ES" || dialect === "es-AD"
+          ? ["coche", "automóvil", "vehículo", "carro"]
+          : ["carro", "coche", "automóvil", "vehículo", "auto"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "computadora-gender",
+    dialects: ["es-CO", "es-CL", "es-EC", "es-VE"],
+    sourcePattern: /\b(computer|laptop|notebook)\b/i,
+    guidance: "'Computadora' (feminine) is standard in most LatAm, but CO, CL, EC prefer 'computador' (masculine). VE uses both. Match the gender to the local norm.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        dialect === "es-CO" || dialect === "es-CL" || dialect === "es-EC"
+          ? ["computador", "computadora"]
+          : ["computadora", "computador"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "bicho-insect-taboo",
+    dialects: ["es-PR", "es-DO"],
+    sourcePattern: /\b(bug|insect|beetle|pest)\b/i,
+    guidance: "'Bicho' is standard for bug/insect in many dialects, but in PR and DO it is a vulgar term for penis. Use 'insecto', 'bicho' (with care), or 'plaga' depending on context. Avoid in formal registers in Caribbean.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [["insecto", "bicho", "plaga"]],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "papel-toilet-paper",
+    dialects: ["es-VE", "es-CO"],
+    sourcePattern: /\b(toilet paper|bathroom tissue)\b/i,
+    guidance: "'Papel higiénico' is universal formal term. In VE informal, 'papel' alone can mean toilet paper but may be ambiguous. Always use 'papel higiénico' for clarity.",
+    expectations: {
+      requiredOutputGroups: [["papel higiénico"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "guagua-bus-caribbean",
+    dialects: ["es-CU", "es-DO", "es-PR"],
+    sourcePattern: /\b(bus|coach|transit|public transport)\b/i,
+    guidance: "'Guagua' is the standard term for bus in CU, DO, PR. In CL/EC/BO it means baby. Do not use 'guagua' for bus outside Caribbean dialects. In formal contexts, 'autobús' works everywhere.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["guagua", "autobús", "bus"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "acelgas-dismissive",
+    dialects: ["es-ES"],
+    sourcePattern: /\b(nonsense|rubbish|bullshit|BS)\b/i,
+    guidance: "'Acelgas' (literally chard) is used colloquially in Spain to mean nonsense/rubbish. For general translation, use 'tonterías', 'memeces', or 'absurdos'.",
+    expectations: {
+      requiredOutputGroups: [["tonterías", "memeces", "absurdos", "necedades"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "chancla-sandal-punishment",
+    dialects: ["es-MX", "es-GT", "es-HN", "es-SV", "es-NI", "es-CR"],
+    sourcePattern: /\b(sandal|flip.flop|slipper|corporal punishment)\b/i,
+    guidance: "'Chancla' is the standard sandal/flip-flop in Mexico and Central America, but carries cultural connotation of maternal discipline ('la chancla'). In formal translation of clothing, it is neutral.",
+    expectations: {
+      requiredOutputGroups: [["chancla", "sandalia", "chancleta"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "mate-drink-ar-uy",
+    dialects: ["es-AR", "es-UY", "es-PY"],
+    sourcePattern: /\b(mate|yerba mate|herbal infusion)\b/i,
+    guidance: "'Mate' is the iconic infused drink of AR, UY, PY. The drinking vessel is also called 'mate' (or 'porongo'). Do not confuse with 'maté' (I killed) or 'mate' (checkmate). Context is usually clear from cultural setting.",
+    expectations: {
+      requiredOutputGroups: [["mate", "yerba mate", "infusión"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "plata-silver-money",
+    dialects: "all",
+    sourcePattern: /\b(money|cash|silver|coins)\b/i,
+    guidance: "'Plata' means silver (metal) universally, but in most LatAm it is also the most common colloquial term for money. 'Pasta' (ES informal), 'lana' (MX), 'guita' (AR), 'luca' (CL, individual note). For formal: 'dinero'.",
+    expectations: {
+      requiredOutputGroups: [["dinero", "plata", "efectivo"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "lata-can-pain",
+    dialects: ["es-MX"],
+    sourcePattern: /\b(can|tin|canned|annoying|pain)\b/i,
+    guidance: "'Lata' means tin/can universally, but in Mexican Spanish 'dar la lata' means to annoy/be a pain. Context determines meaning. For metal containers, 'lata' is neutral.",
+    expectations: {
+      requiredOutputGroups: [["lata", "envase", "bote"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "saco-jacket-co",
+    dialects: ["es-CO", "es-VE"],
+    sourcePattern: /\b(jacket|blazer|sport coat|suit jacket)\b/i,
+    guidance: "'Saco' is the standard term for jacket/blazer in CO and VE. In other dialects 'saco' can mean sack/bag. Use 'chaqueta' for MX (where 'chaqueta' has no vulgar connotation in this context), 'americana' (ES formal).",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["saco", "chaqueta", "americana", "blazer"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "palta-avocado-southern",
+    dialects: ["es-CL", "es-PE", "es-AR", "es-UY"],
+    sourcePattern: /\b(avocado|palta|aguacate)\b/i,
+    guidance: "'Palta' is the standard term for avocado in CL, PE, AR, UY. 'Aguacate' is used in MX, Central Am, CO, Caribbean. Both terms are understood everywhere but regional preference is strong.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["palta", "aguacate"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "poroto-bean-southern",
+    dialects: ["es-CL", "es-AR", "es-UY", "es-PY"],
+    sourcePattern: /\b(bean|beans|legume|green bean)\b/i,
+    guidance: "'Poroto' is the standard term for bean in CL, AR, UY, PY. 'Frijol' is used in MX, Central Am, CO. 'Judía' and 'alubia' in ES. Strong regional preference.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [
+        ["poroto", "frijol", "judía", "alubia", "habichuela"],
+      ],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "chompa-jacket-andean",
+    dialects: ["es-PE", "es-BO", "es-EC"],
+    sourcePattern: /\b(jacket|coat|windbreaker)\b/i,
+    guidance: "'Chompa' is common for jacket/sweater in Andean regions (PE, BO, EC). From English 'jumper'. Use 'chaqueta' for formal, 'chompa' is informal standard.",
+    expectations: {
+      requiredOutputGroups: [["chompa", "chaqueta", "campera"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "billetera-wallet-ar-uy",
+    dialects: ["es-AR", "es-UY", "es-PY", "es-CL"],
+    sourcePattern: /\b(wallet|billfold|purse)\b/i,
+    guidance: "'Billetera' is standard for wallet in Southern Cone. 'Cartera' in AR/UY means purse/handbag, while in MX/ES 'cartera' can mean wallet. 'Portafolio' in CO. Regional preference is strong.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [["billetera", "cartera", "portafolio"]],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "laptop-notebook-ar",
+    dialects: ["es-AR", "es-UY"],
+    sourcePattern: /\b(laptop|notebook|portable computer)\b/i,
+    guidance: "'Notebook' (loanword) is the most common term for laptop in AR and UY. 'Laptop' is used in most LatAm. 'Portátil' in ES. The loanword is fully naturalized in Rioplatense Spanish.",
+    expectations: (dialect) => ({
+      requiredOutputGroups: [["notebook", "laptop", "portátil", "computadora portátil"]],
+      forbiddenOutputTerms: [],
+    }),
+  },
+
+  {
+    id: "tuerta-one-eyed",
+    dialects: ["es-PR", "es-DO"],
+    sourcePattern: /\b(one.eyed|blind in one eye|patch)\b/i,
+    guidance: "'Tuerto/tuerta' means one-eyed and is used across all dialects. In PR/DO slang, it can have additional colloquial meanings. In formal contexts, use 'persona con pérdida de visión en un ojo'.",
+    expectations: {
+      requiredOutputGroups: [["tuerto", "tuerta"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "limon-lemon-lime",
+    dialects: "all",
+    sourcePattern: /\b(lemon|lime|citrus|yellow citrus|green citrus)\b/i,
+    guidance: "'Limón' is used for both lemon and lime in most LatAm, while Spain distinguishes 'limón' (lemon) from 'lima' (lime). In MX, 'limón' usually means lime. Context clarification may be needed for precise botanical distinction.",
+    expectations: {
+      requiredOutputGroups: [["limón", "lima"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "recia-strong-woman",
+    dialects: ["es-CO", "es-VE", "es-EC"],
+    sourcePattern: /\b(strong woman|formidable woman|tough woman)\b/i,
+    guidance: "'Recia' in Andean and northern South American Spanish describes a strong, hardworking woman and is generally positive. In other dialects it may sound unusual. 'Mujer fuerte' works universally.",
+    expectations: {
+      requiredOutputGroups: [["recia", "mujer fuerte", "fuerte"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
+  {
+    id: "chingar-vulgar-mx",
+    dialects: ["es-MX"],
+    sourcePattern: /\b(fuck|screw|mess up|ruin)\b/i,
+    guidance: "'Chingar' is the most versatile vulgar verb in Mexican Spanish (like 'fuck' in English). Its conjugated forms appear in countless expressions. In formal translation, use 'molestar', 'arruinar', 'fastidiar'. The vulgar form should only appear when source demands it.",
+    expectations: {
+      requiredOutputGroups: [["molestar", "arruinar", "fastidiar", "joder"]],
+      forbiddenOutputTerms: [],
+    },
+  },
+
 ];
 
 function appliesToDialect(rule: LexicalAmbiguityRule, dialect: SpanishDialect): boolean {

@@ -109,9 +109,11 @@ describe("buildConjugationPrompt", () => {
     expect(prompt).toContain("conducir");
   });
 
-  it("es-ES has no lemma changes since conducir is the standard", () => {
+  it("es-ES has lemma changes for new vocabulary verbs", () => {
     const prompt = buildConjugationPrompt("es-ES");
-    expect(prompt).toBe("");
+    expect(prompt).toContain("charlar");
+    expect(prompt).toContain("echar de menos");
+    expect(prompt).toContain("enfadarse");
   });
 
   it("shows lemma changes for MX", () => {
@@ -156,8 +158,8 @@ describe("validateDialectCompliance", () => {
 
   it("handles source text with no matching concepts", () => {
     const result = validateDialectCompliance(
-      "The quick brown fox jumps over the lazy dog",
-      "El rápido zorro marrón salta sobre el perro perezoso",
+      "Sphinx of black quartz, judge my vow",
+      "Esfinge de cuarzo negro, juzga mi voto",
       "es-ES",
     );
     expect(result.checkedConcepts).toBe(0);

@@ -573,9 +573,9 @@ describe("getSyntacticRules", () => {
     expect(ids).toContain("loismo-americas");
   });
 
-  it("es-CR gets usted-formal rule", () => {
+  it("es-CR gets voseo-CR-regional rule", () => {
     const rules = getSyntacticRules("es-CR");
     const ids = rules.map((r) => r.id);
-    expect(ids).toContain("usted-formal-CR");
+    expect(ids).toContain("voseo-CR-regional");
   });
 });

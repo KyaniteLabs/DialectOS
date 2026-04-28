@@ -115,12 +115,13 @@ export const ALL_AMERICAN_DIALECTS: readonly SpanishDialect[] = [
 /** Dialects where voseo is the standard informal register */
 export const FULL_VOSEO_DIALECTS: readonly SpanishDialect[] = [
   ...DIALECT_REGIONS.rioplatense.dialects,  // AR, UY, PY
-  "es-GT", "es-HN", "es-SV", "es-NI", "es-CR",  // Central America (partial in CR)
+  "es-GT", "es-HN", "es-SV", "es-NI",  // Central America (excluding CR — see REGIONAL)
 ];
 
 /** Dialects where voseo exists but tú is standard in formal writing */
 export const REGIONAL_VOSEO_DIALECTS: readonly SpanishDialect[] = [
   "es-BO", "es-EC",  // Andean with informal voseo
+  "es-CR",  // CR uses usted heavily; vos is common informal but not dominant
   ...DIALECT_REGIONS.northernSouthAmerica.dialects,  // CO, VE
   ...DIALECT_REGIONS.chilean.dialects,  // CL
 ];

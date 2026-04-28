@@ -264,7 +264,7 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
   },
   {
     id: "voseo-central-america",
-    dialects: ["es-GT", "es-HN", "es-SV", "es-NI", "es-CR"],
+    dialects: ["es-GT", "es-HN", "es-SV", "es-NI"],
     rule: "Use voseo: vos for informal singular. Conjugate like Rioplatense: -ar→-ás, -er→-és, -ir→-ís.",
     enforcement: "validate",
   },
@@ -278,6 +278,12 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
     id: "voseo-CO-VE-CL",
     dialects: ["es-CO", "es-VE", "es-CL"],
     rule: "Voseo exists in informal registers but tú is standard in formal writing. Default to tú for formal, vos for informal.",
+    enforcement: "prompt-only",
+  },
+  {
+    id: "voseo-CR-regional",
+    dialects: ["es-CR"],
+    rule: "Costa Rican Spanish uses usted extensively even in informal contexts. Vos is common in informal speech but not dominant. Default to usted for neutral register, vos for explicitly informal contexts. Avoid tú unless specifically requested.",
     enforcement: "prompt-only",
   },
   {
@@ -302,12 +308,6 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
     id: "pretérito-simple-americas",
     dialects: ALL_AMERICAN_DIALECTS,
     rule: "Use pretérito indefinido (simple past) for completed actions regardless of recency (hoy comí, ayer comí). The perfecto compuesto is rare in most registers.",
-    enforcement: "prompt-only",
-  },
-  {
-    id: "usted-formal-CR",
-    dialects: ["es-CR"],
-    rule: "Costa Rican Spanish uses usted even in some informal contexts. Vos is also used. Avoid tú unless specifically requested.",
     enforcement: "prompt-only",
   },
   {
