@@ -3,7 +3,8 @@ import type { SpanishDialect } from "./index.js";
 export type SemanticField =
   | "technology" | "transport" | "food" | "household" | "clothing"
   | "actions" | "social" | "people" | "education" | "body_parts" | "nature"
-  | "medicine_health" | "family_kinship" | "finance_banking" | "accessibility";
+  | "medicine_health" | "family_kinship" | "finance_banking" | "accessibility"
+  | "core_vocabulary";
 
 export interface Variant {
   term: string;
@@ -5848,5 +5849,193 @@ export const DICTIONARY: readonly DictionaryEntry[] = [
     "es-MX": { term: "subtítulos", frequency: 1, register: "universal" },
     "es-AR": { term: "subtítulos", frequency: 1, register: "universal" },
   }},
+
+// --- core_vocabulary (highest-frequency Spanish nouns) ---
+
+{ field: "core_vocabulary", concept: "time_weather", englishGloss: "time; weather",
+  panHispanic: "tiempo",
+  variants: {
+    "es-ES": { term: "tiempo", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "year", englishGloss: "year",
+  panHispanic: "año",
+  variants: {
+    "es-ES": { term: "año", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "day", englishGloss: "day",
+  panHispanic: "día",
+  variants: {
+    "es-ES": { term: "día", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "night", englishGloss: "night",
+  panHispanic: "noche",
+  variants: {
+    "es-ES": { term: "noche", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "hour", englishGloss: "hour; time of day",
+  panHispanic: "hora",
+  variants: {
+    "es-ES": { term: "hora", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "word", englishGloss: "word",
+  panHispanic: "palabra",
+  variants: {
+    "es-ES": { term: "palabra", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "name", englishGloss: "name",
+  panHispanic: "nombre",
+  variants: {
+    "es-ES": { term: "nombre", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "voice", englishGloss: "voice",
+  panHispanic: "voz",
+  variants: {
+    "es-ES": { term: "voz", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "city", englishGloss: "city; large town",
+  panHispanic: "ciudad",
+  variants: {
+    "es-MX": { term: "ciudad", frequency: 1, register: "universal" },
+    "es-ES": { term: "ciudad", frequency: 1, register: "universal" },
+    "es-AR": { term: "ciudad", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "street", englishGloss: "street; road in a town",
+  panHispanic: "calle",
+  variants: {
+    "es-ES": { term: "calle", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "town_village", englishGloss: "town; village; people",
+  panHispanic: "pueblo",
+  variants: {
+    "es-ES": { term: "pueblo", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "country", englishGloss: "country; nation",
+  panHispanic: "país",
+  variants: {
+    "es-ES": { term: "país", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "road_path", englishGloss: "road; path; way",
+  panHispanic: "camino",
+  variants: {
+    "es-ES": { term: "camino", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "life", englishGloss: "life",
+  panHispanic: "vida",
+  variants: {
+    "es-ES": { term: "vida", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "world", englishGloss: "world",
+  panHispanic: "mundo",
+  variants: {
+    "es-ES": { term: "mundo", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "thing", englishGloss: "thing; object",
+  panHispanic: "cosa",
+  variants: {
+    "es-VE": { term: "vaina", frequency: 1, register: "informal" },
+    "es-DO": { term: "vaina", frequency: 1, register: "informal" },
+  } },
+{ field: "core_vocabulary", concept: "reason", englishGloss: "reason; cause",
+  panHispanic: "razón",
+  variants: {
+    "es-ES": { term: "razón", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "example", englishGloss: "example",
+  panHispanic: "ejemplo",
+  variants: {
+    "es-ES": { term: "ejemplo", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "part", englishGloss: "part; portion",
+  panHispanic: "parte",
+  variants: {
+    "es-ES": { term: "parte", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "problem", englishGloss: "problem; issue",
+  panHispanic: "problema",
+  variants: {
+    "es-ES": { term: "problema", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "point_place", englishGloss: "point; place; tip",
+  panHispanic: "punto",
+  variants: {
+    "es-ES": { term: "punto", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "family", englishGloss: "family",
+  panHispanic: "familia",
+  variants: {
+    "es-ES": { term: "familia", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "sky", englishGloss: "sky; heaven",
+  panHispanic: "cielo",
+  variants: {
+    "es-ES": { term: "cielo", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "fire", englishGloss: "fire",
+  panHispanic: "fuego",
+  variants: {
+    "es-ES": { term: "fuego", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "air", englishGloss: "air",
+  panHispanic: "aire",
+  variants: {
+    "es-ES": { term: "aire", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "tree", englishGloss: "tree",
+  panHispanic: "árbol",
+  variants: {
+    "es-ES": { term: "árbol", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "flower", englishGloss: "flower",
+  panHispanic: "flor",
+  variants: {
+    "es-ES": { term: "flor", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "cat", englishGloss: "cat",
+  panHispanic: "gato",
+  variants: {
+    "es-ES": { term: "gato", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "food_meal", englishGloss: "food; meal",
+  panHispanic: "comida",
+  variants: {
+    "es-MX": { term: "comida", frequency: 1, register: "universal" },
+    "es-ES": { term: "comida", frequency: 1, register: "universal" },
+    "es-AR": { term: "comida", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "wine", englishGloss: "wine",
+  panHispanic: "vino",
+  variants: {
+    "es-ES": { term: "vino", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "book", englishGloss: "book",
+  panHispanic: "libro",
+  variants: {
+    "es-ES": { term: "libro", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "bank_financial", englishGloss: "bank (financial institution)",
+  panHispanic: "banco",
+  variants: {
+    "es-ES": { term: "banco", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "price", englishGloss: "price; cost",
+  panHispanic: "precio",
+  variants: {
+    "es-ES": { term: "precio", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "market", englishGloss: "market; marketplace",
+  panHispanic: "mercado",
+  variants: {
+    "es-ES": { term: "mercado", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "house_home", englishGloss: "house; home",
+  panHispanic: "casa",
+  variants: {
+    "es-ES": { term: "casa", frequency: 1, register: "universal" },
+  } },
+{ field: "core_vocabulary", concept: "earth_ground", englishGloss: "earth; ground; land",
+  panHispanic: "tierra",
+  variants: {
+    "es-ES": { term: "tierra", frequency: 1, register: "universal" },
+  } },
 
 ];
