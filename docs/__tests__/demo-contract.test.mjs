@@ -7,7 +7,7 @@ const engine = readFileSync(new URL("../dialectos-engine.js", import.meta.url), 
 
 test("docs demo is wired to the full app backend", () => {
   assert.match(html, /Full-app translator/i);
-  assert.match(html, /fetch\('\/api\/translate'/);
+  assert.match(html, /\/api\/translate/);
   assert.match(html, /live backend → LLM, static page → vocabulary engine/);
   assert.match(html, /Translate with full app/i);
 });

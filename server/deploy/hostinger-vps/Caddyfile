@@ -1,0 +1,19 @@
+{$DIALECTOS_PUBLIC_HOST} {
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy no-referrer
+		Access-Control-Allow-Origin *
+		Access-Control-Allow-Methods "GET, POST, OPTIONS"
+		Access-Control-Allow-Headers "Content-Type, Accept"
+	}
+
+	@options {
+		method OPTIONS
+	}
+	respond @options 204
+
+	reverse_proxy dialectos-api:8080
+}

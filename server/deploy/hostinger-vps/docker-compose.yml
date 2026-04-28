@@ -1,0 +1,34 @@
+services:
+  dialectos-api:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: dialectos-demo:hostinger
+    restart: unless-stopped
+    env_file:
+      - ./env.hostinger
+    environment:
+      PORT: "8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    expose:
+      - "8080"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - dialectos-api
+    environment:
+      DIALECTOS_PUBLIC_HOST: ${DIALECTOS_PUBLIC_HOST:?Set DIALECTOS_PUBLIC_HOST in env.hostinger}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_config:
+  caddy_data:

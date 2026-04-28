@@ -29,6 +29,8 @@ const PUBLIC_STATIC_FILES = new Map([
   ["/docs/index.html", "docs/index.html"],
   ["/docs/full-app-demo.md", "docs/full-app-demo.md"],
   ["/docs/dialectos-engine.js", "docs/dialectos-engine.js"],
+  ["/dialectos-engine.js", "docs/dialectos-engine.js"],
+  ["/assets/dialectos-logo.svg", "docs/assets/dialectos-logo.svg"],
 ]);
 
 function createRateLimiter(options = {}) {
