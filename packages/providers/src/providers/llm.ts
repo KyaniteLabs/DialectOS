@@ -197,7 +197,27 @@ function isGarbageOutput(source: string, output: string): boolean {
   return false;
 }
 
+const SANITIZE_MAP: Array<[RegExp, string]> = [
+  [/—/g, "-"],           // em-dash → hyphen
+  [/–/g, "-"],           // en-dash → hyphen
+  [/‘|’/g, "'"],    // smart single quotes
+  [/“|”/g, '"'],    // smart double quotes
+  [/€/g, "EUR"],         // € → EUR
+  [/£/g, "GBP"],         // £ → GBP
+  [/¥/g, "JPY"],         // ¥ → JPY
+  [/…/g, "..."],         // … → ...
+];
+
+function sanitizeForPrompt(text: string): string {
+  let result = text;
+  for (const [pattern, replacement] of SANITIZE_MAP) {
+    result = result.replace(pattern, replacement);
+  }
+  return result;
+}
+
 function buildUserPrompt(text: string, sourceLang: string, targetLang: string, options: TranslateOptions = {}): string {
+  const sanitized = sanitizeForPrompt(text);
   return [
     `Source language: ${sourceLang}.`,
     `Target language: ${targetLang}.`,
@@ -206,7 +226,7 @@ function buildUserPrompt(text: string, sourceLang: string, targetLang: string, o
     options.context ? `Dialect/context instructions: ${options.context}` : undefined,
     "Source text (delimited by <<< and >>>):",
     "<<<",
-    text,
+    sanitized,
     ">>>",
   ].filter(Boolean).join("\n");
 }
@@ -226,6 +246,10 @@ export class LLMProvider implements TranslationProvider {
   private rateLimiter: RateLimiter;
   private needsApiKey: boolean;
   private allowLocal: boolean;
+  private activeCount = 0;
+  private maxConcurrency: number;
+  private maxQueueSize: number;
+  private queue: Array<() => void> = [];
 
   constructor(options: LLMProviderOptions = {}) {
     const model = options.model || process.env.LLM_MODEL || "";
@@ -266,6 +290,8 @@ export class LLMProvider implements TranslationProvider {
       options.maxRequests || parseInt(process.env.LLM_RATE_LIMIT || "", 10) || DEFAULT_MAX_REQUESTS,
       options.windowMs || parseInt(process.env.LLM_RATE_WINDOW_MS || "", 10) || DEFAULT_WINDOW_MS
     );
+    this.maxConcurrency = parseInt(process.env.LLM_MAX_CONCURRENCY || "", 10) || 1;
+    this.maxQueueSize = parseInt(process.env.LLM_MAX_QUEUE || "", 10) || 10;
   }
 
   getCircuitBreaker(): CircuitBreaker {
@@ -286,6 +312,30 @@ export class LLMProvider implements TranslationProvider {
       dialectHandling: "semantic",
       rateLimitHints: { maxRequests: DEFAULT_MAX_REQUESTS, windowMs: DEFAULT_WINDOW_MS },
     };
+  }
+
+  private acquireSlot(): Promise<void> {
+    if (this.activeCount < this.maxConcurrency) {
+      this.activeCount++;
+      return Promise.resolve();
+    }
+    if (this.queue.length >= this.maxQueueSize) {
+      return Promise.reject(new Error("LLM provider busy — too many pending requests. Try again later."));
+    }
+    return new Promise<void>((resolve, reject) => {
+      this.queue.push(() => {
+        this.activeCount++;
+        resolve();
+      });
+    });
+  }
+
+  private releaseSlot(): void {
+    this.activeCount--;
+    if (this.queue.length > 0) {
+      const next = this.queue.shift()!;
+      next();
+    }
   }
 
   async translate(
@@ -309,20 +359,24 @@ export class LLMProvider implements TranslationProvider {
       throw new Error("LLM provider is temporarily unavailable (circuit open)");
     }
     await this.rateLimiter.acquire();
+    await this.acquireSlot();
+    try {
+      // Attempt 1: normal prompt
+      let result = await this._doTranslate(text, sourceLang, targetLang, options, buildSystemPrompt());
 
-    // Attempt 1: normal prompt
-    let result = await this._doTranslate(text, sourceLang, targetLang, options, buildSystemPrompt());
-
-    // If output looks like garbage, retry once with a stricter prompt
-    if (isGarbageOutput(text, result.translatedText)) {
-      result = await this._doTranslate(text, sourceLang, targetLang, options, buildStrictSystemPrompt());
+      // If output looks like garbage, retry once with a stricter prompt
       if (isGarbageOutput(text, result.translatedText)) {
-        throw new Error("LLM produced garbage output after retry");
+        result = await this._doTranslate(text, sourceLang, targetLang, options, buildStrictSystemPrompt());
+        if (isGarbageOutput(text, result.translatedText)) {
+          throw new Error("LLM produced garbage output after retry");
+        }
       }
-    }
 
-    this.breaker.recordSuccess();
-    return result;
+      this.breaker.recordSuccess();
+      return result;
+    } finally {
+      this.releaseSlot();
+    }
   }
 
   private async _doTranslate(

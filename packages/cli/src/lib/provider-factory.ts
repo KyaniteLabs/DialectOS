@@ -17,8 +17,8 @@ import { LLMProvider } from "@dialectos/providers";
  * - LIBRETRANSLATE_URL → LibreTranslateProvider
  * - ENABLE_MYMEMORY=1 → MyMemoryProvider (legacy fallback)
  */
-export function createProviderRegistry(): ProviderRegistry {
-  const registry = new ProviderRegistry();
+export function createProviderRegistry(useCache = false): ProviderRegistry {
+  const registry = new ProviderRegistry(5, 60000, useCache);
 
   // Register LLM first when configured; getAuto also ranks semantic providers first.
   const llmEndpoint = process.env.LLM_API_URL || process.env.LLM_ENDPOINT || process.env.LM_STUDIO_URL;

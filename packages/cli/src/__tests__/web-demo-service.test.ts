@@ -117,7 +117,7 @@ describe("web demo service", () => {
     expect(generic.translate).not.toHaveBeenCalled();
   });
 
-  it("rejects provider output that fails the quality judge", async () => {
+  it("returns quality warnings for non-critical judge issues instead of rejecting", async () => {
     const registry = new ProviderRegistry();
     const provider = makeProvider("llm");
     vi.mocked(provider.translate).mockResolvedValue({
@@ -126,10 +126,14 @@ describe("web demo service", () => {
     });
     registry.register(provider);
 
-    await expect(translateForWebDemo({
+    const result = await translateForWebDemo({
       text: "Pick up the file before deployment.",
       dialect: "es-MX",
-    }, registry)).rejects.toThrow(/Provider output failed quality judge/);
+    }, registry);
+    expect(result.ok !== false).toBe(true);
+    expect(result.translatedText).toBe("Recoger the file before deploying.");
+    expect(result.qualityWarnings.length).toBeGreaterThan(0);
+    expect(result.qualityWarnings.some((w: string) => /accuracy/.test(w))).toBe(true);
   });
 
   it("reports missing providers instead of falling back to static rule substitutions", async () => {

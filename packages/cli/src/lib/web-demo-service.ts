@@ -32,6 +32,9 @@ export interface WebDemoTranslateResult {
   sourceDetection: ReturnType<typeof detectDialect>;
   semanticPromptApplied: boolean;
   providerStatus: WebDemoProviderStatus;
+  latencyMs: number;
+  qualityWarnings: string[];
+  cacheHit: boolean;
 }
 
 const VALID_PROVIDERS = new Set(["auto", "llm", "deepl", "libre", "mymemory"]);
@@ -52,7 +55,7 @@ function validateWebDemoProvider(provider: string | undefined): string | undefin
 }
 
 export function getWebDemoProviderStatus(
-  registry: ProviderRegistry = createProviderRegistry()
+  registry: ProviderRegistry = createProviderRegistry(true)
 ): WebDemoProviderStatus {
   const providers = registry.listProviders();
   const semanticProviders = providers.filter((name) =>
@@ -74,8 +77,9 @@ export function getWebDemoProviderStatus(
 
 export async function translateForWebDemo(
   request: WebDemoTranslateRequest,
-  registry: ProviderRegistry = createProviderRegistry()
+  registry: ProviderRegistry = createProviderRegistry(true)
 ): Promise<WebDemoTranslateResult> {
+  const startedAt = Date.now();
   const text = request.text.trim();
   if (!text) {
     throw new Error("No input text provided");
@@ -123,10 +127,19 @@ export async function translateForWebDemo(
     requiredOutputGroups: lexicalExpectations.requiredOutputGroups,
     forbiddenOutputTerms: lexicalExpectations.forbiddenOutputTerms,
   }, dialect, translated.translatedText);
-  if (judge.blockingIssues.length > 0) {
+
+  const qualityWarnings: string[] = judge.issues.map(
+    (issue) => `${issue.category}/${issue.severity}: ${issue.message}`
+  );
+
+  // Only hard-fail for critical security/safety issues; everything else is a warning
+  const criticalIssues = judge.blockingIssues.filter(
+    (issue) => issue.category === "prompt-leak" || issue.category === "taboo-safety"
+  );
+  if (criticalIssues.length > 0) {
     throw new Error(
       `Provider output failed quality judge: ${
-        judge.blockingIssues.map((issue) => `${issue.category}/${issue.severity}: ${issue.message}`).join("; ")
+        criticalIssues.map((issue) => `${issue.category}/${issue.severity}: ${issue.message}`).join("; ")
       }`
     );
   }
@@ -140,6 +153,9 @@ export async function translateForWebDemo(
     sourceDetection: detectDialect(text),
     semanticPromptApplied: true,
     providerStatus,
+    latencyMs: Date.now() - startedAt,
+    qualityWarnings,
+    cacheHit: translated.cacheHit,
   };
 }
 
@@ -159,24 +175,28 @@ async function translateWithSemanticDemoProviders(
   providerUsed: string;
   fallbackCount: number;
   retryCount: number;
+  cacheHit: boolean;
 }> {
   const errors: string[] = [];
   for (const [attemptIndex, name] of providers.entries()) {
     try {
       const provider = registry.get(name);
       const prepared = registry.prepareRequest(name, text, sourceLang, targetLang, options);
+      const preSize = getCacheSize(registry, name);
       const result = await provider.translate(
         text,
         prepared.sourceLang,
         prepared.targetLang,
         prepared.options
       );
+      const postSize = getCacheSize(registry, name);
       registry.recordSuccess(name);
       return {
         translatedText: result.translatedText,
         providerUsed: provider.name,
         fallbackCount: attemptIndex,
         retryCount: 0,
+        cacheHit: preSize === postSize && postSize > 0,
       };
     } catch (error) {
       registry.recordFailure(name);
@@ -185,4 +205,16 @@ async function translateWithSemanticDemoProviders(
   }
 
   throw new Error(`All semantic demo providers failed (${providers.join(" -> ")}): ${errors.join(" | ")}`);
+}
+
+function getCacheSize(registry: ProviderRegistry, _providerName: string): number {
+  try {
+    const entry = (registry as unknown as { providers?: Map<string, { provider: { getCacheStats?: () => { size: number } } }> }).providers;
+    if (!entry) return 0;
+    for (const [, val] of entry) {
+      const stats = val.provider?.getCacheStats?.();
+      if (stats) return stats.size;
+    }
+  } catch { /* cache not available */ }
+  return 0;
 }

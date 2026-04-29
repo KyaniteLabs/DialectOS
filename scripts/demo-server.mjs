@@ -226,7 +226,9 @@ export function createDemoServer(options = {}) {
       }
 
       if (method === "POST" && url.pathname === "/api/translate") {
-        const key = req.socket.remoteAddress || "unknown";
+        const forwarded = req.headers["x-forwarded-for"];
+        const realIp = typeof forwarded === "string" ? forwarded.split(",")[0].trim() : Array.isArray(forwarded) ? forwarded[0] : req.headers["x-real-ip"];
+        const key = (typeof realIp === "string" ? realIp : req.socket.remoteAddress) || "unknown";
         const rate = rateLimiter.check(key);
         if (!rate.allowed) {
           sendJson(res, 429, {
