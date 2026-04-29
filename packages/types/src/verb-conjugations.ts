@@ -1218,7 +1218,7 @@ export const VERB_CONJUGATIONS: VerbConjugation[] = [
   infinitive: "interesar",
   meaning: "to interest, to matter",
   category: "conjugation-pattern",
-  forms: buildForms(túForms("interesas", "interesa"), vosForms("interesanás", "interesá")),
+  forms: buildForms(túForms("interesas", "interesa"), vosForms("interesás", "interesá")),
 },
 
 {

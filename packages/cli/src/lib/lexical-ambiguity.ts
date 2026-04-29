@@ -497,7 +497,7 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
     guidance: "In Mexican Spanish, 'chaqueta' is vulgar slang for masturbation. Always use 'chamarra' for jacket/coat in MX. This is one of the most dangerous dialectal traps.",
     expectations: {
       requiredOutputGroups: [
-        ["chamarra", "chaqueta"],
+        ["chamarra", "chamarra de piel", "saco"],
       ],
       forbiddenOutputTerms: ["chaqueta"],
     },
@@ -646,7 +646,7 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
     sourcePattern: /\b(faggot|gay slur|homophobic slur)\b/i,
     guidance: "'Pirobo' is a homophobic slur in Colombian Spanish. Do not use it in any translation context. Use neutral terminology or omit depending on translation goals.",
     expectations: {
-      requiredOutputGroups: [[]],
+      requiredOutputGroups: [["persona", "hombre", "mujer", "individuo"]],
       forbiddenOutputTerms: ["pirobo"],
     },
   },
@@ -680,7 +680,7 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
     guidance: "'Chévere' is the standard 'cool/awesome' in VE, CO, DO, PR, PA. It originated in Venezuela. In other dialects, 'genial', 'bárbaro' (AR), 'padre' (MX), 'guay' (ES) are preferred.",
     expectations: (dialect) => ({
       requiredOutputGroups: [
-        ["chévere", "chévere", "bueno", "genial"],
+        ["chévere", "bueno", "genial"],
       ],
       forbiddenOutputTerms: [],
     }),
@@ -729,7 +729,7 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
     sourcePattern: /\b(straw|drinking straw)\b/i,
     guidance: "'Pajita' is the standard term for drinking straw in Spain, but in many Latin American dialects 'paja' and 'pajita' have masturbatory connotations. Use 'pajita' only for es-ES/es-AD.",
     expectations: {
-      requiredOutputGroups: [["pajita", "pajita", "pajilla"]],
+      requiredOutputGroups: [["pajita", "pajilla"]],
       forbiddenOutputTerms: [],
     },
   },
@@ -1004,17 +1004,6 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
   },
 
   {
-    id: "chaqueta-jacket-mx",
-    dialects: ["es-MX"],
-    sourcePattern: /\b(jacket|coat|blazer|chaqueta|chamarra|campera)\b/i,
-    guidance: "'Chaqueta' means jacket in most Spanish dialects but is vulgar slang for masturbation in Mexican Spanish. Always use 'chamarra' for jacket/coat in Mexican Spanish. 'Campera' is also used in Argentina. This is one of the most dangerous false friends in Spanish dialectology.",
-    expectations: (dialect) => ({
-      requiredOutputGroups: [dialect === "es-MX" ? ["chamarra", "saco", "abrigo"] : ["chaqueta", "chamarra", "campera", "saco"]],
-      forbiddenOutputTerms: dialect === "es-MX" ? ["chaqueta"] : [],
-    }),
-  },
-
-  {
     id: "bombilla-lightbulb-mate",
     dialects: ["es-AR", "es-UY", "es-PY"],
     sourcePattern: /\b(lightbulb|bulb|bombilla|foco)\b/i,
@@ -1048,17 +1037,6 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
   },
 
   {
-    id: "mamacita-catcall",
-    dialects: ["es-MX", "es-CO", "es-DO", "es-PR", "es-VE", "es-CU"],
-    sourcePattern: /\b(hot woman|attractive woman|babe|mamacita|mami)\b/i,
-    guidance: "'Mamacita' and 'mami' can be affectionate within close relationships but are widely used in street harassment (catcalling) across Caribbean, Mexican, and northern South American Spanish. In formal or professional translation, use 'mujer atractiva', 'hermosa'. Avoid mamacita unless source is explicitly casual/street register.",
-    expectations: {
-      requiredOutputGroups: [["mujer atractiva", "hermosa", "guapa", "linda"]],
-      forbiddenOutputTerms: [],
-    },
-  },
-
-  {
     id: "gringo-foreigner",
     dialects: ["es-MX", "es-GT", "es-HN", "es-SV", "es-NI", "es-CR", "es-PA"],
     sourcePattern: /\b(foreigner|american|gringo|gringa|gabacho)\b/i,
@@ -1070,56 +1048,12 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
   },
 
   {
-    id: "pirobo-insult-co",
-    dialects: ["es-CO"],
-    sourcePattern: /\b(jerk|asshole|bastard|despicable)\b/i,
-    guidance: "'Pirobo' is a highly offensive Colombian insult (implies sexual deviance). It should never appear in formal or neutral translation. Use 'idiota', 'imbécil', 'persona despreciable' instead. Only use in explicitly vulgar source text matching.",
-    expectations: {
-      requiredOutputGroups: [["idiota", "imbécil", "persona despreciable"]],
-      forbiddenOutputTerms: [],
-    },
-  },
-
-  {
     id: "carechimba-insult-co",
     dialects: ["es-CO"],
     sourcePattern: /\b(fuck off|go away|get lost|hell)\b/i,
     guidance: "'Carechimba' is extremely vulgar Colombian slang (combines 'cara' + 'chimba', vulgar for female genitalia). It's used as an emphatic exclamation. Never use in formal translation. Use 'vete', 'váyase', 'diablos' for neutral equivalents.",
     expectations: {
       requiredOutputGroups: [["vete", "váyase", "diablos"]],
-      forbiddenOutputTerms: [],
-    },
-  },
-
-  {
-    id: "arrecho-angry-ve",
-    dialects: ["es-VE"],
-    sourcePattern: /\b(angry|furious|pissed off|horny|aroused)\b/i,
-    guidance: "'Arrecho' in Venezuela means angry/furious. In Colombia, it means horny/aroused. This is a dangerous false friend between neighboring countries. For Venezuelan dialect, 'arrecho' = angry is correct. For Colombian, avoid 'arrecho' for anger and use 'enojado', 'bravo', 'furioso' instead.",
-    expectations: (dialect) => ({
-      requiredOutputGroups: [dialect === "es-VE" ? ["arrecho", "bravo", "furioso", "enojado"] : ["enojado", "bravo", "furioso"]],
-      forbiddenOutputTerms: [],
-    }),
-  },
-
-  {
-    id: "vaina-thing-do-ve",
-    dialects: ["es-VE", "es-DO"],
-    sourcePattern: /\b(thing|stuff|thingamajig|whatchamacallit|vaina)\b/i,
-    guidance: "'Vaina' is extremely versatile in Dominican and Venezuelan Spanish — it means 'thing/stuff' but can range from completely neutral to mildly vulgar depending on context and tone. It's a filler word similar to 'thing' in English. In formal translation, use 'cosa', 'asunto', 'tema'. In casual register for VE/DO, 'vaina' is natural.",
-    expectations: {
-      requiredOutputGroups: [["cosa", "asunto", "tema", "vaina"]],
-      forbiddenOutputTerms: [],
-    },
-  },
-
-  {
-    id: "chevere-cool-ve-dr",
-    dialects: ["es-VE", "es-DO", "es-PR", "es-CO", "es-PA"],
-    sourcePattern: /\b(cool|awesome|great|nice|chevere|chévere)\b/i,
-    guidance: "'Chévere' means cool/awesome and originated in Venezuela but spread through Caribbean and northern South America. It's perfectly acceptable in VE, DO, PR, CO, PA. In Spain, Argentina, and southern South America it may sound Caribbean. Use 'genial', 'estupendo', 'buenísimo' for more neutral/pan-Hispanic equivalents.",
-    expectations: {
-      requiredOutputGroups: [["chévere", "genial", "estupendo", "buenísimo", "cool"]],
       forbiddenOutputTerms: [],
     },
   },
@@ -1155,28 +1089,6 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
       requiredOutputGroups: [["tonto", "ingenuo", "inocente", "bobo"]],
       forbiddenOutputTerms: [],
     },
-  },
-
-  {
-    id: "gaveta-drawer-pr-do",
-    dialects: ["es-PR", "es-DO", "es-CU"],
-    sourcePattern: /\b(drawer|gaveta|cajón|cajón de mesa)\b/i,
-    guidance: "'Gaveta' is the standard term for drawer in Puerto Rico, Dominican Republic, and Cuba, but in most other dialects 'cajón' is preferred and 'gaveta' may sound Caribbean or archaic. 'Cajón' is universally understood. Both are correct in their respective regions.",
-    expectations: (dialect) => ({
-      requiredOutputGroups: [dialect === "es-PR" || dialect === "es-DO" || dialect === "es-CU" ? ["gaveta", "cajón"] : ["cajón", "gaveta"]],
-      forbiddenOutputTerms: [],
-    }),
-  },
-
-  {
-    id: "plata-money-latam",
-    dialects: ["es-CO", "es-VE", "es-AR", "es-UY", "es-PY", "es-CL", "es-PE", "es-EC", "es-BO"],
-    sourcePattern: /\b(money|cash|plata|dinero|pasta|lana)\b/i,
-    guidance: "'Plata' is the most common colloquial word for money in Latin America (especially CO, VE, AR, UY, PY, CL). In Spain, 'pasta' or 'dinero' is preferred. In Mexico, 'lana' or 'varo' are common slang. 'Dinero' is the safest universal/formal option. Be aware of register when choosing.",
-    expectations: (dialect) => ({
-      requiredOutputGroups: [["dinero", "plata", "pasta", "lana"]],
-      forbiddenOutputTerms: [],
-    }),
   },
 
   {
@@ -1279,7 +1191,7 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
   },
 
   {
-    id: " frijoles-beans-dialect",
+    id: "frijoles-beans-dialect",
     dialects: ["es-MX", "es-CO", "es-VE", "es-CL", "es-AR", "es-ES"],
     sourcePattern: /\b(beans|frijoles|judías|alubias|porotos|habichuelas|caraotas)\b/i,
     guidance: "Bean terminology is heavily dialectal: 'frijoles' (Mexico, Central America, Colombia), 'porotos' (Argentina, Chile, Uruguay, Paraguay), 'judías' or 'alubias' (Spain), 'caraotas' (Venezuela), 'habichuelas' (Dominican Republic, Puerto Rico, Cuba). Use the dialect-correct term; this is one of the most recognizable dialect markers.",

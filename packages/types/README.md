@@ -38,7 +38,7 @@ Shared TypeScript types and schemas for DialectOS.
 
 ### Dialect regions
 
-- 10 regions: peninsular, mexican, caribbean, centralAmerica, rioplatense, andean, chilean, northernSouthAmerica, usLatino, african, heritage
+- 11 regions: peninsular, mexican, caribbean, centralAmerica, rioplatense, andean, chilean, northernSouthAmerica, usLatino, african, heritage
 - Derived lists: `ALL_AMERICAN_DIALECTS`, `FULL_VOSEO_DIALECTS`, `REGIONAL_VOSEO_DIALECTS`, `CONTACT_PHENOMENA_DIALECTS`, etc.
 
 ### Syntactic rules
