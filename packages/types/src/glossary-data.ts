@@ -1,4 +1,5 @@
-import type { GlossaryEntry } from "./index.js";
+import type { GlossaryEntry, SpanishDialect } from "./index.js";
+import { DICTIONARY } from "./dialectal-dictionary.js";
 
 export type GlossaryCategory =
   | "programming"
@@ -8,7 +9,11 @@ export type GlossaryCategory =
   | "web"
   | "security"
   | "ai"
-  | "localization";
+  | "localization"
+  | "devops"
+  | "database"
+  | "mobile"
+  | "networking";
 
 export const GLOSSARY_CATEGORIES: GlossaryCategory[] = [
   "programming",
@@ -19,6 +24,10 @@ export const GLOSSARY_CATEGORIES: GlossaryCategory[] = [
   "security",
   "ai",
   "localization",
+  "devops",
+  "database",
+  "mobile",
+  "networking",
 ];
 
 const SOURCE_BY_CATEGORY: Record<string, { source: string; sourceUrl: string }> = {
@@ -37,6 +46,22 @@ const SOURCE_BY_CATEGORY: Record<string, { source: string; sourceUrl: string }> 
   general: {
     source: "Microsoft Language Portal",
     sourceUrl: "https://www.microsoft.com/language",
+  },
+  devops: {
+    source: "CNCF Glossary",
+    sourceUrl: "https://glossary.cncf.io/",
+  },
+  database: {
+    source: "Oracle Database Documentation",
+    sourceUrl: "https://docs.oracle.com/en/database/",
+  },
+  mobile: {
+    source: "Apple Developer Documentation",
+    sourceUrl: "https://developer.apple.com/documentation/",
+  },
+  networking: {
+    source: "Cisco Networking Academy",
+    sourceUrl: "https://www.netacad.com/",
   },
   web: {
     source: "MDN Web Docs Glossary",
@@ -59,9 +84,7 @@ const SOURCE_BY_CATEGORY: Record<string, { source: string; sourceUrl: string }> 
 const RAW_GLOSSARY_DATA: GlossaryEntry[] = [
   { term: "algorithm", translation: "algoritmo", category: "programming" },
   { term: "array", translation: "arreglo", category: "programming" },
-  { term: "array", translation: "matriz", category: "programming" },
   { term: "bug", translation: "error", category: "programming" },
-  { term: "bug", translation: "bicho", category: "programming" },
   { term: "class", translation: "clase", category: "programming" },
   { term: "code", translation: "código", category: "programming" },
   { term: "compile", translation: "compilar", category: "programming" },
@@ -87,7 +110,7 @@ const RAW_GLOSSARY_DATA: GlossaryEntry[] = [
   { term: "software", translation: "software", category: "programming" },
   { term: "statement", translation: "sentencia", category: "programming" },
   { term: "string", translation: "cadena", category: "programming" },
-  { term: "string", translation: "hilera", category: "programming" },
+  { term: "string", translation: "cadena de texto", category: "programming" },
   { term: "syntax", translation: "sintaxis", category: "programming" },
   { term: "variable", translation: "variable", category: "programming" },
   { term: "API", translation: "API", category: "technical" },
@@ -97,6 +120,7 @@ const RAW_GLOSSARY_DATA: GlossaryEntry[] = [
   { term: "cache", translation: "caché", category: "technical" },
   { term: "cloud", translation: "nube", category: "technical" },
   { term: "computer", translation: "computador", category: "technical" },
+  { term: "computer", translation: "computadora", category: "technical" },
   { term: "computer", translation: "ordenador", category: "technical" },
   { term: "data", translation: "datos", category: "technical" },
   { term: "database", translation: "base de datos", category: "technical" },
@@ -111,10 +135,11 @@ const RAW_GLOSSARY_DATA: GlossaryEntry[] = [
   { term: "file", translation: "archivo", category: "technical" },
   { term: "file", translation: "fichero", category: "technical" },
   { term: "filesystem", translation: "sistema de archivos", category: "technical" },
-  { term: "framework", translation: "marco de trabajo", category: "technical" },
+  { term: "framework", translation: "marco de trabajo", category: "technical", confidence: "low" },
+  { term: "framework", translation: "framework", category: "technical" },
   { term: "hardware", translation: "hardware", category: "technical" },
-  { term: "host", translation: "anfitrión", category: "technical" },
   { term: "host", translation: "servidor", category: "technical" },
+  { term: "host", translation: "host", category: "technical" },
   { term: "HTTP", translation: "HTTP", category: "technical" },
   { term: "HTTPS", translation: "HTTPS", category: "technical" },
   { term: "interface", translation: "interfaz", category: "technical" },
@@ -184,7 +209,7 @@ const RAW_GLOSSARY_DATA: GlossaryEntry[] = [
   { term: "date", translation: "fecha", category: "general" },
   { term: "description", translation: "descripción", category: "general" },
   { term: "download", translation: "descargar", category: "general" },
-  { term: "error", translation: "error", category: "general" },
+  { term: "error", translation: "error", category: "general" },  // also in programming
   { term: "feature", translation: "característica", category: "general" },
   { term: "feature", translation: "funcionalidad", category: "general" },
   { term: "help", translation: "ayuda", category: "general" },
@@ -362,7 +387,209 @@ const RAW_GLOSSARY_DATA: GlossaryEntry[] = [
   { term: "shortcut", translation: "atajo", category: "general" },
   { term: "sync", translation: "sincronizar", category: "general" },
   { term: "template", translation: "plantilla", category: "general" },
-  { term: "workspace", translation: "espacio de trabajo", category: "general" }
+  { term: "workspace", translation: "espacio de trabajo", category: "general" },
+
+  // --- devops ---
+  { term: "container", translation: "contenedor", category: "devops" },
+  { term: "orchestration", translation: "orquestación", category: "devops" },
+  { term: "pipeline", translation: "pipeline", category: "devops" },
+  { term: "CI/CD", translation: "CI/CD (integración y entrega continua)", category: "devops" },
+  { term: "deployment", translation: "despliegue", category: "devops" },
+  { term: "staging environment", translation: "entorno de pruebas", category: "devops" },
+  { term: "production environment", translation: "entorno de producción", category: "devops" },
+  { term: "monitoring", translation: "monitoreo", category: "devops" },
+  { term: "alerting", translation: "alertas", category: "devops" },
+  { term: "incident", translation: "incidente", category: "devops" },
+  { term: "post-mortem", translation: "post-mortem", category: "devops" },
+  { term: "rollback", translation: "reversión", category: "devops" },
+  { term: "canary deployment", translation: "despliegue canario", category: "devops" },
+  { term: "blue-green deployment", translation: "despliegue azul-verde", category: "devops" },
+  { term: "infrastructure as code", translation: "infraestructura como código", category: "devops" },
+  { term: "load balancer", translation: "balanceador de carga", category: "devops" },
+  { term: "scalability", translation: "escalabilidad", category: "devops" },
+  { term: "uptime", translation: "tiempo de actividad", category: "devops" },
+  { term: "health check", translation: "verificación de estado", category: "devops" },
+  { term: "artifact", translation: "artefacto", category: "devops" },
+  { term: "registry", translation: "registro de artefactos", category: "devops" },
+  { term: "configuration management", translation: "gestión de configuración", category: "devops" },
+  { term: "provisioning", translation: "aprovisionamiento", category: "devops" },
+  { term: "service mesh", translation: "malla de servicios", category: "devops" },
+  { term: "observability", translation: "observabilidad", category: "devops" },
+
+  // --- database ---
+  { term: "query", translation: "consulta", category: "database" },
+  { term: "index", translation: "índice", category: "database" },
+  { term: "migration", translation: "migración", category: "database" },
+  { term: "schema", translation: "esquema", category: "database" },
+  { term: "foreign key", translation: "clave foránea", category: "database" },
+  { term: "join", translation: "unión (JOIN)", category: "database" },
+  { term: "normalization", translation: "normalización", category: "database" },
+  { term: "transaction", translation: "transacción", category: "database" },
+  { term: "backup", translation: "copia de seguridad", category: "database" },
+  { term: "replica", translation: "réplica", category: "database" },
+  { term: "shard", translation: "fragmento (shard)", category: "database" },
+  { term: "partition", translation: "partición", category: "database" },
+  { term: "cursor", translation: "cursor", category: "database" },
+  { term: "stored procedure", translation: "procedimiento almacenado", category: "database" },
+  { term: "trigger", translation: "disparador", category: "database" },
+  { term: "view", translation: "vista", category: "database" },
+  { term: "primary key", translation: "clave primaria", category: "database" },
+  { term: "table", translation: "tabla", category: "database" },
+  { term: "row", translation: "fila", category: "database" },
+  { term: "column", translation: "columna", category: "database" },
+  { term: "constraint", translation: "restricción", category: "database" },
+  { term: "connection pool", translation: "pool de conexiones", category: "database" },
+  { term: "deadlock", translation: "interbloqueo", category: "database" },
+  { term: "seed data", translation: "datos iniciales", category: "database" },
+  { term: "ORM", translation: "ORM (mapeo objeto-relacional)", category: "database" },
+
+  // --- mobile ---
+  { term: "responsive design", translation: "diseño responsivo", category: "mobile" },
+  { term: "viewport", translation: "ventana gráfica (viewport)", category: "mobile" },
+  { term: "breakpoint", translation: "punto de quiebre", category: "mobile" },
+  { term: "native app", translation: "aplicación nativa", category: "mobile" },
+  { term: "hybrid app", translation: "aplicación híbrida", category: "mobile" },
+  { term: "progressive web app", translation: "aplicación web progresiva", category: "mobile" },
+  { term: "push notification", translation: "notificación push", category: "mobile" },
+  { term: "deep link", translation: "enlace profundo", category: "mobile" },
+  { term: "app store", translation: "tienda de aplicaciones", category: "mobile" },
+  { term: "simulator", translation: "simulador", category: "mobile" },
+  { term: "emulator", translation: "emulador", category: "mobile" },
+  { term: "gesture", translation: "gesto", category: "mobile" },
+  { term: "touch event", translation: "evento táctil", category: "mobile" },
+  { term: "widget", translation: "widget", category: "mobile" },
+  { term: "bundle size", translation: "tamaño del paquete", category: "mobile" },
+  { term: "hot reload", translation: "recarga en caliente", category: "mobile" },
+  { term: "splash screen", translation: "pantalla de inicio", category: "mobile" },
+  { term: "onboarding", translation: "incorporación (onboarding)", category: "mobile" },
+  { term: "runtime permission", translation: "permiso en tiempo de ejecución", category: "mobile" },
+  { term: "biometric authentication", translation: "autenticación biométrica", category: "mobile" },
+  { term: "accessibility", translation: "accesibilidad", category: "mobile" },
+  { term: "screen reader", translation: "lector de pantalla", category: "mobile" },
+  { term: "offline mode", translation: "modo sin conexión", category: "mobile" },
+  { term: "API rate limiting", translation: "limitación de tasa de API", category: "mobile" },
+  { term: "lazy loading", translation: "carga diferida", category: "mobile" },
+
+  // --- networking ---
+  { term: "firewall", translation: "cortafuegos", category: "networking" },
+  { term: "VPN", translation: "VPN (red privada virtual)", category: "networking" },
+  { term: "DNS", translation: "DNS (sistema de nombres de dominio)", category: "networking" },
+  { term: "CDN", translation: "CDN (red de distribución de contenido)", category: "networking" },
+  { term: "packet", translation: "paquete", category: "networking" },
+  { term: "socket", translation: "socket", category: "networking" },
+  { term: "port", translation: "puerto", category: "networking" },
+  { term: "TLS", translation: "TLS (seguridad de la capa de transporte)", category: "networking" },
+  { term: "proxy", translation: "proxy", category: "networking" },
+  { term: "bandwidth", translation: "ancho de banda", category: "networking" },
+  { term: "latency", translation: "latencia", category: "networking" },
+  { term: "throughput", translation: "rendimiento", category: "networking" },
+  { term: "ping", translation: "ping", category: "networking" },
+  { term: "traceroute", translation: "traceroute", category: "networking" },
+  { term: "subnet", translation: "subred", category: "networking" },
+  { term: "IP address", translation: "dirección IP", category: "networking" },
+  { term: "MAC address", translation: "dirección MAC", category: "networking" },
+  { term: "DHCP", translation: "DHCP (protocolo de configuración dinámica de host)", category: "networking" },
+  { term: "HTTP status code", translation: "código de estado HTTP", category: "networking" },
+  { term: "SSL certificate", translation: "certificado SSL", category: "networking" },
+  { term: "caching", translation: "almacenamiento en caché", category: "networking" },
+  { term: "websocket", translation: "websocket", category: "networking" },
+  { term: "load testing", translation: "prueba de carga", category: "networking" },
+  { term: "DDoS", translation: "DDoS (ataque de denegación de servicio distribuido)", category: "networking" },
+  { term: "SSH", translation: "SSH (shell seguro)", category: "networking" },
+  { term: "return value", translation: "valor de retorno", category: "programming" },
+  { term: "condition", translation: "condición", category: "programming" },
+  { term: "expression", translation: "expresión", category: "programming" },
+  { term: "operator", translation: "operador", category: "programming" },
+  { term: "closure", translation: "clausura", category: "programming" },
+  { term: "async/await", translation: "async/await (asincrónico)", category: "programming" },
+  { term: "component", translation: "componente", category: "programming" },
+  { term: "props", translation: "props (propiedades)", category: "programming" },
+  { term: "state", translation: "estado", category: "programming" },
+  { term: "hook", translation: "hook (gancho)", category: "programming" },
+  { term: "middleware", translation: "middleware (intermediario)", category: "programming" },
+  { term: "package manager", translation: "gestor de paquetes", category: "programming" },
+  { term: "version control", translation: "control de versiones", category: "programming" },
+  { term: "branch", translation: "rama", category: "programming" },
+  { term: "merge", translation: "fusionar", category: "programming" },
+  { term: "pull request", translation: "solicitud de extracción", category: "programming" },
+  { term: "code review", translation: "revisión de código", category: "programming" },
+  { term: "refactor", translation: "refactorizar", category: "programming" },
+  { term: "stack trace", translation: "traza de pila", category: "programming" },
+  { term: "memory leak", translation: "fuga de memoria", category: "programming" },
+  { term: "garbage collector", translation: "recolector de basura", category: "programming" },
+  { term: "event", translation: "evento", category: "programming" },
+  { term: "listener", translation: "listener (oyente)", category: "programming" },
+  { term: "lifecycle", translation: "ciclo de vida", category: "programming" },
+  { term: "render", translation: "renderizar", category: "programming" },
+  { term: "hydration", translation: "hidratación", category: "programming" },
+  { term: "server-side rendering", translation: "renderizado del lado del servidor", category: "programming" },
+  { term: "client-side rendering", translation: "renderizado del lado del cliente", category: "programming" },
+  { term: "tree shaking", translation: "tree shaking (eliminación de código muerto)", category: "programming" },
+  { term: "bundle", translation: "bundle (paquete)", category: "programming" },
+  { term: "request", translation: "solicitud", category: "technical" },
+  { term: "response", translation: "respuesta", category: "technical" },
+  { term: "payload", translation: "carga útil", category: "technical" },
+  { term: "header", translation: "encabezado", category: "technical" },
+  { term: "session", translation: "sesión", category: "technical" },
+  { term: "availability", translation: "disponibilidad", category: "technical" },
+  { term: "downtime", translation: "tiempo de inactividad", category: "technical" },
+  { term: "stylesheet", translation: "hoja de estilos", category: "web" },
+  { term: "layout", translation: "diseño", category: "web" },
+  { term: "grid", translation: "cuadrícula", category: "web" },
+  { term: "flexbox", translation: "flexbox (caja flexible)", category: "web" },
+  { term: "anchor", translation: "ancla", category: "web" },
+  { term: "redirect", translation: "redirección", category: "web" },
+  { term: "favicon", translation: "favicon (icono de favoritos)", category: "web" },
+  { term: "metadata", translation: "metadatos", category: "web" },
+  { term: "sitemap", translation: "mapa del sitio", category: "web" },
+  { term: "polyfill", translation: "polyfill (relleno polivalente)", category: "web" },
+  { term: "authentication", translation: "autenticación", category: "security" },
+  { term: "authorization", translation: "autorización", category: "security" },
+  { term: "encryption", translation: "cifrado", category: "security" },
+  { term: "decryption", translation: "descifrado", category: "security" },
+  { term: "hash", translation: "hash (resumen criptográfico)", category: "security" },
+  { term: "salt", translation: "salt (valor aleatorio)", category: "security" },
+  { term: "vulnerability", translation: "vulnerabilidad", category: "security" },
+  { term: "exploit", translation: "exploit (explotación)", category: "security" },
+  { term: "patch", translation: "parche", category: "security" },
+  { term: "compliance", translation: "cumplimiento normativo", category: "security" },
+  { term: "audit log", translation: "registro de auditoría", category: "security" },
+  { term: "rate limiting", translation: "limitación de tasa", category: "security" },
+  { term: "sprint", translation: "sprint (iteración)", category: "business" },
+  { term: "standup", translation: "standup (reunión diaria)", category: "business" },
+  { term: "retrospective", translation: "retrospectiva", category: "business" },
+  { term: "offboarding", translation: "desvinculación", category: "business" },
+  { term: "SLA", translation: "SLA (acuerdo de nivel de servicio)", category: "business" },
+  { term: "KPI", translation: "KPI (indicador clave de rendimiento)", category: "business" },
+  { term: "OKR", translation: "OKR (objetivos y resultados clave)", category: "business" },
+  { term: "vector", translation: "vector", category: "ai" },
+  { term: "tokenization", translation: "tokenización", category: "ai" },
+  { term: "grounding", translation: "fundamentación", category: "ai" },
+  { term: "RAG", translation: "RAG (generación aumentada por recuperación)", category: "ai" },
+  { term: "agent", translation: "agente", category: "ai" },
+  { term: "chain of thought", translation: "cadena de pensamiento", category: "ai" },
+  { term: "few-shot", translation: "few-shot (pocos ejemplos)", category: "ai" },
+  { term: "zero-shot", translation: "zero-shot (sin ejemplos)", category: "ai" },
+  { term: "i18n", translation: "i18n (internacionalización)", category: "localization" },
+  { term: "l10n", translation: "l10n (localización)", category: "localization" },
+  { term: "a11y", translation: "a11y (accesibilidad)", category: "localization" },
+  { term: "timezone", translation: "zona horaria", category: "localization" },
+  { term: "pluralization", translation: "pluralización", category: "localization" },
+  { term: "right-to-left", translation: "de derecha a izquierda (RTL)", category: "localization" },
+  { term: "bidirectional", translation: "bidireccional", category: "localization" },
+  { term: "pseudolocalization", translation: "pseudolocalización", category: "localization" },
+  { term: "transcreation", translation: "transcreación", category: "localization" },
+  { term: "staging", translation: "staging (preproducción)", category: "devops" },
+  { term: "production", translation: "producción", category: "devops" },
+  { term: "native", translation: "nativo", category: "mobile" },
+  { term: "hybrid", translation: "híbrido", category: "mobile" },
+  { term: "responsive", translation: "responsivo", category: "mobile" },
+  { term: "snapshot", translation: "instantánea", category: "database" },
+  { term: "seed", translation: "semilla", category: "database" },
+  { term: "animation", translation: "animación", category: "web" },
+  { term: "toast notification", translation: "notificación toast", category: "web" },
+  { term: "PR", translation: "PR (solicitud de extracción)", category: "programming" },
+  { term: "regression", translation: "regresión", category: "programming" },
 ];
 
 export const GLOSSARY_DATA: GlossaryEntry[] = RAW_GLOSSARY_DATA.map((entry) => ({
@@ -395,4 +622,36 @@ export function getGlossaryByCategory(category?: string): GlossaryEntry[] {
   return GLOSSARY_DATA.filter((entry) =>
     entry.category?.toLowerCase() === lowerCategory
   );
+}
+
+/**
+ * Return glossary entries with dialect-aware translation overrides.
+ * When a dictionary concept matches a glossary term, the dictionary's
+ * dialect-specific preferred term takes precedence over the glossary translation.
+ */
+export function getDialectAwareGlossary(dialect: SpanishDialect): GlossaryEntry[] {
+  // Build a lookup: lowercase glossary term → dictionary entry
+  const dictByTerm = new Map<string, { preferredTerm: string; concept: string }>();
+  for (const entry of DICTIONARY) {
+    const variants = entry.variants as Record<string, { term: string; frequency: number; register: string }> | undefined;
+    const dialectVariant = variants?.[dialect];
+    const panHispanic = entry.panHispanic;
+    if (dialectVariant && dialectVariant.term !== panHispanic) {
+      // This concept has a dialect-specific term that differs from panHispanic
+      if (panHispanic) {
+        dictByTerm.set(panHispanic.toLowerCase(), { preferredTerm: dialectVariant.term, concept: entry.concept });
+      }
+    }
+  }
+
+  return GLOSSARY_DATA.map((entry) => {
+    const override = dictByTerm.get(entry.translation.toLowerCase());
+    if (override) {
+      return {
+        ...entry,
+        dialectPreferences: { [dialect]: override.preferredTerm },
+      };
+    }
+    return entry;
+  });
 }

@@ -29,7 +29,7 @@ export interface ValidationReport {
       concept: string;
       expectedTerm: string;
       foundTerm: string;
-      severity: string;
+      severity: "error" | "warning";
       message: string;
     }>;
     checkedConcepts: number;
@@ -37,12 +37,12 @@ export interface ValidationReport {
   outputJudge: {
     issues: Array<{
       category: string;
-      severity: string;
+      severity: "critical" | "major" | "minor" | "info";
       message: string;
     }>;
     blockingIssues: Array<{
       category: string;
-      severity: string;
+      severity: "critical" | "major" | "minor" | "info";
       message: string;
     }>;
   };

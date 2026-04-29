@@ -78,7 +78,10 @@ function mockTranslate(source, dialect, sample = {}) {
     .replace(/\bUse the computer to open the file\./i, ["es-CO", "es-EC"].includes(dialect) ? "Usa el computador para abrir el archivo." : "Usa la computadora para abrir el archivo.")
     .replace(/\b(Catch|Ride|Get on)\b/i, "Toma")
     .replace(/\bTake\b/i, "Toma")
-    .replace(/\bbus\b/i, GUAGUA_BUS_DIALECTS.has(dialect) ? "guagua" : "bus")
+    .replace(/\bbus\b/i,
+      GUAGUA_BUS_DIALECTS.has(dialect) ? "guagua" :
+      ["es-AR", "es-UY"].includes(dialect) ? "colectivo" :
+      dialect === "es-MX" ? "camión" : "autobús")
     .replace(/\boffice\b/i, "oficina")
     .replace(/\bpackage\b/i, "paquete")
     .replace(/\breception\b/i, "recepción")

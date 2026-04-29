@@ -14,7 +14,7 @@ function makeProvider(
   return {
     name,
     translate: vi.fn(async (text: string, sourceLang: string, targetLang: string, options) => ({
-      translatedText: options?.dialect === "es-MX" && text.includes("file") ? "Recoge el archivo antes del despliegue." : `[${options?.dialect}] ${text}`,
+      translatedText: options?.dialect === "es-MX" && text.includes("file") ? "Recoge el archivo antes de estacionar el carro." : `[${options?.dialect}] ${text}`,
       sourceLang,
       targetLang,
       provider: name as never,
@@ -47,7 +47,7 @@ describe("web demo service", () => {
       provider: "auto",
     }, registry);
 
-    expect(result.translatedText).toBe("Recoge el archivo antes del despliegue.");
+    expect(result.translatedText).toBe("Recoge el archivo antes de estacionar el carro.");
     expect(result.providerUsed).toBe("llm");
     expect(result.semanticPromptApplied).toBe(true);
     expect(result.providerStatus.semanticProviders).toEqual(["llm"]);

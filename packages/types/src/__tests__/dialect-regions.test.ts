@@ -20,8 +20,8 @@ import {
 // ============================================================================
 
 describe("DIALECT_REGIONS", () => {
-  it("has 10 regions", () => {
-    expect(Object.keys(DIALECT_REGIONS).length).toBe(10);
+  it("has 11 regions", () => {
+    expect(Object.keys(DIALECT_REGIONS).length).toBe(11);
   });
 
   it("every region has required fields", () => {
@@ -153,9 +153,10 @@ describe("Voseo partition", () => {
 // ============================================================================
 
 describe("COGER_TABOO_DIALECTS", () => {
-  it("excludes es-GQ and es-PH", () => {
+  it("excludes es-GQ, es-PH, and es-BZ", () => {
     expect(COGER_TABOO_DIALECTS).not.toContain("es-GQ");
     expect(COGER_TABOO_DIALECTS).not.toContain("es-PH");
+    expect(COGER_TABOO_DIALECTS).not.toContain("es-BZ");
   });
 
   it("excludes es-ES and es-AD", () => {
@@ -165,14 +166,14 @@ describe("COGER_TABOO_DIALECTS", () => {
 
   it("includes all other American dialects", () => {
     for (const d of ALL_AMERICAN_DIALECTS) {
-      if (d !== "es-GQ" && d !== "es-PH") {
+      if (d !== "es-GQ" && d !== "es-PH" && d !== "es-BZ") {
         expect(COGER_TABOO_DIALECTS, `${d} missing from COGER_TABOO`).toContain(d);
       }
     }
   });
 
-  it("has exactly 21 dialects (23 American minus GQ and PH)", () => {
-    expect(COGER_TABOO_DIALECTS.length).toBe(21);
+  it("has exactly 20 dialects (23 American minus GQ, PH, and BZ)", () => {
+    expect(COGER_TABOO_DIALECTS.length).toBe(20);
   });
 });
 
@@ -181,18 +182,19 @@ describe("COGER_TABOO_DIALECTS", () => {
 // ============================================================================
 
 describe("CONTACT_PHENOMENA_DIALECTS", () => {
-  it("includes Caribbean, PA, US, and BZ", () => {
-    expect(CONTACT_PHENOMENA_DIALECTS).toContain("es-CU");
+  it("includes DO, PR, VE, PA, US, and BZ", () => {
     expect(CONTACT_PHENOMENA_DIALECTS).toContain("es-DO");
     expect(CONTACT_PHENOMENA_DIALECTS).toContain("es-PR");
+    expect(CONTACT_PHENOMENA_DIALECTS).toContain("es-VE");
     expect(CONTACT_PHENOMENA_DIALECTS).toContain("es-PA");
     expect(CONTACT_PHENOMENA_DIALECTS).toContain("es-US");
     expect(CONTACT_PHENOMENA_DIALECTS).toContain("es-BZ");
   });
 
-  it("does not include es-ES or es-MX", () => {
+  it("does not include es-ES, es-MX, or es-CU", () => {
     expect(CONTACT_PHENOMENA_DIALECTS).not.toContain("es-ES");
     expect(CONTACT_PHENOMENA_DIALECTS).not.toContain("es-MX");
+    expect(CONTACT_PHENOMENA_DIALECTS).not.toContain("es-CU");
   });
 });
 
@@ -201,12 +203,13 @@ describe("CONTACT_PHENOMENA_DIALECTS", () => {
 // ============================================================================
 
 describe("PARQUEAR_DIALECTS", () => {
-  it("includes Caribbean, CR, PA, US, and BZ", () => {
+  it("includes Caribbean, CR, PA, VE, US, and BZ", () => {
     expect(PARQUEAR_DIALECTS).toContain("es-CU");
     expect(PARQUEAR_DIALECTS).toContain("es-DO");
     expect(PARQUEAR_DIALECTS).toContain("es-PR");
     expect(PARQUEAR_DIALECTS).toContain("es-CR");
     expect(PARQUEAR_DIALECTS).toContain("es-PA");
+    expect(PARQUEAR_DIALECTS).toContain("es-VE");
     expect(PARQUEAR_DIALECTS).toContain("es-US");
     expect(PARQUEAR_DIALECTS).toContain("es-BZ");
   });

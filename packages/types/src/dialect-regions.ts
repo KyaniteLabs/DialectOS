@@ -89,11 +89,18 @@ export const DIALECT_REGIONS = {
     basis: "Contact variety with English across Mexican-American, Puerto Rican, and Cuban communities; parquear/troca/lonche/chequear contact phenomena",
   } satisfies DialectRegion,
 
+  african: {
+    id: "african",
+    name: "African Spanish",
+    dialects: ["es-GQ"],
+    basis: "Only Spanish-speaking country in Africa; Spanish is co-official with French and Portuguese; normatively follows Peninsular Spanish with French/indigenous Fang/Bubi substrate influence",
+  } satisfies DialectRegion,
+
   heritage: {
     id: "heritage",
     name: "Heritage/Contact dialects",
-    dialects: ["es-GQ", "es-PH", "es-BZ"],
-    basis: "Small speaker populations with heavy contact from other languages (French/indigenous in GQ, English/Tagalog in PH, English in BZ); limited dialect-specific data",
+    dialects: ["es-PH", "es-BZ"],
+    basis: "Small speaker populations with heavy contact from other languages (English/Tagalog in PH, English/Kriol in BZ); limited dialect-specific data",
   } satisfies DialectRegion,
 } as const;
 
@@ -110,17 +117,19 @@ export const ALL_AMERICAN_DIALECTS: readonly SpanishDialect[] = [
   ...DIALECT_REGIONS.northernSouthAmerica.dialects,
   ...DIALECT_REGIONS.usLatino.dialects,
   ...DIALECT_REGIONS.heritage.dialects,
+  ...DIALECT_REGIONS.african.dialects,
 ];
 
 /** Dialects where voseo is the standard informal register */
 export const FULL_VOSEO_DIALECTS: readonly SpanishDialect[] = [
   ...DIALECT_REGIONS.rioplatense.dialects,  // AR, UY, PY
-  "es-GT", "es-HN", "es-SV", "es-NI", "es-CR",  // Central America (partial in CR)
+  "es-GT", "es-HN", "es-SV", "es-NI",  // Central America (excluding CR — see REGIONAL)
 ];
 
 /** Dialects where voseo exists but tú is standard in formal writing */
 export const REGIONAL_VOSEO_DIALECTS: readonly SpanishDialect[] = [
   "es-BO", "es-EC",  // Andean with informal voseo
+  "es-CR",  // CR uses usted heavily; vos is common informal but not dominant
   ...DIALECT_REGIONS.northernSouthAmerica.dialects,  // CO, VE
   ...DIALECT_REGIONS.chilean.dialects,  // CL
 ];
@@ -133,17 +142,19 @@ export const TÚ_ONLY_DIALECTS: readonly SpanishDialect[] = [
   ...DIALECT_REGIONS.caribbean.dialects,  // CU, DO, PR
   "es-PA",  // Central America (PA uses tú)
   ...DIALECT_REGIONS.usLatino.dialects,  // US
-  ...DIALECT_REGIONS.heritage.dialects,  // GQ, PH, BZ
+  ...DIALECT_REGIONS.heritage.dialects,  // PH, BZ
+  ...DIALECT_REGIONS.african.dialects,  // GQ (follows peninsular norms)
 ];
 
-/** Dialects where "coger" is taboo/vulgar (all American except GQ and PH) */
+/** Dialects where "coger" is taboo/vulgar (all American except GQ, PH, and BZ) */
 export const COGER_TABOO_DIALECTS: readonly SpanishDialect[] = ALL_AMERICAN_DIALECTS.filter(
-  d => d !== "es-GQ" && d !== "es-PH",
+  d => d !== "es-GQ" && d !== "es-PH" && d !== "es-BZ",
 );
 
 /** Dialects with significant English contact phenomena in standard register */
 export const CONTACT_PHENOMENA_DIALECTS: readonly SpanishDialect[] = [
-  ...DIALECT_REGIONS.caribbean.dialects,  // CU, DO, PR
+  "es-DO", "es-PR",  // Caribbean (excluding CU — historical, not contemporary contact)
+  "es-VE",  // chevere, chequear, etc.
   "es-PA",  // Canal Zone English contact
   ...DIALECT_REGIONS.usLatino.dialects,  // US
   "es-BZ",  // English is co-official
@@ -154,6 +165,7 @@ export const PARQUEAR_DIALECTS: readonly SpanishDialect[] = [
   ...DIALECT_REGIONS.caribbean.dialects,  // CU, DO, PR
   "es-CR",  // Costa Rican standard
   "es-PA",  // Panamanian standard
+  "es-VE",  // Venezuelan standard informal
   ...DIALECT_REGIONS.usLatino.dialects,  // US
   "es-BZ",  // English co-official
 ];

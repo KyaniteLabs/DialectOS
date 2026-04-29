@@ -55,6 +55,11 @@ Become the **most accurate open-source engine for Spanish dialect detection and 
 
 ## ✅ Recently Completed
 
+### Unreleased (post v0.3.0)
+- [x] **Dialectal dictionary overhaul** — Stripped 500 padded entries, added 58 high-variation concepts with genuine per-dialect variants; 833 total concepts (333 with real variation)
+- [x] **Optional variants** — `DictionaryEntry.variants` now optional; pan-Hispanic entries have no variants block
+- [x] **New semantic fields** — `medicine_health`, `family`, `finance` fields added alongside existing 11 fields (14 total)
+
 ### v0.3.0 (2026-04-27)
 - [x] **`dialectos validate`** — Standalone translation validation with quality gates, semantic check, and output judge
 - [x] **Translation corpus** — Dialect-indexed JSONL storage for translations and corrections with CLI commands

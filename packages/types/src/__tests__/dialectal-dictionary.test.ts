@@ -29,7 +29,7 @@ describe("DICTIONARY", () => {
       expect(entry.field).toBeTruthy();
       expect(entry.concept).toBeTruthy();
       expect(entry.englishGloss).toBeTruthy();
-      expect(Object.keys(entry.variants).length).toBeGreaterThan(0);
+      expect(Object.keys(entry.variants ?? {}).length + (entry.panHispanic ? 1 : 0)).toBeGreaterThan(0);
     }
   });
 
@@ -53,7 +53,7 @@ describe("DICTIONARY", () => {
   it("all variant dialect codes are valid", () => {
     const validCodes = new Set(ALL_SPANISH_DIALECTS);
     for (const entry of DICTIONARY) {
-      for (const dialect of Object.keys(entry.variants)) {
+      for (const dialect of Object.keys(entry.variants ?? {})) {
         expect(validCodes.has(dialect as SpanishDialect), `Invalid dialect code: ${dialect} in concept ${entry.concept}`).toBe(true);
       }
     }
@@ -61,7 +61,7 @@ describe("DICTIONARY", () => {
 
   it("no duplicate dialect keys within a single entry", () => {
     for (const entry of DICTIONARY) {
-      const keys = Object.keys(entry.variants);
+      const keys = Object.keys(entry.variants ?? {});
       const unique = new Set(keys);
       expect(unique.size, `Duplicate dialect keys in concept "${entry.concept}"`).toBe(keys.length);
     }
@@ -573,9 +573,9 @@ describe("getSyntacticRules", () => {
     expect(ids).toContain("loismo-americas");
   });
 
-  it("es-CR gets usted-formal rule", () => {
+  it("es-CR gets voseo-CR-regional rule", () => {
     const rules = getSyntacticRules("es-CR");
     const ids = rules.map((r) => r.id);
-    expect(ids).toContain("usted-formal-CR");
+    expect(ids).toContain("voseo-CR-regional");
   });
 });

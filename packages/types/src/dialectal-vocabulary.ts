@@ -49,9 +49,9 @@ export interface SyntacticRule {
 // --- Helper: resolve variant for a dialect ---
 
 function resolveVariant(entry: DictionaryEntry, dialect: SpanishDialect): Variant | undefined {
-  if (entry.variants[dialect]) return entry.variants[dialect];
+  if (entry.variants?.[dialect]) return entry.variants[dialect];
   if (entry.panHispanic) return { term: entry.panHispanic, frequency: 1, register: "universal" as const };
-  if (entry.variants["es-ES"]) return entry.variants["es-ES"];
+  if (entry.variants?.["es-ES"]) return entry.variants["es-ES"];
   return undefined;
 }
 
@@ -59,7 +59,7 @@ function resolveVariant(entry: DictionaryEntry, dialect: SpanishDialect): Varian
 function getAllTerms(entry: DictionaryEntry): string[] {
   const terms = new Set<string>();
   if (entry.panHispanic) terms.add(entry.panHispanic);
-  for (const v of Object.values(entry.variants)) {
+  for (const v of Object.values(entry.variants ?? {})) {
     if (v) terms.add(v.term);
   }
   return [...terms];
@@ -108,7 +108,7 @@ export function getForbiddenTerms(dialect: SpanishDialect): ForbiddenTerm[] {
     }
     // Taboo terms get error severity
     if (variant.notes?.includes("vulgar") || variant.notes?.includes("taboo")) {
-      const tabooTerm = entry.variants["es-ES"]?.term;
+      const tabooTerm = entry.variants?.["es-ES"]?.term;
       if (tabooTerm && tabooTerm !== variant.term) {
         const existing = forbidden.find(f => f.term === tabooTerm && f.concept === entry.concept);
         if (existing) existing.severity = "error";
@@ -264,7 +264,7 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
   },
   {
     id: "voseo-central-america",
-    dialects: ["es-GT", "es-HN", "es-SV", "es-NI", "es-CR"],
+    dialects: ["es-GT", "es-HN", "es-SV", "es-NI"],
     rule: "Use voseo: vos for informal singular. Conjugate like Rioplatense: -ar→-ás, -er→-és, -ir→-ís.",
     enforcement: "validate",
   },
@@ -278,6 +278,12 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
     id: "voseo-CO-VE-CL",
     dialects: ["es-CO", "es-VE", "es-CL"],
     rule: "Voseo exists in informal registers but tú is standard in formal writing. Default to tú for formal, vos for informal.",
+    enforcement: "prompt-only",
+  },
+  {
+    id: "voseo-CR-regional",
+    dialects: ["es-CR"],
+    rule: "Costa Rican Spanish uses usted extensively even in informal contexts. Vos is common in informal speech but not dominant. Default to usted for neutral register, vos for explicitly informal contexts. Avoid tú unless specifically requested.",
     enforcement: "prompt-only",
   },
   {
@@ -305,12 +311,6 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
     enforcement: "prompt-only",
   },
   {
-    id: "usted-formal-CR",
-    dialects: ["es-CR"],
-    rule: "Costa Rican Spanish uses usted even in some informal contexts. Vos is also used. Avoid tú unless specifically requested.",
-    enforcement: "prompt-only",
-  },
-  {
     id: "usted-respect-MX-CO",
     dialects: ["es-MX", "es-CO"],
     rule: "Use usted for formal address and with strangers, elders, and authority. Tú is standard informal. Never mix tú/usted with same person.",
@@ -332,6 +332,48 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
     id: "preposition-de-acuerdo",
     dialects: ALL_AMERICAN_DIALECTS,
     rule: "Use 'de acuerdo con' (not 'de acuerdo a') for 'in agreement with' or 'according to'.",
+    enforcement: "prompt-only",
+  },
+  {
+    id: "queismo-dequeismo",
+    dialects: "all",
+    rule: "Use 'pienso que', 'creo que', 'digo que' (correct queísmo). Avoid dequeísmo: 'pienso de que', 'creo de que' is stigmatized. American Spanish tends toward correct queísmo; Peninsular Spanish has more dequeísmo in colloquial registers.",
+    enforcement: "prompt-only",
+  },
+  {
+    id: "voseo-imperative",
+    dialects: ["es-AR", "es-UY", "es-PY", "es-GT", "es-HN", "es-SV", "es-NI"],
+    rule: "Vos imperative: -ar→-á (hablá), -er→-é (tené), -ir→-í (vení). NOT the tú imperative. Irregular: andá (ir), sé (ser), di (decir). Do NOT use tú imperatives like 'habla', 'ten', 'ven' with vos.",
+    enforcement: "validate",
+  },
+  {
+    id: "future-tense-preference",
+    dialects: "all",
+    rule: "Colloquial speech prefers 'voy a + infinitive' (periphrastic future) across all dialects. Synthetic future (comeré, hablarás) is formal/literary. Caribbean and informal Latin American Spanish rarely use synthetic future in speech.",
+    enforcement: "prompt-only",
+  },
+  {
+    id: "gerund-duration",
+    dialects: ["es-US", "es-MX", "es-GT", "es-HN", "es-SV", "es-NI", "es-CR", "es-PA"],
+    rule: "Avoid English-influenced gerund of duration: 'estoy viviendo aquí hace 3 años' → use 'hace 3 años que vivo aquí' or 'llevo 3 años viviendo aquí'. The gerund of duration is a common anglicism in US and Central American Spanish.",
+    enforcement: "prompt-only",
+  },
+  {
+    id: "article-personal-names",
+    dialects: ["es-GT", "es-HN", "es-SV", "es-NI", "es-CR", "es-PA"],
+    rule: "Article before given names is standard: 'la María', 'el José'. This is grammatically correct in Central American Spanish and would sound wrong if omitted in informal registers. Do not apply in other dialects.",
+    enforcement: "prompt-only",
+  },
+  {
+    id: "past-tense-andean",
+    dialects: ["es-BO", "es-EC"],
+    rule: "Andean Spanish can use pretérito perfecto compuesto for recent past actions (hoy he comido) due to Quechua substrate influence, similar to Peninsular Spanish but for different linguistic reasons. This is NOT an error — it is a legitimate Andean feature.",
+    enforcement: "prompt-only",
+  },
+  {
+    id: "person-first-language",
+    dialects: "all",
+    rule: "In formal registers, prefer person-first language for disability references: 'persona con discapacidad' (not 'discapacitado'), 'persona sorda' (not 'sorda' as noun), 'persona ciega' (not 'ciega' as noun), 'persona con movilidad reducida' (not 'minusválido'). In informal registers, adjective forms are acceptable but noun forms (el ciego, el sordo) are stigmatized in most dialects. Always prefer 'persona con X' over 'X-person' constructions.",
     enforcement: "prompt-only",
   },
 ];
