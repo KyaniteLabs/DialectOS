@@ -49,9 +49,9 @@ export interface SyntacticRule {
 // --- Helper: resolve variant for a dialect ---
 
 function resolveVariant(entry: DictionaryEntry, dialect: SpanishDialect): Variant | undefined {
-  if (entry.variants[dialect]) return entry.variants[dialect];
+  if (entry.variants?.[dialect]) return entry.variants[dialect];
   if (entry.panHispanic) return { term: entry.panHispanic, frequency: 1, register: "universal" as const };
-  if (entry.variants["es-ES"]) return entry.variants["es-ES"];
+  if (entry.variants?.["es-ES"]) return entry.variants["es-ES"];
   return undefined;
 }
 
@@ -59,7 +59,7 @@ function resolveVariant(entry: DictionaryEntry, dialect: SpanishDialect): Varian
 function getAllTerms(entry: DictionaryEntry): string[] {
   const terms = new Set<string>();
   if (entry.panHispanic) terms.add(entry.panHispanic);
-  for (const v of Object.values(entry.variants)) {
+  for (const v of Object.values(entry.variants ?? {})) {
     if (v) terms.add(v.term);
   }
   return [...terms];
@@ -108,7 +108,7 @@ export function getForbiddenTerms(dialect: SpanishDialect): ForbiddenTerm[] {
     }
     // Taboo terms get error severity
     if (variant.notes?.includes("vulgar") || variant.notes?.includes("taboo")) {
-      const tabooTerm = entry.variants["es-ES"]?.term;
+      const tabooTerm = entry.variants?.["es-ES"]?.term;
       if (tabooTerm && tabooTerm !== variant.term) {
         const existing = forbidden.find(f => f.term === tabooTerm && f.concept === entry.concept);
         if (existing) existing.severity = "error";
