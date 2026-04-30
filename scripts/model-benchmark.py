@@ -391,7 +391,7 @@ TESTS = [
         "source": "I'll see you on Monday at the office.",
         "dialect": "es-MX",
         "category": "capitalization",
-        "check": lambda t: not bool(re.search(r"\b(el|la|un|en|del|al)\s+Lunes\b", t, re.I)),
+        "check": lambda t: not bool(re.search(r"\b(el|la|un|en|del|al)\s+Lunes\b", t)),
         "expected": "lunes (lowercase, not Lunes)",
     },
     {
@@ -399,7 +399,7 @@ TESTS = [
         "source": "My birthday is in January.",
         "dialect": "es-ES",
         "category": "capitalization",
-        "check": lambda t: not bool(re.search(r"\ben\s+Enero\b", t, re.I)),
+        "check": lambda t: not bool(re.search(r"\ben\s+Enero\b", t)),
         "expected": "enero (lowercase, not Enero)",
     },
     {
@@ -407,7 +407,7 @@ TESTS = [
         "source": "She speaks Spanish and French fluently.",
         "dialect": "es-MX",
         "category": "capitalization",
-        "check": lambda t: not bool(re.search(r"habla\s+Español\b", t, re.I)),
+        "check": lambda t: not bool(re.search(r"habla\s+Español\b", t)),
         "expected": "español (lowercase mid-sentence)",
     },
     # ── Typography: ellipsis, dashes, quotes ─────────────────────────────────
