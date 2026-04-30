@@ -72,6 +72,8 @@ export interface BulkCheckpoint {
   createdAt: string;
   /** Items that have been successfully processed */
   completedIds: string[];
+  /** Completed item results (for true resume without cache) */
+  completedResults: Array<{ id: string; result: TranslationResult }>;
   /** Items that failed */
   failedItems: BulkTranslationFailure[];
   /** Total items in the job */

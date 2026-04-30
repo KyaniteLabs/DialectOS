@@ -170,15 +170,17 @@ describe("BulkTranslationEngine", () => {
 
       const result1 = await engine1.translate(items, provider);
       expect(result1.successes).toHaveLength(1);
+      expect(result1.successes[0].result.translatedText).toBe("a");
 
-      // Create new engine with same cache and checkpoint
-      // The item was completed, so checkpoint should cause it to be skipped
-      const engine2 = new BulkTranslationEngine({ cache, checkpointPath });
+      // Create new engine with fresh cache but same checkpoint
+      // The item was completed, so checkpoint should restore it directly
+      const engine2 = new BulkTranslationEngine({ cache: createFreshCache(), checkpointPath });
       const result2 = await engine2.translate(items, provider);
 
-      // Should be a cache hit since same cache
+      // Should be resumed from checkpoint — no API call, no cache hit needed
       expect(result2.successes).toHaveLength(1);
-      expect(result2.cacheHits).toBe(1);
+      expect(result2.successes[0].result.translatedText).toBe("a");
+      expect(result2.cacheHits).toBe(0);
       expect(result2.apiCalls).toBe(0);
     } finally {
       try {

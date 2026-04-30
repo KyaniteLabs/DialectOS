@@ -30,7 +30,16 @@ const DEFAULT_MAX_CONCURRENCY = 4;
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_RETRY_DELAY_MS = 1000;
 const DEFAULT_CHECKPOINT_INTERVAL = 50;
-const CHECKPOINT_VERSION = 1;
+const CHECKPOINT_VERSION = 2;
+
+/** Result of processing a single deduplicated group of items. */
+interface ProcessedGroup {
+  successes: BulkTranslationSuccess[];
+  failures: BulkTranslationFailure[];
+  cacheHit: boolean;
+  apiCall: boolean;
+  latencyMs: number;
+}
 
 export class BulkTranslationEngine {
   private cache: TranslationMemory;
@@ -75,18 +84,51 @@ export class BulkTranslationEngine {
       };
     }
 
+    // O(1) item lookup for the entire pipeline
+    const itemMap = new Map(items.map((i) => [i.id, i]));
+
     // Deduplicate: map source text → list of item IDs
     const dedupMap = this.buildDedupMap(items);
     const uniqueTexts = Array.from(dedupMap.keys());
 
-    // Load checkpoint (currently only used for tracking; items are re-translated
-    // and cache handles hits. Future: store results in checkpoint for instant resume.)
+    // Load checkpoint and restore completed items
     const checkpoint = this.checkpointPath ? this.loadCheckpoint(this.checkpointPath) : null;
-    // Intentionally not skipping checkpoint items — let cache handle dedup on resume
+    const resumedSuccesses: BulkTranslationSuccess[] = [];
+    const resumedFailures: BulkTranslationFailure[] = [];
+    const resumedIds = new Set<string>();
 
-    // Results
-    const successes: BulkTranslationSuccess[] = [];
-    const failures: BulkTranslationFailure[] = [];
+    if (checkpoint && checkpoint.version === CHECKPOINT_VERSION) {
+      for (const { id, result } of checkpoint.completedResults) {
+        const item = itemMap.get(id);
+        if (item) {
+          resumedSuccesses.push({
+            item,
+            result,
+            latencyMs: 0,
+            cacheHit: false,
+            retryCount: 0,
+          });
+          resumedIds.add(id);
+        }
+      }
+      for (const failure of checkpoint.failedItems) {
+        const item = itemMap.get(failure.item.id);
+        if (item) {
+          resumedFailures.push({ ...failure, item });
+          resumedIds.add(item.id);
+        }
+      }
+    }
+
+    // Filter out resumed items from translation
+    const pendingTexts = uniqueTexts.filter((text) => {
+      const ids = dedupMap.get(text)!;
+      return ids.some((id) => !resumedIds.has(id));
+    });
+
+    // Results accumulators (no longer mutated by concurrent closures)
+    const successes: BulkTranslationSuccess[] = [...resumedSuccesses];
+    const failures: BulkTranslationFailure[] = [...resumedFailures];
     let cacheHits = 0;
     let apiCalls = 0;
 
@@ -95,7 +137,7 @@ export class BulkTranslationEngine {
     const latencies: number[] = [];
 
     // Progress tracking
-    let completedCount = 0;
+    let completedCount = resumedIds.size;
     const totalCount = items.length;
 
     const emit = () => {
@@ -105,17 +147,17 @@ export class BulkTranslationEngine {
         succeeded: successes.length,
         failed: failures.length,
         cacheHits,
-        inFlight: inFlight.filter((p) => this.isPending(p)).length,
+        inFlight: inFlight.length,
         estimatedRemainingMs: this.estimateRemaining(completedCount, totalCount, latencies),
       });
     };
 
-    for (const sourceText of uniqueTexts) {
+    for (const sourceText of pendingTexts) {
       const itemIds = dedupMap.get(sourceText)!;
-      const pendingIds = itemIds;
+      const pendingIds = itemIds.filter((id) => !resumedIds.has(id));
       if (pendingIds.length === 0) continue;
 
-      const representativeItem = items.find((i) => i.id === pendingIds[0])!;
+      const representativeItem = itemMap.get(pendingIds[0])!;
 
       await this.semaphore.acquire();
 
@@ -123,19 +165,14 @@ export class BulkTranslationEngine {
         representativeItem,
         provider,
         pendingIds,
-        items,
-        successes,
-        failures,
-        () => {
-          cacheHits++;
-        },
-        () => {
-          apiCalls++;
-        },
-        (latency: number) => {
-          latencies.push(latency);
-        }
-      ).finally(() => {
+        itemMap
+      ).then((group) => {
+        successes.push(...group.successes);
+        failures.push(...group.failures);
+        if (group.cacheHit) cacheHits++;
+        if (group.apiCall) apiCalls++;
+        if (group.latencyMs > 0) latencies.push(group.latencyMs);
+      }).finally(() => {
         this.semaphore.release();
         completedCount += pendingIds.length;
         emit();
@@ -155,6 +192,7 @@ export class BulkTranslationEngine {
           version: CHECKPOINT_VERSION,
           createdAt: new Date().toISOString(),
           completedIds: successes.map((s) => s.item.id),
+          completedResults: successes.map((s) => ({ id: s.item.id, result: s.result })),
           failedItems: failures,
           totalItems: items.length,
         });
@@ -172,6 +210,7 @@ export class BulkTranslationEngine {
         version: CHECKPOINT_VERSION,
         createdAt: new Date().toISOString(),
         completedIds: successes.map((s) => s.item.id),
+        completedResults: successes.map((s) => ({ id: s.item.id, result: s.result })),
         failedItems: failures,
         totalItems: items.length,
       });
@@ -191,13 +230,8 @@ export class BulkTranslationEngine {
     representativeItem: BulkTranslationItem,
     provider: TranslationProvider,
     pendingIds: string[],
-    allItems: BulkTranslationItem[],
-    successes: BulkTranslationSuccess[],
-    failures: BulkTranslationFailure[],
-    onCacheHit: () => void,
-    onApiCall: () => void,
-    onSuccessLatency: (latency: number) => void
-  ): Promise<void> {
+    itemMap: Map<string, BulkTranslationItem>
+  ): Promise<ProcessedGroup> {
     const { sourceText, sourceLang, targetLang, options } = representativeItem;
 
     // Check cache
@@ -206,8 +240,9 @@ export class BulkTranslationEngine {
       cacheKey = this.cache.computeKey(sourceText, sourceLang, targetLang, options);
       const cached = await this.cache.get(cacheKey);
       if (cached) {
+        const successes: BulkTranslationSuccess[] = [];
         for (const id of pendingIds) {
-          const item = allItems.find((i) => i.id === id)!;
+          const item = itemMap.get(id)!;
           successes.push({
             item,
             result: { ...cached.result },
@@ -216,8 +251,7 @@ export class BulkTranslationEngine {
             retryCount: 0,
           });
         }
-        onCacheHit();
-        return;
+        return { successes, failures: [], cacheHit: true, apiCall: false, latencyMs: 0 };
       }
     }
 
@@ -237,7 +271,6 @@ export class BulkTranslationEngine {
       try {
         result = await provider.translate(sourceText, sourceLang, targetLang, options);
         latencyMs = Date.now() - callStart;
-        onApiCall();
         break;
       } catch (error) {
         latencyMs = Date.now() - callStart;
@@ -249,8 +282,9 @@ export class BulkTranslationEngine {
       if (this.useCache && cacheKey) {
         await this.cache.set(cacheKey, result);
       }
+      const successes: BulkTranslationSuccess[] = [];
       for (const id of pendingIds) {
-        const item = allItems.find((i) => i.id === id)!;
+        const item = itemMap.get(id)!;
         successes.push({
           item,
           result: { ...result },
@@ -259,10 +293,11 @@ export class BulkTranslationEngine {
           retryCount,
         });
       }
-      onSuccessLatency(latencyMs);
+      return { successes, failures: [], cacheHit: false, apiCall: true, latencyMs };
     } else {
+      const failures: BulkTranslationFailure[] = [];
       for (const id of pendingIds) {
-        const item = allItems.find((i) => i.id === id)!;
+        const item = itemMap.get(id)!;
         failures.push({
           item,
           error: lastError ?? "Unknown error",
@@ -270,6 +305,7 @@ export class BulkTranslationEngine {
           failedAt: new Date().toISOString(),
         });
       }
+      return { successes: [], failures, cacheHit: false, apiCall: false, latencyMs: 0 };
     }
   }
 
@@ -307,11 +343,6 @@ export class BulkTranslationEngine {
     if (completed === 0 || latencies.length === 0) return null;
     const avg = latencies.reduce((a, b) => a + b, 0) / latencies.length;
     return Math.round(avg * (total - completed));
-  }
-
-  private isPending(promise: Promise<void>): boolean {
-    // Hack: track pending state externally if needed
-    return true; // Simplified: assume in-flight array only contains pending
   }
 
   private loadCheckpoint(checkpointPath: string): BulkCheckpoint | null {
