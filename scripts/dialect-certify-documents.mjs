@@ -2,6 +2,9 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
+import { ensurePackageBuilt } from "./lib/ensure-built.mjs";
+
+ensurePackageBuilt("cli");
 
 const args = new Map();
 for (const arg of process.argv.slice(2)) {

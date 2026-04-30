@@ -12,6 +12,9 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { ensurePackageBuilt } from "./lib/ensure-built.mjs";
+
+ensurePackageBuilt("cli");
 
 const args = new Map();
 for (const arg of process.argv.slice(2)) {

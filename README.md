@@ -219,7 +219,7 @@ git clone https://github.com/Pastorsimon1798/DialectOS.git
 cd DialectOS
 pnpm install
 pnpm build
-pnpm test        # 1034 tests passing
+pnpm test        # ~850+ tests passing
 ```
 
 ---

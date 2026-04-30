@@ -3,6 +3,9 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSyn
 import { basename, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+import { ensureAllBuilt } from "./lib/ensure-built.mjs";
+
+ensureAllBuilt();
 
 const args = new Map();
 for (const arg of process.argv.slice(2)) {

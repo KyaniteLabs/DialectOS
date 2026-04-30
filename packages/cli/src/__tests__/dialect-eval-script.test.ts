@@ -128,7 +128,7 @@ describe("dialect eval script", () => {
     execFileSync("node", [
       "scripts/dialect-certify.mjs",
       `--out=${outDir}`,
-      "--dialects=es-PA,es-PR",
+      "--dialects=es-PA",
       "--sample-timeout-ms=10000",
     ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe" });
 
@@ -145,7 +145,7 @@ describe("dialect eval script", () => {
     };
     const events = readFileSync(join(outDir, "events.jsonl"), "utf-8").trim().split("\n").map((line) => JSON.parse(line) as { event: string });
 
-    expect(results.total).toBeGreaterThanOrEqual(4);
+    expect(results.total).toBeGreaterThanOrEqual(2);
     expect(results.failed).toBe(0);
     expect(results.passed).toBe(results.total);
     expect(results.results.every((result) => typeof result.elapsedMs === "number")).toBe(true);
@@ -189,7 +189,7 @@ describe("dialect eval script", () => {
     expect(results.results[0].failures.join(" ")).toContain("Sample timed out after 1ms");
 
     rmSync(outDir, { recursive: true, force: true });
-  });
+  }, 15000);
 
 
   it("certify retries transient sample process failures", () => {

@@ -10,6 +10,9 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { ensureAllBuilt } from "./lib/ensure-built.mjs";
+
+ensureAllBuilt();
 
 const args = new Map();
 for (const arg of process.argv.slice(2)) {

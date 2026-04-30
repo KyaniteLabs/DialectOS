@@ -5,7 +5,12 @@
  * post-processors (lexical substitution, voseo adapter, article gender fix, etc.)
  */
 
-import { LLMProvider } from "../packages/providers/dist/index.js";
+import { ensurePackageBuilt } from "./lib/ensure-built.mjs";
+ensurePackageBuilt("providers");
+
+const { LLMProvider } = await import(
+  new URL("../packages/providers/dist/index.js", import.meta.url).href
+);
 
 const API_URL = process.env.LLM_API_URL || "http://100.66.225.85:1234/v1/chat/completions";
 
