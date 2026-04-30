@@ -83,8 +83,13 @@ export function dialectComplianceCheck(context: QualityGateContext): QualityGate
         details: `${v.message} (and ${result.violations.length - 1} more)`,
       };
     }
-  } catch {
-    // If dictionary lookup fails, skip this gate
+  } catch (e) {
+    // If dictionary lookup fails, we cannot verify compliance — fail the gate explicitly
+    return {
+      name: "dialectCompliance",
+      passed: false,
+      details: `Dictionary lookup failed: ${e instanceof Error ? e.message : String(e)}`,
+    };
   }
 
   return { name: "dialectCompliance", passed: true };

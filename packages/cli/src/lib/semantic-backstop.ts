@@ -292,25 +292,34 @@ export function isBorderlineScore(score: number): boolean {
  * @returns finalScore — the heuristic score, or the backstop score if borderline
  * @returns backstop — undefined if score was not borderline (unless negation fail)
  */
-export function combinedSemanticCheck(
-  source: string,
-  translated: string
-): {
+export interface CombinedSemanticCheckResult {
   finalScore: number;
   primaryScore: number;
   backstop?: BackstopResult;
   passed: boolean;
   negationDropped?: boolean;
-} {
+  /** Set when the primary scorer throws, so callers can surface the error instead of silently ignoring it. */
+  error?: string;
+}
+
+export function combinedSemanticCheck(
+  source: string,
+  translated: string
+): CombinedSemanticCheckResult {
   const safeSource = source ?? "";
   const safeTranslated = translated ?? "";
 
   let primary: { score: number };
   try {
     primary = calculateSemanticSimilarity(safeSource, safeTranslated);
-  } catch {
-    // Primary scorer failed — fall back to safe defaults
-    primary = { score: 0 };
+  } catch (e) {
+    // Primary scorer failed — surface the error so the orchestrator can report it
+    return {
+      finalScore: 0,
+      primaryScore: 0,
+      passed: false,
+      error: e instanceof Error ? e.message : String(e),
+    };
   }
 
   // Mandatory negation check: source has negation but translation doesn't = fail

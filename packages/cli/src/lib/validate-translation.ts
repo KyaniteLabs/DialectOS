@@ -71,7 +71,9 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
     }
   }
 
-  if (!semanticCheck.passed) {
+  if (semanticCheck.error) {
+    blockingIssues.push(`Semantic check failed: ${semanticCheck.error}`);
+  } else if (!semanticCheck.passed) {
     if (semanticCheck.negationDropped) {
       blockingIssues.push("Negation was dropped in translation");
     } else {
