@@ -175,8 +175,11 @@ function buildSystemPrompt(): string {
   return "You are a Spanish translation engine for DialectOS. Translate to the requested dialect. Output ONLY the Spanish translation — no preamble, explanations, alternatives, or English text.";
 }
 
-function buildStrictSystemPrompt(): string {
-  return "Translate to the requested Spanish dialect. Output ONLY the Spanish text. No English. No preamble. No explanation. Start with the first Spanish word immediately.";
+function buildStrictSystemPrompt(dialect?: string, text?: string): string {
+  const base = "Translate to Spanish. Output ONLY the Spanish text. No English. No preamble. No explanation. Start with the first Spanish word immediately.";
+  if (!dialect || !text) return base;
+  const hint = buildTargetedVocabHint(text, dialect);
+  return hint ? `${base}\n${hint}` : base;
 }
 
 function buildCompactSystemPrompt(): string {
@@ -194,11 +197,11 @@ function buildDialectSystemPrompt(
   text: string,
   formality?: string
 ): string {
-  const base = "You are a Spanish translation engine. Output ONLY the Spanish translation. No English. No preamble. No explanation. Start with the first Spanish word immediately.";
-  const hint = buildTargetedVocabHint(text, dialect);
+  const base = "You are a Spanish translation engine. Translate the input text to Spanish. Output ONLY the Spanish translation — no preamble, no explanation, no English. Preserve grammatical person: I → yo, you → tú/vos, he/she → él/ella, we → nosotros, they → ellos.";
+  const vocabHint = buildTargetedVocabHint(text, dialect);
   const parts = [base];
-  if (hint) {
-    parts.push(hint);
+  if (vocabHint) {
+    parts.push(vocabHint);
   }
   if (formality && formality !== "auto") {
     parts.push(`Use ${formality} register.`);
@@ -245,6 +248,13 @@ const GARBAGE_PATTERNS = [
   /\bpuedes\s+decirlo\s+en\s+español\b/i,
   /\bdilo\s+en\s+español\b/i,
   /\btraduce\s+(esto|lo siguiente)\b/i,
+  // Conversational/assistant mode fragments (weak models answer instead of translate)
+  /^\s*¡?Bienvenido!?\s*$/i,
+  /\bEntiendo\.?\s*Estoy listo\b/i,
+  // Nonsense repetition patterns
+  /\bfrutill[ao]\b.*\bfrutill[ao]\b/i,
+  // Known hallucinated words that never appear in valid translations
+  /\bcampero\b/i,
 ];
 
 // Reasoning/thinking tags emitted by qwen3 and other thinking-capable models.
@@ -261,6 +271,10 @@ const PREAMBLE_PATTERNS: Array<[RegExp, string]> = [
   [/^[\s\S]*?(Let's begin[^\n]*\n+)/i, ""],
   [/^\s*<<<\s*\n/m, ""],
   [/\n\s*>>>\s*$/m, ""],
+  // Spanish conversational preambles (weak models)
+  [/^\s*¡?Bienvenido!?\s*\n*/i, ""],
+  [/^\s*Entiendo\.?\s*Estoy listo[^\n]*\n+/i, ""],
+  [/^\s*Claro,?\s*(puedo|te puedo)[^\n]*\n+/i, ""],
 ];
 
 function stripPreamble(text: string): string {
@@ -288,12 +302,22 @@ function isGarbageOutput(source: string, output: string): boolean {
   // likely untranslated. Skip very short outputs to avoid false positives.
   if (trimmed.length > 15) {
     const hasSpanishChar = /[áéíóúñ¿¡]/i.test(trimmed);
-    const hasSpanishWord = /\b(el|la|un|una|los|las|es|está|son|muy|más|pero|porque|como|cuando|donde|qué|cómo|quién|cuál|este|ese|aquel|mi|tu|su|nuestro|vuestro|con|para|por|sin|sobre|entre|desde|hasta|hacia|durante|mediante|según|salvo|excepto|mismo|tal|cual|tan|tanto|todo|nada|algo|alguien|nadie|ninguno|cada|otro|mismo|tal|cual|bueno|mal|grande|pequeño|nuevo|viejo|primero|último|mismo|propio|único|cierto|varios|todos|ambos|algunos|muchos|pocos|demasiado|bastante|mucho|poco|nada|algo|tan|tanto|cómo|cuándo|dónde|por qué|para qué)\b/i.test(trimmed);
+    const hasSpanishWord = /\b(el|la|un|una|los|las|es|está|son|muy|más|pero|porque|como|cuando|donde|qué|cómo|quién|cuál|este|ese|aquel|mi|tu|su|nuestro|vuestro|con|para|por|sin|sobre|entre|desde|hasta|hacia|durante|mediante|según|salvo|excepto|mismo|tal|cual|tan|tanto|todo|nada|algo|alguien|nadie|ninguno|cada|otro|mismo|propio|único|cierto|varios|todos|ambos|algunos|muchos|pocos|demasiado|bastante|mucho|poco|nada|algo|tan|tanto|cómo|cuándo|dónde|por qué|para qué)\b/i.test(trimmed);
     const commonEnglishWords = /\b(the|is|are|was|were|have|has|had|do|does|did|will|would|could|should|may|might|can|this|that|these|those|with|from|into|through|during|before|after|above|below|between|under|again|further|then|once|here|there|when|where|why|how|all|any|both|each|few|more|most|other|some|such|no|nor|not|only|own|same|so|than|too|very|just|now|also|back|down|off|over|out|up|about|because|but|if|or|since|though|while|although|unless|until|whether|either|neither|both|and|yet|still|however|therefore|moreover|furthermore|nevertheless|otherwise|meanwhile|instead|besides|actually|probably|certainly|definitely|absolutely|completely|totally|exactly|precisely|specifically|particularly|especially|generally|usually|normally|typically|frequently|often|sometimes|occasionally|rarely|seldom|never|always|constantly|continuously|repeatedly|regularly|daily|weekly|monthly|yearly|early|late|soon|recently|already|yet|still|before|after|later|earlier|formerly|previously|currently|presently|immediately|instantly|directly|straight|slowly|quickly|rapidly|suddenly|gradually|eventually|finally|initially|originally|primarily|mainly|mostly|largely|partly|slightly|somewhat|fairly|pretty|rather|quite|very|extremely|incredibly|unbelievably|amazingly|surprisingly|remarkably|notably|significantly|substantially|considerably|greatly|deeply|strongly|weakly|hardly|barely|scarcely|nearly|almost|practically|virtually|essentially|basically|fundamentally|ultimately|absolutely|relatively|comparatively|exceptionally|extraordinarily|tremendously|enormously|hugely|vastly|widely|narrowly|closely|loosely|tightly|firmly|softly|gently|roughly|smoothly|easily|difficultly|simply|complexly|plainly|clearly|obviously|evidently|apparently|seemingly|presumably|supposedly|allegedly|reportedly|supposedly|theoretically|hypothetically|potentially|possibly|perhaps|maybe|likely|probably|presumably|undoubtedly|unquestionably|indisputably|incontrovertibly|indefinitely|permanently|temporarily|briefly|shortly|momentarily|instantaneously|simultaneously|consecutively|sequentially|successively|alternately|reciprocally|mutually|jointly|collectively|individually|separately|independently|exclusively|inclusively|collectively|altogether|entirely|wholly|fully|partially|incompletely|adequately|insufficiently|sufficiently|appropriately|properly|correctly|incorrectly|wrongly|rightly|justly|unjustly|fairly|unfairly|equally|unequally|similarly|differently|likewise|otherwise|instead|alternatively|conversely|inversely|oppositely|contrarily|contrastingly|correspondingly|accordingly|consequently|subsequently|accordingly|thus|hence|thereby|whereby|whatsoever|whatsoever|whatever|whichever|whoever|whomever|whenever|wherever|however|whyever)\b/g;
     const englishWordCount = (trimmed.match(commonEnglishWords) || []).length;
     if (!hasSpanishChar && !hasSpanishWord && englishWordCount >= 3) {
       return true;
     }
+  }
+
+  // Length ratio check: translations should be roughly similar in length to
+  // the source. Wild deviations suggest hallucination or failure.
+  const sourceLen = source.trim().length;
+  const outputLen = trimmed.length;
+  if (sourceLen > 10 && outputLen > 0) {
+    const ratio = outputLen / sourceLen;
+    if (ratio > 4) return true;  // Output is 4x longer than source
+    if (ratio < 0.15) return true; // Output is <15% of source length
   }
 
   return false;
@@ -433,6 +457,71 @@ function buildTargetedVocabHint(text: string, dialect: string): string {
   } catch {
     return "";
   }
+}
+
+/**
+ * Build targeted grammar hints based on specific English patterns in the source.
+ * Weak models often fail on ambiguous constructions; explicit rules help.
+ */
+function buildTargetedGrammarHint(text: string): string {
+  const hints: string[] = [];
+  const lower = text.toLowerCase();
+
+  // Possessive "have" vs auxiliary "have" — weak models confuse these
+  if (/\b(you|i|we|they)\s+have\s+a\b/.test(lower)) {
+    hints.push('Possessive "have" (owning something) = "tener". Do not use "haber".');
+  }
+
+  // "You" at sentence start — weak models sometimes flip to first person (answering mode)
+  if (/^you\b/i.test(text.trim())) {
+    hints.push('Preserve "you" as tú/vos. Do not change to "yo" (I).');
+  }
+
+  // Question form — weak models sometimes answer instead of translate
+  if (/^do\s+you\b/i.test(text.trim()) || /^are\s+you\b/i.test(text.trim()) || /^can\s+you\b/i.test(text.trim())) {
+    hints.push('Translate the question exactly. Do not answer it.');
+  }
+
+  return hints.join(" ");
+}
+
+// Cache: dialect → Map<lowercaseConcept, preferredTerm>
+const conceptCache = new Map<string, Map<string, string>>();
+
+function getConceptMap(dialect: SpanishDialect): Map<string, string> {
+  const key = dialect;
+  if (conceptCache.has(key)) return conceptCache.get(key)!;
+  const map = new Map<string, string>();
+  const swaps = getVocabularyForDialect(dialect);
+  for (const s of swaps) {
+    // Only index by exact concept name to avoid false positives from gloss words
+    map.set(s.concept.toLowerCase(), s.preferredTerm);
+  }
+  conceptCache.set(key, map);
+  return map;
+}
+
+/**
+ * Fix untranslated English words that appear in the output.
+ * Weak models sometimes leave English nouns untranslated (e.g., "elevator").
+ * Only replaces exact concept-name matches to avoid false positives.
+ */
+function fixUntranslatedWords(text: string, dialect: SpanishDialect): string {
+  const conceptMap = getConceptMap(dialect);
+  if (conceptMap.size === 0) return text;
+
+  // Tokenize and replace words that match dictionary concepts exactly
+  return text.replace(/\b([a-zA-Z]+)\b/g, (match) => {
+    const lower = match.toLowerCase();
+    const replacement = conceptMap.get(lower);
+    if (!replacement) return match;
+    // Preserve case pattern
+    if (match === match.toUpperCase()) return replacement.toUpperCase();
+    if (match[0] === match[0].toUpperCase()) {
+      return replacement[0].toUpperCase() + replacement.slice(1);
+    }
+    return replacement;
+  });
 }
 
 // Cache for Spanish→hint reverse lookup
@@ -682,7 +771,8 @@ export class LLMProvider implements TranslationProvider {
 
         // If output looks like garbage, retry once with a stricter prompt
         if (isGarbageOutput(text, result.translatedText)) {
-          result = await this._doSingleCallTranslate(strippedText, sourceLang, targetLang, options, buildStrictSystemPrompt(), sentinels);
+          const retryPrompt = buildStrictSystemPrompt(dialect, strippedText);
+          result = await this._doSingleCallTranslate(strippedText, sourceLang, targetLang, options, retryPrompt, sentinels);
           if (isGarbageOutput(text, result.translatedText)) {
             throw new Error("LLM produced garbage output after retry");
           }
@@ -843,18 +933,20 @@ export class LLMProvider implements TranslationProvider {
   ): string {
     // Post-processing pipeline: deterministic fixes in order
     // 1. Lexical substitution (wrong-dialect → right-dialect words)
-    // 2. Voseo verb swap (tú → vos for voseo dialects)
-    // 3. Agreement validation
-    // 4. Punctuation normalization
-    // 5. Accentuation correction
-    // 6. Capitalization normalization
-    // 7. Typography normalization
-    // 8. Sentinel restoration (always last)
+    // 2. Fix untranslated English words (weak model fallback)
+    // 3. Voseo verb swap (tú → vos for voseo dialects)
+    // 4. Agreement validation
+    // 5. Punctuation normalization
+    // 6. Accentuation correction
+    // 7. Capitalization normalization
+    // 8. Typography normalization
+    // 9. Sentinel restoration (always last)
     const dialect = options?.dialect;
     let result = text;
 
     if (dialect) {
       result = applyLexicalSubstitution(result, dialect);
+      result = fixUntranslatedWords(result, dialect);
       result = applyVoseo(result, dialect, options?.formality);
     }
 

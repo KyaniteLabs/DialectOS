@@ -1064,7 +1064,10 @@ export const VERB_CONJUGATIONS: VerbConjugation[] = [
   infinitive: "haber",
   meaning: "to have (auxiliary); there is/are",
   category: "conjugation-pattern",
-  forms: buildForms(túForms("has", "he"), vosForms("habés", "habé")),
+  // NOTE: "haber" present_2s is "has" for BOTH tú and vos in standard voseo.
+  // The form "habés" does not exist. Using same form prevents false swaps
+  // in compound tenses like "has dado" (you have given).
+  forms: buildForms(túForms("has", "he"), vosForms("has", "he")),
 },
 
 {
