@@ -1,0 +1,21 @@
+# DialectOS
+
+> Spanish dialect localization MCP server, CLI, and QA toolkit.
+
+DialectOS helps AI agents and localization teams translate, validate, and certify Spanish content across regional dialects while preserving structure, glossary terms, placeholders, and locale files.
+
+## Use cases
+- Spanish dialect translation for AI agents
+- i18n locale validation
+- MCP localization workflows
+- Launch-readiness audits for Spanish products
+- Glossary enforcement and adversarial QA
+
+## Key paths
+- `README.md`: public overview and quick start
+- `docs/`: implementation and certification documentation
+- `packages/`: TypeScript packages
+- `audits/`: sample and release certification artifacts
+
+## Keywords
+Spanish dialect translation, MCP server, Model Context Protocol, localization QA, i18n validation, glossary enforcement, regional Spanish, Spanish launch certification.

@@ -12,15 +12,15 @@ quality gates that catch semantic drift before it reaches users.
 
 Translate, detect, and adapt content across **25 regional Spanish variants** while preserving markdown structure, code comments, and locale file formatting.
 
-[![CI](https://github.com/Pastorsimon1798/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/Pastorsimon1798/DialectOS/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-1034%20passing-brightgreen)](https://github.com/Pastorsimon1798/DialectOS/actions)
+[![CI](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-1034%20passing-brightgreen)](https://github.com/KyaniteLabs/DialectOS/actions)
 [![License](https://img.shields.io/badge/license-BSL%201.1-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
 [![pnpm](https://img.shields.io/badge/pnpm-9.15.0-orange)](package.json)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
-[![Security](https://img.shields.io/badge/security-hardened-success)](https://github.com/Pastorsimon1798/DialectOS/security)
+[![Security](https://img.shields.io/badge/security-hardened-success)](https://github.com/KyaniteLabs/DialectOS/security)
 
-[📖 Documentation](https://github.com/Pastorsimon1798/DialectOS#readme) ·
+[📖 Documentation](https://github.com/KyaniteLabs/DialectOS#readme) ·
 [🚀 Quick Start](#quick-start) ·
 [🛠️ MCP Tools](#mcp-tools) ·
 [📦 Packages](#packages) ·
@@ -31,6 +31,15 @@ Translate, detect, and adapt content across **25 regional Spanish variants** whi
 
 ---
 
+
+
+## Public Discovery
+
+**DialectOS** is a Spanish localization and dialect QA system for AI agents, documentation teams, app developers, and support organizations. It provides MCP tools, CLI workflows, glossary enforcement, locale-file validation, and adversarial quality gates for regional Spanish variants.
+
+**AI discovery:** [`llms.txt`](llms.txt) provides a compact project summary for AI assistants and search crawlers.
+
+**Best-fit searches:** Spanish dialect translation MCP server, Spanish localization QA, Model Context Protocol translation tool, i18n validation CLI, regional Spanish translator, glossary enforcement, AI localization audit, Spanish launch certification.
 
 ## Spanish Launch Certification
 
@@ -215,7 +224,7 @@ dialectos dialects list
 ### From source
 
 ```bash
-git clone https://github.com/Pastorsimon1798/DialectOS.git
+git clone https://github.com/KyaniteLabs/DialectOS.git
 cd DialectOS
 pnpm install
 pnpm build
@@ -422,7 +431,7 @@ semantic similarity) and adversarial tests. 1034 tests verify correctness across
 Add this badge to your project if you use DialectOS for translation:
 
 ```markdown
-[![Translated with DialectOS](https://img.shields.io/badge/translated%20with-DialectOS-d89b2b)](https://github.com/Pastorsimon1798/DialectOS)
+[![Translated with DialectOS](https://img.shields.io/badge/translated%20with-DialectOS-d89b2b)](https://github.com/KyaniteLabs/DialectOS)
 ```
 
 ## ⚡ GitHub Action
@@ -430,7 +439,7 @@ Add this badge to your project if you use DialectOS for translation:
 Validate Spanish translations in CI on every pull request:
 
 ```yaml
-- uses: Pastorsimon1798/DialectOS/action@v0.3.0
+- uses: KyaniteLabs/DialectOS/action@v0.3.0
   with:
     dialect: es-MX
     source-dir: locales/en
@@ -445,7 +454,7 @@ strategy:
   matrix:
     dialect: [es-ES, es-MX, es-AR, es-CO]
 steps:
-  - uses: Pastorsimon1798/DialectOS/action@v0.3.0
+  - uses: KyaniteLabs/DialectOS/action@v0.3.0
     with:
       dialect: ${{ matrix.dialect }}
       fail-on-blocking: true
@@ -486,7 +495,7 @@ BSL 1.1 — see [`LICENSE`](LICENSE) for details. The Licensed Work will become 
 
 <div align="center">
 
-Made with ❤️ by [Pastorsimon1798](https://github.com/Pastorsimon1798) and contributors.
+Made with ❤️ by KyaniteLabs and contributors.
 
 **Star ⭐ this repo if it helps your project!**
 
