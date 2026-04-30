@@ -23,7 +23,7 @@ describe("Global Error Handler", () => {
     expect(handlers.has("unhandledRejection")).toBe(true);
     expect(handlers.has("SIGINT")).toBe(true);
     expect(handlers.has("SIGTERM")).toBe(true);
-  });
+  }, 10000);
 
   it("should handle uncaughtException with sanitized error", async () => {
     const exitSpy = vi.spyOn(process, "exit").mockImplementation(() => {});

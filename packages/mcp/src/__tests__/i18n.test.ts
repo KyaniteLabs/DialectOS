@@ -16,11 +16,21 @@ class MockSecurityError extends Error {
   }
 }
 
-// Mock fs module
-vi.mock("node:fs", () => ({
-  existsSync: vi.fn().mockReturnValue(true),
-  statSync: vi.fn().mockReturnValue({ isDirectory: () => true }),
-}));
+// Mock fs module — preserve dialectal-dictionary.json reads
+vi.mock("node:fs", async () => {
+  const actual = await vi.importActual<typeof import("node:fs")>("node:fs");
+  return {
+    ...actual,
+    readFileSync: vi.fn((path: string | URL, ...args: any[]) => {
+      if (typeof path === "string" && path.includes("dialectal-dictionary.json")) {
+        return actual.readFileSync(path, ...args);
+      }
+      return "# Hello World";
+    }),
+    existsSync: vi.fn().mockReturnValue(true),
+    statSync: vi.fn().mockReturnValue({ isDirectory: () => true }),
+  };
+});
 
 // Mock the core libraries
 vi.mock("@dialectos/locale-utils", () => ({

@@ -6,12 +6,21 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 
-// Mock fs module
-vi.mock("node:fs", () => ({
-  readFileSync: vi.fn(),
-  existsSync: vi.fn().mockReturnValue(true),
-  statSync: vi.fn().mockReturnValue({ isDirectory: () => true }),
-}));
+// Mock fs module — preserve dialectal-dictionary.json reads
+vi.mock("node:fs", async () => {
+  const actual = await vi.importActual<typeof import("node:fs")>("node:fs");
+  return {
+    ...actual,
+    readFileSync: vi.fn((path: string | URL, ...args: any[]) => {
+      if (typeof path === "string" && path.includes("dialectal-dictionary.json")) {
+        return actual.readFileSync(path, ...args);
+      }
+      return "# Hello World";
+    }),
+    existsSync: vi.fn().mockReturnValue(true),
+    statSync: vi.fn().mockReturnValue({ isDirectory: () => true }),
+  };
+});
 
 // Mock core libraries
 vi.mock("@dialectos/markdown-parser", () => ({
@@ -175,8 +184,6 @@ describe("MCP Security Tests", () => {
     vi.mocked(validateJsonPath).mockReturnValue("/test/locale.json");
     vi.mocked(validateContentLength).mockReturnValue(true);
 
-    // Mock readFileSync
-    vi.mocked(readFileSync).mockReturnValue("# Hello World");
   });
 
   describe("1. Path Traversal Protection", () => {

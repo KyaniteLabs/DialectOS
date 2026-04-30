@@ -15,10 +15,19 @@ class MockSecurityError extends Error {
   }
 }
 
-// Mock fs module
-vi.mock("node:fs", () => ({
-  readFileSync: vi.fn(),
-}));
+// Mock fs module — preserve dialectal-dictionary.json reads
+vi.mock("node:fs", async () => {
+  const actual = await vi.importActual<typeof import("node:fs")>("node:fs");
+  return {
+    ...actual,
+    readFileSync: vi.fn((path: string | URL, ...args: any[]) => {
+      if (typeof path === "string" && path.includes("dialectal-dictionary.json")) {
+        return actual.readFileSync(path, ...args);
+      }
+      return "# Hello World\n\nThis is a test paragraph.\n\n```javascript\nconsole.log('code');\n```";
+    }),
+  };
+});
 
 // Mock the core libraries
 vi.mock("@dialectos/markdown-parser", () => ({
@@ -112,11 +121,6 @@ describe("MCP Docs Tools", () => {
       getAuto: vi.fn(),
       register: vi.fn(),
     } as unknown as ProviderRegistry;
-
-    // Mock readFileSync to return sample markdown
-    vi.mocked(readFileSync).mockReturnValue(
-      "# Hello World\n\nThis is a test paragraph.\n\n```javascript\nconsole.log('code');\n```"
-    );
 
     // Mock parseMarkdown
     vi.mocked(parseMarkdown).mockReturnValue({
