@@ -21,22 +21,13 @@ const sampleTimeoutMs = parsePositiveInt(args.get("sample-timeout-ms"), 300000);
 const sampleRetries = parseNonNegativeInt(args.get("sample-retries"), 1);
 const dialectFilter = new Set((args.get("dialects") || "").split(",").map((d) => d.trim()).filter(Boolean));
 
-const VOSEO_DIALECTS = new Set(["es-AR", "es-UY", "es-PY", "es-GT", "es-HN", "es-SV", "es-NI"]);
-const VOSOTROS_DIALECTS = new Set(["es-ES", "es-AD"]);
-const GUAGUA_BUS_DIALECTS = new Set(["es-CU", "es-DO", "es-PR"]);
-
-const { buildLexicalAmbiguityExpectations } = await import(
-  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/lexical-ambiguity.js`).href
-);
-const { judgeTranslationOutput } = await import(
-  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/output-judge.js`).href
-);
-
-// Import shared evaluation primitives
+// Import shared evaluation primitives (single source of truth)
 const {
   mockTranslate: mockTranslateShared,
   createLiveTranslate: createLiveTranslateShared,
   hasForbiddenTerm: hasForbiddenTermShared,
+  buildLexicalAmbiguityExpectations,
+  judgeTranslationOutput,
 } = await import(
   pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/eval-harness.js`).href
 );

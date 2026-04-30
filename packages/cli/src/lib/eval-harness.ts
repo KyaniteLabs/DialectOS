@@ -15,6 +15,9 @@ import { validateTranslation } from "./validate-translation.js";
 import { createProviderRegistry } from "./provider-factory.js";
 import { buildSemanticTranslationContext } from "./semantic-context.js";
 
+// Re-export utilities so scripts can import everything from one module
+export { buildLexicalAmbiguityExpectations, judgeTranslationOutput, validateTranslation };
+
 // ============================================================================
 // Dialect sets
 // ============================================================================

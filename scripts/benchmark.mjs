@@ -38,23 +38,15 @@ const categoryFilter = new Set(
     .filter(Boolean)
 );
 
-// Import built modules
-const { validateTranslation } = await import(
-  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/validate-translation.js`).href
-);
-const { buildLexicalAmbiguityExpectations } = await import(
-  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/lexical-ambiguity.js`).href
-);
-const { judgeTranslationOutput } = await import(
-  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/output-judge.js`).href
-);
-
-// Import shared evaluation primitives
+// Import shared evaluation primitives (single source of truth)
 const {
   mockTranslate,
   createLiveTranslate,
   hasForbiddenTerm,
   loadFixtures,
+  validateTranslation,
+  buildLexicalAmbiguityExpectations,
+  judgeTranslationOutput,
 } = await import(
   pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/eval-harness.js`).href
 );
