@@ -43,13 +43,21 @@ const PROMPT_LEAK_PATTERNS = [
   /\bforbidden output\b/i,
   /\btaboo policy\b/i,
   /\bdo not translate literally\b/i,
+  /\bdialect fidelity\b/i,
+  /\bformality.*regional nuances\b/i,
 ];
 
 const EXPLANATION_PATTERNS = [
   /^\s*(translation|traducci[oó]n)\s*:/i,
-  /\bhere is (the )?translation\b/i,
+  /\bhere is (a |the )?translat/i,
+  /\bhere('s| is) (a |the )?(translated|spanish)\b/i,
+  /\bbelow is (a |the )?translat/i,
   /\baqu[ií] (est[aá]|tienes) (la )?traducci[oó]n\b/i,
+  /\bsure,? i can help/i,
+  /\bokay,? i understand/i,
+  /\blet'?s begin/i,
   /```/,
+  /^\s*<<<\s*$/m,
 ];
 
 const ENGLISH_FUNCTION_WORDS = /\b(the|before|after|from|your|with|without|support|payment|office|package|file|room|guests|arrive|deployment|message|this|english|sentence|should|remain|impossible)\b/i;

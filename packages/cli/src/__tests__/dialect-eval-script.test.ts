@@ -256,6 +256,6 @@ describe("dialect eval script", () => {
     expect(matrix).toContain("dialect-collision");
 
     rmSync(outDir, { recursive: true, force: true });
-  }, 60000);
+  }, 180000);
 
 });

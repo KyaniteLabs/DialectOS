@@ -46,6 +46,10 @@ export interface ValidationReport {
       message: string;
     }>;
   };
+  idiomCheck: {
+    passed: boolean;
+    literalTraps: string[];
+  };
   structureValidation?: {
     valid: boolean;
     violations: string[];

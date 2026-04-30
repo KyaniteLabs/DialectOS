@@ -1,9 +1,10 @@
 import type { ProviderRegistry } from "@dialectos/providers";
 import type { FormalityLevel, SpanishDialect } from "@dialectos/types";
 import { ALL_SPANISH_DIALECTS } from "@dialectos/types";
-import { validateContentLength } from "@dialectos/security";
+import { stripHtmlTags, validateContentLength } from "@dialectos/security";
 import { detectDialect } from "./dialect-info.js";
 import { buildLexicalAmbiguityExpectations } from "./lexical-ambiguity.js";
+import { detectIdioms, checkIdiomCompliance } from "./idiom-detection.js";
 import { judgeTranslationOutput } from "./output-judge.js";
 import { createProviderRegistry } from "./provider-factory.js";
 import { buildSemanticTranslationContext } from "./semantic-context.js";
@@ -132,6 +133,17 @@ export async function translateForWebDemo(
     (issue) => `${issue.category}/${issue.severity}: ${issue.message}`
   );
 
+  // Idiom detection: warn if source contains English idioms
+  const detectedIdioms = detectIdioms(text);
+  if (detectedIdioms.length > 0) {
+    const idiomCheck = checkIdiomCompliance(translated.translatedText, text, dialect);
+    if (!idiomCheck.passed) {
+      for (const trap of idiomCheck.literalTraps) {
+        qualityWarnings.push(`idiom/literal-trap: Literal translation of English idiom detected — "${trap}" is a word-for-word rendering, not idiomatic Spanish.`);
+      }
+    }
+  }
+
   // Only hard-fail for critical security/safety issues; everything else is a warning
   const criticalIssues = judge.blockingIssues.filter(
     (issue) => issue.category === "prompt-leak" || issue.category === "taboo-safety"
@@ -145,7 +157,7 @@ export async function translateForWebDemo(
   }
 
   return {
-    translatedText: translated.translatedText,
+    translatedText: stripHtmlTags(translated.translatedText),
     dialect,
     providerUsed: translated.providerUsed,
     fallbackCount: translated.fallbackCount,

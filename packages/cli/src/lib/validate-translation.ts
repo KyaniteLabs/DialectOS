@@ -3,6 +3,7 @@ import { validateDialectCompliance } from "@dialectos/types";
 import { validateMarkdownStructure } from "./structure-validator.js";
 import { buildLexicalAmbiguityExpectations, checkLexicalCompliance } from "./lexical-ambiguity.js";
 import type { LexicalComplianceResult } from "./lexical-ambiguity.js";
+import { checkIdiomCompliance } from "./idiom-detection.js";
 import { calculateQualityScore } from "./quality-score.js";
 import type { QualityScore } from "./quality-score.js";
 import { combinedSemanticCheck } from "./semantic-backstop.js";
@@ -50,6 +51,9 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
     translated
   );
 
+  // 7. Idiom detection (literal translation traps)
+  const idiomCheck = checkIdiomCompliance(translated, source, dialect);
+
   // Collect all blocking issues
   const blockingIssues: string[] = [];
 
@@ -79,6 +83,12 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
     blockingIssues.push(issue.message);
   }
 
+  if (!idiomCheck.passed) {
+    for (const trap of idiomCheck.literalTraps) {
+      blockingIssues.push(`Literal idiom translation detected: "${trap}" is a word-for-word rendering, not an idiomatic Spanish equivalent.`);
+    }
+  }
+
   return {
     valid: blockingIssues.length === 0,
     dialect,
@@ -94,6 +104,10 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
     outputJudge: {
       issues: judge.issues.map((i) => ({ category: i.category, severity: i.severity, message: i.message })),
       blockingIssues: judge.blockingIssues.map((i) => ({ category: i.category, severity: i.severity, message: i.message })),
+    },
+    idiomCheck: {
+      passed: idiomCheck.passed,
+      literalTraps: idiomCheck.literalTraps,
     },
     structureValidation,
     blockingIssues,

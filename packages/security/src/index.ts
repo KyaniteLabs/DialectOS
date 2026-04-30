@@ -403,6 +403,21 @@ export function sanitizeHtml(html: string): string {
   }
 }
 
+/**
+ * Strip all HTML tags from text — for sanitizing LLM translation output.
+ * Removes <script>, <style>, and all other tags, returning plain text.
+ */
+export function stripHtmlTags(text: string): string {
+  try {
+    return DOMPurify.sanitize(text, {
+      ALLOWED_TAGS: [],
+      ALLOWED_ATTR: [],
+    });
+  } catch {
+    return text.replace(/<[^>]*>/g, "");
+  }
+}
+
 // ============================================================================
 // URL Validation
 // ============================================================================

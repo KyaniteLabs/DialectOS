@@ -873,8 +873,8 @@ describe("Provider capabilities", () => {
     }));
     const body = JSON.parse(vi.mocked(global.fetch).mock.calls.at(-1)![1]!.body as string);
     expect(body.model).toBe("dialect-model");
-    expect(body.messages[0].content).toContain("semantic dialect-aware Spanish translation engine");
-    expect(body.messages[1].content).toContain("Target dialect: es-AR");
+    expect(body.messages[0].content).toContain("Spanish translation engine");
+    expect(body.messages[1].content).toContain("es-AR");
     expect(body.messages[1].content).toContain("Use pronominal and verbal voseo");
     expect(body.messages[1].content).toContain("You can update your account now.");
   });
@@ -931,10 +931,10 @@ describe("Provider capabilities", () => {
     }));
     const body = JSON.parse(vi.mocked(global.fetch).mock.calls.at(-1)![1]!.body as string);
     expect(body.model).toBe("claude-dialect");
-    expect(body.system).toContain("semantic dialect-aware Spanish translation engine");
+    expect(body.system).toContain("Spanish translation engine");
     expect(body.messages).toHaveLength(1);
     expect(body.messages[0].role).toBe("user");
-    expect(body.messages[0].content).toContain("Target dialect: es-AR");
+    expect(body.messages[0].content).toContain("es-AR");
     expect(body.messages[0].content).toContain("Use pronominal and verbal voseo");
   });
 
@@ -1001,8 +1001,8 @@ describe("Provider capabilities", () => {
     expect(global.fetch).toHaveBeenNthCalledWith(3, "http://127.0.0.1:1234/api/v1/chat", expect.objectContaining({ method: "POST" }));
     const chatBody = JSON.parse(vi.mocked(global.fetch).mock.calls[2][1]!.body as string);
     expect(chatBody.model).toBe("local/dialect-model");
-    expect(chatBody.system_prompt).toContain("semantic dialect-aware Spanish translation engine");
-    expect(chatBody.input).toContain("Target dialect: es-AR");
+    expect(chatBody.system_prompt).toContain("Spanish translation engine");
+    expect(chatBody.input).toContain("es-AR");
     expect(chatBody.store).toBe(false);
   });
 
