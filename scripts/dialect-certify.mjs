@@ -32,6 +32,15 @@ const { judgeTranslationOutput } = await import(
   pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/output-judge.js`).href
 );
 
+// Import shared evaluation primitives
+const {
+  mockTranslate: mockTranslateShared,
+  createLiveTranslate: createLiveTranslateShared,
+  hasForbiddenTerm: hasForbiddenTermShared,
+} = await import(
+  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/eval-harness.js`).href
+);
+
 function parsePositiveInt(value, fallback) {
   const parsed = parseInt(value || "", 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
@@ -51,85 +60,21 @@ function appendJsonl(path, value) {
 }
 
 function hasForbiddenTerm(output, term) {
-  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`, "iu").test(output);
+  return hasForbiddenTermShared(output, term);
 }
 
 function mockTranslate(source, dialect, sample = {}) {
-  const formalSupport = sample.register === "formal" && /\b(password|support|payment)\b/i.test(source);
-
-  return source
-    .replace(/\bDo not delete the database without a backup\./i, "No elimine la base de datos sin una copia de seguridad.")
-    .replace(/\bYou can update your account settings in the profile page\./i,
-      VOSEO_DIALECTS.has(dialect) ? "Podés actualizar la configuración de tu cuenta en la página de perfil." :
-      VOSOTROS_DIALECTS.has(dialect) ? "Podéis actualizar la configuración de vuestra cuenta en la página de perfil." :
-      "Puedes actualizar la configuración de tu cuenta en la página de perfil.")
-    .replace(/\bThe traditional dish for the holiday celebration includes (.+?)\./i, "El plato tradicional para la celebración festiva incluye $1.")
-    .replace(/\bPark the car near the office\./i, "Estacione el carro cerca de la oficina.")
-    .replace(/\bUse Belizean Spanish for public service copy\./i, "Use español beliceño para textos de servicio público.")
-    .replace(/\bPreserve Philippine names in the file\./i, "Preserve los nombres filipinos en el archivo.")
-    .replace(/\bDo not use slang in this customer support message\./i, "No use jerga en este mensaje de soporte al cliente.")
-    .replace(/\bUse yam in the recipe\./i, dialect === "es-GQ" ? "Use ñame en la receta." : "Use yam en la receta.")
-    .replace(/\bBuy hot sauce for lunch\./i, dialect === "es-BO" ? "Compre llajwa para el almuerzo." : "Compre salsa picante para el almuerzo.")
-    .replace(/\bBuy avocado for lunch\./i, dialect === "es-CL" ? "Compra palta para el almuerzo." : "Compra aguacate para el almuerzo.")
-    .replace(/\bOrange juice is ready\./i, ["es-PR", "es-DO"].includes(dialect) ? "El jugo de china está listo." : "El jugo de naranja está listo.")
-    .replace(/\bJugo de china is on the Puerto Rican menu\./i, dialect === "es-MX" ? "El jugo de naranja está en el menú puertorriqueño." : "El jugo de china está en el menú puertorriqueño.")
-    .replace(/\bThe baby is sleeping\./i, dialect === "es-CL" ? "La guagua está durmiendo." : "El bebé está durmiendo.")
-    .replace(/\bUse the computer to open the file\./i, ["es-CO", "es-EC"].includes(dialect) ? "Usa el computador para abrir el archivo." : "Usa la computadora para abrir el archivo.")
-    .replace(/\b(Catch|Ride|Get on)\b/i, "Toma")
-    .replace(/\bTake\b/i, "Toma")
-    .replace(/\bbus\b/i,
-      GUAGUA_BUS_DIALECTS.has(dialect) ? "guagua" :
-      ["es-AR", "es-UY"].includes(dialect) ? "colectivo" :
-      dialect === "es-MX" ? "camión" : "autobús")
-    .replace(/\boffice\b/i, "oficina")
-    .replace(/\bpackage\b/i, "paquete")
-    .replace(/\breception\b/i, "recepción")
-    .replace(/\bpassword\b/i, "contraseña")
-    .replace(/\baccount settings\b/i, "configuración de la cuenta")
-    .replace(/\bPlease update your contraseña before continuing\./i, formalSupport ? "Por favor, actualice su contraseña antes de continuar." : "Actualiza tu contraseña antes de continuar.")
-    .replace(/\bContact support\b/i, formalSupport ? "Comuníquese con soporte" : "Contacta a soporte")
-    .replace(/\bpayment fails\b/i, "pago falla")
-    .replace(/\bPick up the room before guests arrive\./i, dialect === "es-PR" ? "Recoge el cuarto antes de que lleguen los invitados." : "Ordena la habitación antes de que lleguen los invitados.")
-    .replace(/\bPick up\b/i, "Recoge")
-    .replace(/\bfiles\b/i, "archivos")
-    .replace(/\bfile\b/i, "archivo")
-    .replace(/\bdeployment\b/i, "despliegue")
-    .replace(/\bYou can update\b/i, VOSEO_DIALECTS.has(dialect) ? "Vos podés actualizar" : "Puedes actualizar")
-    .replace(/\byour account now\b/i, "tu cuenta ahora")
-    .replace(/\bYou can all update\b/i, VOSOTROS_DIALECTS.has(dialect) ? "Vosotros podéis actualizar" : "Ustedes pueden actualizar")
-    .replace(/\byour passwords now\b/i, "vuestras contraseñas ahora");
+  return mockTranslateShared(source, dialect, sample);
 }
 
 async function createLiveTranslate() {
-  const { createProviderRegistry } = await import(pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/provider-factory.js`).href);
-  const { buildSemanticTranslationContext } = await import(pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/semantic-context.js`).href);
-  const registry = createProviderRegistry();
-  const available = registry.listProviders();
-  if (available.length === 0) {
-    throw new Error("No live providers are configured. Set LLM_API_URL + LLM_MODEL, DEEPL_AUTH_KEY, LIBRETRANSLATE_URL, or ENABLE_MYMEMORY=1.");
-  }
-
+  const translate = await createLiveTranslateShared(providerName);
   return async (sample, dialect) => {
-    const provider = providerName === "auto" || providerName === "mock-semantic"
-      ? registry.getAuto()
-      : registry.get(providerName);
-    const context = buildSemanticTranslationContext({
-      text: sample.source,
-      dialect,
-      formality: sample.register,
-      documentKind: sample.documentKind,
-    });
     const delayMs = parsePositiveInt(process.env.DIALECT_CERTIFY_TEST_DELAY_MS, 0);
     if (delayMs > 0) {
       await new Promise((resolveDelay) => setTimeout(resolveDelay, delayMs));
     }
-    const result = await provider.translate(sample.source, "auto", "es", {
-      dialect,
-      formality: sample.register,
-      context,
-    });
-    return result.translatedText;
+    return translate(sample, dialect);
   };
 }
 

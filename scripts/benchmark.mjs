@@ -49,76 +49,21 @@ const { judgeTranslationOutput } = await import(
   pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/output-judge.js`).href
 );
 
-// Dialect-specific mock translation for benchmarking
-const VOSEO_DIALECTS = new Set(["es-AR", "es-UY", "es-PY", "es-GT", "es-HN", "es-SV", "es-NI"]);
-const VOSOTROS_DIALECTS = new Set(["es-ES", "es-AD"]);
-const GUAGUA_BUS_DIALECTS = new Set(["es-CU", "es-DO", "es-PR"]);
-
-function mockTranslate(source, dialect) {
-  return source
-    .replace(/\bCatch the bus to the office\./i, "Toma el autobús a la oficina.")
-    .replace(/\bPick up the file before deployment\./i, "Recoge el archivo antes del despliegue.")
-    .replace(/\bPick up the package from reception\./i, "Recoge el paquete de recepción.")
-    .replace(/\bDo not use slang in this customer support message\./i, "No use jerga en este mensaje de soporte al cliente.")
-    .replace(/\bHi \{userName\}, your %\{count\} files are ready at https:\/\/example\.com\/app\./i,
-      `Hola {userName}, tus %{count} archivos están listos en https://example.com/app.`)
-    .replace(/\bJugo de china is on the Puerto Rican menu\./i,
-      dialect === "es-MX" ? "El jugo de naranja está en el menú puertorriqueño." : "El jugo de china está en el menú puertorriqueño.")
-    .replace(/\bPark the car near the office\./i, "Estaciona el coche cerca de la oficina.")
-    .replace(/\bThe baby is sleeping\./i, "El bebé está durmiendo.")
-    .replace(/\bBuy avocado for lunch\./i, "Compra aguacate para el almuerzo.")
-    .replace(/\bUse the computer to open the file\./i, "Usa la computadora para abrir el archivo.")
-    .replace(/\bYou can update your account now\./i,
-      VOSEO_DIALECTS.has(dialect) ? "Vos podés actualizar tu cuenta ahora." : "Puedes actualizar tu cuenta ahora.");
-}
-
-async function createLiveTranslate() {
-  const { createProviderRegistry } = await import(
-    pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/provider-factory.js`).href
-  );
-  const { buildSemanticTranslationContext } = await import(
-    pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/semantic-context.js`).href
-  );
-  const registry = createProviderRegistry();
-  const available = registry.listProviders();
-  if (available.length === 0) {
-    throw new Error(
-      "No live providers configured. Set LLM_API_URL + LLM_MODEL, DEEPL_AUTH_KEY, etc."
-    );
-  }
-
-  return async (source, dialect, sample) => {
-    const provider =
-      providerName === "auto" || providerName === "mock-semantic"
-        ? registry.getAuto()
-        : registry.get(providerName);
-    const context = buildSemanticTranslationContext({
-      text: source,
-      dialect,
-      formality: sample.register,
-      documentKind: sample.documentKind,
-    });
-    const result = await provider.translate(source, "auto", "es", {
-      dialect,
-      formality: sample.register,
-      context,
-    });
-    return result.translatedText;
-  };
-}
+// Import shared evaluation primitives
+const {
+  mockTranslate,
+  createLiveTranslate,
+  hasForbiddenTerm,
+  loadFixtures,
+} = await import(
+  pathToFileURL(`${process.cwd()}/packages/cli/dist/lib/eval-harness.js`).href
+);
 
 const translate = live
-  ? await createLiveTranslate()
+  ? await createLiveTranslate(providerName)
   : async (source, dialect, _sample) => mockTranslate(source, dialect);
 
-function hasTerm(output, term) {
-  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(
-    `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`,
-    "iu"
-  ).test(output);
-}
-
+// Benchmark-specific evaluation (uses unified validation pipeline)
 async function evaluateSample(sample, dialect) {
   let output = "";
   const failures = [];
@@ -152,7 +97,7 @@ async function evaluateSample(sample, dialect) {
     ...lexicalExp.forbiddenOutputTerms,
   ];
   for (const term of allForbidden) {
-    if (hasTerm(output, term)) {
+    if (hasForbiddenTerm(output, term)) {
       failures.push(`Forbidden term: ${term}`);
     }
   }
@@ -163,14 +108,14 @@ async function evaluateSample(sample, dialect) {
     ...lexicalExp.requiredOutputGroups,
   ];
   for (const group of allGroups) {
-    if (!group.some((term) => hasTerm(output, term))) {
+    if (!group.some((term) => hasForbiddenTerm(output, term))) {
       failures.push(`Missing required group: ${group.join(", ")}`);
     }
   }
 
   // Required output any
   if (sample.requiredOutputAny?.length) {
-    if (!sample.requiredOutputAny.some((term) => hasTerm(output, term))) {
+    if (!sample.requiredOutputAny.some((term) => hasForbiddenTerm(output, term))) {
       failures.push(
         `Missing required output: ${sample.requiredOutputAny.join(", ")}`
       );
@@ -218,13 +163,7 @@ async function evaluateSample(sample, dialect) {
 
 // Run benchmark
 const results = [];
-for (const file of readdirSync(fixtureDir)
-  .filter((name) => name.endsWith(".json"))
-  .sort()) {
-  const dialect = basename(file, ".json");
-  if (dialectFilter.size > 0 && !dialectFilter.has(dialect)) continue;
-
-  const samples = JSON.parse(readFileSync(join(fixtureDir, file), "utf-8"));
+for (const { dialect, samples } of loadFixtures(fixtureDir, dialectFilter)) {
   for (const sample of samples) {
     if (categoryFilter.size > 0 && !categoryFilter.has(sample.category)) continue;
     results.push(await evaluateSample(sample, dialect));
