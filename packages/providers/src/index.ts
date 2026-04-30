@@ -65,6 +65,14 @@ export type {
   BulkEngineOptions,
 } from "./bulk/types.js";
 
+// Factory
+export {
+  createProviderRegistry,
+  getDefaultProviderRegistry,
+  resetDefaultProviderRegistryForTests,
+} from "./factory.js";
+export type { ProviderFactoryEnv } from "./factory.js";
+
 // Quality gates
 export { runQualityGates, lengthSanityCheck, dialectComplianceCheck, personConsistencyCheck, haberTenerCheck } from "./quality-gates.js";
 export type { QualityGateResult, QualityGateContext, ModelTier } from "./quality-gates.js";

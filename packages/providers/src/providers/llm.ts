@@ -18,6 +18,7 @@ import { normalizeCapitalization } from "../capitalization.js";
 import { normalizeTypography } from "../typography.js";
 import { applyLexicalSubstitution } from "../lexical-substitution.js";
 import { applyVoseo } from "../voseo-adapter.js";
+import { runQualityGates } from "../quality-gates.js";
 import { RateLimiter, sanitizeErrorMessage, HTTP_TIMEOUT, validateContentLength, SecurityError, ErrorCode } from "@dialectos/security";
 import { ALL_SPANISH_DIALECTS, languageCodeSchema, getVocabularyForDialect, getSyntacticRules } from "@dialectos/types";
 import type { SpanishDialect } from "@dialectos/types";
@@ -217,45 +218,7 @@ function buildDialectAdaptationSystemPrompt(): string {
   return "You are a Spanish dialect adapter. Adapt the following standard Spanish text to the requested dialect. Apply the dialect vocabulary and grammar rules exactly. Output ONLY the adapted Spanish text — no preamble, explanations, alternatives, or English text.";
 }
 
-const GARBAGE_PATTERNS = [
-  /```/,
-  /^\s*(translation|traducci[oó]n)\s*:/i,
-  /\bhere is (a |the )?translat/i,
-  /\bhere('s| is) (a |the )?(translated|spanish)\b/i,
-  /\bbelow is (a |the )?translat/i,
-  /\baqu[ií] (est[aá]|tienes) (la )?traducci[oó]n\b/i,
-  /\bdialect quality contract\b/i,
-  /\blexical ambiguity constraints\b/i,
-  /\bforbidden output\b/i,
-  /\btaboo policy\b/i,
-  /\bdo not translate literally\b/i,
-  /\bsure,? i can help/i,
-  /\bokay,? i understand/i,
-  /\blet'?s begin/i,
-  /\bof (the |your )?(provided |given |original )?text\b/i,
-  /^\s*<<<\s*$/m,
-  // Weak-model hallucinations observed in benchmark runs
-  /^\s*elote\s*$/i,                      // Corn hallucination for baby/strawberry/elevator
-  /^\s*mazorca\s*$/i,                    // Another corn variant
-  /^\s*es-[a-z]{2}\s*$/i,                // Dialect code only (es-MX, es-AR, etc.)
-  /\/no_think/,                           // Qwen tag leaked into output
-  /^\s*voseo\s*:/i,                       // Dialect annotation instead of translation
-  /^\s*la respuesta es\s*:/i,             // Quiz-answer format
-  /\bnice\s+[a-z]+\b/i,                   // Spanglish (nice casa, nice carro)
-  /\bgood\s+[a-z]+\b/i,                   // Spanglish
-  // Meta-instruction outputs (model tells user how to translate instead of translating)
-  /\bpuede\s+decirlo\s+en\s+español\b/i,
-  /\bpuedes\s+decirlo\s+en\s+español\b/i,
-  /\bdilo\s+en\s+español\b/i,
-  /\btraduce\s+(esto|lo siguiente)\b/i,
-  // Conversational/assistant mode fragments (weak models answer instead of translate)
-  /^\s*¡?Bienvenido!?\s*$/i,
-  /\bEntiendo\.?\s*Estoy listo\b/i,
-  // Nonsense repetition patterns
-  /\bfrutill[ao]\b.*\bfrutill[ao]\b/i,
-  // Known hallucinated words that never appear in valid translations
-  /\bcampero\b/i,
-];
+
 
 // Reasoning/thinking tags emitted by qwen3 and other thinking-capable models.
 const THINK_TAG_PATTERN = /<think[^>]*>[\s\S]*?<\/think\s*>/g;
@@ -287,40 +250,50 @@ function stripPreamble(text: string): string {
   return result.trim();
 }
 
-function isGarbageOutput(source: string, output: string): boolean {
-  const trimmed = output.trim();
-  if (!trimmed) return true;
-  // Unchanged from source (common LLM failure)
-  if (trimmed.toLowerCase() === source.trim().toLowerCase()) return true;
-  // Contains garbage patterns
-  for (const pattern of GARBAGE_PATTERNS) {
-    if (pattern.test(trimmed)) return true;
+function detectModelTier(model: string): "tiny" | "small" | "medium" | "large" {
+  if (process.env.LLM_COMPACT_PROMPT === "1") return "small";
+  if (process.env.LLM_COMPACT_PROMPT === "0") return "large";
+
+  const lower = model.toLowerCase();
+  if (lower.includes("minimax")) return "small";
+  if (/\d+m\b/.test(lower)) return "tiny";
+
+  const effMatch = lower.match(/e(\d*\.?\d+)b/);
+  if (effMatch) {
+    const params = parseFloat(effMatch[1]);
+    if (params <= 1) return "tiny";
+    if (params <= 8) return "small";
+    return "medium";
   }
 
-  // Detect mostly-English output (untranslated). Heuristic: if the output has
-  // no Spanish-specific characters and contains common English words, it's
-  // likely untranslated. Skip very short outputs to avoid false positives.
-  if (trimmed.length > 15) {
-    const hasSpanishChar = /[áéíóúñ¿¡]/i.test(trimmed);
-    const hasSpanishWord = /\b(el|la|un|una|los|las|es|está|son|muy|más|pero|porque|como|cuando|donde|qué|cómo|quién|cuál|este|ese|aquel|mi|tu|su|nuestro|vuestro|con|para|por|sin|sobre|entre|desde|hasta|hacia|durante|mediante|según|salvo|excepto|mismo|tal|cual|tan|tanto|todo|nada|algo|alguien|nadie|ninguno|cada|otro|mismo|propio|único|cierto|varios|todos|ambos|algunos|muchos|pocos|demasiado|bastante|mucho|poco|nada|algo|tan|tanto|cómo|cuándo|dónde|por qué|para qué)\b/i.test(trimmed);
-    const commonEnglishWords = /\b(the|is|are|was|were|have|has|had|do|does|did|will|would|could|should|may|might|can|this|that|these|those|with|from|into|through|during|before|after|above|below|between|under|again|further|then|once|here|there|when|where|why|how|all|any|both|each|few|more|most|other|some|such|no|nor|not|only|own|same|so|than|too|very|just|now|also|back|down|off|over|out|up|about|because|but|if|or|since|though|while|although|unless|until|whether|either|neither|both|and|yet|still|however|therefore|moreover|furthermore|nevertheless|otherwise|meanwhile|instead|besides|actually|probably|certainly|definitely|absolutely|completely|totally|exactly|precisely|specifically|particularly|especially|generally|usually|normally|typically|frequently|often|sometimes|occasionally|rarely|seldom|never|always|constantly|continuously|repeatedly|regularly|daily|weekly|monthly|yearly|early|late|soon|recently|already|yet|still|before|after|later|earlier|formerly|previously|currently|presently|immediately|instantly|directly|straight|slowly|quickly|rapidly|suddenly|gradually|eventually|finally|initially|originally|primarily|mainly|mostly|largely|partly|slightly|somewhat|fairly|pretty|rather|quite|very|extremely|incredibly|unbelievably|amazingly|surprisingly|remarkably|notably|significantly|substantially|considerably|greatly|deeply|strongly|weakly|hardly|barely|scarcely|nearly|almost|practically|virtually|essentially|basically|fundamentally|ultimately|absolutely|relatively|comparatively|exceptionally|extraordinarily|tremendously|enormously|hugely|vastly|widely|narrowly|closely|loosely|tightly|firmly|softly|gently|roughly|smoothly|easily|difficultly|simply|complexly|plainly|clearly|obviously|evidently|apparently|seemingly|presumably|supposedly|allegedly|reportedly|supposedly|theoretically|hypothetically|potentially|possibly|perhaps|maybe|likely|probably|presumably|undoubtedly|unquestionably|indisputably|incontrovertibly|indefinitely|permanently|temporarily|briefly|shortly|momentarily|instantaneously|simultaneously|consecutively|sequentially|successively|alternately|reciprocally|mutually|jointly|collectively|individually|separately|independently|exclusively|inclusively|collectively|altogether|entirely|wholly|fully|partially|incompletely|adequately|insufficiently|sufficiently|appropriately|properly|correctly|incorrectly|wrongly|rightly|justly|unjustly|fairly|unfairly|equally|unequally|similarly|differently|likewise|otherwise|instead|alternatively|conversely|inversely|oppositely|contrarily|contrastingly|correspondingly|accordingly|consequently|subsequently|accordingly|thus|hence|thereby|whereby|whatsoever|whatsoever|whatever|whichever|whoever|whomever|whenever|wherever|however|whyever)\b/g;
-    const englishWordCount = (trimmed.match(commonEnglishWords) || []).length;
-    if (!hasSpanishChar && !hasSpanishWord && englishWordCount >= 3) {
-      return true;
-    }
+  const paramMatch = lower.match(/(\d*\.?\d+)b/);
+  if (paramMatch) {
+    const params = parseFloat(paramMatch[1]);
+    if (params <= 1) return "tiny";
+    if (params <= 8) return "small";
+    return "medium";
   }
 
-  // Length ratio check: translations should be roughly similar in length to
-  // the source. Wild deviations suggest hallucination or failure.
-  const sourceLen = source.trim().length;
-  const outputLen = trimmed.length;
-  if (sourceLen > 10 && outputLen > 0) {
-    const ratio = outputLen / sourceLen;
-    if (ratio > 4) return true;  // Output is 4x longer than source
-    if (ratio < 0.15) return true; // Output is <15% of source length
-  }
+  return "large";
+}
 
-  return false;
+async function checkQuality(
+  sourceText: string,
+  translatedText: string,
+  dialect: string,
+  model: string
+): Promise<{ passed: boolean; details?: string }> {
+  const results = await runQualityGates({
+    sourceText,
+    translatedText,
+    dialect: dialect as any,
+    modelTier: detectModelTier(model),
+  });
+  const failed = results.filter((r) => !r.passed);
+  if (failed.length > 0) {
+    return { passed: false, details: failed.map((f) => `${f.name}: ${f.details}`).join("; ") };
+  }
+  return { passed: true };
 }
 
 const SANITIZE_MAP: Array<[RegExp, string]> = [
@@ -769,12 +742,14 @@ export class LLMProvider implements TranslationProvider {
           : buildSystemPrompt();
         result = await this._doSingleCallTranslate(strippedText, sourceLang, targetLang, options, sysPrompt, sentinels);
 
-        // If output looks like garbage, retry once with a stricter prompt
-        if (isGarbageOutput(text, result.translatedText)) {
+        // Run quality gates; if any fail, retry once with a stricter prompt
+        const quality = await checkQuality(text, result.translatedText, dialect, this.model);
+        if (!quality.passed) {
           const retryPrompt = buildStrictSystemPrompt(dialect, strippedText);
           result = await this._doSingleCallTranslate(strippedText, sourceLang, targetLang, options, retryPrompt, sentinels);
-          if (isGarbageOutput(text, result.translatedText)) {
-            throw new Error("LLM produced garbage output after retry");
+          const retryQuality = await checkQuality(text, result.translatedText, dialect, this.model);
+          if (!retryQuality.passed) {
+            throw new Error(`LLM failed quality gates after retry: ${retryQuality.details}`);
           }
         }
       }

@@ -68,6 +68,12 @@ vi.mock("@dialectos/providers", () => ({
       register: vi.fn(),
     };
   }),
+  createProviderRegistry: vi.fn().mockReturnValue({
+    get: vi.fn(),
+    getAuto: vi.fn(),
+    register: vi.fn(),
+  }),
+  getDefaultProviderRegistry: vi.fn(),
   DeepLProvider: vi.fn(),
   LibreTranslateProvider: vi.fn(),
   MyMemoryProvider: vi.fn(),
@@ -422,33 +428,4 @@ describe("MCP Docs Tools", () => {
     });
   });
 
-  describe("createProviderRegistry", () => {
-    it("should create provider registry with environment providers", async () => {
-      // Set environment variables
-      const originalDeeplKey = process.env.DEEPL_AUTH_KEY;
-      const originalLibreUrl = process.env.LIBRETRANSLATE_URL;
-
-      process.env.DEEPL_AUTH_KEY = "test-key";
-      process.env.LIBRETRANSLATE_URL = "http://test.com";
-
-      const { createProviderRegistry } = await import("../tools/docs.js");
-      const registry = createProviderRegistry();
-
-      expect(registry).toBeDefined();
-      expect(registry.register).toHaveBeenCalled();
-
-      // Restore environment
-      if (originalDeeplKey === undefined) {
-        delete process.env.DEEPL_AUTH_KEY;
-      } else {
-        process.env.DEEPL_AUTH_KEY = originalDeeplKey;
-      }
-
-      if (originalLibreUrl === undefined) {
-        delete process.env.LIBRETRANSLATE_URL;
-      } else {
-        process.env.LIBRETRANSLATE_URL = originalLibreUrl;
-      }
-    });
-  });
 });
