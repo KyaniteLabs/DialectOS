@@ -21,3 +21,7 @@ audits/dialect-eval-*
 benchmark_runs/*.json
 benchmark_results.json
 benchmark_report.md
+
+# Agent runtime state
+.omc/
+.claude/
