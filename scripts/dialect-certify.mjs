@@ -272,6 +272,9 @@ function shouldRetry(result) {
 async function runParentMode() {
   const startedAt = new Date().toISOString();
   const samples = loadSamples();
+  const translate = live
+    ? await createLiveTranslate()
+    : async (sample, dialect) => mockTranslate(sample.source, dialect, sample);
   const results = [];
   const absoluteOutDir = resolve(outDir);
   const tmpDir = join(absoluteOutDir, ".tmp");
@@ -300,29 +303,62 @@ async function runParentMode() {
     for (let attempt = 1; attempt <= sampleRetries + 1; attempt++) {
       appendJsonl(eventsPath, { event: "sample_started", attempt, maxAttempts: sampleRetries + 1, ...progressBase });
 
-      const sampleFile = join(tmpDir, `${index + 1}-${payload.dialect}-${payload.sample.id}-attempt-${attempt}.json`);
-      writeJson(sampleFile, payload);
-      const childArgs = [
-        new URL(import.meta.url).pathname,
-        "--run-sample",
-        `--sample-file=${sampleFile}`,
-        `--provider=${providerName}`,
-        ...(judgeEnabled ? ["--judge=true"] : []),
-      ];
-      if (live) childArgs.push("--live");
       const started = Date.now();
-      const child = spawnSync(process.execPath, childArgs, {
-        cwd: process.cwd(),
-        env: process.env,
-        encoding: "utf-8",
-        timeout: sampleTimeoutMs,
-        killSignal: "SIGKILL",
-        maxBuffer: 10 * 1024 * 1024,
-      });
-      result = {
-        ...resultFromChild(payload, child, Date.now() - started),
-        attempts: attempt,
-      };
+      if (live) {
+        const sampleFile = join(tmpDir, `${index + 1}-${payload.dialect}-${payload.sample.id}-attempt-${attempt}.json`);
+        writeJson(sampleFile, payload);
+        const childArgs = [
+          new URL(import.meta.url).pathname,
+          "--run-sample",
+          `--sample-file=${sampleFile}`,
+          `--provider=${providerName}`,
+          ...(judgeEnabled ? ["--judge=true"] : []),
+          "--live",
+        ];
+        const child = spawnSync(process.execPath, childArgs, {
+          cwd: process.cwd(),
+          env: process.env,
+          encoding: "utf-8",
+          timeout: sampleTimeoutMs,
+          killSignal: "SIGKILL",
+          maxBuffer: 10 * 1024 * 1024,
+        });
+        result = {
+          ...resultFromChild(payload, child, Date.now() - started),
+          attempts: attempt,
+        };
+      } else {
+        let evalResult;
+        let timeoutId;
+        try {
+          maybeInjectOneTimeFailure(payload);
+          const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => reject(new Error(`Sample timed out after ${sampleTimeoutMs}ms`)), sampleTimeoutMs);
+          });
+          evalResult = await Promise.race([evaluate(payload.sample, payload.dialect, translate), timeoutPromise]);
+          evalResult.elapsedMs = Date.now() - started;
+        } catch (error) {
+          evalResult = {
+            dialect: payload.dialect,
+            fixture: payload.sample.id,
+            category: payload.sample.category,
+            severity: payload.sample.severity,
+            tags: payload.sample.tags || [],
+            provider: "mock-semantic",
+            live: false,
+            source: payload.sample.source,
+            output: "",
+            passes: false,
+            failures: [`Provider error: ${error instanceof Error ? error.message : String(error)}`],
+            warnings: [],
+            qualityWarnings: [],
+            elapsedMs: Date.now() - started,
+          };
+        } finally {
+          clearTimeout(timeoutId);
+        }
+        result = { ...evalResult, attempts: attempt };
+      }
       if (!shouldRetry(result) || attempt > sampleRetries) break;
       appendJsonl(eventsPath, {
         event: "sample_retrying",

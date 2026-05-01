@@ -22,7 +22,7 @@ describe("dialect report script", () => {
       `--out=${out}`,
       "--customer=Acme SaaS",
       "--product=Spanish launch",
-    ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe" });
+    ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe", timeout: 30000 });
 
     const report = readFileSync(out, "utf-8");
     expect(report).toContain("DialectOS Certification Report: Acme SaaS");
@@ -55,7 +55,7 @@ describe("dialect report script", () => {
       "scripts/dialect-report.mjs",
       `--input=${input}`,
       `--out=${out}`,
-    ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe" });
+    ], { cwd: join(import.meta.dirname, "../../../.."), stdio: "pipe", timeout: 30000 });
 
     const report = readFileSync(out, "utf-8");
     expect(report).toContain("Overall grade: **No-Go**");
