@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-05-01T04:12:06.919Z",
+  "generatedAt": "2026-05-01T04:22:48.619Z",
   "corpusPath": "/Users/simongonzalezdecruz/workspaces/DialectOS/packages/benchmarks/dialect-detection-corpus/samples.json",
   "total": 250,
-  "top1Correct": 64,
-  "top3Correct": 96,
-  "top1Accuracy": 0.256,
-  "top3Accuracy": 0.384,
-  "avgConfidence": 0.0835568758365093,
+  "top1Correct": 110,
+  "top3Correct": 137,
+  "top1Accuracy": 0.44,
+  "top3Accuracy": 0.548,
+  "avgConfidence": 0.09230647618046013,
   "byDialect": {
     "es-ES": {
       "total": 10,
@@ -17,115 +17,115 @@
     },
     "es-MX": {
       "total": 10,
-      "top1Correct": 3,
-      "top3Correct": 4,
-      "top1Accuracy": 0.3,
-      "top3Accuracy": 0.4
+      "top1Correct": 4,
+      "top3Correct": 6,
+      "top1Accuracy": 0.4,
+      "top3Accuracy": 0.6
     },
     "es-AR": {
       "total": 10,
-      "top1Correct": 5,
-      "top3Correct": 8,
-      "top1Accuracy": 0.5,
-      "top3Accuracy": 0.8
+      "top1Correct": 8,
+      "top3Correct": 9,
+      "top1Accuracy": 0.8,
+      "top3Accuracy": 0.9
     },
     "es-CO": {
       "total": 10,
-      "top1Correct": 2,
-      "top3Correct": 5,
-      "top1Accuracy": 0.2,
-      "top3Accuracy": 0.5
+      "top1Correct": 4,
+      "top3Correct": 6,
+      "top1Accuracy": 0.4,
+      "top3Accuracy": 0.6
     },
     "es-CU": {
       "total": 10,
-      "top1Correct": 3,
-      "top3Correct": 4,
-      "top1Accuracy": 0.3,
-      "top3Accuracy": 0.4
+      "top1Correct": 5,
+      "top3Correct": 6,
+      "top1Accuracy": 0.5,
+      "top3Accuracy": 0.6
     },
     "es-PE": {
       "total": 10,
+      "top1Correct": 5,
+      "top3Correct": 6,
+      "top1Accuracy": 0.5,
+      "top3Accuracy": 0.6
+    },
+    "es-CL": {
+      "total": 10,
+      "top1Correct": 6,
+      "top3Correct": 7,
+      "top1Accuracy": 0.6,
+      "top3Accuracy": 0.7
+    },
+    "es-VE": {
+      "total": 10,
+      "top1Correct": 6,
+      "top3Correct": 7,
+      "top1Accuracy": 0.6,
+      "top3Accuracy": 0.7
+    },
+    "es-UY": {
+      "total": 10,
+      "top1Correct": 5,
+      "top3Correct": 9,
+      "top1Accuracy": 0.5,
+      "top3Accuracy": 0.9
+    },
+    "es-PY": {
+      "total": 10,
+      "top1Correct": 3,
+      "top3Correct": 8,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.8
+    },
+    "es-BO": {
+      "total": 10,
+      "top1Correct": 5,
+      "top3Correct": 5,
+      "top1Accuracy": 0.5,
+      "top3Accuracy": 0.5
+    },
+    "es-EC": {
+      "total": 10,
+      "top1Correct": 4,
+      "top3Correct": 5,
+      "top1Accuracy": 0.4,
+      "top3Accuracy": 0.5
+    },
+    "es-GT": {
+      "total": 10,
+      "top1Correct": 4,
+      "top3Correct": 6,
+      "top1Accuracy": 0.4,
+      "top3Accuracy": 0.6
+    },
+    "es-HN": {
+      "total": 10,
+      "top1Correct": 3,
+      "top3Correct": 5,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.5
+    },
+    "es-SV": {
+      "total": 10,
+      "top1Correct": 3,
+      "top3Correct": 3,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.3
+    },
+    "es-NI": {
+      "total": 10,
       "top1Correct": 3,
       "top3Correct": 4,
       "top1Accuracy": 0.3,
       "top3Accuracy": 0.4
     },
-    "es-CL": {
-      "total": 10,
-      "top1Correct": 2,
-      "top3Correct": 3,
-      "top1Accuracy": 0.2,
-      "top3Accuracy": 0.3
-    },
-    "es-VE": {
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 2,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.2
-    },
-    "es-UY": {
-      "total": 10,
-      "top1Correct": 2,
-      "top3Correct": 8,
-      "top1Accuracy": 0.2,
-      "top3Accuracy": 0.8
-    },
-    "es-PY": {
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 7,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.7
-    },
-    "es-BO": {
-      "total": 10,
-      "top1Correct": 3,
-      "top3Correct": 3,
-      "top1Accuracy": 0.3,
-      "top3Accuracy": 0.3
-    },
-    "es-EC": {
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 2,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.2
-    },
-    "es-GT": {
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 3,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.3
-    },
-    "es-HN": {
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 3,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.3
-    },
-    "es-SV": {
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 1,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.1
-    },
-    "es-NI": {
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 2,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.2
-    },
     "es-CR": {
       "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 1,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.1
+      "top1Correct": 4,
+      "top3Correct": 4,
+      "top1Accuracy": 0.4,
+      "top3Accuracy": 0.4
     },
     "es-PA": {
       "total": 10,
@@ -136,17 +136,17 @@
     },
     "es-DO": {
       "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 2,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.2
+      "top1Correct": 4,
+      "top3Correct": 5,
+      "top1Accuracy": 0.4,
+      "top3Accuracy": 0.5
     },
     "es-PR": {
       "total": 10,
-      "top1Correct": 2,
-      "top3Correct": 4,
-      "top1Accuracy": 0.2,
-      "top3Accuracy": 0.4
+      "top1Correct": 3,
+      "top3Correct": 5,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.5
     },
     "es-GQ": {
       "total": 10,
@@ -171,10 +171,10 @@
     },
     "es-BZ": {
       "total": 10,
-      "top1Correct": 4,
-      "top3Correct": 4,
-      "top1Accuracy": 0.4,
-      "top3Accuracy": 0.4
+      "top1Correct": 5,
+      "top3Correct": 5,
+      "top1Accuracy": 0.5,
+      "top3Accuracy": 0.5
     },
     "es-AD": {
       "total": 10,
@@ -187,24 +187,24 @@
   "byDifficulty": {
     "easy": {
       "total": 75,
-      "top1Correct": 47,
-      "top3Correct": 59,
-      "top1Accuracy": 0.6266666666666667,
-      "top3Accuracy": 0.7866666666666666
+      "top1Correct": 59,
+      "top3Correct": 67,
+      "top1Accuracy": 0.7866666666666666,
+      "top3Accuracy": 0.8933333333333333
     },
     "medium": {
       "total": 100,
-      "top1Correct": 11,
-      "top3Correct": 21,
-      "top1Accuracy": 0.11,
-      "top3Accuracy": 0.21
+      "top1Correct": 43,
+      "top3Correct": 52,
+      "top1Accuracy": 0.43,
+      "top3Accuracy": 0.52
     },
     "hard": {
       "total": 75,
-      "top1Correct": 6,
-      "top3Correct": 16,
-      "top1Accuracy": 0.08,
-      "top3Accuracy": 0.21333333333333335
+      "top1Correct": 8,
+      "top3Correct": 18,
+      "top1Accuracy": 0.10666666666666667,
+      "top3Accuracy": 0.24
     }
   },
   "confusionMatrix": {
@@ -212,96 +212,87 @@
       "es-ES": 10
     },
     "es-MX": {
-      "es-MX": 3,
-      "es-ES": 5,
-      "es-US": 1,
-      "es-AR": 1
+      "es-MX": 4,
+      "es-ES": 6
     },
     "es-AR": {
-      "es-AR": 5,
-      "es-ES": 5
+      "es-AR": 8,
+      "es-ES": 2
     },
     "es-CO": {
-      "es-CO": 2,
-      "es-VE": 1,
-      "es-ES": 7
+      "es-CO": 4,
+      "es-ES": 6
     },
     "es-CU": {
-      "es-CU": 3,
-      "es-ES": 7
-    },
-    "es-PE": {
-      "es-PE": 3,
-      "es-AR": 1,
-      "es-ES": 5,
-      "es-US": 1
-    },
-    "es-CL": {
-      "es-CL": 2,
-      "es-AR": 1,
-      "es-ES": 7
-    },
-    "es-VE": {
-      "es-VE": 1,
-      "es-ES": 9
-    },
-    "es-UY": {
-      "es-UY": 2,
-      "es-AR": 3,
+      "es-CU": 5,
       "es-ES": 5
     },
+    "es-PE": {
+      "es-PE": 5,
+      "es-US": 1,
+      "es-ES": 4
+    },
+    "es-CL": {
+      "es-CL": 6,
+      "es-ES": 4
+    },
+    "es-VE": {
+      "es-VE": 6,
+      "es-ES": 4
+    },
+    "es-UY": {
+      "es-UY": 5,
+      "es-ES": 4,
+      "es-AR": 1
+    },
     "es-PY": {
-      "es-ES": 5,
-      "es-PY": 1,
-      "es-AR": 4
+      "es-PY": 3,
+      "es-AR": 4,
+      "es-ES": 3
     },
     "es-BO": {
-      "es-BO": 3,
-      "es-ES": 5,
+      "es-BO": 5,
+      "es-ES": 3,
       "es-AR": 2
     },
     "es-EC": {
-      "es-EC": 1,
+      "es-EC": 4,
       "es-CL": 1,
-      "es-AR": 2,
-      "es-ES": 6
+      "es-ES": 5
     },
     "es-GT": {
-      "es-GT": 1,
-      "es-ES": 9
+      "es-GT": 4,
+      "es-ES": 6
     },
     "es-HN": {
-      "es-HN": 1,
-      "es-ES": 8,
+      "es-HN": 3,
+      "es-ES": 6,
       "es-EC": 1
     },
     "es-SV": {
-      "es-SV": 1,
-      "es-ES": 7,
-      "es-AR": 1,
+      "es-SV": 3,
+      "es-ES": 6,
       "es-MX": 1
     },
     "es-NI": {
-      "es-ES": 9,
-      "es-NI": 1
+      "es-ES": 7,
+      "es-NI": 3
     },
     "es-CR": {
-      "es-CR": 1,
-      "es-ES": 8,
-      "es-AR": 1
+      "es-CR": 4,
+      "es-ES": 6
     },
     "es-PA": {
       "es-PA": 2,
       "es-ES": 8
     },
     "es-DO": {
-      "es-DO": 1,
-      "es-ES": 8,
-      "es-AR": 1
+      "es-DO": 4,
+      "es-ES": 6
     },
     "es-PR": {
-      "es-PR": 2,
-      "es-ES": 8
+      "es-PR": 3,
+      "es-ES": 7
     },
     "es-GQ": {
       "es-GQ": 4,
@@ -309,7 +300,8 @@
     },
     "es-US": {
       "es-US": 5,
-      "es-ES": 5
+      "es-MX": 1,
+      "es-ES": 4
     },
     "es-PH": {
       "es-PH": 3,
@@ -317,8 +309,8 @@
       "es-PY": 1
     },
     "es-BZ": {
-      "es-BZ": 4,
-      "es-ES": 6
+      "es-BZ": 5,
+      "es-ES": 5
     },
     "es-AD": {
       "es-AD": 2,
@@ -328,43 +320,43 @@
   },
   "hardestDialects": [
     {
-      "code": "es-VE",
+      "code": "es-PA",
       "total": 10,
-      "top1Correct": 1,
+      "top1Correct": 2,
       "top3Correct": 2,
-      "top1Accuracy": 0.1,
+      "top1Accuracy": 0.2,
+      "top3Accuracy": 0.2
+    },
+    {
+      "code": "es-AD",
+      "total": 10,
+      "top1Correct": 2,
+      "top3Correct": 2,
+      "top1Accuracy": 0.2,
       "top3Accuracy": 0.2
     },
     {
       "code": "es-PY",
       "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 7,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.7
-    },
-    {
-      "code": "es-EC",
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 2,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.2
-    },
-    {
-      "code": "es-GT",
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 3,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.3
+      "top1Correct": 3,
+      "top3Correct": 8,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.8
     },
     {
       "code": "es-HN",
       "total": 10,
-      "top1Correct": 1,
+      "top1Correct": 3,
+      "top3Correct": 5,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.5
+    },
+    {
+      "code": "es-SV",
+      "total": 10,
+      "top1Correct": 3,
       "top3Correct": 3,
-      "top1Accuracy": 0.1,
+      "top1Accuracy": 0.3,
       "top3Accuracy": 0.3
     }
   ],
@@ -573,7 +565,7 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.33059008467787804,
+      "confidence": 0.2567736452443967,
       "matchedKeywords": [
         "computadora",
         "departamento",
@@ -600,7 +592,7 @@
         "es-AR",
         "es-PE"
       ],
-      "confidence": 0.1696300441212049,
+      "confidence": 0.13175387523921187,
       "matchedKeywords": [
         "camión",
         "departamento"
@@ -623,7 +615,7 @@
         "es-MX",
         "es-US"
       ],
-      "confidence": 0.25652432847879086,
+      "confidence": 0.19924580309645884,
       "matchedKeywords": [
         "neta",
         "chamba"
@@ -684,16 +676,16 @@
     {
       "text": "Ese vato es bien fresa, siempre trae ropa cara.",
       "expectedDialect": "es-MX",
-      "predictedDialect": "es-US",
+      "predictedDialect": "es-ES",
       "top3Predicted": [
+        "es-MX",
         "es-US"
       ],
-      "confidence": 0.11984856182040725,
-      "matchedKeywords": [
-        "vato"
-      ],
+      "confidence": 0,
+      "matchedKeywords": [],
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-US)",
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "fresa",
@@ -704,16 +696,18 @@
     {
       "text": "Estoy crudo después de la fiesta, ¿me das un jugo?",
       "expectedDialect": "es-MX",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-MX",
       "top3Predicted": [
+        "es-MX",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.11164345643549316,
+      "matchedKeywords": [
+        "crudo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "crudo",
@@ -780,7 +774,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.8486854285460318,
+      "confidence": 0.4593960526641848,
       "matchedKeywords": [
         "vos",
         "colectivo",
@@ -804,16 +798,20 @@
     {
       "text": "Vos sabés que esta computadora está en el departamento del pibe.",
       "expectedDialect": "es-AR",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-AR",
       "top3Predicted": [
         "es-AR",
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
-      "top1Correct": false,
+      "confidence": 0.19077610054509903,
+      "matchedKeywords": [
+        "vos",
+        "computadora",
+        "departamento",
+        "pibe"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -833,8 +831,11 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
+      "confidence": 0.19630395874491696,
+      "matchedKeywords": [
+        "quilombo",
+        "morfar"
+      ],
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -848,16 +849,18 @@
     {
       "text": "La mina se fue en auto después de comprar la remera.",
       "expectedDialect": "es-AR",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-AR",
       "top3Predicted": [
         "es-AR",
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
-      "top1Correct": false,
+      "confidence": 0.1254830236602988,
+      "matchedKeywords": [
+        "auto",
+        "remera"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
       "tags": [
@@ -870,12 +873,16 @@
     {
       "text": "Este poroto está re piola, y la frutilla también.",
       "expectedDialect": "es-AR",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR"
+      ],
+      "confidence": 0.09173938017264606,
+      "matchedKeywords": [
+        "piola"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "poroto",
@@ -929,7 +936,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": true,
       "top3Correct": true,
@@ -948,7 +955,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": true,
       "top3Correct": true,
@@ -967,7 +974,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": true,
       "top3Correct": true,
@@ -986,11 +993,12 @@
         "es-CL",
         "es-EC"
       ],
-      "confidence": 0.3432275609661759,
+      "confidence": 0.30223520521670855,
       "matchedKeywords": [
         "computador",
         "carro",
-        "chévere"
+        "chévere",
+        "parce"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -1005,19 +1013,19 @@
     {
       "text": "Pilas, pana, que el bus ya llegó al apartamento.",
       "expectedDialect": "es-CO",
-      "predictedDialect": "es-VE",
+      "predictedDialect": "es-CO",
       "top3Predicted": [
+        "es-CO",
         "es-VE",
-        "es-PA",
-        "es-CO"
+        "es-PA"
       ],
-      "confidence": 0.24594299050438606,
+      "confidence": 0.1872200688270289,
       "matchedKeywords": [
         "bus",
         "apartamento",
-        "pana"
+        "pilas"
       ],
-      "top1Correct": false,
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -1036,10 +1044,11 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.3923824514463212,
+      "confidence": 0.3297765863815207,
       "matchedKeywords": [
         "parcero",
-        "bacano"
+        "bacano",
+        "rumba"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -1088,12 +1097,16 @@
     {
       "text": "Vamos a tomar guaro, tengo guayabo de la fiesta.",
       "expectedDialect": "es-CO",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-CO",
+      "top3Predicted": [
+        "es-CO"
+      ],
+      "confidence": 0.10992552879384024,
+      "matchedKeywords": [
+        "guayabo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "guaro",
@@ -1181,7 +1194,7 @@
         "es-EC",
         "es-PR"
       ],
-      "confidence": 0.37729982908680293,
+      "confidence": 0.27102806661713214,
       "matchedKeywords": [
         "auto",
         "guagua",
@@ -1207,7 +1220,7 @@
         "es-VE",
         "es-DO"
       ],
-      "confidence": 0.14636181399267476,
+      "confidence": 0.10513696645191102,
       "matchedKeywords": [
         "computadora",
         "acere"
@@ -1245,12 +1258,17 @@
     {
       "text": "Pasa la grifo que hace calor, socio.",
       "expectedDialect": "es-CU",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-CU",
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.18777597068602891,
+      "matchedKeywords": [
+        "grifo",
+        "socio"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "grifo",
@@ -1261,12 +1279,16 @@
     {
       "text": "Ese temba sabe pinchar bien en la fiesta.",
       "expectedDialect": "es-CU",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-CU",
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.09388798534301446,
+      "matchedKeywords": [
+        "temba"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "temba",
@@ -1304,7 +1326,7 @@
         "es-CO",
         "es-GT"
       ],
-      "confidence": 0.13070203859464202,
+      "confidence": 0.09388798534301446,
       "matchedKeywords": [
         "ma"
       ],
@@ -1376,7 +1398,7 @@
         "es-CL",
         "es-EC"
       ],
-      "confidence": 0.43218943867554915,
+      "confidence": 0.25835585819392126,
       "matchedKeywords": [
         "pata",
         "chévere",
@@ -1402,7 +1424,7 @@
         "es-MX",
         "es-AR"
       ],
-      "confidence": 0.25702090999584043,
+      "confidence": 0.15364294412017673,
       "matchedKeywords": [
         "computadora",
         "auto",
@@ -1428,9 +1450,10 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.1682113787711647,
+      "confidence": 0.20110808470279096,
       "matchedKeywords": [
-        "bro"
+        "bro",
+        "chifa"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -1446,16 +1469,19 @@
     {
       "text": "Vamos al huarique, traé tu chela y los lentes.",
       "expectedDialect": "es-PE",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-PE",
       "top3Predicted": [
+        "es-PE",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.20110808470279096,
+      "matchedKeywords": [
+        "huarique",
+        "chela"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "huarique",
@@ -1467,12 +1493,16 @@
     {
       "text": "El chapo trajo maní y frutilla para todos.",
       "expectedDialect": "es-PE",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-PE",
+      "top3Predicted": [
+        "es-PE"
+      ],
+      "confidence": 0.10055404235139548,
+      "matchedKeywords": [
+        "chapo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "chapo",
@@ -1577,10 +1607,10 @@
       "predictedDialect": "es-CL",
       "top3Predicted": [
         "es-CL",
-        "es-AR",
-        "es-UY"
+        "es-PE",
+        "es-AR"
       ],
-      "confidence": 0.2551908091366926,
+      "confidence": 0.14453715133682318,
       "matchedKeywords": [
         "micro",
         "wea"
@@ -1605,7 +1635,7 @@
         "es-EC",
         "es-CO"
       ],
-      "confidence": 0.26157709491572634,
+      "confidence": 0.1481542704534837,
       "matchedKeywords": [
         "computador",
         "papa",
@@ -1626,16 +1656,20 @@
     {
       "text": "Qué bacán, el pololo me invitó palta y choclo.",
       "expectedDialect": "es-CL",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-CL",
       "top3Predicted": [
+        "es-CL",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.21680572700523476,
+      "matchedKeywords": [
+        "palta",
+        "pololo",
+        "choclo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "bacán",
@@ -1647,12 +1681,16 @@
     {
       "text": "Esa mina es flaite, siempre anda con liantas.",
       "expectedDialect": "es-CL",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-CL",
+      "top3Predicted": [
+        "es-CL"
+      ],
+      "confidence": 0.07226857566841159,
+      "matchedKeywords": [
+        "flaite"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "flaite",
@@ -1696,17 +1734,19 @@
     {
       "text": "¡Chucha! Se me olvidó el auto en la calle.",
       "expectedDialect": "es-CL",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-CL",
       "top3Predicted": [
+        "es-CL",
         "es-MX",
-        "es-AR",
-        "es-CU"
+        "es-AR"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.08874728120211667,
+      "matchedKeywords": [
+        "auto",
+        "chucha"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "chucha",
@@ -1717,12 +1757,16 @@
     {
       "text": "¿Sabes si hay caleta por aquí?",
       "expectedDialect": "es-CL",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-CL",
+      "top3Predicted": [
+        "es-CL"
+      ],
+      "confidence": 0.07226857566841159,
+      "matchedKeywords": [
+        "caleta"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "tú",
@@ -1772,7 +1816,7 @@
         "es-PA",
         "es-ES"
       ],
-      "confidence": 0.7082750431837229,
+      "confidence": 0.30497045835655245,
       "matchedKeywords": [
         "apartamento",
         "chamo",
@@ -1816,12 +1860,18 @@
     {
       "text": "Arrecho, ese pajúo sifrino no sabe nada de guarapo.",
       "expectedDialect": "es-VE",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-VE",
+      "top3Predicted": [
+        "es-VE"
+      ],
+      "confidence": 0.21353176391810028,
+      "matchedKeywords": [
+        "arrecho",
+        "sifrino",
+        "guarapo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "arrecho",
@@ -1834,12 +1884,17 @@
     {
       "text": "Voy a la porra con el chimbo de morrocoy.",
       "expectedDialect": "es-VE",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-VE",
+      "top3Predicted": [
+        "es-VE"
+      ],
+      "confidence": 0.14235450927873353,
+      "matchedKeywords": [
+        "morrocoy",
+        "chimbo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "porra",
@@ -1867,17 +1922,19 @@
     {
       "text": "Ese ladilla no quiere comer caraota con papa.",
       "expectedDialect": "es-VE",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-VE",
       "top3Predicted": [
+        "es-VE",
         "es-MX",
-        "es-AR",
-        "es-CO"
+        "es-AR"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.07724572770627626,
+      "matchedKeywords": [
+        "papa",
+        "caraota"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "ladilla",
@@ -1888,12 +1945,16 @@
     {
       "text": "Guarambare, hace calor y no hay agua.",
       "expectedDialect": "es-VE",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-VE",
+      "top3Predicted": [
+        "es-VE"
+      ],
+      "confidence": 0.07117725463936676,
+      "matchedKeywords": [
+        "guarambare"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "guarambare",
@@ -1923,17 +1984,19 @@
     {
       "text": "Voy a buscar el auto que dejé en el parqueo.",
       "expectedDialect": "es-VE",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-VE",
       "top3Predicted": [
+        "es-VE",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.08740711677586856,
+      "matchedKeywords": [
+        "auto",
+        "parqueo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "auto",
@@ -1964,7 +2027,7 @@
         "es-AR",
         "es-PY"
       ],
-      "confidence": 0.6008282281601593,
+      "confidence": 0.31967602001071677,
       "matchedKeywords": [
         "vos",
         "auto",
@@ -1994,7 +2057,7 @@
         "es-AR",
         "es-PY"
       ],
-      "confidence": 0.3385094469220052,
+      "confidence": 0.18010697177032398,
       "matchedKeywords": [
         "ta",
         "laburo"
@@ -2013,15 +2076,18 @@
     {
       "text": "Qué fiaca, el payador no vino al fogón con mate.",
       "expectedDialect": "es-UY",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-UY",
       "top3Predicted": [
-        "es-AR",
         "es-UY",
+        "es-AR",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
+      "confidence": 0.2002600970106812,
+      "matchedKeywords": [
+        "payador",
+        "fogón"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -2034,15 +2100,17 @@
     {
       "text": "La gurisa trajo frutilla y poroto para el chajá.",
       "expectedDialect": "es-UY",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-UY",
       "top3Predicted": [
-        "es-AR",
         "es-UY",
+        "es-AR",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
+      "confidence": 0.10667188161994304,
+      "matchedKeywords": [
+        "chajá"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
       "tags": [
@@ -2055,12 +2123,17 @@
     {
       "text": "Ese karai tiene mufa, siempre pierde en la changa.",
       "expectedDialect": "es-UY",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-UY",
+      "top3Predicted": [
+        "es-UY"
+      ],
+      "confidence": 0.18717643078147628,
+      "matchedKeywords": [
+        "karai",
+        "changa"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "karai",
@@ -2140,7 +2213,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": false,
       "top3Correct": true,
@@ -2173,16 +2246,20 @@
     {
       "text": "Che, vos sabés que el chipa y el terere son lo mejor.",
       "expectedDialect": "es-PY",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-PY",
       "top3Predicted": [
+        "es-PY",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
-      "top1Correct": false,
+      "confidence": 0.3606249876997208,
+      "matchedKeywords": [
+        "che",
+        "vos",
+        "terere",
+        "chipa"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -2201,7 +2278,7 @@
         "es-MX",
         "es-AR"
       ],
-      "confidence": 0.41558175885016396,
+      "confidence": 0.24122900281464357,
       "matchedKeywords": [
         "computadora",
         "departamento",
@@ -2227,7 +2304,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": false,
       "top3Correct": true,
@@ -2243,12 +2320,17 @@
     {
       "text": "El jagua trajo maní y frutilla para el jopara.",
       "expectedDialect": "es-PY",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-PY",
+      "top3Predicted": [
+        "es-PY"
+      ],
+      "confidence": 0.20976950061273325,
+      "matchedKeywords": [
+        "jopara",
+        "jagua"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "jagua",
@@ -2266,7 +2348,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": false,
       "top3Correct": true,
@@ -2329,7 +2411,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": false,
       "top3Correct": true,
@@ -2363,7 +2445,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": false,
       "top3Correct": true,
@@ -2380,9 +2462,12 @@
       "top3Predicted": [
         "es-BO"
       ],
-      "confidence": 0.15684853414040797,
+      "confidence": 0.3516304967164435,
       "matchedKeywords": [
-        "wawa"
+        "wawa",
+        "jallalla",
+        "chairo",
+        "qhatu"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -2404,11 +2489,12 @@
         "es-MX",
         "es-AR"
       ],
-      "confidence": 0.2038942370738023,
+      "confidence": 0.20218257142806148,
       "matchedKeywords": [
         "computadora",
         "departamento",
-        "joven"
+        "joven",
+        "cholita"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -2423,17 +2509,19 @@
     {
       "text": "Qué pucha, el chango no quiere llajwa con papa.",
       "expectedDialect": "es-BO",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-BO",
       "top3Predicted": [
+        "es-BO",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.10605342032056216,
+      "matchedKeywords": [
+        "papa",
+        "llajwa"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "pucha",
@@ -2483,7 +2571,7 @@
       "top3Predicted": [
         "es-BO"
       ],
-      "confidence": 0.15684853414040797,
+      "confidence": 0.08790762417911087,
       "matchedKeywords": [
         "wawa"
       ],
@@ -2499,17 +2587,19 @@
     {
       "text": "Vos sabés que el auto está en el qhatu.",
       "expectedDialect": "es-BO",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-BO",
       "top3Predicted": [
+        "es-BO",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.1292541813322307,
+      "matchedKeywords": [
+        "auto",
+        "qhatu"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "vos",
@@ -2526,7 +2616,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": false,
       "top3Correct": false,
@@ -2565,7 +2655,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": false,
       "top3Correct": false,
@@ -2584,7 +2674,7 @@
         "es-CU",
         "es-PR"
       ],
-      "confidence": 0.7694878554146458,
+      "confidence": 0.4489880342911934,
       "matchedKeywords": [
         "chévere",
         "guagua",
@@ -2612,7 +2702,7 @@
         "es-CO",
         "es-MX"
       ],
-      "confidence": 0.13398169034738,
+      "confidence": 0.0758856947850721,
       "matchedKeywords": [
         "computador",
         "papa",
@@ -2631,16 +2721,18 @@
     {
       "text": "Qué bacán, el longo trajo caña y esfero.",
       "expectedDialect": "es-EC",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-EC",
       "top3Predicted": [
+        "es-EC",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.11286189020264534,
+      "matchedKeywords": [
+        "longo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "bacán",
@@ -2652,12 +2744,17 @@
     {
       "text": "Achachay, hace frío, dame el chado de la chulla.",
       "expectedDialect": "es-EC",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-EC",
+      "top3Predicted": [
+        "es-EC"
+      ],
+      "confidence": 0.20825528230770338,
+      "matchedKeywords": [
+        "achachay",
+        "chado"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "achachay",
@@ -2669,16 +2766,18 @@
     {
       "text": "Ese cacho está chuchaqui después de la fiesta.",
       "expectedDialect": "es-EC",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-EC",
       "top3Predicted": [
+        "es-EC",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.11286189020264534,
+      "matchedKeywords": [
+        "chuchaqui"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "cacho",
@@ -2788,7 +2887,7 @@
         "es-HN",
         "es-SV"
       ],
-      "confidence": 0.6928853405700192,
+      "confidence": 0.37496085976531307,
       "matchedKeywords": [
         "carro",
         "chapín",
@@ -2832,17 +2931,18 @@
     {
       "text": "Qué shute, el chucho no quiere clavo ni cipote.",
       "expectedDialect": "es-GT",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-GT",
       "top3Predicted": [
+        "es-GT",
         "es-HN",
-        "es-SV",
-        "es-NI"
+        "es-SV"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-HN vs es-SV)",
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.10288695381380945,
+      "matchedKeywords": [
+        "chucho"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "shute",
@@ -2855,12 +2955,17 @@
     {
       "text": "Ese canche es culero, siempre trae morral vacío.",
       "expectedDialect": "es-GT",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-GT",
+      "top3Predicted": [
+        "es-GT"
+      ],
+      "confidence": 0.18353656063391838,
+      "matchedKeywords": [
+        "canche",
+        "culero"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "canche",
@@ -2888,12 +2993,17 @@
     {
       "text": "El patojo hizo bochinche en el istmo.",
       "expectedDialect": "es-GT",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-GT",
+      "top3Predicted": [
+        "es-GT"
+      ],
+      "confidence": 0.18353656063391838,
+      "matchedKeywords": [
+        "bochinche",
+        "patojo"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "patojo",
@@ -2987,7 +3097,7 @@
         "es-SV",
         "es-NI"
       ],
-      "confidence": 0.6740184062213297,
+      "confidence": 0.39187567754638225,
       "matchedKeywords": [
         "carro",
         "catracho",
@@ -3037,7 +3147,7 @@
         "es-HN",
         "es-SV"
       ],
-      "confidence": 0.193425764646887,
+      "confidence": 0.11286189020264534,
       "matchedKeywords": [
         "ñaño"
       ],
@@ -3055,12 +3165,18 @@
     {
       "text": "Ese mañe es bayunco, siempre trae pichu sucio.",
       "expectedDialect": "es-HN",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-HN",
+      "top3Predicted": [
+        "es-HN"
+      ],
+      "confidence": 0.3139484686961569,
+      "matchedKeywords": [
+        "bayunco",
+        "pichu",
+        "mañe"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "mañe",
@@ -3093,12 +3209,16 @@
     {
       "text": "El chepa trajo cirilo para el arrastrado.",
       "expectedDialect": "es-HN",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-HN",
+      "top3Predicted": [
+        "es-HN"
+      ],
+      "confidence": 0.10464948956538563,
+      "matchedKeywords": [
+        "chepa"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "chepa",
@@ -3192,7 +3312,7 @@
         "es-HN",
         "es-NI"
       ],
-      "confidence": 0.6352585819219574,
+      "confidence": 0.3693406365613033,
       "matchedKeywords": [
         "carro",
         "guanaco",
@@ -3235,16 +3355,19 @@
     {
       "text": "Qué tuanis, el chero trajo chel y chunche.",
       "expectedDialect": "es-SV",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-SV",
       "top3Predicted": [
+        "es-SV",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.22197834396217836,
+      "matchedKeywords": [
+        "chero",
+        "chel"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "tuanis",
@@ -3257,12 +3380,17 @@
     {
       "text": "Ese bicho es cerote, siempre trae puch sucio.",
       "expectedDialect": "es-SV",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-SV",
+      "top3Predicted": [
+        "es-SV"
+      ],
+      "confidence": 0.20929897913077125,
+      "matchedKeywords": [
+        "cerote",
+        "puch"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "bicho",
@@ -3294,7 +3422,7 @@
       "top3Predicted": [
         "es-MX"
       ],
-      "confidence": 0.14373834854278555,
+      "confidence": 0.11164345643549316,
       "matchedKeywords": [
         "chamba"
       ],
@@ -3438,7 +3566,7 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.36755210155524276,
+      "confidence": 0.21708629539808358,
       "matchedKeywords": [
         "chigüe",
         "sapién"
@@ -3457,12 +3585,17 @@
     {
       "text": "Ese pinolero es arre, siempre trae pichilingo.",
       "expectedDialect": "es-NI",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-NI",
+      "top3Predicted": [
+        "es-NI"
+      ],
+      "confidence": 0.2046863635393258,
+      "matchedKeywords": [
+        "pichilingo",
+        "pinolero"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "pinolero",
@@ -3490,12 +3623,17 @@
     {
       "text": "El chele trajo naca para el samaritano.",
       "expectedDialect": "es-NI",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-NI",
+      "top3Predicted": [
+        "es-NI"
+      ],
+      "confidence": 0.2046863635393258,
+      "matchedKeywords": [
+        "naca",
+        "chele"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "chele",
@@ -3589,7 +3727,7 @@
         "es-GT",
         "es-HN"
       ],
-      "confidence": 0.6113379090261083,
+      "confidence": 0.3793977077071318,
       "matchedKeywords": [
         "tico",
         "mae",
@@ -3632,16 +3770,18 @@
     {
       "text": "Qué tuanis, el guaro trajo chunche y brete.",
       "expectedDialect": "es-CR",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-CR",
       "top3Predicted": [
+        "es-CR",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.10634141310893398,
+      "matchedKeywords": [
+        "brete"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "tuanis",
@@ -3687,12 +3827,17 @@
     {
       "text": "El yigüirro trajo bomba para el carajillo.",
       "expectedDialect": "es-CR",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-CR",
+      "top3Predicted": [
+        "es-CR"
+      ],
+      "confidence": 0.1896988538535659,
+      "matchedKeywords": [
+        "carajillo",
+        "yigüirro"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "yigüirro",
@@ -3704,17 +3849,20 @@
     {
       "text": "Vamos en bus a la pulpería con papa.",
       "expectedDialect": "es-CR",
-      "predictedDialect": "es-ES",
+      "predictedDialect": "es-CR",
       "top3Predicted": [
+        "es-CR",
         "es-CO",
-        "es-PE",
-        "es-VE"
+        "es-PE"
       ],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.12220516632744438,
+      "matchedKeywords": [
+        "papa",
+        "bus",
+        "pulpería"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "bus",
@@ -3987,7 +4135,7 @@
         "es-PR",
         "es-EC"
       ],
-      "confidence": 0.5649310024126081,
+      "confidence": 0.3126270926513613,
       "matchedKeywords": [
         "apartamento",
         "tiguere",
@@ -4030,16 +4178,19 @@
     {
       "text": "Qué chin, el jevo trajo china y kukú.",
       "expectedDialect": "es-DO",
-      "predictedDialect": "es-AR",
+      "predictedDialect": "es-DO",
       "top3Predicted": [
+        "es-DO",
         "es-AR",
-        "es-UY",
-        "es-PY"
+        "es-UY"
       ],
-      "confidence": 0.023693192261558284,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "confidence": 0.178644052943635,
+      "matchedKeywords": [
+        "chin",
+        "kukú"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "chin",
@@ -4052,12 +4203,16 @@
     {
       "text": "Ese papichulo es vaina, siempre trae bandola.",
       "expectedDialect": "es-DO",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-DO",
+      "top3Predicted": [
+        "es-DO"
+      ],
+      "confidence": 0.0893220264718175,
+      "matchedKeywords": [
+        "bandola"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "papichulo",
@@ -4085,12 +4240,17 @@
     {
       "text": "El concon trajo vívere para el aplatar.",
       "expectedDialect": "es-DO",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-DO",
+      "top3Predicted": [
+        "es-DO"
+      ],
+      "confidence": 0.178644052943635,
+      "matchedKeywords": [
+        "concon",
+        "vívere"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "concon",
@@ -4185,7 +4345,7 @@
         "es-EC",
         "es-CU"
       ],
-      "confidence": 0.47492130756350576,
+      "confidence": 0.2711097411094433,
       "matchedKeywords": [
         "guagua",
         "apartamento",
@@ -4234,9 +4394,11 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.15035355470446685,
+      "confidence": 0.2574888469414178,
       "matchedKeywords": [
-        "cabra"
+        "cabra",
+        "zafacón",
+        "pulpo"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -4252,12 +4414,18 @@
     {
       "text": "Ese bichote es chota, siempre trae floor.",
       "expectedDialect": "es-PR",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-PR",
+      "top3Predicted": [
+        "es-PR"
+      ],
+      "confidence": 0.2574888469414178,
+      "matchedKeywords": [
+        "bichote",
+        "chota",
+        "floor"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "bichote",
@@ -4386,7 +4554,7 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.584166646200032,
+      "confidence": 0.43255583229308364,
       "matchedKeywords": [
         "guineano",
         "malabo",
@@ -4435,9 +4603,11 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.1168333292400064,
+      "confidence": 0.2595334993758502,
       "matchedKeywords": [
-        "fang"
+        "fang",
+        "ndowe",
+        "bangá"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -4457,7 +4627,7 @@
       "top3Predicted": [
         "es-GQ"
       ],
-      "confidence": 0.1168333292400064,
+      "confidence": 0.08651116645861673,
       "matchedKeywords": [
         "annobón"
       ],
@@ -4499,10 +4669,11 @@
       "top3Predicted": [
         "es-GQ"
       ],
-      "confidence": 0.2336666584800128,
+      "confidence": 0.2595334993758502,
       "matchedKeywords": [
         "guineano",
-        "bioko"
+        "bioko",
+        "malamba"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -4669,10 +4840,14 @@
     {
       "text": "Ese huero es fresa, siempre trae chafa.",
       "expectedDialect": "es-US",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
+      "predictedDialect": "es-MX",
+      "top3Predicted": [
+        "es-MX"
+      ],
+      "confidence": 0.11164345643549316,
+      "matchedKeywords": [
+        "fresa"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4921,7 +5096,7 @@
       "top3Predicted": [
         "es-PY"
       ],
-      "confidence": 0.18069215766054703,
+      "confidence": 0.10488475030636663,
       "matchedKeywords": [
         "jaha"
       ],
@@ -5021,7 +5196,7 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.584166646200032,
+      "confidence": 0.39811448390628107,
       "matchedKeywords": [
         "beliceño",
         "kriol",
@@ -5049,7 +5224,7 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.2336666584800128,
+      "confidence": 0.15924579356251242,
       "matchedKeywords": [
         "criollo",
         "dangriga"
@@ -5072,9 +5247,11 @@
         "es-AR",
         "es-UY"
       ],
-      "confidence": 0.1168333292400064,
+      "confidence": 0.23886869034376865,
       "matchedKeywords": [
-        "mopan"
+        "mopan",
+        "zapote",
+        "cayuco"
       ],
       "top1Correct": true,
       "top3Correct": true,
@@ -5090,12 +5267,17 @@
     {
       "text": "Ese kekchi es bway, siempre trae yucatec.",
       "expectedDialect": "es-BZ",
-      "predictedDialect": "es-ES",
-      "top3Predicted": [],
-      "confidence": 0,
-      "matchedKeywords": [],
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-BZ",
+      "top3Predicted": [
+        "es-BZ"
+      ],
+      "confidence": 0.15924579356251242,
+      "matchedKeywords": [
+        "kekchi",
+        "yucatec"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "kekchi",
@@ -5134,7 +5316,7 @@
         "es-CO",
         "es-GT"
       ],
-      "confidence": 0.1168333292400064,
+      "confidence": 0.07962289678125621,
       "matchedKeywords": [
         "beliceño"
       ],
@@ -5285,7 +5467,7 @@
         "es-UY",
         "es-PY"
       ],
-      "confidence": 0.023693192261558284,
+      "confidence": 0.012825198399624836,
       "matchedKeywords": [],
       "top1Correct": false,
       "top3Correct": false,

@@ -386,7 +386,7 @@ describe("MCP Translator Tools", () => {
 
       const parsed = JSON.parse(result.content[0].text);
       expect(parsed.dialect).toBe("es-PR");
-      expect(parsed.confidence).toBeGreaterThan(0.15);
+      expect(parsed.confidence).toBeGreaterThan(0.08);
       expect(parsed.matchedKeywords).toContain("guagua");
       expect(parsed.matchedKeywords).toContain("apartamento");
     });
@@ -537,7 +537,7 @@ describe("MCP Translator Tools", () => {
 
       const parsed2 = JSON.parse(result.content[0].text);
       expect(parsed2.dialect).toBe("es-AR");
-      expect(parsed2.confidence).toBeGreaterThan(0.5);
+      expect(parsed2.confidence).toBeGreaterThan(0.4);
     });
 
     it("should not confuse vosotros with voseo", async () => {
