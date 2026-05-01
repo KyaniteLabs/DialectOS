@@ -19,6 +19,41 @@ import {
 import { ToolResult } from "../lib/types.js";
 import { prepareProviderRequest } from "../lib/provider-request.js";
 import { DIALECT_METADATA, researchRegionalTermMcp, serperSearch } from "./translator-data.js";
+
+/* ------------------------------------------------------------------ */
+/*  IDF-weighted dialect detection helpers                           */
+/* ------------------------------------------------------------------ */
+
+/** Map<lowercaseKeyword, weight> where weight = ln(totalDialects / freq) */
+const KEYWORD_WEIGHTS = (() => {
+  const totalDialects = DIALECT_METADATA.length;
+  const freq = new Map<string, number>();
+  for (const d of DIALECT_METADATA) {
+    for (const k of d.keywords) {
+      const key = k.toLowerCase();
+      freq.set(key, (freq.get(key) || 0) + 1);
+    }
+  }
+  const weights = new Map<string, number>();
+  for (const [kw, count] of freq) {
+    weights.set(kw, Math.log(totalDialects / count));
+  }
+  return weights;
+})();
+
+/** Maximum possible weighted score for each dialect (sum of all its keyword weights) */
+const DIALECT_POTENTIAL = (() => {
+  const map = new Map<string, number>();
+  for (const d of DIALECT_METADATA) {
+    let sum = 0;
+    for (const k of d.keywords) {
+      sum += KEYWORD_WEIGHTS.get(k.toLowerCase()) || 0;
+    }
+    map.set(d.code, sum);
+  }
+  return map;
+})();
+
 import type {
   TranslateTextParams,
   DetectDialectParams,
@@ -28,6 +63,13 @@ import type {
   ListDialectsParams,
   ResearchRegionalTermParams,
 } from "./translator-types.js";
+
+interface ScoredDialect {
+  dialect: string;
+  rawScore: number;
+  confidence: number;
+  keywords: string[];
+}
 
 /**
  * Handle translate_text tool
@@ -122,36 +164,39 @@ export async function handleDetectDialect(
 
     validateContentLength(params.text);
 
-    // Search for dialect keywords
+    // Search for dialect keywords using IDF-weighted scoring
     const lowerText = params.text.toLowerCase();
-    const scores: Array<{ dialect: string; score: number; keywords: string[] }> = [];
+    const scores: ScoredDialect[] = [];
 
     for (const dialect of DIALECT_METADATA) {
-      let score = 0;
+      let rawScore = 0;
       const matchedKeywords: string[] = [];
 
       for (const keyword of dialect.keywords) {
-        if (lowerText.includes(keyword.toLowerCase())) {
-          score++;
+        const lowerKeyword = keyword.toLowerCase();
+        if (lowerText.includes(lowerKeyword)) {
+          rawScore += KEYWORD_WEIGHTS.get(lowerKeyword) || 0;
           matchedKeywords.push(keyword);
         }
       }
 
-      if (score > 0) {
+      if (rawScore > 0) {
+        const potential = DIALECT_POTENTIAL.get(dialect.code) || 1;
         scores.push({
           dialect: dialect.code,
-          score,
+          rawScore,
+          confidence: Math.min(rawScore / potential, 1),
           keywords: matchedKeywords,
         });
       }
     }
 
-    // Sort by score descending
-    scores.sort((a, b) => b.score - a.score);
+    // Sort by raw weighted score descending
+    scores.sort((a, b) => b.rawScore - a.rawScore);
 
-    // Reject ambiguous inputs: if top two dialects are tied in score,
-    // the input contains conflicting dialect markers.
-    if (scores.length >= 2 && scores[0].score === scores[1].score) {
+    // Reject ambiguous inputs: if the second-best dialect is within 10% of
+    // the top raw score, the input contains conflicting dialect markers.
+    if (scores.length >= 2 && scores[1].rawScore >= 0.9 * scores[0].rawScore) {
       return {
         content: [
           {
@@ -170,9 +215,7 @@ export async function handleDetectDialect(
 
     // Return best match or default
     const bestMatch = scores[0];
-    // 3 keyword matches = 100% confidence
-    const CONFIDENCE_NORMALIZER = 3;
-    const confidence = bestMatch ? Math.min(bestMatch.score / CONFIDENCE_NORMALIZER, 1) : 0;
+    const confidence = bestMatch ? bestMatch.confidence : 0;
     const detectedDialect = bestMatch ? bestMatch.dialect : "es-ES";
     const matchedKeywords = bestMatch ? bestMatch.keywords : [];
     const dialectInfo = DIALECT_METADATA.find((d) => d.code === detectedDialect);

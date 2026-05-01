@@ -1,0 +1,2589 @@
+[
+  {
+    "text": "Vosotros vais al cine en coche mientras yo enciendo el ordenador.",
+    "expectedDialect": "es-ES",
+    "difficulty": "easy",
+    "tags": [
+      "vosotros",
+      "coche",
+      "ordenador",
+      "multiple-keywords"
+    ]
+  },
+  {
+    "text": "¿Os apetece una tortilla de patata y un zumo de naranja?",
+    "expectedDialect": "es-ES",
+    "difficulty": "easy",
+    "tags": [
+      "patata",
+      "zumo",
+      "vosotros-implied"
+    ]
+  },
+  {
+    "text": "Vale, chaval, pues aparca el coche y sube al piso.",
+    "expectedDialect": "es-ES",
+    "difficulty": "easy",
+    "tags": [
+      "vale",
+      "chaval",
+      "coche",
+      "piso"
+    ]
+  },
+  {
+    "text": "Necesito comprar un bolígrafo antes de coger el autobús.",
+    "expectedDialect": "es-ES",
+    "difficulty": "medium",
+    "tags": [
+      "bolígrafo",
+      "autobús",
+      "coger",
+      "context"
+    ]
+  },
+  {
+    "text": "El frigorífico está vacío, vamos a currar un poco y luego comemos.",
+    "expectedDialect": "es-ES",
+    "difficulty": "medium",
+    "tags": [
+      "frigorífico",
+      "currar",
+      "slang"
+    ]
+  },
+  {
+    "text": "Mi móvil no funciona, ¿me prestas el tuyo?",
+    "expectedDialect": "es-ES",
+    "difficulty": "medium",
+    "tags": [
+      "móvil",
+      "context"
+    ]
+  },
+  {
+    "text": "Tía, qué guay está tu nuevo ordenador.",
+    "expectedDialect": "es-ES",
+    "difficulty": "medium",
+    "tags": [
+      "tía",
+      "guay",
+      "ordenador",
+      "slang"
+    ]
+  },
+  {
+    "text": "¿Vosotros habéis visto esa película? Es la bomba.",
+    "expectedDialect": "es-ES",
+    "difficulty": "hard",
+    "tags": [
+      "vosotros",
+      "grammar",
+      "register"
+    ]
+  },
+  {
+    "text": "Cuando lleguéis, dejad las llaves en la mesa.",
+    "expectedDialect": "es-ES",
+    "difficulty": "hard",
+    "tags": [
+      "vosotros-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "¿Queréis tomar algo? Hay cerveza en la nevera.",
+    "expectedDialect": "es-ES",
+    "difficulty": "hard",
+    "tags": [
+      "vosotros-verb",
+      "register"
+    ]
+  },
+  {
+    "text": "Qué chido, güey, ya llegó la computadora al departamento.",
+    "expectedDialect": "es-MX",
+    "difficulty": "easy",
+    "tags": [
+      "chido",
+      "güey",
+      "computadora",
+      "departamento",
+      "multiple-keywords"
+    ]
+  },
+  {
+    "text": "Voy a rentar un departamento cerca del estacionamiento del camión.",
+    "expectedDialect": "es-MX",
+    "difficulty": "easy",
+    "tags": [
+      "rentar",
+      "departamento",
+      "estacionamiento",
+      "camión"
+    ]
+  },
+  {
+    "text": "Neta, esta chamba está muy padre, ¿no?",
+    "expectedDialect": "es-MX",
+    "difficulty": "easy",
+    "tags": [
+      "neta",
+      "chamba",
+      "padre",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa al auto, vamos por unos aguacates y plátanos.",
+    "expectedDialect": "es-MX",
+    "difficulty": "medium",
+    "tags": [
+      "auto",
+      "aguacate",
+      "plátano",
+      "context"
+    ]
+  },
+  {
+    "text": "Dejé la pluma en la habitación de la computadora.",
+    "expectedDialect": "es-MX",
+    "difficulty": "medium",
+    "tags": [
+      "pluma",
+      "habitación",
+      "computadora"
+    ]
+  },
+  {
+    "text": "Ese vato es bien fresa, siempre trae ropa cara.",
+    "expectedDialect": "es-MX",
+    "difficulty": "medium",
+    "tags": [
+      "fresa",
+      "vato",
+      "slang"
+    ]
+  },
+  {
+    "text": "Estoy crudo después de la fiesta, ¿me das un jugo?",
+    "expectedDialect": "es-MX",
+    "difficulty": "medium",
+    "tags": [
+      "crudo",
+      "jugo",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Tú sabes dónde queda la nueva tienda de celulares?",
+    "expectedDialect": "es-MX",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "Voy a lavar el carro y luego paso por ti.",
+    "expectedDialect": "es-MX",
+    "difficulty": "hard",
+    "tags": [
+      "carro",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que prepare la cena? Ya casi es hora.",
+    "expectedDialect": "es-MX",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Che, boludo, ¿vos tomás el bondi o el colectivo al laburo?",
+    "expectedDialect": "es-AR",
+    "difficulty": "easy",
+    "tags": [
+      "che",
+      "boludo",
+      "vos",
+      "bondi",
+      "colectivo",
+      "laburo"
+    ]
+  },
+  {
+    "text": "Vos sabés que esta computadora está en el departamento del pibe.",
+    "expectedDialect": "es-AR",
+    "difficulty": "easy",
+    "tags": [
+      "vos",
+      "sabés",
+      "computadora",
+      "departamento",
+      "pibe"
+    ]
+  },
+  {
+    "text": "Qué quilombo, no tengo ni una moneda de guita para morfar.",
+    "expectedDialect": "es-AR",
+    "difficulty": "easy",
+    "tags": [
+      "quilombo",
+      "guita",
+      "morfar",
+      "slang"
+    ]
+  },
+  {
+    "text": "La mina se fue en auto después de comprar la remera.",
+    "expectedDialect": "es-AR",
+    "difficulty": "medium",
+    "tags": [
+      "mina",
+      "auto",
+      "remera",
+      "context"
+    ]
+  },
+  {
+    "text": "Este poroto está re piola, y la frutilla también.",
+    "expectedDialect": "es-AR",
+    "difficulty": "medium",
+    "tags": [
+      "poroto",
+      "piola",
+      "frutilla"
+    ]
+  },
+  {
+    "text": "Me da fiaca salir, prefiero quedarme en casa con maní.",
+    "expectedDialect": "es-AR",
+    "difficulty": "medium",
+    "tags": [
+      "fiaca",
+      "maní",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Vos podés pasarme el agua? Hace mucho calor hoy.",
+    "expectedDialect": "es-AR",
+    "difficulty": "medium",
+    "tags": [
+      "vos",
+      "podés",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabés dónde queda la estación de tren?",
+    "expectedDialect": "es-AR",
+    "difficulty": "hard",
+    "tags": [
+      "voseo",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Cuando vengas, traé las llaves que te di.",
+    "expectedDialect": "es-AR",
+    "difficulty": "hard",
+    "tags": [
+      "voseo-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Tené cuidado con el perro que ladra mucho.",
+    "expectedDialect": "es-AR",
+    "difficulty": "hard",
+    "tags": [
+      "voseo-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Parce, qué chévere este computador y el carro nuevo.",
+    "expectedDialect": "es-CO",
+    "difficulty": "easy",
+    "tags": [
+      "parce",
+      "chévere",
+      "computador",
+      "carro"
+    ]
+  },
+  {
+    "text": "Pilas, pana, que el bus ya llegó al apartamento.",
+    "expectedDialect": "es-CO",
+    "difficulty": "easy",
+    "tags": [
+      "pilas",
+      "pana",
+      "bus",
+      "apartamento"
+    ]
+  },
+  {
+    "text": "Qué bacano, rumba con el parcero hasta el amanecer.",
+    "expectedDialect": "es-CO",
+    "difficulty": "easy",
+    "tags": [
+      "bacano",
+      "rumba",
+      "parcero",
+      "slang"
+    ]
+  },
+  {
+    "text": "El maní está rico, dame banano y lentes para leer.",
+    "expectedDialect": "es-CO",
+    "difficulty": "medium",
+    "tags": [
+      "maní",
+      "banano",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "Ese veci es mono, pero a veces es una vaina.",
+    "expectedDialect": "es-CO",
+    "difficulty": "medium",
+    "tags": [
+      "veci",
+      "mono",
+      "vaina",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos a tomar guaro, tengo guayabo de la fiesta.",
+    "expectedDialect": "es-CO",
+    "difficulty": "medium",
+    "tags": [
+      "guaro",
+      "guayabo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Llave, préstame el esfero para la clase de matemáticas.",
+    "expectedDialect": "es-CO",
+    "difficulty": "medium",
+    "tags": [
+      "llave",
+      "esfero",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Tú sabes si el carro ya está listo?",
+    "expectedDialect": "es-CO",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "Voy a comprar papa para la cena de hoy.",
+    "expectedDialect": "es-CO",
+    "difficulty": "hard",
+    "tags": [
+      "papa",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que te acompañe a la tienda?",
+    "expectedDialect": "es-CO",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Asere, la guagua llegó y el yuma se fue en auto.",
+    "expectedDialect": "es-CU",
+    "difficulty": "easy",
+    "tags": [
+      "asere",
+      "guagua",
+      "yuma",
+      "auto"
+    ]
+  },
+  {
+    "text": "Qué bola, acere, ¿tienes la computadora en el apartamento?",
+    "expectedDialect": "es-CU",
+    "difficulty": "easy",
+    "tags": [
+      "qué bola",
+      "acere",
+      "computadora",
+      "apartamento"
+    ]
+  },
+  {
+    "text": "El jinetero está en la esquina con el fufú listo.",
+    "expectedDialect": "es-CU",
+    "difficulty": "easy",
+    "tags": [
+      "jinetero",
+      "fufú",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa la grifo que hace calor, socio.",
+    "expectedDialect": "es-CU",
+    "difficulty": "medium",
+    "tags": [
+      "grifo",
+      "socio",
+      "context"
+    ]
+  },
+  {
+    "text": "Ese temba sabe pinchar bien en la fiesta.",
+    "expectedDialect": "es-CU",
+    "difficulty": "medium",
+    "tags": [
+      "temba",
+      "pinchar",
+      "slang"
+    ]
+  },
+  {
+    "text": "Voy a comprar papa y habichuela para el almuerzo.",
+    "expectedDialect": "es-CU",
+    "difficulty": "medium",
+    "tags": [
+      "papa",
+      "habichuela",
+      "context"
+    ]
+  },
+  {
+    "text": "Ma, préstame el carro para ir al trabajo.",
+    "expectedDialect": "es-CU",
+    "difficulty": "medium",
+    "tags": [
+      "ma",
+      "carro",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Tú sabes dónde queda la nueva tienda?",
+    "expectedDialect": "es-CU",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Dame un momento que termino esto.",
+    "expectedDialect": "es-CU",
+    "difficulty": "hard",
+    "tags": [
+      "neutral",
+      "register"
+    ]
+  },
+  {
+    "text": "Voy a buscar el auto que dejé ayer.",
+    "expectedDialect": "es-CU",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "Pata, qué chévere, vamos al jato en micro al toque.",
+    "expectedDialect": "es-PE",
+    "difficulty": "easy",
+    "tags": [
+      "pata",
+      "chévere",
+      "jato",
+      "micro",
+      "al toque"
+    ]
+  },
+  {
+    "text": "Causa, esta computadora está en el departamento con auto.",
+    "expectedDialect": "es-PE",
+    "difficulty": "easy",
+    "tags": [
+      "causa",
+      "computadora",
+      "departamento",
+      "auto"
+    ]
+  },
+  {
+    "text": "Qué bro, el chibolo se fue al chifa con el poto sucio.",
+    "expectedDialect": "es-PE",
+    "difficulty": "easy",
+    "tags": [
+      "bro",
+      "chibolo",
+      "chifa",
+      "poto",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos al huarique, traé tu chela y los lentes.",
+    "expectedDialect": "es-PE",
+    "difficulty": "medium",
+    "tags": [
+      "huarique",
+      "chela",
+      "lentes",
+      "slang"
+    ]
+  },
+  {
+    "text": "El chapo trajo maní y frutilla para todos.",
+    "expectedDialect": "es-PE",
+    "difficulty": "medium",
+    "tags": [
+      "chapo",
+      "maní",
+      "frutilla"
+    ]
+  },
+  {
+    "text": "Ese flaco es cholo pero tiene buen corazón.",
+    "expectedDialect": "es-PE",
+    "difficulty": "medium",
+    "tags": [
+      "flaco",
+      "cholo",
+      "context"
+    ]
+  },
+  {
+    "text": "Oye pe, pasa la pluma que escribo rápido.",
+    "expectedDialect": "es-PE",
+    "difficulty": "medium",
+    "tags": [
+      "pe",
+      "pluma",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el bus pasa por aquí?",
+    "expectedDialect": "es-PE",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a comprar papa para hacer la cena.",
+    "expectedDialect": "es-PE",
+    "difficulty": "hard",
+    "tags": [
+      "papa",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que vayamos juntos al centro?",
+    "expectedDialect": "es-PE",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Weón, qué fome esta wea, mejor tomo una chela en el micro.",
+    "expectedDialect": "es-CL",
+    "difficulty": "easy",
+    "tags": [
+      "wea",
+      "fome",
+      "weón",
+      "micro",
+      "slang"
+    ]
+  },
+  {
+    "text": "Cachái, el guagua trajo computador y papa para el departamento.",
+    "expectedDialect": "es-CL",
+    "difficulty": "easy",
+    "tags": [
+      "cachái",
+      "guagua",
+      "computador",
+      "papa",
+      "departamento"
+    ]
+  },
+  {
+    "text": "Qué bacán, el pololo me invitó palta y choclo.",
+    "expectedDialect": "es-CL",
+    "difficulty": "easy",
+    "tags": [
+      "bacán",
+      "pololo",
+      "palta",
+      "choclo"
+    ]
+  },
+  {
+    "text": "Esa mina es flaite, siempre anda con liantas.",
+    "expectedDialect": "es-CL",
+    "difficulty": "medium",
+    "tags": [
+      "flaite",
+      "lianta",
+      "slang"
+    ]
+  },
+  {
+    "text": "La raja, al tiro llego con los lentes y el maní.",
+    "expectedDialect": "es-CL",
+    "difficulty": "medium",
+    "tags": [
+      "la raja",
+      "al tiro",
+      "lentes",
+      "maní"
+    ]
+  },
+  {
+    "text": "Voy a comprar poroto y frutilla para la once.",
+    "expectedDialect": "es-CL",
+    "difficulty": "medium",
+    "tags": [
+      "poroto",
+      "frutilla",
+      "context"
+    ]
+  },
+  {
+    "text": "¡Chucha! Se me olvidó el auto en la calle.",
+    "expectedDialect": "es-CL",
+    "difficulty": "medium",
+    "tags": [
+      "chucha",
+      "auto",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si hay caleta por aquí?",
+    "expectedDialect": "es-CL",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el computador en casa.",
+    "expectedDialect": "es-CL",
+    "difficulty": "hard",
+    "tags": [
+      "computador",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que prepare algo para comer?",
+    "expectedDialect": "es-CL",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Chamo, pana, qué burda de guara tiene ese apartamento.",
+    "expectedDialect": "es-VE",
+    "difficulty": "easy",
+    "tags": [
+      "chamo",
+      "pana",
+      "burda",
+      "guara",
+      "apartamento"
+    ]
+  },
+  {
+    "text": "Qué chévere, el bus trajo computadora y auto para todos.",
+    "expectedDialect": "es-VE",
+    "difficulty": "easy",
+    "tags": [
+      "chévere",
+      "bus",
+      "computadora",
+      "auto"
+    ]
+  },
+  {
+    "text": "Arrecho, ese pajúo sifrino no sabe nada de guarapo.",
+    "expectedDialect": "es-VE",
+    "difficulty": "easy",
+    "tags": [
+      "arrecho",
+      "pajúo",
+      "sifrino",
+      "guarapo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Voy a la porra con el chimbo de morrocoy.",
+    "expectedDialect": "es-VE",
+    "difficulty": "medium",
+    "tags": [
+      "porra",
+      "chimbo",
+      "morrocoy",
+      "slang"
+    ]
+  },
+  {
+    "text": "Dame el lapicero y los lentes para leer la carta.",
+    "expectedDialect": "es-VE",
+    "difficulty": "medium",
+    "tags": [
+      "lapicero",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "Ese ladilla no quiere comer caraota con papa.",
+    "expectedDialect": "es-VE",
+    "difficulty": "medium",
+    "tags": [
+      "ladilla",
+      "caraota",
+      "papa"
+    ]
+  },
+  {
+    "text": "Guarambare, hace calor y no hay agua.",
+    "expectedDialect": "es-VE",
+    "difficulty": "medium",
+    "tags": [
+      "guarambare",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro tiene gasolina?",
+    "expectedDialect": "es-VE",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a buscar el auto que dejé en el parqueo.",
+    "expectedDialect": "es-VE",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que vayamos juntos mañana?",
+    "expectedDialect": "es-VE",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Che, bo, ¿vos tomás el colectivo al departamento o en auto?",
+    "expectedDialect": "es-UY",
+    "difficulty": "easy",
+    "tags": [
+      "che",
+      "bo",
+      "vos",
+      "colectivo",
+      "departamento",
+      "auto"
+    ]
+  },
+  {
+    "text": "Ta, vamo a la cana después del laburo con el gurí.",
+    "expectedDialect": "es-UY",
+    "difficulty": "easy",
+    "tags": [
+      "ta",
+      "vamo",
+      "cana",
+      "laburo",
+      "gurí"
+    ]
+  },
+  {
+    "text": "Qué fiaca, el payador no vino al fogón con mate.",
+    "expectedDialect": "es-UY",
+    "difficulty": "easy",
+    "tags": [
+      "fiaca",
+      "payador",
+      "fogón",
+      "mate"
+    ]
+  },
+  {
+    "text": "La gurisa trajo frutilla y poroto para el chajá.",
+    "expectedDialect": "es-UY",
+    "difficulty": "medium",
+    "tags": [
+      "gurisa",
+      "frutilla",
+      "poroto",
+      "chajá"
+    ]
+  },
+  {
+    "text": "Ese karai tiene mufa, siempre pierde en la changa.",
+    "expectedDialect": "es-UY",
+    "difficulty": "medium",
+    "tags": [
+      "karai",
+      "mufa",
+      "changa",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los anteojos que no veo la computadora.",
+    "expectedDialect": "es-UY",
+    "difficulty": "medium",
+    "tags": [
+      "anteojos",
+      "computadora",
+      "context"
+    ]
+  },
+  {
+    "text": "Vos sabés que esta papa está buena para el auto.",
+    "expectedDialect": "es-UY",
+    "difficulty": "medium",
+    "tags": [
+      "vos",
+      "sabés",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabés dónde queda la parada del colectivo?",
+    "expectedDialect": "es-UY",
+    "difficulty": "hard",
+    "tags": [
+      "voseo",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Cuando vengas, traé el mate que quedó en casa.",
+    "expectedDialect": "es-UY",
+    "difficulty": "hard",
+    "tags": [
+      "voseo-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Podés dejar el auto acá, no hay problema.",
+    "expectedDialect": "es-UY",
+    "difficulty": "hard",
+    "tags": [
+      "voseo-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Che, vos sabés que el chipa y el terere son lo mejor.",
+    "expectedDialect": "es-PY",
+    "difficulty": "easy",
+    "tags": [
+      "che",
+      "vos",
+      "chipa",
+      "terere"
+    ]
+  },
+  {
+    "text": "Jaha, el mbarete está en el departamento con computadora.",
+    "expectedDialect": "es-PY",
+    "difficulty": "easy",
+    "tags": [
+      "jaha",
+      "mbarete",
+      "departamento",
+      "computadora"
+    ]
+  },
+  {
+    "text": "Qué tranquilopa, de balde me hallo en este al pedo.",
+    "expectedDialect": "es-PY",
+    "difficulty": "easy",
+    "tags": [
+      "tranquilopa",
+      "de balde",
+      "me hallo",
+      "al pedo",
+      "slang"
+    ]
+  },
+  {
+    "text": "El jagua trajo maní y frutilla para el jopara.",
+    "expectedDialect": "es-PY",
+    "difficulty": "medium",
+    "tags": [
+      "jagua",
+      "maní",
+      "frutilla",
+      "jopara"
+    ]
+  },
+  {
+    "text": "Ese chake está vai-vai después del gua'u.",
+    "expectedDialect": "es-PY",
+    "difficulty": "medium",
+    "tags": [
+      "chake",
+      "vai-vai",
+      "gua'u",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los anteojos que no veo el bus.",
+    "expectedDialect": "es-PY",
+    "difficulty": "medium",
+    "tags": [
+      "anteojos",
+      "bus",
+      "context"
+    ]
+  },
+  {
+    "text": "Vos tenés que traer la papa para el auto.",
+    "expectedDialect": "es-PY",
+    "difficulty": "medium",
+    "tags": [
+      "vos",
+      "tenés",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabés si hay agua en la casa?",
+    "expectedDialect": "es-PY",
+    "difficulty": "hard",
+    "tags": [
+      "voseo",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Vení temprano para que no llegues tarde.",
+    "expectedDialect": "es-PY",
+    "difficulty": "hard",
+    "tags": [
+      "voseo-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Hacé lo que te digo y no te arrepentirás.",
+    "expectedDialect": "es-PY",
+    "difficulty": "hard",
+    "tags": [
+      "voseo-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Jallalla, el wawa trajo chairo y api al qhatu.",
+    "expectedDialect": "es-BO",
+    "difficulty": "easy",
+    "tags": [
+      "jallalla",
+      "wawa",
+      "chairo",
+      "api",
+      "qhatu"
+    ]
+  },
+  {
+    "text": "El cholita dejó la computadora en el departamento del joven.",
+    "expectedDialect": "es-BO",
+    "difficulty": "easy",
+    "tags": [
+      "cholita",
+      "computadora",
+      "departamento",
+      "joven"
+    ]
+  },
+  {
+    "text": "Qué pucha, el chango no quiere llajwa con papa.",
+    "expectedDialect": "es-BO",
+    "difficulty": "easy",
+    "tags": [
+      "pucha",
+      "chango",
+      "llajwa",
+      "papa",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese jichi tiene q'omer pero no quiere ch'iti.",
+    "expectedDialect": "es-BO",
+    "difficulty": "medium",
+    "tags": [
+      "jichi",
+      "q'omer",
+      "ch'iti",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y el frijol para el almuerzo.",
+    "expectedDialect": "es-BO",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "frijol",
+      "context"
+    ]
+  },
+  {
+    "text": "El ch'usa no sabe nada de la wawa.",
+    "expectedDialect": "es-BO",
+    "difficulty": "medium",
+    "tags": [
+      "ch'usa",
+      "wawa",
+      "context"
+    ]
+  },
+  {
+    "text": "Vos sabés que el auto está en el qhatu.",
+    "expectedDialect": "es-BO",
+    "difficulty": "medium",
+    "tags": [
+      "vos",
+      "sabés",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabés dónde queda el mercado?",
+    "expectedDialect": "es-BO",
+    "difficulty": "hard",
+    "tags": [
+      "voseo",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Traé la papa que dejaste en la mesa.",
+    "expectedDialect": "es-BO",
+    "difficulty": "hard",
+    "tags": [
+      "voseo-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Andá despacio por la calle empedrada.",
+    "expectedDialect": "es-BO",
+    "difficulty": "hard",
+    "tags": [
+      "voseo-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Ñaño, qué chévere el guagua con yapa y canguil.",
+    "expectedDialect": "es-EC",
+    "difficulty": "easy",
+    "tags": [
+      "ñaño",
+      "chévere",
+      "guagua",
+      "yapa",
+      "canguil"
+    ]
+  },
+  {
+    "text": "El chibolo dejó el computador en el departamento con papa.",
+    "expectedDialect": "es-EC",
+    "difficulty": "easy",
+    "tags": [
+      "chibolo",
+      "computador",
+      "departamento",
+      "papa"
+    ]
+  },
+  {
+    "text": "Qué bacán, el longo trajo caña y esfero.",
+    "expectedDialect": "es-EC",
+    "difficulty": "easy",
+    "tags": [
+      "bacán",
+      "longo",
+      "caña",
+      "esfero"
+    ]
+  },
+  {
+    "text": "Achachay, hace frío, dame el chado de la chulla.",
+    "expectedDialect": "es-EC",
+    "difficulty": "medium",
+    "tags": [
+      "achachay",
+      "chado",
+      "chulla",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese cacho está chuchaqui después de la fiesta.",
+    "expectedDialect": "es-EC",
+    "difficulty": "medium",
+    "tags": [
+      "cacho",
+      "chuchaqui",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y el banano para el almuerzo.",
+    "expectedDialect": "es-EC",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "banano",
+      "context"
+    ]
+  },
+  {
+    "text": "Vamos en carro a buscar maní y guagua.",
+    "expectedDialect": "es-EC",
+    "difficulty": "medium",
+    "tags": [
+      "carro",
+      "maní",
+      "guagua",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el bus ya pasó?",
+    "expectedDialect": "es-EC",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar la computadora en casa.",
+    "expectedDialect": "es-EC",
+    "difficulty": "hard",
+    "tags": [
+      "computadora",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que prepare algo de comer?",
+    "expectedDialect": "es-EC",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Chapín, qué cabal el carro con shuco y pisto.",
+    "expectedDialect": "es-GT",
+    "difficulty": "easy",
+    "tags": [
+      "chapín",
+      "cabal",
+      "carro",
+      "shuco",
+      "pisto"
+    ]
+  },
+  {
+    "text": "Bo, dejé la computadora en el departamento con papa.",
+    "expectedDialect": "es-GT",
+    "difficulty": "easy",
+    "tags": [
+      "bo",
+      "computadora",
+      "departamento",
+      "papa"
+    ]
+  },
+  {
+    "text": "Qué shute, el chucho no quiere clavo ni cipote.",
+    "expectedDialect": "es-GT",
+    "difficulty": "easy",
+    "tags": [
+      "shute",
+      "chucho",
+      "clavo",
+      "cipote",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese canche es culero, siempre trae morral vacío.",
+    "expectedDialect": "es-GT",
+    "difficulty": "medium",
+    "tags": [
+      "canche",
+      "culero",
+      "morral",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y el frijol para la cena.",
+    "expectedDialect": "es-GT",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "frijol",
+      "context"
+    ]
+  },
+  {
+    "text": "El patojo hizo bochinche en el istmo.",
+    "expectedDialect": "es-GT",
+    "difficulty": "medium",
+    "tags": [
+      "patojo",
+      "bochinche",
+      "ishtmo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en bus a comprar papa y plátano.",
+    "expectedDialect": "es-GT",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro tiene gasolina?",
+    "expectedDialect": "es-GT",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a lavar el auto antes de salir.",
+    "expectedDialect": "es-GT",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que vayamos temprano?",
+    "expectedDialect": "es-GT",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Catracho, qué maje, el carro tiene pisto y cipote.",
+    "expectedDialect": "es-HN",
+    "difficulty": "easy",
+    "tags": [
+      "catracho",
+      "maje",
+      "carro",
+      "pisto",
+      "cipote"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en el departamento con papa y frijol.",
+    "expectedDialect": "es-HN",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "departamento",
+      "papa",
+      "frijol"
+    ]
+  },
+  {
+    "text": "Qué chuco, el ñaño no quiere chure ni choco.",
+    "expectedDialect": "es-HN",
+    "difficulty": "easy",
+    "tags": [
+      "chuco",
+      "ñaño",
+      "chure",
+      "choco",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese mañe es bayunco, siempre trae pichu sucio.",
+    "expectedDialect": "es-HN",
+    "difficulty": "medium",
+    "tags": [
+      "mañe",
+      "bayunco",
+      "pichu",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes que no veo el bus.",
+    "expectedDialect": "es-HN",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "bus",
+      "context"
+    ]
+  },
+  {
+    "text": "El chepa trajo cirilo para el arrastrado.",
+    "expectedDialect": "es-HN",
+    "difficulty": "medium",
+    "tags": [
+      "chepa",
+      "cirilo",
+      "arrastrado",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en carro a buscar papa y frijol.",
+    "expectedDialect": "es-HN",
+    "difficulty": "medium",
+    "tags": [
+      "carro",
+      "papa",
+      "frijol",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si ya llegó el autobús?",
+    "expectedDialect": "es-HN",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el auto en la casa.",
+    "expectedDialect": "es-HN",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que prepare la cena?",
+    "expectedDialect": "es-HN",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Guanaco, qué chuco, el carro tiene pisto y cipote.",
+    "expectedDialect": "es-SV",
+    "difficulty": "easy",
+    "tags": [
+      "guanaco",
+      "chuco",
+      "carro",
+      "pisto",
+      "cipote"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en el departamento con papa.",
+    "expectedDialect": "es-SV",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "departamento",
+      "papa"
+    ]
+  },
+  {
+    "text": "Qué tuanis, el chero trajo chel y chunche.",
+    "expectedDialect": "es-SV",
+    "difficulty": "easy",
+    "tags": [
+      "tuanis",
+      "chero",
+      "chel",
+      "chunche",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese bicho es cerote, siempre trae puch sucio.",
+    "expectedDialect": "es-SV",
+    "difficulty": "medium",
+    "tags": [
+      "bicho",
+      "cerote",
+      "puch",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y el frijol para la cena.",
+    "expectedDialect": "es-SV",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "frijol",
+      "context"
+    ]
+  },
+  {
+    "text": "El chamba trajo chivo para el pacha.",
+    "expectedDialect": "es-SV",
+    "difficulty": "medium",
+    "tags": [
+      "chamba",
+      "chivo",
+      "pacha",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en bus a buscar papa y lentes.",
+    "expectedDialect": "es-SV",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro está listo?",
+    "expectedDialect": "es-SV",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a lavar el auto antes de irme.",
+    "expectedDialect": "es-SV",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que te ayude con eso?",
+    "expectedDialect": "es-SV",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Nica, qué maje, el carro tiene pisto y cipote.",
+    "expectedDialect": "es-NI",
+    "difficulty": "easy",
+    "tags": [
+      "nica",
+      "maje",
+      "carro",
+      "pisto",
+      "cipote"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en el departamento con papa.",
+    "expectedDialect": "es-NI",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "departamento",
+      "papa"
+    ]
+  },
+  {
+    "text": "Qué chigüe, el chunche no quiere bole ni sapién.",
+    "expectedDialect": "es-NI",
+    "difficulty": "easy",
+    "tags": [
+      "chigüe",
+      "chunche",
+      "bole",
+      "sapién",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese pinolero es arre, siempre trae pichilingo.",
+    "expectedDialect": "es-NI",
+    "difficulty": "medium",
+    "tags": [
+      "pinolero",
+      "arre",
+      "pichilingo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y el frijol para la cena.",
+    "expectedDialect": "es-NI",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "frijol",
+      "context"
+    ]
+  },
+  {
+    "text": "El chele trajo naca para el samaritano.",
+    "expectedDialect": "es-NI",
+    "difficulty": "medium",
+    "tags": [
+      "chele",
+      "naca",
+      "samaritano",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en bus a buscar papa y lentes.",
+    "expectedDialect": "es-NI",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si ya pasó el autobús?",
+    "expectedDialect": "es-NI",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el carro en la casa.",
+    "expectedDialect": "es-NI",
+    "difficulty": "hard",
+    "tags": [
+      "carro",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que prepare algo de comer?",
+    "expectedDialect": "es-NI",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Tico, pura vida, el mae trajo pisto y chine.",
+    "expectedDialect": "es-CR",
+    "difficulty": "easy",
+    "tags": [
+      "tico",
+      "pura vida",
+      "mae",
+      "pisto",
+      "chine"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en el departamento con carro y papa.",
+    "expectedDialect": "es-CR",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "departamento",
+      "carro",
+      "papa"
+    ]
+  },
+  {
+    "text": "Qué tuanis, el guaro trajo chunche y brete.",
+    "expectedDialect": "es-CR",
+    "difficulty": "easy",
+    "tags": [
+      "tuanis",
+      "guaro",
+      "chunche",
+      "brete",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese roine es sarasa, siempre trae jupa.",
+    "expectedDialect": "es-CR",
+    "difficulty": "medium",
+    "tags": [
+      "roine",
+      "sarasa",
+      "jupa",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y el frijol para la cena.",
+    "expectedDialect": "es-CR",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "frijol",
+      "context"
+    ]
+  },
+  {
+    "text": "El yigüirro trajo bomba para el carajillo.",
+    "expectedDialect": "es-CR",
+    "difficulty": "medium",
+    "tags": [
+      "yigüirro",
+      "bomba",
+      "carajillo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en bus a la pulpería con papa.",
+    "expectedDialect": "es-CR",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "pulpería",
+      "papa",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro tiene gasolina?",
+    "expectedDialect": "es-CR",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el auto en la casa.",
+    "expectedDialect": "es-CR",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que vayamos juntos?",
+    "expectedDialect": "es-CR",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Pana, qué xopa, el carro tiene chuleta y yeye.",
+    "expectedDialect": "es-PA",
+    "difficulty": "easy",
+    "tags": [
+      "pana",
+      "qué xopa",
+      "carro",
+      "chuleta",
+      "yeye"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en el departamento con papa.",
+    "expectedDialect": "es-PA",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "departamento",
+      "papa"
+    ]
+  },
+  {
+    "text": "Qué chombo, el chivo no quiere fufu ni pitillo.",
+    "expectedDialect": "es-PA",
+    "difficulty": "easy",
+    "tags": [
+      "chombo",
+      "chivo",
+      "fufu",
+      "pitillo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese sorrin es majare, siempre trae talla.",
+    "expectedDialect": "es-PA",
+    "difficulty": "medium",
+    "tags": [
+      "sorrin",
+      "majare",
+      "talla",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y el frijol para la cena.",
+    "expectedDialect": "es-PA",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "frijol",
+      "context"
+    ]
+  },
+  {
+    "text": "El pelar trajo aju para el tongo.",
+    "expectedDialect": "es-PA",
+    "difficulty": "medium",
+    "tags": [
+      "pelar",
+      "aju",
+      "tongo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en bus a buscar papa y lentes.",
+    "expectedDialect": "es-PA",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro está listo?",
+    "expectedDialect": "es-PA",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a lavar el auto antes de salir.",
+    "expectedDialect": "es-PA",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que te acompañe?",
+    "expectedDialect": "es-PA",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Tiguere, qué lo qué, el apartamento tiene guagua y concho.",
+    "expectedDialect": "es-DO",
+    "difficulty": "easy",
+    "tags": [
+      "tiguere",
+      "qué lo qué",
+      "apartamento",
+      "guagua",
+      "concho"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en el apartamento con auto y papa.",
+    "expectedDialect": "es-DO",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "apartamento",
+      "auto",
+      "papa"
+    ]
+  },
+  {
+    "text": "Qué chin, el jevo trajo china y kukú.",
+    "expectedDialect": "es-DO",
+    "difficulty": "easy",
+    "tags": [
+      "chin",
+      "jevo",
+      "china",
+      "kukú",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese papichulo es vaina, siempre trae bandola.",
+    "expectedDialect": "es-DO",
+    "difficulty": "medium",
+    "tags": [
+      "papichulo",
+      "vaina",
+      "bandola",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y la habichuela para la cena.",
+    "expectedDialect": "es-DO",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "habichuela",
+      "context"
+    ]
+  },
+  {
+    "text": "El concon trajo vívere para el aplatar.",
+    "expectedDialect": "es-DO",
+    "difficulty": "medium",
+    "tags": [
+      "concon",
+      "vívere",
+      "aplatar",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en bus a buscar papa y lentes.",
+    "expectedDialect": "es-DO",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el auto tiene gasolina?",
+    "expectedDialect": "es-DO",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el carro en la casa.",
+    "expectedDialect": "es-DO",
+    "difficulty": "hard",
+    "tags": [
+      "carro",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que prepare la cena?",
+    "expectedDialect": "es-DO",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Broki, qué chevere, el apartamento tiene guagua y pichar.",
+    "expectedDialect": "es-PR",
+    "difficulty": "easy",
+    "tags": [
+      "broki",
+      "chevere",
+      "apartamento",
+      "guagua",
+      "pichar"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en el apartamento con auto y papa.",
+    "expectedDialect": "es-PR",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "apartamento",
+      "auto",
+      "papa"
+    ]
+  },
+  {
+    "text": "Qué cabra, el jevo trajo zafacón y pulpo.",
+    "expectedDialect": "es-PR",
+    "difficulty": "easy",
+    "tags": [
+      "cabra",
+      "jevo",
+      "zafacón",
+      "pulpo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese bichote es chota, siempre trae floor.",
+    "expectedDialect": "es-PR",
+    "difficulty": "medium",
+    "tags": [
+      "bichote",
+      "chota",
+      "floor",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y la habichuela para la cena.",
+    "expectedDialect": "es-PR",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "habichuela",
+      "context"
+    ]
+  },
+  {
+    "text": "El nene trajo mami para el papi.",
+    "expectedDialect": "es-PR",
+    "difficulty": "medium",
+    "tags": [
+      "nene",
+      "mami",
+      "papi",
+      "context"
+    ]
+  },
+  {
+    "text": "Vamos en guagua a buscar papa y lentes.",
+    "expectedDialect": "es-PR",
+    "difficulty": "medium",
+    "tags": [
+      "guagua",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el auto está listo?",
+    "expectedDialect": "es-PR",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el carro en el parking.",
+    "expectedDialect": "es-PR",
+    "difficulty": "hard",
+    "tags": [
+      "carro",
+      "parking",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que vayamos juntos?",
+    "expectedDialect": "es-PR",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Guineano, qué ñame, el malabo tiene fufú y bubi.",
+    "expectedDialect": "es-GQ",
+    "difficulty": "easy",
+    "tags": [
+      "guineano",
+      "ñame",
+      "malabo",
+      "fufú",
+      "bubi"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en el río muni con batata.",
+    "expectedDialect": "es-GQ",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "río muni",
+      "batata"
+    ]
+  },
+  {
+    "text": "Qué bangá, el fang trajo ndowe y mongomo.",
+    "expectedDialect": "es-GQ",
+    "difficulty": "easy",
+    "tags": [
+      "bangá",
+      "fang",
+      "ndowe",
+      "mongomo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese annobón es camisola, siempre trae bacalao.",
+    "expectedDialect": "es-GQ",
+    "difficulty": "medium",
+    "tags": [
+      "annobón",
+      "camisola",
+      "bacalao",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y la papa para la cena.",
+    "expectedDialect": "es-GQ",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "papa",
+      "context"
+    ]
+  },
+  {
+    "text": "El bioko trajo malamba para el guineano.",
+    "expectedDialect": "es-GQ",
+    "difficulty": "medium",
+    "tags": [
+      "bioko",
+      "malamba",
+      "guineano",
+      "context"
+    ]
+  },
+  {
+    "text": "Vamos en bus a buscar papa y lentes.",
+    "expectedDialect": "es-GQ",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro tiene gasolina?",
+    "expectedDialect": "es-GQ",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el auto en la casa.",
+    "expectedDialect": "es-GQ",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que prepare algo de comer?",
+    "expectedDialect": "es-GQ",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Vato, qué neta, la troca tiene lonche y wacha.",
+    "expectedDialect": "es-US",
+    "difficulty": "easy",
+    "tags": [
+      "vato",
+      "neta",
+      "troca",
+      "lonche",
+      "wacha"
+    ]
+  },
+  {
+    "text": "Voy a parquear el carro cerca de la computadora.",
+    "expectedDialect": "es-US",
+    "difficulty": "easy",
+    "tags": [
+      "parquear",
+      "carro",
+      "computadora"
+    ]
+  },
+  {
+    "text": "Qué cholo, el carnal trajo firme y simón.",
+    "expectedDialect": "es-US",
+    "difficulty": "easy",
+    "tags": [
+      "cholo",
+      "carnal",
+      "firme",
+      "simón",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese huero es fresa, siempre trae chafa.",
+    "expectedDialect": "es-US",
+    "difficulty": "medium",
+    "tags": [
+      "huero",
+      "fresa",
+      "chafa",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y la papa para el lonche.",
+    "expectedDialect": "es-US",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "papa",
+      "lonche",
+      "context"
+    ]
+  },
+  {
+    "text": "El mijo trajo mija para la raza.",
+    "expectedDialect": "es-US",
+    "difficulty": "medium",
+    "tags": [
+      "mijo",
+      "mija",
+      "raza",
+      "context"
+    ]
+  },
+  {
+    "text": "Mande, voy en troca a buscar papa.",
+    "expectedDialect": "es-US",
+    "difficulty": "medium",
+    "tags": [
+      "mande",
+      "troca",
+      "papa",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro está listo?",
+    "expectedDialect": "es-US",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el auto en la casa.",
+    "expectedDialect": "es-US",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que vayamos juntos?",
+    "expectedDialect": "es-US",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Kame, qué jendeh, el kita tiene tamén y onde.",
+    "expectedDialect": "es-PH",
+    "difficulty": "easy",
+    "tags": [
+      "kame",
+      "jendeh",
+      "kita",
+      "tamén",
+      "onde"
+    ]
+  },
+  {
+    "text": "Dejé la computadora con conele y vusos.",
+    "expectedDialect": "es-PH",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "conele",
+      "vusos"
+    ]
+  },
+  {
+    "text": "Qué quilaya, el sila trajo connosotros y nisos.",
+    "expectedDialect": "es-PH",
+    "difficulty": "easy",
+    "tags": [
+      "quilaya",
+      "sila",
+      "connosotros",
+      "nisos",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese kamo es mo'o, siempre trae evo.",
+    "expectedDialect": "es-PH",
+    "difficulty": "medium",
+    "tags": [
+      "kamo",
+      "mo'o",
+      "evo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y la papa para la cena.",
+    "expectedDialect": "es-PH",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "papa",
+      "context"
+    ]
+  },
+  {
+    "text": "El jaha trajo akon para el dele.",
+    "expectedDialect": "es-PH",
+    "difficulty": "medium",
+    "tags": [
+      "jaha",
+      "akon",
+      "dele",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en bus a buscar papa y lentes.",
+    "expectedDialect": "es-PH",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro tiene gasolina?",
+    "expectedDialect": "es-PH",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el auto en la casa.",
+    "expectedDialect": "es-PH",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que prepare algo de comer?",
+    "expectedDialect": "es-PH",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Beliceño, qué kriol, el garífuna tiene cayos y mestizo.",
+    "expectedDialect": "es-BZ",
+    "difficulty": "easy",
+    "tags": [
+      "beliceño",
+      "kriol",
+      "garífuna",
+      "cayos",
+      "mestizo"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en dangriga con criollo.",
+    "expectedDialect": "es-BZ",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "dangriga",
+      "criollo"
+    ]
+  },
+  {
+    "text": "Qué breki, el mopan trajo zapote y cayuco.",
+    "expectedDialect": "es-BZ",
+    "difficulty": "easy",
+    "tags": [
+      "breki",
+      "mopan",
+      "zapote",
+      "cayuco",
+      "slang"
+    ]
+  },
+  {
+    "text": "Ese kekchi es bway, siempre trae yucatec.",
+    "expectedDialect": "es-BZ",
+    "difficulty": "medium",
+    "tags": [
+      "kekchi",
+      "bway",
+      "yucatec",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y la papa para la cena.",
+    "expectedDialect": "es-BZ",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "papa",
+      "context"
+    ]
+  },
+  {
+    "text": "El placencia trajo carro para el beliceño.",
+    "expectedDialect": "es-BZ",
+    "difficulty": "medium",
+    "tags": [
+      "placencia",
+      "carro",
+      "beliceño",
+      "context"
+    ]
+  },
+  {
+    "text": "Vamos en bus a buscar papa y lentes.",
+    "expectedDialect": "es-BZ",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabes si el carro está listo?",
+    "expectedDialect": "es-BZ",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "neutral"
+    ]
+  },
+  {
+    "text": "Voy a dejar el auto en la casa.",
+    "expectedDialect": "es-BZ",
+    "difficulty": "hard",
+    "tags": [
+      "auto",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Quieres que vayamos juntos?",
+    "expectedDialect": "es-BZ",
+    "difficulty": "hard",
+    "tags": [
+      "tú",
+      "register"
+    ]
+  },
+  {
+    "text": "Andorrano, qué pirineo, el canillo tiene escaldes y encamp.",
+    "expectedDialect": "es-AD",
+    "difficulty": "easy",
+    "tags": [
+      "andorrano",
+      "pirineo",
+      "canillo",
+      "escaldes",
+      "encamp"
+    ]
+  },
+  {
+    "text": "Dejé la computadora en ordino con massana.",
+    "expectedDialect": "es-AD",
+    "difficulty": "easy",
+    "tags": [
+      "computadora",
+      "ordino",
+      "massana"
+    ]
+  },
+  {
+    "text": "Qué caldea, el comú trajo parroquia y principado.",
+    "expectedDialect": "es-AD",
+    "difficulty": "easy",
+    "tags": [
+      "caldea",
+      "comú",
+      "parroquia",
+      "principado"
+    ]
+  },
+  {
+    "text": "Ese vall es pas, siempre trae madriu.",
+    "expectedDialect": "es-AD",
+    "difficulty": "medium",
+    "tags": [
+      "vall",
+      "pas",
+      "madriu",
+      "slang"
+    ]
+  },
+  {
+    "text": "Pasa los lentes y la papa para la cena.",
+    "expectedDialect": "es-AD",
+    "difficulty": "medium",
+    "tags": [
+      "lentes",
+      "papa",
+      "context"
+    ]
+  },
+  {
+    "text": "El xaval trajo doncs para el aixo.",
+    "expectedDialect": "es-AD",
+    "difficulty": "medium",
+    "tags": [
+      "xaval",
+      "doncs",
+      "aixo",
+      "slang"
+    ]
+  },
+  {
+    "text": "Vamos en bus a buscar papa y lentes.",
+    "expectedDialect": "es-AD",
+    "difficulty": "medium",
+    "tags": [
+      "bus",
+      "papa",
+      "lentes",
+      "context"
+    ]
+  },
+  {
+    "text": "¿Sabéis si el carro está listo?",
+    "expectedDialect": "es-AD",
+    "difficulty": "hard",
+    "tags": [
+      "vosotros-verb",
+      "grammar"
+    ]
+  },
+  {
+    "text": "Voy a dejar el coche en la casa.",
+    "expectedDialect": "es-AD",
+    "difficulty": "hard",
+    "tags": [
+      "coche",
+      "neutral-context"
+    ]
+  },
+  {
+    "text": "¿Queréis que vayamos juntos?",
+    "expectedDialect": "es-AD",
+    "difficulty": "hard",
+    "tags": [
+      "vosotros-verb",
+      "register"
+    ]
+  }
+]

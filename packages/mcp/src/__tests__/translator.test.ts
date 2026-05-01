@@ -342,6 +342,101 @@ describe("MCP Translator Tools", () => {
       expect(parsedResult.confidence).toBe(0);
       expect(parsedResult.matchedKeywords).toEqual([]);
     });
+
+    it("should detect high confidence from unique keywords", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      // "troca", "lonche", "wacha", "cholo", "vato", "carnal", "neta"
+      // Most are unique to es-US; neta is shared with es-MX.
+      const result = await handler({
+        text: "Ese vato y el cholo carnal neta wacha la troca parquear lonche",
+      } as any);
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.dialect).toBe("es-US");
+      expect(parsed.confidence).toBeGreaterThan(0.85);
+      expect(parsed.confidence).toBeLessThanOrEqual(1);
+      expect(parsed.matchedKeywords.length).toBeGreaterThanOrEqual(6);
+    });
+
+    it("should give partial credit for shared keywords and break ties with unique ones", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      // "guagua" is shared by es-CU, es-EC, es-PR;
+      // "apartamento" is also in es-PR (plus 4 others), tipping the scale.
+      const result = await handler({
+        text: "La guagua va al apartamento",
+      } as any);
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.dialect).toBe("es-PR");
+      expect(parsed.confidence).toBeGreaterThan(0.15);
+      expect(parsed.matchedKeywords).toContain("guagua");
+      expect(parsed.matchedKeywords).toContain("apartamento");
+    });
+
+    it("should reject near-tie ambiguous inputs within 10% of top score", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      // "guagua" appears in exactly 3 dialects with the same weight,
+      // producing an exact tie (well within 10%).
+      const result = await handler({
+        text: "Esperando la guagua",
+      } as any);
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.dialect).toBe("es-ES");
+      expect(parsed.confidence).toBe(0);
+      expect(parsed.matchedKeywords).toEqual([]);
+      expect(parsed.ambiguity).toMatch(/conflicting dialect markers/);
+      expect(parsed.ambiguity).toMatch(/es-CU|es-EC|es-PR/);
+    });
+
+    it("should fall back to neutral when input lacks dialect-specific markers", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      // "hola" and "amigo" are not in any dialect keyword list.
+      const result = await handler({
+        text: "hola amigo",
+      } as any);
+
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.dialect).toBe("es-ES");
+      expect(parsed.confidence).toBe(0);
+      expect(parsed.matchedKeywords).toEqual([]);
+    });
   });
 
   describe("translate_code_comment tool", () => {
