@@ -12,6 +12,7 @@
  */
 
 import * as fs from "node:fs";
+import * as fsp from "node:fs/promises";
 import * as path from "node:path";
 import type { TranslationProvider, TranslationResult } from "@dialectos/types";
 import { TranslationMemory } from "../translation-memory.js";
@@ -92,7 +93,7 @@ export class BulkTranslationEngine {
     const uniqueTexts = Array.from(dedupMap.keys());
 
     // Load checkpoint and restore completed items
-    const checkpoint = this.checkpointPath ? this.loadCheckpoint(this.checkpointPath) : null;
+    const checkpoint = this.checkpointPath ? await this.loadCheckpoint(this.checkpointPath) : null;
     const resumedSuccesses: BulkTranslationSuccess[] = [];
     const resumedFailures: BulkTranslationFailure[] = [];
     const resumedIds = new Set<string>();
@@ -188,7 +189,7 @@ export class BulkTranslationEngine {
       ) {
         await Promise.all([...inFlight]);
         inFlight.length = 0;
-        this.saveCheckpoint(this.checkpointPath, {
+        await this.saveCheckpoint(this.checkpointPath, {
           version: CHECKPOINT_VERSION,
           createdAt: new Date().toISOString(),
           completedIds: successes.map((s) => s.item.id),
@@ -206,7 +207,7 @@ export class BulkTranslationEngine {
 
     // Final checkpoint
     if (this.checkpointPath) {
-      this.saveCheckpoint(this.checkpointPath, {
+      await this.saveCheckpoint(this.checkpointPath, {
         version: CHECKPOINT_VERSION,
         createdAt: new Date().toISOString(),
         completedIds: successes.map((s) => s.item.id),
@@ -345,9 +346,9 @@ export class BulkTranslationEngine {
     return Math.round(avg * (total - completed));
   }
 
-  private loadCheckpoint(checkpointPath: string): BulkCheckpoint | null {
+  private async loadCheckpoint(checkpointPath: string): Promise<BulkCheckpoint | null> {
     try {
-      const raw = fs.readFileSync(checkpointPath, "utf-8");
+      const raw = await fsp.readFile(checkpointPath, "utf-8");
       const parsed = JSON.parse(raw) as BulkCheckpoint;
       return parsed.version === CHECKPOINT_VERSION ? parsed : null;
     } catch {
@@ -355,13 +356,16 @@ export class BulkTranslationEngine {
     }
   }
 
-  private saveCheckpoint(checkpointPath: string, checkpoint: BulkCheckpoint): void {
+  private async saveCheckpoint(
+    checkpointPath: string,
+    checkpoint: BulkCheckpoint
+  ): Promise<void> {
     try {
       const dir = path.dirname(checkpointPath);
-      fs.mkdirSync(dir, { recursive: true });
+      await fsp.mkdir(dir, { recursive: true });
       const tempPath = `${checkpointPath}.tmp`;
-      fs.writeFileSync(tempPath, JSON.stringify(checkpoint, null, 2), "utf-8");
-      fs.renameSync(tempPath, checkpointPath);
+      await fsp.writeFile(tempPath, JSON.stringify(checkpoint, null, 2), "utf-8");
+      await fsp.rename(tempPath, checkpointPath);
       this.onCheckpoint?.(checkpoint);
     } catch {
       // Non-fatal

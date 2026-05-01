@@ -125,6 +125,8 @@ for (let run = 1; run <= repeat; run++) {
     env: process.env,
     encoding: "utf-8",
     maxBuffer: 20 * 1024 * 1024,
+    timeout: 300000,
+    killSignal: "SIGKILL",
   });
   process.stdout.write(child.stdout || "");
   process.stderr.write(child.stderr || "");

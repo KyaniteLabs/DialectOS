@@ -40,14 +40,18 @@ vi.mock("@dialectos/security", () => ({
 
 const mockReadFile = vi.fn();
 
-vi.mock("node:fs", () => ({
-  promises: {
-    readFile: (filePath: string, encoding: string) => mockReadFile(filePath, encoding),
-    writeFile: vi.fn().mockResolvedValue(undefined),
-    rename: vi.fn().mockResolvedValue(undefined),
-    unlink: vi.fn().mockResolvedValue(undefined),
-  },
-}));
+vi.mock("node:fs", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:fs")>();
+  return {
+    ...actual,
+    promises: {
+      readFile: (filePath: string, encoding: string) => mockReadFile(filePath, encoding),
+      writeFile: vi.fn().mockResolvedValue(undefined),
+      rename: vi.fn().mockResolvedValue(undefined),
+      unlink: vi.fn().mockResolvedValue(undefined),
+    },
+  };
+});
 
 function makeRegistry(provider: TranslationProvider): ProviderRegistry {
   return {
