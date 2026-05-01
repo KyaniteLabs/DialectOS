@@ -12,9 +12,9 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Import MCP DIALECT_METADATA (keyword source of truth)
-const { DIALECT_METADATA } = await import(
-  join(__dirname, "../packages/mcp/dist/tools/translator-data.js")
+// Import the shared detection logic (must be built first)
+const { detectDialect, scoreAllDialects } = await import(
+  join(__dirname, "../packages/mcp/dist/tools/dialect-detector.js")
 );
 
 const args = new Map();
@@ -33,87 +33,29 @@ const outDir =
 
 const corpus = JSON.parse(readFileSync(corpusPath, "utf-8"));
 
-/**
- * Replicate the MCP keyword-matching detection algorithm.
- * See packages/mcp/src/tools/translator-handlers.ts handleDetectDialect
- */
-function detectDialectMcp(text) {
-  const lowerText = text.toLowerCase();
-  const scores = [];
-
-  for (const dialect of DIALECT_METADATA) {
-    let score = 0;
-    const matchedKeywords = [];
-
-    for (const keyword of dialect.keywords) {
-      if (lowerText.includes(keyword.toLowerCase())) {
-        score++;
-        matchedKeywords.push(keyword);
-      }
-    }
-
-    if (score > 0) {
-      scores.push({
-        dialect: dialect.code,
-        score,
-        matchedKeywords,
-      });
-    }
-  }
-
-  scores.sort((a, b) => b.score - a.score);
-
-  // Tie handling: if top two are tied, ambiguous
-  if (scores.length >= 2 && scores[0].score === scores[1].score) {
-    return {
-      top1: { dialect: "es-ES", confidence: 0, matchedKeywords: [] },
-      top3: scores.slice(0, 3).map((s) => ({
-        dialect: s.dialect,
-        confidence: Math.min(s.score / 3, 1),
-        matchedKeywords: s.matchedKeywords,
-      })),
-      ambiguity: `Tied: ${scores[0].dialect} vs ${scores[1].dialect}`,
-    };
-  }
-
-  const best = scores[0];
-  const CONFIDENCE_NORMALIZER = 3;
-  const confidence = best ? Math.min(best.score / CONFIDENCE_NORMALIZER, 1) : 0;
-  const detectedDialect = best ? best.dialect : "es-ES";
-  const matchedKeywords = best ? best.matchedKeywords : [];
-
-  return {
-    top1: { dialect: detectedDialect, confidence, matchedKeywords },
-    top3: scores.slice(0, 3).map((s) => ({
-      dialect: s.dialect,
-      confidence: Math.min(s.score / CONFIDENCE_NORMALIZER, 1),
-      matchedKeywords: s.matchedKeywords,
-    })),
-    ambiguity: null,
-  };
-}
-
 // Run benchmark
 const results = [];
 let totalConfidence = 0;
 let confidenceCount = 0;
 
 for (const sample of corpus) {
-  const detection = detectDialectMcp(sample.text);
-  const top1Correct = detection.top1.dialect === sample.expectedDialect;
-  const top3Correct = detection.top3.some(
-    (t) => t.dialect === sample.expectedDialect
-  );
+  const detection = detectDialect(sample.text);
+  const scoredDialects = scoreAllDialects(sample.text);
+  const top3Dialects = scoredDialects.slice(0, 3).map((s) => s.dialect);
+  const top1Correct = detection.dialect === sample.expectedDialect;
+  const top3Correct =
+    top1Correct || top3Dialects.includes(sample.expectedDialect);
 
-  totalConfidence += detection.top1.confidence;
+  totalConfidence += detection.confidence;
   confidenceCount++;
 
   results.push({
     text: sample.text,
     expectedDialect: sample.expectedDialect,
-    predictedDialect: detection.top1.dialect,
-    confidence: detection.top1.confidence,
-    matchedKeywords: detection.top1.matchedKeywords,
+    predictedDialect: detection.dialect,
+    top3Predicted: top3Dialects,
+    confidence: detection.confidence,
+    matchedKeywords: detection.matchedKeywords,
     ambiguity: detection.ambiguity,
     top1Correct,
     top3Correct,

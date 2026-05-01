@@ -437,6 +437,127 @@ describe("MCP Translator Tools", () => {
       expect(parsed.confidence).toBe(0);
       expect(parsed.matchedKeywords).toEqual([]);
     });
+
+    it("should detect pure voseo text as Argentine/Uruguayan/Paraguayan", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      const result = await handler({
+        text: "¿Sabés dónde queda la estación de tren?",
+      } as any);
+
+      const parsed2 = JSON.parse(result.content[0].text);
+      const allowed = ["es-AR", "es-UY", "es-PY"];
+      expect(allowed).toContain(parsed2.dialect);
+      expect(parsed2.confidence).toBeGreaterThan(0);
+    });
+
+    it("should detect pure voseo imperative text as a voseo dialect", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      const result = await handler({
+        text: "Tené cuidado con el perro que ladra mucho.",
+      } as any);
+
+      const parsed2 = JSON.parse(result.content[0].text);
+      const allowed = ["es-AR", "es-UY", "es-PY"];
+      expect(allowed).toContain(parsed2.dialect);
+      expect(parsed2.confidence).toBeGreaterThan(0);
+    });
+
+    it("should detect pure vosotros text as Spain", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      const result = await handler({
+        text: "Cuando lleguéis, dejad las llaves en la mesa.",
+      } as any);
+
+      const parsed2 = JSON.parse(result.content[0].text);
+      expect(parsed2.dialect).toBe("es-ES");
+      expect(parsed2.confidence).toBeGreaterThan(0);
+    });
+
+    it("should detect vosotros present indicative as Spain", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      const result = await handler({
+        text: "¿Queréis beber algo? Hay cerveza fría.",
+      } as any);
+
+      const parsed2 = JSON.parse(result.content[0].text);
+      expect(parsed2.dialect).toBe("es-ES");
+      expect(parsed2.confidence).toBeGreaterThan(0);
+    });
+
+    it("should boost confidence when keywords and grammar align", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      const result = await handler({
+        text: "Che boludo, ¿vos tomás el bondi o el colectivo al laburo?",
+      } as any);
+
+      const parsed2 = JSON.parse(result.content[0].text);
+      expect(parsed2.dialect).toBe("es-AR");
+      expect(parsed2.confidence).toBeGreaterThan(0.5);
+    });
+
+    it("should not confuse vosotros with voseo", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = { tool: vi.fn() };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const detectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "detect_dialect"
+      );
+      const handler = detectCall![3];
+
+      const result = await handler({
+        text: "Vosotros vais al cine en coche mientras yo enciendo el ordenador.",
+      } as any);
+
+      const parsed2 = JSON.parse(result.content[0].text);
+      expect(parsed2.dialect).toBe("es-ES");
+    });
   });
 
   describe("translate_code_comment tool", () => {

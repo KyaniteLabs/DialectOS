@@ -50,6 +50,7 @@ export type {
 } from "./translator-types.js";
 
 export { DIALECT_METADATA } from "./translator-data.js";
+export { detectDialect } from "./dialect-detector.js";
 
 /**
  * Register all translator tools with the MCP server

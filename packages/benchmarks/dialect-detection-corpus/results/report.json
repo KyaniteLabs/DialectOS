@@ -1,40 +1,40 @@
 {
-  "generatedAt": "2026-05-01T02:47:01.036Z",
+  "generatedAt": "2026-05-01T03:33:14.894Z",
   "corpusPath": "/Users/simongonzalezdecruz/workspaces/DialectOS/packages/benchmarks/dialect-detection-corpus/samples.json",
   "total": 250,
-  "top1Correct": 41,
-  "top3Correct": 82,
-  "top1Accuracy": 0.164,
-  "top3Accuracy": 0.328,
-  "avgConfidence": 0.23466666666666672,
+  "top1Correct": 53,
+  "top3Correct": 96,
+  "top1Accuracy": 0.212,
+  "top3Accuracy": 0.384,
+  "avgConfidence": 0.12673839925789193,
   "byDialect": {
     "es-ES": {
       "total": 10,
-      "top1Correct": 5,
-      "top3Correct": 6,
-      "top1Accuracy": 0.5,
-      "top3Accuracy": 0.6
+      "top1Correct": 7,
+      "top3Correct": 8,
+      "top1Accuracy": 0.7,
+      "top3Accuracy": 0.8
     },
     "es-MX": {
       "total": 10,
       "top1Correct": 2,
-      "top3Correct": 5,
+      "top3Correct": 4,
       "top1Accuracy": 0.2,
-      "top3Accuracy": 0.5
+      "top3Accuracy": 0.4
     },
     "es-AR": {
       "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 4,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.4
+      "top1Correct": 3,
+      "top3Correct": 8,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.8
     },
     "es-CO": {
       "total": 10,
       "top1Correct": 2,
-      "top3Correct": 5,
+      "top3Correct": 4,
       "top1Accuracy": 0.2,
-      "top3Accuracy": 0.5
+      "top3Accuracy": 0.4
     },
     "es-CU": {
       "total": 10,
@@ -52,31 +52,31 @@
     },
     "es-CL": {
       "total": 10,
-      "top1Correct": 2,
+      "top1Correct": 3,
       "top3Correct": 6,
-      "top1Accuracy": 0.2,
+      "top1Accuracy": 0.3,
       "top3Accuracy": 0.6
     },
     "es-VE": {
       "total": 10,
       "top1Correct": 2,
-      "top3Correct": 5,
+      "top3Correct": 3,
       "top1Accuracy": 0.2,
-      "top3Accuracy": 0.5
+      "top3Accuracy": 0.3
     },
     "es-UY": {
       "total": 10,
       "top1Correct": 4,
-      "top3Correct": 5,
+      "top3Correct": 8,
       "top1Accuracy": 0.4,
-      "top3Accuracy": 0.5
+      "top3Accuracy": 0.8
     },
     "es-PY": {
       "total": 10,
       "top1Correct": 1,
-      "top3Correct": 3,
+      "top3Correct": 7,
       "top1Accuracy": 0.1,
-      "top3Accuracy": 0.3
+      "top3Accuracy": 0.7
     },
     "es-BO": {
       "total": 10,
@@ -95,9 +95,9 @@
     "es-GT": {
       "total": 10,
       "top1Correct": 1,
-      "top3Correct": 3,
+      "top3Correct": 4,
       "top1Accuracy": 0.1,
-      "top3Accuracy": 0.3
+      "top3Accuracy": 0.4
     },
     "es-HN": {
       "total": 10,
@@ -115,9 +115,9 @@
     },
     "es-NI": {
       "total": 10,
-      "top1Correct": 0,
+      "top1Correct": 1,
       "top3Correct": 2,
-      "top1Accuracy": 0,
+      "top1Accuracy": 0.1,
       "top3Accuracy": 0.2
     },
     "es-CR": {
@@ -129,24 +129,24 @@
     },
     "es-PA": {
       "total": 10,
-      "top1Correct": 1,
+      "top1Correct": 2,
       "top3Correct": 2,
-      "top1Accuracy": 0.1,
+      "top1Accuracy": 0.2,
       "top3Accuracy": 0.2
     },
     "es-DO": {
       "total": 10,
       "top1Correct": 1,
-      "top3Correct": 2,
+      "top3Correct": 1,
       "top1Accuracy": 0.1,
-      "top3Accuracy": 0.2
+      "top3Accuracy": 0.1
     },
     "es-PR": {
       "total": 10,
       "top1Correct": 1,
-      "top3Correct": 2,
+      "top3Correct": 3,
       "top1Accuracy": 0.1,
-      "top3Accuracy": 0.2
+      "top3Accuracy": 0.3
     },
     "es-GQ": {
       "total": 10,
@@ -157,74 +157,76 @@
     },
     "es-US": {
       "total": 10,
-      "top1Correct": 2,
-      "top3Correct": 2,
-      "top1Accuracy": 0.2,
-      "top3Accuracy": 0.2
+      "top1Correct": 3,
+      "top3Correct": 5,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.5
     },
     "es-PH": {
       "total": 10,
-      "top1Correct": 2,
+      "top1Correct": 3,
       "top3Correct": 3,
-      "top1Accuracy": 0.2,
+      "top1Accuracy": 0.3,
       "top3Accuracy": 0.3
     },
     "es-BZ": {
       "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 3,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.3
+      "top1Correct": 3,
+      "top3Correct": 4,
+      "top1Accuracy": 0.3,
+      "top3Accuracy": 0.4
     },
     "es-AD": {
       "total": 10,
-      "top1Correct": 1,
+      "top1Correct": 2,
       "top3Correct": 2,
-      "top1Accuracy": 0.1,
+      "top1Accuracy": 0.2,
       "top3Accuracy": 0.2
     }
   },
   "byDifficulty": {
     "easy": {
       "total": 75,
-      "top1Correct": 32,
-      "top3Correct": 56,
-      "top1Accuracy": 0.4266666666666667,
-      "top3Accuracy": 0.7466666666666667
+      "top1Correct": 38,
+      "top3Correct": 57,
+      "top1Accuracy": 0.5066666666666667,
+      "top3Accuracy": 0.76
     },
     "medium": {
       "total": 100,
-      "top1Correct": 8,
-      "top3Correct": 17,
-      "top1Accuracy": 0.08,
-      "top3Accuracy": 0.17
+      "top1Correct": 11,
+      "top3Correct": 23,
+      "top1Accuracy": 0.11,
+      "top3Accuracy": 0.23
     },
     "hard": {
       "total": 75,
-      "top1Correct": 1,
-      "top3Correct": 9,
-      "top1Accuracy": 0.013333333333333334,
-      "top3Accuracy": 0.12
+      "top1Correct": 4,
+      "top3Correct": 16,
+      "top1Accuracy": 0.05333333333333334,
+      "top3Accuracy": 0.21333333333333335
     }
   },
   "confusionMatrix": {
     "es-ES": {
-      "es-ES": 5,
-      "es-UY": 3,
+      "es-ES": 7,
       "es-CL": 1,
+      "es-UY": 1,
       "es-CU": 1
     },
     "es-MX": {
       "es-MX": 2,
-      "es-ES": 6,
+      "es-ES": 4,
+      "es-UY": 2,
       "es-US": 1,
-      "es-UY": 1
+      "es-CL": 1
     },
     "es-AR": {
-      "es-AR": 1,
+      "es-AR": 3,
       "es-UY": 3,
-      "es-ES": 5,
-      "es-CU": 1
+      "es-ES": 2,
+      "es-CU": 1,
+      "es-CL": 1
     },
     "es-CO": {
       "es-CO": 2,
@@ -240,19 +242,22 @@
     },
     "es-PE": {
       "es-PE": 1,
-      "es-ES": 7,
+      "es-ES": 5,
       "es-US": 1,
+      "es-CU": 1,
+      "es-CL": 1,
       "es-SV": 1
     },
     "es-CL": {
-      "es-ES": 6,
-      "es-CL": 2,
-      "es-UY": 1,
-      "es-CU": 1
+      "es-CL": 3,
+      "es-UY": 3,
+      "es-CU": 1,
+      "es-ES": 3
     },
     "es-VE": {
       "es-VE": 2,
-      "es-ES": 6,
+      "es-ES": 5,
+      "es-CL": 1,
       "es-UY": 2
     },
     "es-UY": {
@@ -262,32 +267,38 @@
       "es-ES": 3
     },
     "es-PY": {
-      "es-ES": 7,
+      "es-ES": 3,
       "es-PY": 1,
+      "es-AR": 4,
       "es-CU": 1,
       "es-UY": 1
     },
     "es-BO": {
       "es-BO": 2,
-      "es-ES": 7,
+      "es-ES": 6,
+      "es-AR": 1,
       "es-CL": 1
     },
     "es-EC": {
       "es-EC": 1,
       "es-UY": 3,
-      "es-ES": 6
+      "es-AR": 1,
+      "es-ES": 4,
+      "es-CU": 1
     },
     "es-GT": {
       "es-GT": 1,
-      "es-UY": 2,
-      "es-ES": 6,
+      "es-UY": 3,
+      "es-CL": 1,
+      "es-ES": 4,
       "es-SV": 1
     },
     "es-HN": {
       "es-HN": 1,
       "es-UY": 1,
-      "es-ES": 7,
-      "es-CU": 1
+      "es-EC": 1,
+      "es-CU": 1,
+      "es-ES": 6
     },
     "es-SV": {
       "es-SV": 1,
@@ -296,28 +307,31 @@
       "es-MX": 1
     },
     "es-NI": {
-      "es-ES": 8,
-      "es-UY": 2
+      "es-ES": 7,
+      "es-UY": 2,
+      "es-NI": 1
     },
     "es-CR": {
       "es-CR": 1,
-      "es-ES": 8,
+      "es-UY": 1,
+      "es-ES": 7,
       "es-SV": 1
     },
     "es-PA": {
-      "es-PA": 1,
+      "es-PA": 2,
       "es-UY": 1,
-      "es-ES": 8
+      "es-ES": 7
     },
     "es-DO": {
       "es-DO": 1,
-      "es-ES": 8,
-      "es-UY": 1
+      "es-UY": 2,
+      "es-AR": 1,
+      "es-ES": 6
     },
     "es-PR": {
       "es-PR": 1,
-      "es-ES": 5,
-      "es-UY": 1,
+      "es-UY": 2,
+      "es-ES": 4,
       "es-CU": 1,
       "es-EC": 1,
       "es-SV": 1
@@ -328,44 +342,29 @@
       "es-ES": 5
     },
     "es-US": {
-      "es-US": 2,
-      "es-ES": 7,
+      "es-US": 3,
+      "es-ES": 6,
       "es-SV": 1
     },
     "es-PH": {
-      "es-PH": 2,
-      "es-ES": 7,
+      "es-PH": 3,
+      "es-ES": 6,
       "es-PY": 1
     },
     "es-BZ": {
-      "es-BZ": 1,
-      "es-ES": 8,
+      "es-BZ": 3,
+      "es-ES": 6,
       "es-SV": 1
     },
     "es-AD": {
-      "es-AD": 1,
-      "es-ES": 7,
+      "es-AD": 2,
+      "es-AR": 1,
       "es-CU": 1,
+      "es-ES": 5,
       "es-SV": 1
     }
   },
   "hardestDialects": [
-    {
-      "code": "es-NI",
-      "total": 10,
-      "top1Correct": 0,
-      "top3Correct": 2,
-      "top1Accuracy": 0,
-      "top3Accuracy": 0.2
-    },
-    {
-      "code": "es-AR",
-      "total": 10,
-      "top1Correct": 1,
-      "top3Correct": 4,
-      "top1Accuracy": 0.1,
-      "top3Accuracy": 0.4
-    },
     {
       "code": "es-CU",
       "total": 10,
@@ -386,9 +385,25 @@
       "code": "es-PY",
       "total": 10,
       "top1Correct": 1,
-      "top3Correct": 3,
+      "top3Correct": 7,
       "top1Accuracy": 0.1,
-      "top3Accuracy": 0.3
+      "top3Accuracy": 0.7
+    },
+    {
+      "code": "es-EC",
+      "total": 10,
+      "top1Correct": 1,
+      "top3Correct": 2,
+      "top1Accuracy": 0.1,
+      "top3Accuracy": 0.2
+    },
+    {
+      "code": "es-GT",
+      "total": 10,
+      "top1Correct": 1,
+      "top3Correct": 4,
+      "top1Accuracy": 0.1,
+      "top3Accuracy": 0.4
     }
   ],
   "results": [
@@ -396,13 +411,17 @@
       "text": "Vosotros vais al cine en coche mientras yo enciendo el ordenador.",
       "expectedDialect": "es-ES",
       "predictedDialect": "es-ES",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-ES",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.349673252430203,
       "matchedKeywords": [
         "vosotros",
         "ordenador",
         "coche"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -417,9 +436,14 @@
       "text": "¿Os apetece una tortilla de patata y un zumo de naranja?",
       "expectedDialect": "es-ES",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-ES",
+        "es-PE",
+        "es-UY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-ES vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-ES vs es-PE)",
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -433,12 +457,16 @@
       "text": "Vale, chaval, pues aparca el coche y sube al piso.",
       "expectedDialect": "es-ES",
       "predictedDialect": "es-ES",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-ES",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.22077001080090203,
       "matchedKeywords": [
         "coche",
         "vale"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -452,14 +480,16 @@
     {
       "text": "Necesito comprar un bolígrafo antes de coger el autobús.",
       "expectedDialect": "es-ES",
-      "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
-      "matchedKeywords": [
-        "auto",
-        "bo"
+      "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-UY",
+        "es-ES",
+        "es-GT"
       ],
-      "ambiguity": null,
-      "top1Correct": false,
+      "confidence": 0,
+      "matchedKeywords": [],
+      "ambiguity": "Input contains conflicting dialect markers (es-UY vs es-ES)",
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
       "tags": [
@@ -473,11 +503,13 @@
       "text": "El frigorífico está vacío, vamos a currar un poco y luego comemos.",
       "expectedDialect": "es-ES",
       "predictedDialect": "es-CL",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CL"
+      ],
+      "confidence": 0.1275954045683463,
       "matchedKeywords": [
         "po"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -491,11 +523,13 @@
       "text": "Mi móvil no funciona, ¿me prestas el tuyo?",
       "expectedDialect": "es-ES",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY"
+      ],
+      "confidence": 0.1758982160376105,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -508,11 +542,15 @@
       "text": "Tía, qué guay está tu nuevo ordenador.",
       "expectedDialect": "es-ES",
       "predictedDialect": "es-ES",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-ES",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.11038500540045101,
       "matchedKeywords": [
         "ordenador"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
@@ -526,14 +564,16 @@
     {
       "text": "¿Vosotros habéis visto esa película? Es la bomba.",
       "expectedDialect": "es-ES",
-      "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
-      "matchedKeywords": [
-        "vos",
-        "bo"
+      "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-ES",
+        "es-UY",
+        "es-GT"
       ],
-      "ambiguity": null,
-      "top1Correct": false,
+      "confidence": 0,
+      "matchedKeywords": [],
+      "ambiguity": "Input contains conflicting dialect markers (es-ES vs es-UY)",
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "hard",
       "tags": [
@@ -546,11 +586,13 @@
       "text": "Cuando lleguéis, dejad las llaves en la mesa.",
       "expectedDialect": "es-ES",
       "predictedDialect": "es-ES",
-      "confidence": 0,
+      "top3Predicted": [
+        "es-ES"
+      ],
+      "confidence": 0.037036472457699886,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": true,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "vosotros-verb",
@@ -561,13 +603,16 @@
       "text": "¿Queréis tomar algo? Hay cerveza en la nevera.",
       "expectedDialect": "es-ES",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU",
+        "es-ES"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "vosotros-verb",
@@ -578,14 +623,18 @@
       "text": "Qué chido, güey, ya llegó la computadora al departamento.",
       "expectedDialect": "es-MX",
       "predictedDialect": "es-MX",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-MX",
+        "es-UY",
+        "es-CL"
+      ],
+      "confidence": 0.33059008467787804,
       "matchedKeywords": [
         "computadora",
         "departamento",
         "chido",
         "güey"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -601,9 +650,14 @@
       "text": "Voy a rentar un departamento cerca del estacionamiento del camión.",
       "expectedDialect": "es-MX",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-UY",
+        "es-AR"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-UY)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -618,12 +672,16 @@
       "text": "Neta, esta chamba está muy padre, ¿no?",
       "expectedDialect": "es-MX",
       "predictedDialect": "es-MX",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-MX",
+        "es-UY",
+        "es-US"
+      ],
+      "confidence": 0.25652432847879086,
       "matchedKeywords": [
         "neta",
         "chamba"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -638,9 +696,14 @@
       "text": "Pasa al auto, vamos por unos aguacates y plátanos.",
       "expectedDialect": "es-MX",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CL",
+        "es-UY",
+        "es-MX"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-CL vs es-UY)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "medium",
@@ -654,12 +717,19 @@
     {
       "text": "Dejé la pluma en la habitación de la computadora.",
       "expectedDialect": "es-MX",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-UY",
+      "predictedDialect": "es-UY",
+      "top3Predicted": [
+        "es-UY",
+        "es-CU",
+        "es-CO"
+      ],
+      "confidence": 0.22156370535185288,
+      "matchedKeywords": [
+        "computadora",
+        "ta"
+      ],
       "top1Correct": false,
-      "top3Correct": true,
+      "top3Correct": false,
       "difficulty": "medium",
       "tags": [
         "pluma",
@@ -671,11 +741,13 @@
       "text": "Ese vato es bien fresa, siempre trae ropa cara.",
       "expectedDialect": "es-MX",
       "predictedDialect": "es-US",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-US"
+      ],
+      "confidence": 0.11984856182040725,
       "matchedKeywords": [
         "vato"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -689,11 +761,15 @@
       "text": "Estoy crudo después de la fiesta, ¿me das un jugo?",
       "expectedDialect": "es-MX",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY",
+        "es-AR",
+        "es-PY"
+      ],
+      "confidence": 0.20048885001155875,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -707,9 +783,9 @@
       "text": "¿Tú sabes dónde queda la nueva tienda de celulares?",
       "expectedDialect": "es-MX",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -721,10 +797,16 @@
     {
       "text": "Voy a lavar el carro y luego paso por ti.",
       "expectedDialect": "es-MX",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-CL",
+      "predictedDialect": "es-CL",
+      "top3Predicted": [
+        "es-CL",
+        "es-CO",
+        "es-GT"
+      ],
+      "confidence": 0.1275954045683463,
+      "matchedKeywords": [
+        "po"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -737,9 +819,9 @@
       "text": "¿Quieres que prepare la cena? Ya casi es hora.",
       "expectedDialect": "es-MX",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -752,7 +834,12 @@
       "text": "Che, boludo, ¿vos tomás el bondi o el colectivo al laburo?",
       "expectedDialect": "es-AR",
       "predictedDialect": "es-AR",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.8486854285460318,
       "matchedKeywords": [
         "vos",
         "colectivo",
@@ -761,7 +848,6 @@
         "bondi",
         "laburo"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -778,14 +864,18 @@
       "text": "Vos sabés que esta computadora está en el departamento del pibe.",
       "expectedDialect": "es-AR",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-AR",
+        "es-PY"
+      ],
+      "confidence": 0.3657881237625854,
       "matchedKeywords": [
         "vos",
         "computadora",
         "departamento",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -801,14 +891,18 @@
       "text": "Qué quilombo, no tengo ni una moneda de guita para morfar.",
       "expectedDialect": "es-AR",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-GT",
+        "es-AR"
+      ],
+      "confidence": 0.3385094469220052,
       "matchedKeywords": [
         "bo",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "quilombo",
@@ -821,9 +915,14 @@
       "text": "La mina se fue en auto después de comprar la remera.",
       "expectedDialect": "es-AR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "medium",
@@ -838,9 +937,13 @@
       "text": "Este poroto está re piola, y la frutilla también.",
       "expectedDialect": "es-AR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CL",
+        "es-UY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-CL vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -854,11 +957,13 @@
       "text": "Me da fiaca salir, prefiero quedarme en casa con maní.",
       "expectedDialect": "es-AR",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -871,10 +976,16 @@
     {
       "text": "¿Vos podés pasarme el agua? Hace mucho calor hoy.",
       "expectedDialect": "es-AR",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-CL",
+      "predictedDialect": "es-CL",
+      "top3Predicted": [
+        "es-CL",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.1275954045683463,
+      "matchedKeywords": [
+        "po"
+      ],
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "medium",
@@ -888,13 +999,17 @@
       "text": "¿Sabés dónde queda la estación de tren?",
       "expectedDialect": "es-AR",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY",
+        "es-AR",
+        "es-PY"
+      ],
+      "confidence": 0.20048885001155875,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "voseo",
@@ -904,12 +1019,16 @@
     {
       "text": "Cuando vengas, traé las llaves que te di.",
       "expectedDialect": "es-AR",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
-      "top1Correct": false,
-      "top3Correct": false,
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "voseo-verb",
@@ -919,12 +1038,16 @@
     {
       "text": "Tené cuidado con el perro que ladra mucho.",
       "expectedDialect": "es-AR",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
-      "top1Correct": false,
-      "top3Correct": false,
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "voseo-verb",
@@ -935,13 +1058,17 @@
       "text": "Parce, qué chévere este computador y el carro nuevo.",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-CO",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-CO",
+        "es-UY",
+        "es-CL"
+      ],
+      "confidence": 0.3432275609661759,
       "matchedKeywords": [
         "computador",
         "carro",
         "chévere"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -956,15 +1083,19 @@
       "text": "Pilas, pana, que el bus ya llegó al apartamento.",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-VE",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-VE",
+        "es-UY",
+        "es-PA"
+      ],
+      "confidence": 0.24594299050438606,
       "matchedKeywords": [
         "bus",
         "apartamento",
         "pana"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": true,
+      "top3Correct": false,
       "difficulty": "easy",
       "tags": [
         "pilas",
@@ -977,12 +1108,16 @@
       "text": "Qué bacano, rumba con el parcero hasta el amanecer.",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-CO",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-CO",
+        "es-UY",
+        "es-CU"
+      ],
+      "confidence": 0.3923824514463212,
       "matchedKeywords": [
         "parcero",
         "bacano"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -997,11 +1132,13 @@
       "text": "El maní está rico, dame banano y lentes para leer.",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1016,9 +1153,9 @@
       "text": "Ese veci es mono, pero a veces es una vaina.",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1033,12 +1170,16 @@
       "text": "Vamos a tomar guaro, tengo guayabo de la fiesta.",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-CU",
+        "es-GT"
+      ],
+      "confidence": 0.3139188129480569,
       "matchedKeywords": [
         "bo",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1052,9 +1193,14 @@
       "text": "Llave, préstame el esfero para la clase de matemáticas.",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CU",
+        "es-UY",
+        "es-CR"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-CU vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1068,9 +1214,14 @@
       "text": "¿Tú sabes si el carro ya está listo?",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "hard",
@@ -1083,9 +1234,14 @@
       "text": "Voy a comprar papa para la cena de hoy.",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "hard",
@@ -1098,9 +1254,9 @@
       "text": "¿Quieres que te acompañe a la tienda?",
       "expectedDialect": "es-CO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1113,7 +1269,12 @@
       "text": "Asere, la guagua llegó y el yuma se fue en auto.",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-CU",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-CU",
+        "es-EC",
+        "es-PR"
+      ],
+      "confidence": 0.508001867681445,
       "matchedKeywords": [
         "auto",
         "guagua",
@@ -1121,7 +1282,6 @@
         "yuma",
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1136,13 +1296,17 @@
       "text": "Qué bola, acere, ¿tienes la computadora en el apartamento?",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-CU"
+      ],
+      "confidence": 0.3595843022622993,
       "matchedKeywords": [
         "computadora",
         "bo",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1157,9 +1321,13 @@
       "text": "El jinetero está en la esquina con el fufú listo.",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CU",
+        "es-GQ"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-GQ",
+      "ambiguity": "Input contains conflicting dialect markers (es-CU vs es-GQ)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1173,9 +1341,9 @@
       "text": "Pasa la grifo que hace calor, socio.",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1189,11 +1357,13 @@
       "text": "Ese temba sabe pinchar bien en la fiesta.",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY"
+      ],
+      "confidence": 0.1758982160376105,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1207,9 +1377,14 @@
       "text": "Voy a comprar papa y habichuela para el almuerzo.",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1223,9 +1398,14 @@
       "text": "Ma, préstame el carro para ir al trabajo.",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CU",
+        "es-UY",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-CU",
+      "ambiguity": "Input contains conflicting dialect markers (es-CU vs es-UY)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "medium",
@@ -1239,9 +1419,9 @@
       "text": "¿Tú sabes dónde queda la nueva tienda?",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1254,9 +1434,9 @@
       "text": "Dame un momento que termino esto.",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1269,9 +1449,14 @@
       "text": "Voy a buscar el auto que dejé ayer.",
       "expectedDialect": "es-CU",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-PY",
+        "es-BO",
+        "es-EC"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-PE vs es-VE",
+      "ambiguity": "Input contains conflicting dialect markers (es-PY vs es-BO)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1284,13 +1469,17 @@
       "text": "Pata, qué chévere, vamos al jato en micro al toque.",
       "expectedDialect": "es-PE",
       "predictedDialect": "es-PE",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-PE",
+        "es-UY",
+        "es-CL"
+      ],
+      "confidence": 0.43218943867554915,
       "matchedKeywords": [
         "pata",
         "chévere",
         "al toque"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1306,9 +1495,14 @@
       "text": "Causa, esta computadora está en el departamento con auto.",
       "expectedDialect": "es-PE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-PE",
+        "es-UY",
+        "es-CL"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-PE vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-PE vs es-UY)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1323,9 +1517,14 @@
       "text": "Qué bro, el chibolo se fue al chifa con el poto sucio.",
       "expectedDialect": "es-PE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-PE",
+        "es-CL",
+        "es-UY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-PE vs es-CL",
+      "ambiguity": "Input contains conflicting dialect markers (es-PE vs es-CL)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1341,9 +1540,14 @@
       "text": "Vamos al huarique, traé tu chela y los lentes.",
       "expectedDialect": "es-PE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1358,9 +1562,13 @@
       "text": "El chapo trajo maní y frutilla para todos.",
       "expectedDialect": "es-PE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CU",
+        "es-CL"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-CL",
+      "ambiguity": "Input contains conflicting dialect markers (es-CU vs es-CL)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1374,11 +1582,13 @@
       "text": "Ese flaco es cholo pero tiene buen corazón.",
       "expectedDialect": "es-PE",
       "predictedDialect": "es-US",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-US"
+      ],
+      "confidence": 0.11984856182040725,
       "matchedKeywords": [
         "cholo"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1391,10 +1601,16 @@
     {
       "text": "Oye pe, pasa la pluma que escribo rápido.",
       "expectedDialect": "es-PE",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-UY",
+      "predictedDialect": "es-CU",
+      "top3Predicted": [
+        "es-CU",
+        "es-UY",
+        "es-GT"
+      ],
+      "confidence": 0.13070203859464202,
+      "matchedKeywords": [
+        "ma"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1407,10 +1623,16 @@
     {
       "text": "¿Sabes si el bus pasa por aquí?",
       "expectedDialect": "es-PE",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "predictedDialect": "es-CL",
+      "top3Predicted": [
+        "es-CL",
+        "es-CO",
+        "es-PE"
+      ],
+      "confidence": 0.1275954045683463,
+      "matchedKeywords": [
+        "po"
+      ],
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "hard",
@@ -1423,9 +1645,14 @@
       "text": "Voy a comprar papa para hacer la cena.",
       "expectedDialect": "es-PE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1438,11 +1665,13 @@
       "text": "¿Quieres que vayamos juntos al centro?",
       "expectedDialect": "es-PE",
       "predictedDialect": "es-SV",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-SV"
+      ],
+      "confidence": 0.1799950499872203,
       "matchedKeywords": [
         "vaya"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1454,11 +1683,18 @@
     {
       "text": "Weón, qué fome esta wea, mejor tomo una chela en el micro.",
       "expectedDialect": "es-CL",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-UY",
-      "top1Correct": false,
+      "predictedDialect": "es-CL",
+      "top3Predicted": [
+        "es-CL",
+        "es-UY",
+        "es-AR"
+      ],
+      "confidence": 0.2551908091366926,
+      "matchedKeywords": [
+        "micro",
+        "wea"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -1473,14 +1709,18 @@
       "text": "Cachái, el guagua trajo computador y papa para el departamento.",
       "expectedDialect": "es-CL",
       "predictedDialect": "es-CL",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-CL",
+        "es-UY",
+        "es-EC"
+      ],
+      "confidence": 0.26157709491572634,
       "matchedKeywords": [
         "computador",
         "papa",
         "departamento",
         "cachái"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1495,10 +1735,16 @@
     {
       "text": "Qué bacán, el pololo me invitó palta y choclo.",
       "expectedDialect": "es-CL",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-UY",
+      "predictedDialect": "es-UY",
+      "top3Predicted": [
+        "es-UY",
+        "es-CL",
+        "es-AR"
+      ],
+      "confidence": 0.20048885001155875,
+      "matchedKeywords": [
+        "ta"
+      ],
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1513,11 +1759,13 @@
       "text": "Esa mina es flaite, siempre anda con liantas.",
       "expectedDialect": "es-CL",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY"
+      ],
+      "confidence": 0.1758982160376105,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1531,11 +1779,13 @@
       "text": "La raja, al tiro llego con los lentes y el maní.",
       "expectedDialect": "es-CL",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1550,11 +1800,13 @@
       "text": "Voy a comprar poroto y frutilla para la once.",
       "expectedDialect": "es-CL",
       "predictedDialect": "es-CL",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CL"
+      ],
+      "confidence": 0.1275954045683463,
       "matchedKeywords": [
         "po"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
@@ -1568,9 +1820,14 @@
       "text": "¡Chucha! Se me olvidó el auto en la calle.",
       "expectedDialect": "es-CL",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1584,9 +1841,13 @@
       "text": "¿Sabes si hay caleta por aquí?",
       "expectedDialect": "es-CL",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CL",
+        "es-UY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-CL vs es-UY)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "hard",
@@ -1598,10 +1859,16 @@
     {
       "text": "Voy a dejar el computador en casa.",
       "expectedDialect": "es-CL",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-CL",
+      "predictedDialect": "es-UY",
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-CL"
+      ],
+      "confidence": 0.1758982160376105,
+      "matchedKeywords": [
+        "ta"
+      ],
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "hard",
@@ -1614,9 +1881,9 @@
       "text": "¿Quieres que prepare algo para comer?",
       "expectedDialect": "es-CL",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1629,7 +1896,12 @@
       "text": "Chamo, pana, qué burda de guara tiene ese apartamento.",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-VE",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-VE",
+        "es-UY",
+        "es-PA"
+      ],
+      "confidence": 0.7082750431837229,
       "matchedKeywords": [
         "apartamento",
         "chamo",
@@ -1637,7 +1909,6 @@
         "guara",
         "pana"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1653,11 +1924,16 @@
       "text": "Qué chévere, el bus trajo computadora y auto para todos.",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-UY",
+        "es-EC"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-PE vs es-VE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-UY)",
       "top1Correct": false,
-      "top3Correct": true,
+      "top3Correct": false,
       "difficulty": "easy",
       "tags": [
         "chévere",
@@ -1670,9 +1946,13 @@
       "text": "Arrecho, ese pajúo sifrino no sabe nada de guarapo.",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CL",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-VE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CL vs es-VE)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1687,10 +1967,16 @@
     {
       "text": "Voy a la porra con el chimbo de morrocoy.",
       "expectedDialect": "es-VE",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-UY",
+      "predictedDialect": "es-CL",
+      "top3Predicted": [
+        "es-CL",
+        "es-UY",
+        "es-GT"
+      ],
+      "confidence": 0.1275954045683463,
+      "matchedKeywords": [
+        "po"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1705,11 +1991,13 @@
       "text": "Dame el lapicero y los lentes para leer la carta.",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY"
+      ],
+      "confidence": 0.1758982160376105,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1723,12 +2011,16 @@
       "text": "Ese ladilla no quiere comer caraota con papa.",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-MX",
+        "es-AR"
+      ],
+      "confidence": 0.1908950516412036,
       "matchedKeywords": [
         "papa",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1742,11 +2034,13 @@
       "text": "Guarambare, hace calor y no hay agua.",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-VE",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-VE"
+      ],
+      "confidence": 0.16530477533812965,
       "matchedKeywords": [
         "guara"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
@@ -1759,9 +2053,14 @@
       "text": "¿Sabes si el carro tiene gasolina?",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1774,11 +2073,16 @@
       "text": "Voy a buscar el auto que dejé en el parqueo.",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-PY",
+        "es-BO",
+        "es-EC"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-PE vs es-VE",
+      "ambiguity": "Input contains conflicting dialect markers (es-PY vs es-BO)",
       "top1Correct": false,
-      "top3Correct": true,
+      "top3Correct": false,
       "difficulty": "hard",
       "tags": [
         "auto",
@@ -1789,9 +2093,13 @@
       "text": "¿Quieres que vayamos juntos mañana?",
       "expectedDialect": "es-VE",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CU",
+        "es-SV"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-SV",
+      "ambiguity": "Input contains conflicting dialect markers (es-CU vs es-SV)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1804,7 +2112,12 @@
       "text": "Che, bo, ¿vos tomás el colectivo al departamento o en auto?",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-AR",
+        "es-PY"
+      ],
+      "confidence": 0.7767264441977699,
       "matchedKeywords": [
         "vos",
         "auto",
@@ -1814,7 +2127,6 @@
         "bo",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1831,12 +2143,16 @@
       "text": "Ta, vamo a la cana después del laburo con el gurí.",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-AR",
+        "es-PY"
+      ],
+      "confidence": 0.3385094469220052,
       "matchedKeywords": [
         "ta",
         "laburo"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -1852,13 +2168,17 @@
       "text": "Qué fiaca, el payador no vino al fogón con mate.",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "fiaca",
@@ -1871,13 +2191,17 @@
       "text": "La gurisa trajo frutilla y poroto para el chajá.",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-CL",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CL",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.1275954045683463,
       "matchedKeywords": [
         "po"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "gurisa",
@@ -1890,9 +2214,9 @@
       "text": "Ese karai tiene mufa, siempre pierde en la changa.",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -1907,12 +2231,16 @@
       "text": "Pasa los anteojos que no veo la computadora.",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-CL"
+      ],
+      "confidence": 0.19697307137790462,
       "matchedKeywords": [
         "computadora",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
@@ -1926,14 +2254,18 @@
       "text": "Vos sabés que esta papa está buena para el auto.",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-PY",
+        "es-AR"
+      ],
+      "confidence": 0.36813379945803415,
       "matchedKeywords": [
         "vos",
         "auto",
         "papa",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
@@ -1947,9 +2279,14 @@
       "text": "¿Sabés dónde queda la parada del colectivo?",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "hard",
@@ -1962,13 +2299,17 @@
       "text": "Cuando vengas, traé el mate que quedó en casa.",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "voseo-verb",
@@ -1979,9 +2320,14 @@
       "text": "Podés dejar el auto acá, no hay problema.",
       "expectedDialect": "es-UY",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CU",
+        "es-CL",
+        "es-AR"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-CL",
+      "ambiguity": "Input contains conflicting dialect markers (es-CU vs es-CL)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -1994,9 +2340,14 @@
       "text": "Che, vos sabés que el chipa y el terere son lo mejor.",
       "expectedDialect": "es-PY",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2011,14 +2362,18 @@
       "text": "Jaha, el mbarete está en el departamento con computadora.",
       "expectedDialect": "es-PY",
       "predictedDialect": "es-PY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-PY",
+        "es-UY",
+        "es-CL"
+      ],
+      "confidence": 0.41558175885016396,
       "matchedKeywords": [
         "computadora",
         "departamento",
         "mbarete",
         "jaha"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2032,12 +2387,16 @@
     {
       "text": "Qué tranquilopa, de balde me hallo en este al pedo.",
       "expectedDialect": "es-PY",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "tranquilopa",
@@ -2051,11 +2410,13 @@
       "text": "El jagua trajo maní y frutilla para el jopara.",
       "expectedDialect": "es-PY",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2069,12 +2430,16 @@
     {
       "text": "Ese chake está vai-vai después del gua'u.",
       "expectedDialect": "es-PY",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "chake",
@@ -2087,9 +2452,14 @@
       "text": "Pasa los anteojos que no veo el bus.",
       "expectedDialect": "es-PY",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2103,9 +2473,14 @@
       "text": "Vos tenés que traer la papa para el auto.",
       "expectedDialect": "es-PY",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-PY",
+        "es-AR",
+        "es-UY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-PY vs es-AR)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "medium",
@@ -2118,12 +2493,16 @@
     {
       "text": "¿Sabés si hay agua en la casa?",
       "expectedDialect": "es-PY",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "voseo",
@@ -2134,11 +2513,13 @@
       "text": "Vení temprano para que no llegues tarde.",
       "expectedDialect": "es-PY",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY"
+      ],
+      "confidence": 0.1758982160376105,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2150,12 +2531,16 @@
     {
       "text": "Hacé lo que te digo y no te arrepentirás.",
       "expectedDialect": "es-PY",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "hard",
       "tags": [
         "voseo-verb",
@@ -2166,11 +2551,13 @@
       "text": "Jallalla, el wawa trajo chairo y api al qhatu.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-BO",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-BO"
+      ],
+      "confidence": 0.15684853414040797,
       "matchedKeywords": [
         "wawa"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2186,9 +2573,14 @@
       "text": "El cholita dejó la computadora en el departamento del joven.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-UY",
+        "es-BO",
+        "es-CL"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-UY vs es-BO",
+      "ambiguity": "Input contains conflicting dialect markers (es-UY vs es-BO)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2203,9 +2595,14 @@
       "text": "Qué pucha, el chango no quiere llajwa con papa.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -2221,9 +2618,9 @@
       "text": "Ese jichi tiene q'omer pero no quiere ch'iti.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2238,9 +2635,9 @@
       "text": "Pasa los lentes y el frijol para el almuerzo.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2254,11 +2651,13 @@
       "text": "El ch'usa no sabe nada de la wawa.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-BO",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-BO"
+      ],
+      "confidence": 0.15684853414040797,
       "matchedKeywords": [
         "wawa"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
@@ -2272,9 +2671,14 @@
       "text": "Vos sabés que el auto está en el qhatu.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2287,10 +2691,14 @@
     {
       "text": "¿Sabés dónde queda el mercado?",
       "expectedDialect": "es-BO",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2303,9 +2711,14 @@
       "text": "Traé la papa que dejaste en la mesa.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2318,11 +2731,15 @@
       "text": "Andá despacio por la calle empedrada.",
       "expectedDialect": "es-BO",
       "predictedDialect": "es-CL",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CL",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.1275954045683463,
       "matchedKeywords": [
         "po"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2335,7 +2752,12 @@
       "text": "Ñaño, qué chévere el guagua con yapa y canguil.",
       "expectedDialect": "es-EC",
       "predictedDialect": "es-EC",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-EC",
+        "es-CU",
+        "es-PR"
+      ],
+      "confidence": 0.7694878554146458,
       "matchedKeywords": [
         "chévere",
         "guagua",
@@ -2343,7 +2765,6 @@
         "ñaño",
         "canguil"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2359,14 +2780,18 @@
       "text": "El chibolo dejó el computador en el departamento con papa.",
       "expectedDialect": "es-EC",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-CL",
+        "es-GT"
+      ],
+      "confidence": 0.36060032496962907,
       "matchedKeywords": [
         "papa",
         "departamento",
         "bo",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -2380,10 +2805,14 @@
     {
       "text": "Qué bacán, el longo trajo caña y esfero.",
       "expectedDialect": "es-EC",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -2398,9 +2827,9 @@
       "text": "Achachay, hace frío, dame el chado de la chulla.",
       "expectedDialect": "es-EC",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2415,11 +2844,15 @@
       "text": "Ese cacho está chuchaqui después de la fiesta.",
       "expectedDialect": "es-EC",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY",
+        "es-AR",
+        "es-PY"
+      ],
+      "confidence": 0.20048885001155875,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2433,9 +2866,9 @@
       "text": "Pasa los lentes y el banano para el almuerzo.",
       "expectedDialect": "es-EC",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2448,10 +2881,17 @@
     {
       "text": "Vamos en carro a buscar maní y guagua.",
       "expectedDialect": "es-EC",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-CU",
+      "predictedDialect": "es-CU",
+      "top3Predicted": [
+        "es-CU",
+        "es-EC",
+        "es-PR"
+      ],
+      "confidence": 0.21679506660095954,
+      "matchedKeywords": [
+        "guagua",
+        "ma"
+      ],
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "medium",
@@ -2466,9 +2906,14 @@
       "text": "¿Sabes si el bus ya pasó?",
       "expectedDialect": "es-EC",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2481,12 +2926,16 @@
       "text": "Voy a dejar la computadora en casa.",
       "expectedDialect": "es-EC",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-CL"
+      ],
+      "confidence": 0.19697307137790462,
       "matchedKeywords": [
         "computadora",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2499,9 +2948,9 @@
       "text": "¿Quieres que prepare algo de comer?",
       "expectedDialect": "es-EC",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2514,7 +2963,12 @@
       "text": "Chapín, qué cabal el carro con shuco y pisto.",
       "expectedDialect": "es-GT",
       "predictedDialect": "es-GT",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-GT",
+        "es-HN",
+        "es-SV"
+      ],
+      "confidence": 0.6928853405700192,
       "matchedKeywords": [
         "carro",
         "chapín",
@@ -2522,7 +2976,6 @@
         "shuco",
         "pisto"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2538,7 +2991,12 @@
       "text": "Bo, dejé la computadora en el departamento con papa.",
       "expectedDialect": "es-GT",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-GT",
+        "es-CL"
+      ],
+      "confidence": 0.4062658142838715,
       "matchedKeywords": [
         "computadora",
         "papa",
@@ -2546,7 +3004,6 @@
         "bo",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2560,10 +3017,16 @@
     {
       "text": "Qué shute, el chucho no quiere clavo ni cipote.",
       "expectedDialect": "es-GT",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-HN",
+      "predictedDialect": "es-CL",
+      "top3Predicted": [
+        "es-CL",
+        "es-HN",
+        "es-SV"
+      ],
+      "confidence": 0.1275954045683463,
+      "matchedKeywords": [
+        "po"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -2579,9 +3042,14 @@
       "text": "Ese canche es culero, siempre trae morral vacío.",
       "expectedDialect": "es-GT",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2596,9 +3064,9 @@
       "text": "Pasa los lentes y el frijol para la cena.",
       "expectedDialect": "es-GT",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2612,14 +3080,18 @@
       "text": "El patojo hizo bochinche en el istmo.",
       "expectedDialect": "es-GT",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-GT",
+        "es-AR"
+      ],
+      "confidence": 0.2538842070149034,
       "matchedKeywords": [
         "che",
         "bo"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "patojo",
@@ -2631,10 +3103,17 @@
     {
       "text": "Vamos en bus a comprar papa y plátano.",
       "expectedDialect": "es-GT",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "predictedDialect": "es-UY",
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-PE"
+      ],
+      "confidence": 0.1908950516412036,
+      "matchedKeywords": [
+        "papa",
+        "ta"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2648,9 +3127,14 @@
       "text": "¿Sabes si el carro tiene gasolina?",
       "expectedDialect": "es-GT",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "hard",
@@ -2663,9 +3147,14 @@
       "text": "Voy a lavar el auto antes de salir.",
       "expectedDialect": "es-GT",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2678,11 +3167,13 @@
       "text": "¿Quieres que vayamos temprano?",
       "expectedDialect": "es-GT",
       "predictedDialect": "es-SV",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-SV"
+      ],
+      "confidence": 0.1799950499872203,
       "matchedKeywords": [
         "vaya"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2695,7 +3186,12 @@
       "text": "Catracho, qué maje, el carro tiene pisto y cipote.",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-HN",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-HN",
+        "es-SV",
+        "es-NI"
+      ],
+      "confidence": 0.6740184062213297,
       "matchedKeywords": [
         "carro",
         "catracho",
@@ -2703,7 +3199,6 @@
         "cipote",
         "pisto"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2719,14 +3214,18 @@
       "text": "Dejé la computadora en el departamento con papa y frijol.",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-CL",
+        "es-CO"
+      ],
+      "confidence": 0.26824521737342505,
       "matchedKeywords": [
         "computadora",
         "papa",
         "departamento",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -2740,10 +3239,16 @@
     {
       "text": "Qué chuco, el ñaño no quiere chure ni choco.",
       "expectedDialect": "es-HN",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-EC vs es-HN",
+      "predictedDialect": "es-EC",
+      "top3Predicted": [
+        "es-EC",
+        "es-HN",
+        "es-SV"
+      ],
+      "confidence": 0.193425764646887,
+      "matchedKeywords": [
+        "ñaño"
+      ],
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2759,11 +3264,13 @@
       "text": "Ese mañe es bayunco, siempre trae pichu sucio.",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2778,9 +3285,14 @@
       "text": "Pasa los lentes que no veo el bus.",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2794,9 +3306,14 @@
       "text": "El chepa trajo cirilo para el arrastrado.",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2811,9 +3328,14 @@
       "text": "Vamos en carro a buscar papa y frijol.",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "medium",
@@ -2828,9 +3350,15 @@
       "text": "¿Sabes si ya llegó el autobús?",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-ES vs es-MX",
+      "top3Predicted": [
+        "es-ES",
+        "es-MX",
+        "es-AR"
+      ],
+      "confidence": 0.11038500540045101,
+      "matchedKeywords": [
+        "autobús"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2843,9 +3371,14 @@
       "text": "Voy a dejar el auto en la casa.",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2858,9 +3391,9 @@
       "text": "¿Quieres que prepare la cena?",
       "expectedDialect": "es-HN",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -2873,7 +3406,12 @@
       "text": "Guanaco, qué chuco, el carro tiene pisto y cipote.",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-SV",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-SV",
+        "es-HN",
+        "es-NI"
+      ],
+      "confidence": 0.6352585819219574,
       "matchedKeywords": [
         "carro",
         "guanaco",
@@ -2881,7 +3419,6 @@
         "cipote",
         "pisto"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -2897,14 +3434,18 @@
       "text": "Dejé la computadora en el departamento con papa.",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-CL",
+        "es-CO"
+      ],
+      "confidence": 0.26824521737342505,
       "matchedKeywords": [
         "computadora",
         "papa",
         "departamento",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -2918,9 +3459,14 @@
       "text": "Qué tuanis, el chero trajo chel y chunche.",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -2936,9 +3482,9 @@
       "text": "Ese bicho es cerote, siempre trae puch sucio.",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2953,9 +3499,9 @@
       "text": "Pasa los lentes y el frijol para la cena.",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2969,11 +3515,13 @@
       "text": "El chamba trajo chivo para el pacha.",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-MX",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-MX"
+      ],
+      "confidence": 0.14373834854278555,
       "matchedKeywords": [
         "chamba"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -2988,9 +3536,14 @@
       "text": "Vamos en bus a buscar papa y lentes.",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3005,9 +3558,14 @@
       "text": "¿Sabes si el carro está listo?",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3020,9 +3578,14 @@
       "text": "Voy a lavar el auto antes de irme.",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3035,9 +3598,9 @@
       "text": "¿Quieres que te ayude con eso?",
       "expectedDialect": "es-SV",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3050,9 +3613,14 @@
       "text": "Nica, qué maje, el carro tiene pisto y cipote.",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-HN",
+        "es-NI",
+        "es-SV"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-HN vs es-NI",
+      "ambiguity": "Input contains conflicting dialect markers (es-HN vs es-NI)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -3068,14 +3636,18 @@
       "text": "Dejé la computadora en el departamento con papa.",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-CL",
+        "es-CO"
+      ],
+      "confidence": 0.26824521737342505,
       "matchedKeywords": [
         "computadora",
         "papa",
         "departamento",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -3088,11 +3660,18 @@
     {
       "text": "Qué chigüe, el chunche no quiere bole ni sapién.",
       "expectedDialect": "es-NI",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-UY vs es-NI",
-      "top1Correct": false,
+      "predictedDialect": "es-NI",
+      "top3Predicted": [
+        "es-NI",
+        "es-UY",
+        "es-GT"
+      ],
+      "confidence": 0.36755210155524276,
+      "matchedKeywords": [
+        "chigüe",
+        "sapién"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -3107,9 +3686,9 @@
       "text": "Ese pinolero es arre, siempre trae pichilingo.",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3124,9 +3703,9 @@
       "text": "Pasa los lentes y el frijol para la cena.",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3140,12 +3719,16 @@
       "text": "El chele trajo naca para el samaritano.",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-CU",
+        "es-AR"
+      ],
+      "confidence": 0.29176182614206747,
       "matchedKeywords": [
         "che",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3160,9 +3743,14 @@
       "text": "Vamos en bus a buscar papa y lentes.",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3177,9 +3765,15 @@
       "text": "¿Sabes si ya pasó el autobús?",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-ES vs es-MX",
+      "top3Predicted": [
+        "es-ES",
+        "es-MX",
+        "es-AR"
+      ],
+      "confidence": 0.11038500540045101,
+      "matchedKeywords": [
+        "autobús"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3192,9 +3786,14 @@
       "text": "Voy a dejar el carro en la casa.",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3207,9 +3806,9 @@
       "text": "¿Quieres que prepare algo de comer?",
       "expectedDialect": "es-NI",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3222,14 +3821,18 @@
       "text": "Tico, pura vida, el mae trajo pisto y chine.",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-CR",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-CR",
+        "es-CU",
+        "es-GT"
+      ],
+      "confidence": 0.6113379090261083,
       "matchedKeywords": [
         "tico",
         "mae",
         "chine",
         "pura vida"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -3244,10 +3847,19 @@
     {
       "text": "Dejé la computadora en el departamento con carro y papa.",
       "expectedDialect": "es-CR",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-UY vs es-GT",
+      "predictedDialect": "es-UY",
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-CL"
+      ],
+      "confidence": 0.26824521737342505,
+      "matchedKeywords": [
+        "computadora",
+        "papa",
+        "departamento",
+        "ta"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -3262,9 +3874,14 @@
       "text": "Qué tuanis, el guaro trajo chunche y brete.",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-AR vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -3280,9 +3897,9 @@
       "text": "Ese roine es sarasa, siempre trae jupa.",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3297,9 +3914,9 @@
       "text": "Pasa los lentes y el frijol para la cena.",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3313,9 +3930,13 @@
       "text": "El yigüirro trajo bomba para el carajillo.",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-UY",
+        "es-GT"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-UY vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-UY vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3330,9 +3951,14 @@
       "text": "Vamos en bus a la pulpería con papa.",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3347,9 +3973,14 @@
       "text": "¿Sabes si el carro tiene gasolina?",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3362,9 +3993,14 @@
       "text": "Voy a dejar el auto en la casa.",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3377,11 +4013,13 @@
       "text": "¿Quieres que vayamos juntos?",
       "expectedDialect": "es-CR",
       "predictedDialect": "es-SV",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-SV"
+      ],
+      "confidence": 0.1799950499872203,
       "matchedKeywords": [
         "vaya"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3394,7 +4032,12 @@
       "text": "Pana, qué xopa, el carro tiene chuleta y yeye.",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-PA",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-PA",
+        "es-UY",
+        "es-VE"
+      ],
+      "confidence": 0.679757134080037,
       "matchedKeywords": [
         "carro",
         "pana",
@@ -3402,7 +4045,6 @@
         "yeye",
         "qué xopa"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -3418,14 +4060,18 @@
       "text": "Dejé la computadora en el departamento con papa.",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-UY",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-UY",
+        "es-CL",
+        "es-CO"
+      ],
+      "confidence": 0.26824521737342505,
       "matchedKeywords": [
         "computadora",
         "papa",
         "departamento",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -3438,11 +4084,17 @@
     {
       "text": "Qué chombo, el chivo no quiere fufu ni pitillo.",
       "expectedDialect": "es-PA",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-UY vs es-GT",
-      "top1Correct": false,
+      "predictedDialect": "es-PA",
+      "top3Predicted": [
+        "es-PA",
+        "es-UY",
+        "es-GT"
+      ],
+      "confidence": 0.17718324819995496,
+      "matchedKeywords": [
+        "chombo"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -3457,9 +4109,13 @@
       "text": "Ese sorrin es majare, siempre trae talla.",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CU",
+        "es-UY"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-CU vs es-UY)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3474,9 +4130,9 @@
       "text": "Pasa los lentes y el frijol para la cena.",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3490,9 +4146,9 @@
       "text": "El pelar trajo aju para el tongo.",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3507,9 +4163,14 @@
       "text": "Vamos en bus a buscar papa y lentes.",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3524,9 +4185,14 @@
       "text": "¿Sabes si el carro está listo?",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3539,9 +4205,14 @@
       "text": "Voy a lavar el auto antes de salir.",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3554,9 +4225,9 @@
       "text": "¿Quieres que te acompañe?",
       "expectedDialect": "es-PA",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3569,14 +4240,18 @@
       "text": "Tiguere, qué lo qué, el apartamento tiene guagua y concho.",
       "expectedDialect": "es-DO",
       "predictedDialect": "es-DO",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-DO",
+        "es-UY",
+        "es-PR"
+      ],
+      "confidence": 0.5649310024126081,
       "matchedKeywords": [
         "apartamento",
         "tiguere",
         "concho",
         "qué lo qué"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -3591,12 +4266,21 @@
     {
       "text": "Dejé la computadora en el apartamento con auto y papa.",
       "expectedDialect": "es-DO",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-VE vs es-UY",
+      "predictedDialect": "es-UY",
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-CL"
+      ],
+      "confidence": 0.2766689128055748,
+      "matchedKeywords": [
+        "computadora",
+        "auto",
+        "papa",
+        "ta"
+      ],
       "top1Correct": false,
-      "top3Correct": true,
+      "top3Correct": false,
       "difficulty": "easy",
       "tags": [
         "computadora",
@@ -3608,10 +4292,14 @@
     {
       "text": "Qué chin, el jevo trajo china y kukú.",
       "expectedDialect": "es-DO",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -3627,9 +4315,9 @@
       "text": "Ese papichulo es vaina, siempre trae bandola.",
       "expectedDialect": "es-DO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3644,9 +4332,9 @@
       "text": "Pasa los lentes y la habichuela para la cena.",
       "expectedDialect": "es-DO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3660,11 +4348,13 @@
       "text": "El concon trajo vívere para el aplatar.",
       "expectedDialect": "es-DO",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY"
+      ],
+      "confidence": 0.1758982160376105,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3679,9 +4369,14 @@
       "text": "Vamos en bus a buscar papa y lentes.",
       "expectedDialect": "es-DO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3696,9 +4391,14 @@
       "text": "¿Sabes si el auto tiene gasolina?",
       "expectedDialect": "es-DO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3711,9 +4411,14 @@
       "text": "Voy a dejar el carro en la casa.",
       "expectedDialect": "es-DO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3726,9 +4431,9 @@
       "text": "¿Quieres que prepare la cena?",
       "expectedDialect": "es-DO",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3741,14 +4446,18 @@
       "text": "Broki, qué chevere, el apartamento tiene guagua y pichar.",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-PR",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-PR",
+        "es-UY",
+        "es-PE"
+      ],
+      "confidence": 0.47492130756350576,
       "matchedKeywords": [
         "guagua",
         "apartamento",
         "pichar",
         "broki"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -3763,10 +4472,19 @@
     {
       "text": "Dejé la computadora en el apartamento con auto y papa.",
       "expectedDialect": "es-PR",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-VE vs es-UY",
+      "predictedDialect": "es-UY",
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-CL"
+      ],
+      "confidence": 0.2766689128055748,
+      "matchedKeywords": [
+        "computadora",
+        "auto",
+        "papa",
+        "ta"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -3781,9 +4499,14 @@
       "text": "Qué cabra, el jevo trajo zafacón y pulpo.",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CL",
+        "es-PR",
+        "es-AR"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-PR",
+      "ambiguity": "Input contains conflicting dialect markers (es-CL vs es-PR)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -3799,11 +4522,13 @@
       "text": "Ese bichote es chota, siempre trae floor.",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-UY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-UY"
+      ],
+      "confidence": 0.1758982160376105,
       "matchedKeywords": [
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3818,9 +4543,9 @@
       "text": "Pasa los lentes y la habichuela para la cena.",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3834,11 +4559,13 @@
       "text": "El nene trajo mami para el papi.",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -3853,15 +4580,19 @@
       "text": "Vamos en guagua a buscar papa y lentes.",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-EC",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-EC",
+        "es-CU",
+        "es-PR"
+      ],
+      "confidence": 0.16901804737427306,
       "matchedKeywords": [
         "papa",
         "bus",
         "guagua"
       ],
-      "ambiguity": null,
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "guagua",
@@ -3874,9 +4605,14 @@
       "text": "¿Sabes si el auto está listo?",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3889,9 +4625,14 @@
       "text": "Voy a dejar el carro en el parking.",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3905,11 +4646,13 @@
       "text": "¿Quieres que vayamos juntos?",
       "expectedDialect": "es-PR",
       "predictedDialect": "es-SV",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-SV"
+      ],
+      "confidence": 0.1799950499872203,
       "matchedKeywords": [
         "vaya"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -3922,7 +4665,12 @@
       "text": "Guineano, qué ñame, el malabo tiene fufú y bubi.",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-GQ",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-GQ",
+        "es-CU",
+        "es-UY"
+      ],
+      "confidence": 0.584166646200032,
       "matchedKeywords": [
         "guineano",
         "malabo",
@@ -3930,7 +4678,6 @@
         "ñame",
         "fufú"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -3946,12 +4693,16 @@
       "text": "Dejé la computadora en el río muni con batata.",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-UY",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-UY",
+        "es-CO",
+        "es-CL"
+      ],
+      "confidence": 0.22156370535185288,
       "matchedKeywords": [
         "computadora",
         "ta"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -3965,11 +4716,15 @@
       "text": "Qué bangá, el fang trajo ndowe y mongomo.",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-GQ",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-GQ",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.1168333292400064,
       "matchedKeywords": [
         "fang"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -3985,11 +4740,13 @@
       "text": "Ese annobón es camisola, siempre trae bacalao.",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-GQ",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-GQ"
+      ],
+      "confidence": 0.1168333292400064,
       "matchedKeywords": [
         "annobón"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
@@ -4004,9 +4761,14 @@
       "text": "Pasa los lentes y la papa para la cena.",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4020,12 +4782,15 @@
       "text": "El bioko trajo malamba para el guineano.",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-GQ",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-GQ",
+        "es-CU"
+      ],
+      "confidence": 0.2336666584800128,
       "matchedKeywords": [
         "guineano",
         "bioko"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "medium",
@@ -4040,9 +4805,14 @@
       "text": "Vamos en bus a buscar papa y lentes.",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4057,9 +4827,14 @@
       "text": "¿Sabes si el carro tiene gasolina?",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4072,9 +4847,14 @@
       "text": "Voy a dejar el auto en la casa.",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4087,9 +4867,9 @@
       "text": "¿Quieres que prepare algo de comer?",
       "expectedDialect": "es-GQ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4102,7 +4882,12 @@
       "text": "Vato, qué neta, la troca tiene lonche y wacha.",
       "expectedDialect": "es-US",
       "predictedDialect": "es-US",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-US",
+        "es-UY",
+        "es-AR"
+      ],
+      "confidence": 0.5734348260546066,
       "matchedKeywords": [
         "troca",
         "lonche",
@@ -4110,7 +4895,6 @@
         "vato",
         "neta"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -4126,11 +4910,16 @@
       "text": "Voy a parquear el carro cerca de la computadora.",
       "expectedDialect": "es-US",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-UY",
+        "es-US"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-UY",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-UY)",
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "easy",
       "tags": [
         "parquear",
@@ -4142,12 +4931,16 @@
       "text": "Qué cholo, el carnal trajo firme y simón.",
       "expectedDialect": "es-US",
       "predictedDialect": "es-US",
-      "confidence": 0.6666666666666666,
+      "top3Predicted": [
+        "es-US",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.2396971236408145,
       "matchedKeywords": [
         "cholo",
         "carnal"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -4163,9 +4956,9 @@
       "text": "Ese huero es fresa, siempre trae chafa.",
       "expectedDialect": "es-US",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4179,12 +4972,18 @@
     {
       "text": "Pasa los lentes y la papa para el lonche.",
       "expectedDialect": "es-US",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-AR vs es-UY",
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-US",
+      "top3Predicted": [
+        "es-US",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.11984856182040725,
+      "matchedKeywords": [
+        "lonche"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "lentes",
@@ -4197,9 +4996,9 @@
       "text": "El mijo trajo mija para la raza.",
       "expectedDialect": "es-US",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4214,11 +5013,16 @@
       "text": "Mande, voy en troca a buscar papa.",
       "expectedDialect": "es-US",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CU",
+        "es-US",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-CU",
+      "ambiguity": "Input contains conflicting dialect markers (es-CU vs es-US)",
       "top1Correct": false,
-      "top3Correct": false,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "mande",
@@ -4231,9 +5035,14 @@
       "text": "¿Sabes si el carro está listo?",
       "expectedDialect": "es-US",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4246,9 +5055,14 @@
       "text": "Voy a dejar el auto en la casa.",
       "expectedDialect": "es-US",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4261,11 +5075,13 @@
       "text": "¿Quieres que vayamos juntos?",
       "expectedDialect": "es-US",
       "predictedDialect": "es-SV",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-SV"
+      ],
+      "confidence": 0.1799950499872203,
       "matchedKeywords": [
         "vaya"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4278,7 +5094,12 @@
       "text": "Kame, qué jendeh, el kita tiene tamén y onde.",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-PH",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-PH",
+        "es-UY",
+        "es-AR"
+      ],
+      "confidence": 0.584166646200032,
       "matchedKeywords": [
         "jendeh",
         "kame",
@@ -4286,7 +5107,6 @@
         "tamén",
         "onde"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -4301,11 +5121,18 @@
     {
       "text": "Dejé la computadora con conele y vusos.",
       "expectedDialect": "es-PH",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-UY vs es-PH",
-      "top1Correct": false,
+      "predictedDialect": "es-PH",
+      "top3Predicted": [
+        "es-PH",
+        "es-UY",
+        "es-CO"
+      ],
+      "confidence": 0.2336666584800128,
+      "matchedKeywords": [
+        "conele",
+        "vusos"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -4318,11 +5145,15 @@
       "text": "Qué quilaya, el sila trajo connosotros y nisos.",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-PH",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-PH",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.1168333292400064,
       "matchedKeywords": [
         "quilaya"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -4338,9 +5169,9 @@
       "text": "Ese kamo es mo'o, siempre trae evo.",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4355,9 +5186,14 @@
       "text": "Pasa los lentes y la papa para la cena.",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4371,11 +5207,13 @@
       "text": "El jaha trajo akon para el dele.",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-PY",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-PY"
+      ],
+      "confidence": 0.18069215766054703,
       "matchedKeywords": [
         "jaha"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4390,9 +5228,14 @@
       "text": "Vamos en bus a buscar papa y lentes.",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4407,9 +5250,14 @@
       "text": "¿Sabes si el carro tiene gasolina?",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4422,9 +5270,14 @@
       "text": "Voy a dejar el auto en la casa.",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4437,9 +5290,9 @@
       "text": "¿Quieres que prepare algo de comer?",
       "expectedDialect": "es-PH",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4452,7 +5305,12 @@
       "text": "Beliceño, qué kriol, el garífuna tiene cayos y mestizo.",
       "expectedDialect": "es-BZ",
       "predictedDialect": "es-BZ",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-BZ",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.584166646200032,
       "matchedKeywords": [
         "beliceño",
         "kriol",
@@ -4460,7 +5318,6 @@
         "cayos",
         "mestizo"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -4475,11 +5332,18 @@
     {
       "text": "Dejé la computadora en dangriga con criollo.",
       "expectedDialect": "es-BZ",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-UY vs es-BZ",
-      "top1Correct": false,
+      "predictedDialect": "es-BZ",
+      "top3Predicted": [
+        "es-BZ",
+        "es-UY",
+        "es-CO"
+      ],
+      "confidence": 0.2336666584800128,
+      "matchedKeywords": [
+        "criollo",
+        "dangriga"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -4492,9 +5356,14 @@
       "text": "Qué breki, el mopan trajo zapote y cayuco.",
       "expectedDialect": "es-BZ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CL",
+        "es-BZ",
+        "es-AR"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CL vs es-BZ",
+      "ambiguity": "Input contains conflicting dialect markers (es-CL vs es-BZ)",
       "top1Correct": false,
       "top3Correct": true,
       "difficulty": "easy",
@@ -4510,9 +5379,9 @@
       "text": "Ese kekchi es bway, siempre trae yucatec.",
       "expectedDialect": "es-BZ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4527,9 +5396,14 @@
       "text": "Pasa los lentes y la papa para la cena.",
       "expectedDialect": "es-BZ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4542,12 +5416,18 @@
     {
       "text": "El placencia trajo carro para el beliceño.",
       "expectedDialect": "es-BZ",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
-      "top1Correct": false,
-      "top3Correct": false,
+      "predictedDialect": "es-BZ",
+      "top3Predicted": [
+        "es-BZ",
+        "es-CO",
+        "es-GT"
+      ],
+      "confidence": 0.1168333292400064,
+      "matchedKeywords": [
+        "beliceño"
+      ],
+      "top1Correct": true,
+      "top3Correct": true,
       "difficulty": "medium",
       "tags": [
         "placencia",
@@ -4560,9 +5440,14 @@
       "text": "Vamos en bus a buscar papa y lentes.",
       "expectedDialect": "es-BZ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4577,9 +5462,14 @@
       "text": "¿Sabes si el carro está listo?",
       "expectedDialect": "es-BZ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4592,9 +5482,14 @@
       "text": "Voy a dejar el auto en la casa.",
       "expectedDialect": "es-BZ",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CU"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4607,11 +5502,13 @@
       "text": "¿Quieres que vayamos juntos?",
       "expectedDialect": "es-BZ",
       "predictedDialect": "es-SV",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-SV"
+      ],
+      "confidence": 0.1799950499872203,
       "matchedKeywords": [
         "vaya"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4624,7 +5521,12 @@
       "text": "Andorrano, qué pirineo, el canillo tiene escaldes y encamp.",
       "expectedDialect": "es-AD",
       "predictedDialect": "es-AD",
-      "confidence": 1,
+      "top3Predicted": [
+        "es-AD",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.7009999754400384,
       "matchedKeywords": [
         "andorrano",
         "canillo",
@@ -4633,7 +5535,6 @@
         "pirineo",
         "andorra"
       ],
-      "ambiguity": null,
       "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
@@ -4648,11 +5549,18 @@
     {
       "text": "Dejé la computadora en ordino con massana.",
       "expectedDialect": "es-AD",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-CU vs es-UY",
-      "top1Correct": false,
+      "predictedDialect": "es-AD",
+      "top3Predicted": [
+        "es-AD",
+        "es-UY",
+        "es-CU"
+      ],
+      "confidence": 0.2336666584800128,
+      "matchedKeywords": [
+        "ordino",
+        "massana"
+      ],
+      "top1Correct": true,
       "top3Correct": true,
       "difficulty": "easy",
       "tags": [
@@ -4664,10 +5572,14 @@
     {
       "text": "Qué caldea, el comú trajo parroquia y principado.",
       "expectedDialect": "es-AD",
-      "predictedDialect": "es-ES",
-      "confidence": 0,
+      "predictedDialect": "es-AR",
+      "top3Predicted": [
+        "es-AR",
+        "es-UY",
+        "es-PY"
+      ],
+      "confidence": 0.023693192261558284,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "easy",
@@ -4682,11 +5594,13 @@
       "text": "Ese vall es pas, siempre trae madriu.",
       "expectedDialect": "es-AD",
       "predictedDialect": "es-CU",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-CU"
+      ],
+      "confidence": 0.13070203859464202,
       "matchedKeywords": [
         "ma"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4701,9 +5615,14 @@
       "text": "Pasa los lentes y la papa para la cena.",
       "expectedDialect": "es-AD",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-MX",
+        "es-AR",
+        "es-CO"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-MX vs es-AR",
+      "ambiguity": "Input contains conflicting dialect markers (es-MX vs es-AR)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4717,9 +5636,9 @@
       "text": "El xaval trajo doncs para el aixo.",
       "expectedDialect": "es-AD",
       "predictedDialect": "es-ES",
+      "top3Predicted": [],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4734,9 +5653,14 @@
       "text": "Vamos en bus a buscar papa y lentes.",
       "expectedDialect": "es-AD",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-PE",
+        "es-VE"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-PE",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-PE)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "medium",
@@ -4751,9 +5675,14 @@
       "text": "¿Sabéis si el carro está listo?",
       "expectedDialect": "es-AD",
       "predictedDialect": "es-ES",
+      "top3Predicted": [
+        "es-CO",
+        "es-GT",
+        "es-HN"
+      ],
       "confidence": 0,
       "matchedKeywords": [],
-      "ambiguity": "Tied: es-CO vs es-GT",
+      "ambiguity": "Input contains conflicting dialect markers (es-CO vs es-GT)",
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4766,9 +5695,15 @@
       "text": "Voy a dejar el coche en la casa.",
       "expectedDialect": "es-AD",
       "predictedDialect": "es-ES",
-      "confidence": 0,
-      "matchedKeywords": [],
-      "ambiguity": "Tied: es-ES vs es-AR",
+      "top3Predicted": [
+        "es-ES",
+        "es-AR",
+        "es-UY"
+      ],
+      "confidence": 0.11038500540045101,
+      "matchedKeywords": [
+        "coche"
+      ],
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
@@ -4781,11 +5716,14 @@
       "text": "¿Queréis que vayamos juntos?",
       "expectedDialect": "es-AD",
       "predictedDialect": "es-SV",
-      "confidence": 0.3333333333333333,
+      "top3Predicted": [
+        "es-SV",
+        "es-ES"
+      ],
+      "confidence": 0.1799950499872203,
       "matchedKeywords": [
         "vaya"
       ],
-      "ambiguity": null,
       "top1Correct": false,
       "top3Correct": false,
       "difficulty": "hard",
