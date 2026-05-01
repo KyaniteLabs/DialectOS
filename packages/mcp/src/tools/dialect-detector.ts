@@ -48,6 +48,22 @@ const DIALECT_POTENTIAL = (() => {
   return map;
 })();
 
+/** Pre-compiled regexes for each keyword using Unicode word boundaries.
+ *  Prevents substring false-positives (e.g. "po" inside "poco", "ta" inside "prestas").
+ */
+const KEYWORD_REGEXES = (() => {
+  const map = new Map<string, RegExp>();
+  for (const d of DIALECT_METADATA) {
+    for (const k of d.keywords) {
+      if (!map.has(k)) {
+        const escaped = k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        map.set(k, new RegExp(`(?<!\\p{L})${escaped}(?!\\p{L})`, "iu"));
+      }
+    }
+  }
+  return map;
+})();
+
 /* ------------------------------------------------------------------ */
 /*  Grammar scoring constants                                          */
 /* ------------------------------------------------------------------ */
@@ -106,7 +122,6 @@ export function detectDialect(text: string): DetectionResult {
  * Useful for benchmark top-N evaluation.
  */
 export function scoreAllDialects(text: string): ScoredDialect[] {
-  const lowerText = text.toLowerCase();
   const grammarSignals = detectGrammarSignals(text);
   const scores: ScoredDialect[] = [];
 
@@ -115,9 +130,9 @@ export function scoreAllDialects(text: string): ScoredDialect[] {
     const matchedKeywords: string[] = [];
 
     for (const keyword of dialect.keywords) {
-      const lowerKeyword = keyword.toLowerCase();
-      if (lowerText.includes(lowerKeyword)) {
-        keywordScore += KEYWORD_WEIGHTS.get(lowerKeyword) || 0;
+      const re = KEYWORD_REGEXES.get(keyword)!;
+      if (re.test(text)) {
+        keywordScore += KEYWORD_WEIGHTS.get(keyword.toLowerCase()) || 0;
         matchedKeywords.push(keyword);
       }
     }
