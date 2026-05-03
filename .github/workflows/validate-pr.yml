@@ -9,6 +9,10 @@ on:
       - '**/*-es-*.md'
       - 'locales/**'
 
+concurrency:
+  group: validate-pr-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     runs-on: blacksmith-2vcpu-ubuntu-2404
