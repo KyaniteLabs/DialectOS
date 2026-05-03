@@ -27,7 +27,7 @@
     "@dialectos/security": "workspace:*",
     "@dialectos/types": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "zod": "^4.4.1"
+    "zod": "^4.4.2"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

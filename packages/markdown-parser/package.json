@@ -22,8 +22,8 @@
     "@dialectos/security": "workspace:*",
     "@dialectos/types": "workspace:*",
     "isomorphic-dompurify": "^3.12.0",
-    "marked": "^18.0.3",
-    "zod": "^4.4.1"
+    "marked": "^18.0.2",
+    "zod": "^4.4.2"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
