@@ -43,10 +43,15 @@ jobs:
         run: |
           for pkg in packages/*; do
             [ -f "$pkg/package.json" ] || continue
-            (cd "$pkg" && npm pack --dry-run) >/tmp/"$(basename "$pkg")"-pack.txt 2>&1
-            if grep -E 'src/__tests__|src/.*\.test\.ts|fixtures/' /tmp/"$(basename "$pkg")"-pack.txt; then
-              echo "Unexpected test/source fixture content in package $pkg"
-              cat /tmp/"$(basename "$pkg")"-pack.txt
+            name="$(basename "$pkg")"
+            if ! (cd "$pkg" && npm pack --dry-run) >/tmp/"$name"-pack.txt 2>&1; then
+              echo "::error::npm pack failed for $pkg"
+              cat /tmp/"$name"-pack.txt
+              exit 1
+            fi
+            if grep -E 'src/__tests__|src/.*\.test\.ts|fixtures/' /tmp/"$name"-pack.txt; then
+              echo "::error::Unexpected test/source fixture content in package $pkg"
+              cat /tmp/"$name"-pack.txt
               exit 1
             fi
           done
