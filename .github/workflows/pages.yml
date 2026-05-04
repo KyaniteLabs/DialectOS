@@ -24,25 +24,22 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
-      # Preflight check for GNU tar availability
-      - name: Check required tools
+      # Ensure GNU tar is available as 'gtar' (required by upload-pages-artifact)
+      - name: Ensure gtar is available
         run: |
-          TAR_CMD=""
           if command -v gtar &> /dev/null; then
-            TAR_CMD="gtar"
-          elif command -v tar &> /dev/null && tar --version 2>&1 | grep -q "GNU tar"; then
-            TAR_CMD="tar"
+            echo "gtar already available"
+            gtar --version | head -n 1
+          elif command -v brew &> /dev/null; then
+            echo "macOS runner detected — installing GNU tar via coreutils"
+            brew install coreutils
+            echo "Installed gtar:"
+            gtar --version | head -n 1
+          else
+            echo "Creating gtar symlink to GNU tar"
+            sudo ln -sf "$(command -v tar)" /usr/local/bin/gtar
+            gtar --version | head -n 1
           fi
-          
-          if [ -z "$TAR_CMD" ]; then
-            echo "ERROR: GNU tar is not found in PATH"
-            echo "This workflow requires GNU tar to be available."
-            echo "On macOS runners, install with: brew install coreutils"
-            exit 1
-          fi
-          
-          echo "$TAR_CMD found at: $(which $TAR_CMD)"
-          $TAR_CMD --version | head -n 1
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
