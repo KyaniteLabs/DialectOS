@@ -24,6 +24,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      # Preflight check for gtar (GNU tar) availability
+      - name: Check required tools
+        run: |
+          if ! command -v gtar &> /dev/null; then
+            echo "ERROR: 'gtar' (GNU tar) is not found in PATH"
+            echo "This workflow requires GNU tar (gtar) to be available."
+            echo "On macOS runners, install with: brew install coreutils"
+            exit 1
+          fi
+          echo "gtar found at: $(which gtar)"
+          gtar --version | head -n 1
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
