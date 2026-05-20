@@ -21,7 +21,7 @@
   "dependencies": {
     "@dialectos/security": "workspace:*",
     "@dialectos/types": "workspace:*",
-    "isomorphic-dompurify": "^3.12.0",
+    "isomorphic-dompurify": "^3.13.0",
     "marked": "^18.0.3",
     "zod": "^4.4.3"
   },

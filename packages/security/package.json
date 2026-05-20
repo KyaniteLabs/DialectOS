@@ -19,7 +19,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "isomorphic-dompurify": "^3.12.0",
+    "isomorphic-dompurify": "^3.13.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
