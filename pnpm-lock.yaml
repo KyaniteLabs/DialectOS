@@ -47,14 +47,14 @@ importers:
         version: 14.0.3
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
+        specifier: ^25.9.1
+        version: 25.9.1
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
       vitest:
         specifier: ^4.1.6
-        version: 4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+        version: 4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
 
   packages/locale-utils:
     dependencies:
@@ -69,14 +69,14 @@ importers:
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
+        specifier: ^25.9.1
+        version: 25.9.1
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
       vitest:
         specifier: ^4.1.6
-        version: 4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+        version: 4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
 
   packages/markdown-parser:
     dependencies:
@@ -90,21 +90,21 @@ importers:
         specifier: ^3.13.0
         version: 3.13.0
       marked:
-        specifier: ^18.0.3
-        version: 18.0.3
+        specifier: ^18.0.4
+        version: 18.0.4
       zod:
         specifier: ^4.4.3
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
+        specifier: ^25.9.1
+        version: 25.9.1
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
       vitest:
         specifier: ^4.1.6
-        version: 4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+        version: 4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
 
   packages/mcp:
     dependencies:
@@ -131,14 +131,14 @@ importers:
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
+        specifier: ^25.9.1
+        version: 25.9.1
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
       vitest:
         specifier: ^4.1.6
-        version: 4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+        version: 4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
 
   packages/providers:
     dependencies:
@@ -153,14 +153,14 @@ importers:
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
+        specifier: ^25.9.1
+        version: 25.9.1
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
       vitest:
         specifier: ^4.1.6
-        version: 4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+        version: 4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
 
   packages/security:
     dependencies:
@@ -172,14 +172,14 @@ importers:
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
+        specifier: ^25.9.1
+        version: 25.9.1
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
       vitest:
         specifier: ^4.1.6
-        version: 4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+        version: 4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
 
   packages/types:
     dependencies:
@@ -188,14 +188,14 @@ importers:
         version: 4.4.3
     devDependencies:
       '@types/node':
-        specifier: ^25.6.0
-        version: 25.6.0
+        specifier: ^25.9.1
+        version: 25.9.1
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
       vitest:
         specifier: ^4.1.6
-        version: 4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+        version: 4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
 
 packages:
 
@@ -606,8 +606,8 @@ packages:
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
-  '@types/node@25.6.0':
-    resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
+  '@types/node@25.9.1':
+    resolution: {integrity: sha512-xfrlY7UD5rMJk3ZVJP8BNzS28J36YJg+xp+LPXV1TdWxr8uMH5A860QNxYDGQe/ylDSgjxE52Q9VnO7p75tJxg==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -1042,15 +1042,15 @@ packages:
   magic-string@0.30.21:
     resolution: {integrity: sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==}
 
-  magicast@0.5.3:
-    resolution: {integrity: sha512-pVKE4UdSQ7DvHzivsCIFx2BJn1mHG6KsyrFcaxFx6tONdneEuThrDx0Cj3AMg58KyN4pzYT+LHOotxDQDjNvkw==}
+  magicast@0.5.2:
+    resolution: {integrity: sha512-E3ZJh4J3S9KfwdjZhe2afj6R9lGIN5Pher1pF39UGrXRqq/VDaGVIGN13BjHd2u8B61hArAGOnso7nBOouW3TQ==}
 
   make-dir@4.0.0:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
     engines: {node: '>=10'}
 
-  marked@18.0.3:
-    resolution: {integrity: sha512-7VT90JOkDeaRWpfjOReRGPEKn0ecdARBkDGL+tT1wZY0efPPqkUxLUSmzy/C7TIylQYJC9STISEsCHrqb/7VIA==}
+  marked@18.0.4:
+    resolution: {integrity: sha512-c/BTaKzg0G6ezQx97DAkYU7k0HM6ys0FqYeKBL6hlBByZwy+ycA1+f0vDdjMHKKeEjdgkx0GOv9Il6D+85cOqA==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -1179,8 +1179,8 @@ packages:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
 
-  semver@7.8.1:
-    resolution: {integrity: sha512-rkVq3IXh+4FDGch+KwzX3aV9W3kO54GyEgpvBzSyctDA6Xtd7RJQV1xmXbeQp5v7+VzLOfVqiutSE6GICgPFvg==}
+  semver@7.8.0:
+    resolution: {integrity: sha512-AcM7dV/5ul4EekoQ29Agm5vri8JNqRyj39o0qpX6vDF2GZrtutZl5RwgD1XnZjiTAfncsJhMI48QQH3sN87YNA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -1286,8 +1286,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  undici-types@7.19.2:
-    resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
+  undici-types@7.24.6:
+    resolution: {integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==}
 
   undici@7.25.0:
     resolution: {integrity: sha512-xXnp4kTyor2Zq+J1FfPI6Eq3ew5h6Vl0F/8d9XU5zZQf1tX9s2Su1/3PiMmUANFULpmksxkClamIZcaUqryHsQ==}
@@ -1694,9 +1694,9 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
-  '@types/node@25.6.0':
+  '@types/node@25.9.1':
     dependencies:
-      undici-types: 7.19.2
+      undici-types: 7.24.6
 
   '@types/trusted-types@2.0.7':
     optional: true
@@ -1709,11 +1709,11 @@ snapshots:
       istanbul-lib-coverage: 3.2.2
       istanbul-lib-report: 3.0.1
       istanbul-reports: 3.2.0
-      magicast: 0.5.3
+      magicast: 0.5.2
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+      vitest: 4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
 
   '@vitest/expect@4.1.6':
     dependencies:
@@ -1724,13 +1724,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.6(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))':
+  '@vitest/mocker@4.1.6(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))':
     dependencies:
       '@vitest/spy': 4.1.6
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.2(@types/node@25.6.0)(lightningcss@1.32.0)
+      vite: 7.3.2(@types/node@25.9.1)(lightningcss@1.32.0)
 
   '@vitest/pretty-format@4.1.6':
     dependencies:
@@ -2178,7 +2178,7 @@ snapshots:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  magicast@0.5.3:
+  magicast@0.5.2:
     dependencies:
       '@babel/parser': 7.29.3
       '@babel/types': 7.29.0
@@ -2186,9 +2186,9 @@ snapshots:
 
   make-dir@4.0.0:
     dependencies:
-      semver: 7.8.1
+      semver: 7.8.0
 
-  marked@18.0.3: {}
+  marked@18.0.4: {}
 
   math-intrinsics@1.1.0: {}
 
@@ -2317,7 +2317,7 @@ snapshots:
     dependencies:
       xmlchars: 2.2.0
 
-  semver@7.8.1: {}
+  semver@7.8.0: {}
 
   send@1.2.1:
     dependencies:
@@ -2431,7 +2431,7 @@ snapshots:
 
   typescript@6.0.3: {}
 
-  undici-types@7.19.2: {}
+  undici-types@7.24.6: {}
 
   undici@7.25.0: {}
 
@@ -2439,7 +2439,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0):
+  vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -2448,14 +2448,14 @@ snapshots:
       rollup: 4.60.4
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@types/node': 25.6.0
+      '@types/node': 25.9.1
       fsevents: 2.3.3
       lightningcss: 1.32.0
 
-  vitest@4.1.6(@types/node@25.6.0)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0)):
+  vitest@4.1.6(@types/node@25.9.1)(@vitest/coverage-v8@4.1.7(vitest@4.1.6))(jsdom@29.1.1)(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0)):
     dependencies:
       '@vitest/expect': 4.1.6
-      '@vitest/mocker': 4.1.6(vite@7.3.2(@types/node@25.6.0)(lightningcss@1.32.0))
+      '@vitest/mocker': 4.1.6(vite@7.3.2(@types/node@25.9.1)(lightningcss@1.32.0))
       '@vitest/pretty-format': 4.1.6
       '@vitest/runner': 4.1.6
       '@vitest/snapshot': 4.1.6
@@ -2472,10 +2472,10 @@ snapshots:
       tinyexec: 1.1.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 7.3.2(@types/node@25.6.0)(lightningcss@1.32.0)
+      vite: 7.3.2(@types/node@25.9.1)(lightningcss@1.32.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 25.6.0
+      '@types/node': 25.9.1
       '@vitest/coverage-v8': 4.1.7(vitest@4.1.6)
       jsdom: 29.1.1
     transitivePeerDependencies:
