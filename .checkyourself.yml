@@ -1,0 +1,11 @@
+version: 1
+suppress:
+  - id: Possible secret-like field without credential shape
+    reason: DialectOS intentionally reads API keys from environment variables, documents the apiKey option without hardcoded values, and exposes a non-secret needsApiKey capability flag.
+    files:
+      - packages/cli/src/commands/research.ts
+      - packages/mcp/src/tools/translator-data.ts
+      - packages/providers/README.md
+      - packages/providers/src/providers/llm.ts
+    reviewed_by: KyaniteLabs
+    reviewed_at: "2026-05-29"
