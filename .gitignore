@@ -8,6 +8,8 @@ coverage/
 .env*
 !.env.example
 env.hostinger
+*.pem
+*.key
 *.tgz
 
 # Translation checkpoints

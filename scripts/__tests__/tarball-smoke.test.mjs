@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import test from "node:test";
 import assert from "node:assert/strict";
+import { ensurePackageBuilt } from "../lib/ensure-built.mjs";
 
 function run(args) {
   return spawnSync(process.execPath, ["scripts/tarball-smoke.mjs", ...args], {
@@ -79,6 +80,7 @@ test("tarball-smoke fails on missing bin shebang", () => {
 });
 
 test("tarball-smoke passes on real @dialectos/types pack", () => {
+  ensurePackageBuilt("types");
   const packResult = spawnSync("pnpm", ["pack", "--pack-destination", tmpdir()], {
     cwd: "packages/types",
     encoding: "utf8",
@@ -90,6 +92,7 @@ test("tarball-smoke passes on real @dialectos/types pack", () => {
 });
 
 test("tarball-smoke passes on real @dialectos/cli pack", () => {
+  ensurePackageBuilt("cli");
   const packResult = spawnSync("pnpm", ["pack", "--pack-destination", tmpdir()], {
     cwd: "packages/cli",
     encoding: "utf8",

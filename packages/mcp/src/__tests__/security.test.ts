@@ -446,14 +446,14 @@ describe("MCP Security Tests", () => {
       const { registerTranslatorTools } = await import("../tools/translator.js");
       const mockServer = { tool: vi.fn() };
 
+      const fixtureApiKey = "sk-" + "1234567890abcdef1234567890abcdef";
+
       // Mock provider to throw error with API key
       const registryWithKeyError = {
         get: vi.fn().mockReturnValue({
           name: "deepl",
           translate: vi.fn().mockRejectedValue(
-            new Error(
-              "API request failed with key sk-1234567890abcdef1234567890abcdef"
-            )
+            new Error(`API request failed with key ${fixtureApiKey}`)
           ),
         }),
       } as unknown as ProviderRegistry;
@@ -471,7 +471,7 @@ describe("MCP Security Tests", () => {
       expect(result.isError).toBe(true);
       const parsedResult = JSON.parse(result.content[0].text);
       // API key should be redacted
-      expect(parsedResult.error).not.toContain("sk-1234567890abcdef");
+      expect(parsedResult.error).not.toContain(fixtureApiKey);
     });
 
     it("should sanitize stack traces from error messages", async () => {

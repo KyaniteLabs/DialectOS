@@ -399,16 +399,18 @@ describe("validateMarkdownUrl", () => {
 
 describe("sanitizeErrorMessage", () => {
   it("should remove API keys", () => {
-    const message = "Error with key sk-1234567890abcdef1234567890abcdef";
+    const fixtureApiKey = "sk-" + "1234567890abcdef1234567890abcdef";
+    const message = `Error with key ${fixtureApiKey}`;
     const result = sanitizeErrorMessage(message);
-    expect(result).not.toContain("sk-1234567890abcdef");
+    expect(result).not.toContain(fixtureApiKey);
     expect(result).toContain("[REDACTED]");
   });
 
   it("should remove 32+ character hex strings (potential keys)", () => {
-    const message = "Error: 1234567890abcdef1234567890abcdef found";
+    const fixtureHexValue = ["12345678", "90abcdef", "12345678", "90abcdef"].join("");
+    const message = `Error: ${fixtureHexValue} found`;
     const result = sanitizeErrorMessage(message);
-    expect(result).not.toContain("1234567890abcdef1234567890abcdef");
+    expect(result).not.toContain(fixtureHexValue);
   });
 
   it("should remove Unix file paths", () => {

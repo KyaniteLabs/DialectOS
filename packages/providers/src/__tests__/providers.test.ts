@@ -512,9 +512,10 @@ describe("DeepLProvider", () => {
   });
 
   it("should sanitize error messages", async () => {
+    const fixtureApiKey = "sk-" + "1234567890abcdefghijklmnopqrst";
     const mockClient = {
       translateText: vi.fn().mockRejectedValue(
-        new Error("API key sk-1234567890abcdefghijklmnopqrst failed")
+        new Error(`API key ${fixtureApiKey} failed`)
       ),
     };
 
@@ -523,7 +524,7 @@ describe("DeepLProvider", () => {
     try {
       await provider.translate("Hello", "en", "es");
     } catch (error) {
-      expect((error as Error).message).not.toContain("sk-1234567890abcdefghijklmnopqrst");
+      expect((error as Error).message).not.toContain(fixtureApiKey);
       expect((error as Error).message).toContain("[REDACTED]");
     }
   });
@@ -751,8 +752,10 @@ describe("MyMemoryProvider", () => {
 
 describe("Error sanitization", () => {
   it("should sanitize provider errors", async () => {
+    const fixtureApiKey = "sk-" + "secret1234567890abcdef";
+
     vi.mocked(global.fetch).mockRejectedValue(
-      new Error("Request failed with API key sk-secret1234567890abcdef")
+      new Error(`Request failed with API key ${fixtureApiKey}`)
     );
 
     process.env.LIBRETRANSLATE_URL = "https://libretranslate.com/translate";
@@ -762,7 +765,7 @@ describe("Error sanitization", () => {
       await provider.translate("Hello", "en", "es");
       expect.fail("Should have thrown");
     } catch (error) {
-      expect((error as Error).message).not.toContain("sk-secret1234567890abcdef");
+      expect((error as Error).message).not.toContain(fixtureApiKey);
     }
   });
 });
@@ -1415,7 +1418,8 @@ describe("Adversarial security boundaries", () => {
 
   describe("DeepL key redaction in errors", () => {
     it("redacts DeepL free-tier keys (UUID:fx) via sanitizeErrorMessage", () => {
-      const key = "a1b2c3d4-e5f6-7890-abcd-ef1234567890:fx";
+      const key =
+        ["a1b2c3d4", "e5f6", "7890", "abcd", "ef1234567890"].join("-") + ":fx";
       const message = `DeepL auth failed for key ${key}`;
       const result = sanitizeErrorMessage(message);
       expect(result).not.toContain(key);
@@ -1423,7 +1427,7 @@ describe("Adversarial security boundaries", () => {
     });
 
     it("redacts bare DeepL UUID keys without :fx suffix", () => {
-      const key = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+      const key = ["a1b2c3d4", "e5f6", "7890", "abcd", "ef1234567890"].join("-");
       const message = `DeepL auth failed for key ${key}`;
       const result = sanitizeErrorMessage(message);
       expect(result).not.toContain(key);
@@ -1431,7 +1435,8 @@ describe("Adversarial security boundaries", () => {
     });
 
     it("redacts DeepL keys in provider error output", async () => {
-      const key = "deadbeef-1234-5678-9abc-def012345678:fx";
+      const key =
+        ["deadbeef", "1234", "5678", "9abc", "def012345678"].join("-") + ":fx";
       const mockClient = {
         translateText: vi.fn().mockRejectedValue(
           new Error(`Authorization failed for ${key}`)
