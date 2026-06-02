@@ -53,31 +53,7 @@ interface WalkableToken {
  * Used for validation before parsing
  */
 function extractUrlsFromContent(content: string): string[] {
-  const urls: string[] = [];
-  const seen = new Set<string>();
-
-  // Use marked's lexer to safely tokenize content (no regex ReDoS)
-  const tokens = marked.lexer(content);
-
-  function walkTokens(tokens: WalkableToken[]): void {
-    for (const token of tokens) {
-      if (token.href && typeof token.href === "string") {
-        if (!seen.has(token.href)) {
-          seen.add(token.href);
-          urls.push(token.href);
-        }
-      }
-      if (token.tokens && Array.isArray(token.tokens)) {
-        walkTokens(token.tokens);
-      }
-      if (token.items && Array.isArray(token.items)) {
-        walkTokens(token.items);
-      }
-    }
-  }
-
-  walkTokens(tokens);
-  return urls;
+  return [...new Set(collectMarkdownHrefs(content))];
 }
 
 /**
@@ -108,23 +84,42 @@ function validateAllUrls(content: string): void {
 function collectMarkdownHrefs(content: string): string[] {
   const hrefs: string[] = [];
   const tokens = marked.lexer(content);
+  walkMarkedTokens(tokens, (href) => hrefs.push(href));
+  return hrefs;
+}
 
-  function walkTokens(tokens: WalkableToken[]): void {
-    for (const token of tokens) {
-      if (token.href && typeof token.href === "string") {
-        hrefs.push(token.href);
-      }
-      if (token.tokens && Array.isArray(token.tokens)) {
-        walkTokens(token.tokens);
-      }
-      if (token.items && Array.isArray(token.items)) {
-        walkTokens(token.items);
+function walkMarkedTokens(tokens: WalkableToken[], onHref: (href: string) => void): void {
+  for (const token of tokens) {
+    if (token.href && typeof token.href === "string") {
+      onHref(token.href);
+    }
+    if (token.tokens && Array.isArray(token.tokens)) {
+      walkMarkedTokens(token.tokens, onHref);
+    }
+    if (token.items && Array.isArray(token.items)) {
+      walkMarkedTokens(token.items, onHref);
+    }
+    if (token.header && Array.isArray(token.header)) {
+      walkTableCells(token.header, onHref);
+    }
+    if (token.rows && Array.isArray(token.rows)) {
+      for (const row of token.rows) {
+        if (Array.isArray(row)) {
+          walkTableCells(row, onHref);
+        }
       }
     }
   }
+}
 
-  walkTokens(tokens);
-  return hrefs;
+function walkTableCells(cells: unknown[], onHref: (href: string) => void): void {
+  for (const cell of cells) {
+    if (!cell || typeof cell !== "object") continue;
+    const tokens = (cell as { tokens?: unknown }).tokens;
+    if (Array.isArray(tokens)) {
+      walkMarkedTokens(tokens as WalkableToken[], onHref);
+    }
+  }
 }
 
 function findClosing(content: string, openIndex: number, closeChar: string): number {
@@ -152,6 +147,22 @@ type InlineLink = {
 };
 
 function parseInlineLinkAt(content: string, openIndex: number): InlineLink | null {
+  if (
+    openIndex > 0 &&
+    content[openIndex - 1] === "!" &&
+    !isEscaped(content, openIndex - 1)
+  ) {
+    return null;
+  }
+  return parseBracketLinkAt(content, openIndex);
+}
+
+function parseInlineImageAt(content: string, bangIndex: number): InlineLink | null {
+  if (content[bangIndex] !== "!" || isEscaped(content, bangIndex)) return null;
+  return parseBracketLinkAt(content, bangIndex + 1);
+}
+
+function parseBracketLinkAt(content: string, openIndex: number): InlineLink | null {
   if (content[openIndex] !== "[") return null;
   const textEnd = findClosing(content, openIndex, "]");
   if (textEnd === -1 || content[textEnd + 1] !== "(") return null;
@@ -176,6 +187,18 @@ function parseInlineLinkAt(content: string, openIndex: number): InlineLink | nul
     rawUrl: content.slice(urlStart, urlEnd),
     end: urlEnd,
   };
+}
+
+function extractInlineImages(content: string): InlineLink[] {
+  const images: InlineLink[] = [];
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] !== "!") continue;
+    const image = parseInlineImageAt(content, i);
+    if (!image) continue;
+    images.push(image);
+    i = image.end;
+  }
+  return images;
 }
 
 function extractInlineLinks(content: string): InlineLink[] {
@@ -548,6 +571,11 @@ function reconstructSection(
     case "paragraph": {
       // For paragraphs, check if there are links that need URL preservation
       const originalLinks = extractInlineLinks(original.raw);
+      const originalImages = extractInlineImages(original.raw);
+
+      if (originalImages.length === 1 && originalLinks.length === 0 && !translated.content.includes("](")) {
+        return `![${translated.content}](${originalImages[0].rawUrl})`;
+      }
 
       // If original has links, extract URLs and create links with translated text
       if (originalLinks.length > 0) {

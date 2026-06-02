@@ -214,6 +214,13 @@ describe("parseMarkdown", () => {
       expect(result.linkCount).toBe(1);
       expect(result.sections[0].content).toContain("Download");
     });
+
+    it("should count links inside table cells", () => {
+      const content = "| Resource |\n| --- |\n| [Guide](https://example.com/guide) |";
+      const result = parseMarkdown(content);
+
+      expect(result.linkCount).toBe(1);
+    });
   });
 
   describe("Image handling", () => {
@@ -234,6 +241,11 @@ describe("parseMarkdown", () => {
 
     it("should reject javascript: URLs in images", () => {
       const content = "![alt](javascript:alert('xss'))";
+      expect(() => parseMarkdown(content)).toThrow(SecurityError);
+    });
+
+    it("should reject malicious links inside table cells", () => {
+      const content = "| Resource |\n| --- |\n| [Bad](javascript:alert(1)) |";
       expect(() => parseMarkdown(content)).toThrow(SecurityError);
     });
   });
@@ -665,6 +677,28 @@ describe("reconstructMarkdown", () => {
 
     const result = reconstructMarkdown(sections, translatedSections);
     expect(result).toBe("[Descargar corchete](<https://example.com/path_(with)_parens>)");
+  });
+
+  it("should reconstruct images with URL preserved", () => {
+    const sections: MarkdownSection[] = [
+      {
+        type: "paragraph",
+        content: "Alt text",
+        raw: "![Alt text](https://example.com/image.png)",
+        translatable: true,
+      },
+    ];
+    const translatedSections: MarkdownSection[] = [
+      {
+        type: "paragraph",
+        content: "Texto alternativo",
+        raw: "![Alt text](https://example.com/image.png)",
+        translatable: true,
+      },
+    ];
+
+    const result = reconstructMarkdown(sections, translatedSections);
+    expect(result).toBe("![Texto alternativo](https://example.com/image.png)");
   });
 
   it("should reconstruct multiple sections", () => {
