@@ -33,7 +33,7 @@
     "README.md",
     "package.json"
   ],
-  "license": "BSL-1.1",
+  "license": "Apache-2.0",
   "author": "Simon Gonzalez <simon@kyanitelabs.com>",
   "repository": {
     "type": "git",
