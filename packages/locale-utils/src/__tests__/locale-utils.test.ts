@@ -715,6 +715,33 @@ describe("locale-utils", () => {
         arr: ["zero", undefined, "two"],
       });
     });
+
+    it("should reject prototype-pollution keys", () => {
+      const entries: I18nEntry[] = [
+        { key: "__proto__.polluted", value: "yes" },
+      ];
+
+      expect(() => unflattenLocale(entries)).toThrow(SecurityError);
+      expect(({} as Record<string, unknown>).polluted).toBeUndefined();
+    });
+
+    it("should reject keys that are values before namespaces", () => {
+      const entries: I18nEntry[] = [
+        { key: "nav", value: "Navigation" },
+        { key: "nav.home", value: "Home" },
+      ];
+
+      expect(() => unflattenLocale(entries)).toThrow(SecurityError);
+    });
+
+    it("should reject keys that are namespaces before values", () => {
+      const entries: I18nEntry[] = [
+        { key: "nav.home", value: "Home" },
+        { key: "nav", value: "Navigation" },
+      ];
+
+      expect(() => unflattenLocale(entries)).toThrow(SecurityError);
+    });
   });
 
   describe("diffLocales", () => {

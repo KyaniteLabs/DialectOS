@@ -437,6 +437,7 @@ test("demo server does not expose repo implementation files as public assets", a
       "/scripts/demo-server.mjs",
       "/packages/cli/src/lib/web-demo-service.ts",
       "/docs/../package.json",
+      "/docs/%2e%2e/package.json",
       "/%2e%2e/package.json",
     ]) {
       const response = await fetch(`${baseUrl}${path}`);

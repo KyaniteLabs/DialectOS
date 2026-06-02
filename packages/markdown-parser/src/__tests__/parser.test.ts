@@ -206,6 +206,14 @@ describe("parseMarkdown", () => {
 
       expect(result.linkCount).toBeGreaterThanOrEqual(1);
     });
+
+    it("should handle escaped delimiters and angle-bracket URLs", () => {
+      const content = "[Download \\] bracket](<https://example.com/path_(with)_parens>)";
+      const result = parseMarkdown(content);
+
+      expect(result.linkCount).toBe(1);
+      expect(result.sections[0].content).toContain("Download");
+    });
   });
 
   describe("Image handling", () => {
@@ -635,6 +643,28 @@ describe("reconstructMarkdown", () => {
     const result = reconstructMarkdown(sections, translatedSections);
     expect(result).toContain("https://example.com");
     expect(result).toContain("Haga clic");
+  });
+
+  it("should reconstruct links with escaped text and angle-bracket URLs preserved", () => {
+    const sections: MarkdownSection[] = [
+      {
+        type: "paragraph",
+        content: "Download ] bracket",
+        raw: "[Download \\] bracket](<https://example.com/path_(with)_parens>)",
+        translatable: true,
+      },
+    ];
+    const translatedSections: MarkdownSection[] = [
+      {
+        type: "paragraph",
+        content: "Descargar corchete",
+        raw: "[Download \\] bracket](<https://example.com/path_(with)_parens>)",
+        translatable: true,
+      },
+    ];
+
+    const result = reconstructMarkdown(sections, translatedSections);
+    expect(result).toBe("[Descargar corchete](<https://example.com/path_(with)_parens>)");
   });
 
   it("should reconstruct multiple sections", () => {

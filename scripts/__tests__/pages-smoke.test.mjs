@@ -2,14 +2,36 @@ import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
 import { mkdtempSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { isAbsolute, join, relative, resolve } from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+
+function safeFixturePath(rootDir, requestUrl) {
+  const url = new URL(requestUrl || '/', 'http://127.0.0.1');
+  let decodedPathname;
+  try {
+    decodedPathname = decodeURIComponent(url.pathname);
+  } catch {
+    return null;
+  }
+  const relativePath = decodedPathname === '/' ? 'index.html' : decodedPathname.slice(1);
+  const absolute = resolve(rootDir, relativePath);
+  const rel = relative(rootDir, absolute);
+  if (rel.startsWith('..') || isAbsolute(rel)) {
+    return null;
+  }
+  return absolute;
+}
 
 function startServer(rootDir, port) {
   return new Promise((resolve) => {
     const server = createServer((req, res) => {
-      const path = join(rootDir, req.url === '/' ? 'index.html' : req.url);
+      const path = safeFixturePath(rootDir, req.url);
+      if (!path) {
+        res.writeHead(404);
+        res.end('not found');
+        return;
+      }
       try {
         const data = readFileSync(path, 'utf8');
         res.writeHead(200, { 'content-type': 'text/plain' });
@@ -66,6 +88,19 @@ test('smoke-pages fails against a 404 site', async () => {
   try {
     const res = await runSmoke(`http://127.0.0.1:${port}`);
     assert.notEqual(res.code, 0, 'smoke should fail on 404');
+  } finally {
+    server.closeAllConnections?.();
+    server.close();
+  }
+});
+
+test('fixture server treats malformed encoded paths as 404', async () => {
+  const server = await startServer(tmpdir(), 0);
+  const port = server.address().port;
+
+  try {
+    const res = await fetch(`http://127.0.0.1:${port}/%E0%A4%A`);
+    assert.equal(res.status, 404);
   } finally {
     server.closeAllConnections?.();
     server.close();

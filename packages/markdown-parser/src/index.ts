@@ -105,6 +105,115 @@ function validateAllUrls(content: string): void {
   }
 }
 
+function collectMarkdownHrefs(content: string): string[] {
+  const hrefs: string[] = [];
+  const tokens = marked.lexer(content);
+
+  function walkTokens(tokens: WalkableToken[]): void {
+    for (const token of tokens) {
+      if (token.href && typeof token.href === "string") {
+        hrefs.push(token.href);
+      }
+      if (token.tokens && Array.isArray(token.tokens)) {
+        walkTokens(token.tokens);
+      }
+      if (token.items && Array.isArray(token.items)) {
+        walkTokens(token.items);
+      }
+    }
+  }
+
+  walkTokens(tokens);
+  return hrefs;
+}
+
+function findClosing(content: string, openIndex: number, closeChar: string): number {
+  for (let i = openIndex + 1; i < content.length; i++) {
+    if (content[i] === closeChar && !isEscaped(content, i)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function isEscaped(content: string, index: number): boolean {
+  let slashCount = 0;
+  for (let i = index - 1; i >= 0 && content[i] === "\\"; i--) {
+    slashCount++;
+  }
+  return slashCount % 2 === 1;
+}
+
+type InlineLink = {
+  text: string;
+  url: string;
+  rawUrl: string;
+  end: number;
+};
+
+function parseInlineLinkAt(content: string, openIndex: number): InlineLink | null {
+  if (content[openIndex] !== "[") return null;
+  const textEnd = findClosing(content, openIndex, "]");
+  if (textEnd === -1 || content[textEnd + 1] !== "(") return null;
+
+  const urlStart = textEnd + 2;
+  if (content[urlStart] === "<") {
+    const angleEnd = findClosing(content, urlStart, ">");
+    if (angleEnd === -1 || content[angleEnd + 1] !== ")") return null;
+    return {
+      text: content.slice(openIndex + 1, textEnd),
+      url: content.slice(urlStart + 1, angleEnd),
+      rawUrl: content.slice(urlStart, angleEnd + 1),
+      end: angleEnd + 1,
+    };
+  }
+
+  const urlEnd = findClosing(content, textEnd + 1, ")");
+  if (urlEnd === -1) return null;
+  return {
+    text: content.slice(openIndex + 1, textEnd),
+    url: content.slice(urlStart, urlEnd),
+    rawUrl: content.slice(urlStart, urlEnd),
+    end: urlEnd,
+  };
+}
+
+function extractInlineLinks(content: string): InlineLink[] {
+  const links: InlineLink[] = [];
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] !== "[") continue;
+    const link = parseInlineLinkAt(content, i);
+    if (!link) continue;
+    links.push(link);
+    i = link.end;
+  }
+  return links;
+}
+
+function replaceInlineLinkUrls(content: string, urls: string[]): string {
+  let result = "";
+  let cursor = 0;
+  let urlIndex = 0;
+
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] !== "[") continue;
+    const link = parseInlineLinkAt(content, i);
+    if (!link) continue;
+
+    result += content.slice(cursor, i);
+    if (urlIndex < urls.length) {
+      result += `[${link.text}](${urls[urlIndex]})`;
+      urlIndex++;
+    } else {
+      result += content.slice(i, link.end + 1);
+    }
+    cursor = link.end + 1;
+    i = link.end;
+  }
+
+  return result + content.slice(cursor);
+}
+
 // ============================================================================
 // Token to Section Conversion
 // ============================================================================
@@ -438,31 +547,23 @@ function reconstructSection(
 
     case "paragraph": {
       // For paragraphs, check if there are links that need URL preservation
-      const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-      const urlMatches = [...original.raw.matchAll(linkRegex)];
+      const originalLinks = extractInlineLinks(original.raw);
 
       // If original has links, extract URLs and create links with translated text
-      if (urlMatches.length > 0) {
+      if (originalLinks.length > 0) {
         // If there's only one link and translated content is plain text,
         // create a link with the translated text
-        if (urlMatches.length === 1 && !translated.content.includes("](")) {
-          const url = urlMatches[0][2];
+        if (originalLinks.length === 1 && !translated.content.includes("](")) {
+          const url = originalLinks[0].rawUrl;
           return `[${translated.content}](${url})`;
         }
 
         // Multiple links or translated content already has link format
         // Try to replace URLs in translated content
-        let result = translated.content;
-        let matchIdx = 0;
-        result = result.replace(/\[([^\]]+)\]\([^)]+\)/g, (match, text) => {
-          if (matchIdx < urlMatches.length) {
-            const url = urlMatches[matchIdx][2];
-            matchIdx++;
-            return `[${text}](${url})`;
-          }
-          return match;
-        });
-        return result;
+        return replaceInlineLinkUrls(
+          translated.content,
+          originalLinks.map((link) => link.rawUrl)
+        );
       }
 
       return translated.content;
@@ -707,28 +808,5 @@ export function countCodeBlocks(content: string): number {
  * @returns Number of links
  */
 export function countLinks(content: string): number {
-  let count = 0;
-
-  // Count inline links: [text](url)
-  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  const linkMatches = content.match(linkRegex);
-  if (linkMatches) {
-    count += linkMatches.length;
-  }
-
-  // Count reference-style links: [text][ref]
-  const refLinkRegex = /\[([^\]]+)\]\[[^\]]*\]/g;
-  const refLinkMatches = content.match(refLinkRegex);
-  if (refLinkMatches) {
-    count += refLinkMatches.length;
-  }
-
-  // Count autolinks: <url>
-  const autolinkRegex = /<(https?:\/\/[^>]+)>/g;
-  let match;
-  while ((match = autolinkRegex.exec(content)) !== null) {
-    count++;
-  }
-
-  return count;
+  return collectMarkdownHrefs(content).length;
 }

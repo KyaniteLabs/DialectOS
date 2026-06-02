@@ -6,11 +6,8 @@
  * small models commonly emit.
  */
 
-// Reasoning/thinking tags emitted by qwen3 and other thinking-capable models.
-const THINK_TAG_PATTERN = /<think[^>]*>[\s\S]*?<\/think\s*>/g;
-
 // Tags stripped from LLM output before preamble removal.
-const REASONING_TAG_RE = /<think[\s>][\s\S]*?<\/think>|<thinking[\s>][\s\S]*?<\/thinking>|<tiz[\s>][\s\S]*?<\/tiz>/gi;
+const REASONING_TAGS = ["thinking", "think", "tiz"];
 
 // Common conversational preambles small models emit before the actual translation.
 const PREAMBLE_PATTERNS: Array<[RegExp, string]> = [
@@ -92,8 +89,90 @@ export function extractChatCompletionText(data: unknown): string | null {
 }
 
 function stripReasoningTags(text: string): string {
-  const stripped = text.replace(REASONING_TAG_RE, "").trim();
-  return stripped.length > 0 ? stripped : text;
+  return stripTaggedBlocks(text, REASONING_TAGS).trim();
+}
+
+function stripTaggedBlocks(text: string, tagNames: string[]): string {
+  let result = text;
+  for (const tagName of tagNames) {
+    result = stripTagBlock(result, tagName);
+  }
+  return result;
+}
+
+function stripTagBlock(text: string, tagName: string): string {
+  const lowerTag = tagName.toLowerCase();
+  const lowerText = text.toLowerCase();
+  let result = "";
+  let cursor = 0;
+
+  while (cursor < text.length) {
+    const open = findOpeningTag(lowerText, lowerTag, cursor);
+    if (open === -1) {
+      result += text.slice(cursor);
+      break;
+    }
+
+    const openEnd = lowerText.indexOf(">", open);
+    if (openEnd === -1) {
+      result += text.slice(cursor);
+      break;
+    }
+
+    const closeStart = findClosingTag(lowerText, lowerTag, openEnd + 1);
+    if (closeStart === -1) {
+      result += text.slice(cursor);
+      break;
+    }
+
+    const closeEnd = lowerText.indexOf(">", closeStart);
+    if (closeEnd === -1) {
+      result += text.slice(cursor);
+      break;
+    }
+
+    result += text.slice(cursor, open);
+    cursor = closeEnd + 1;
+  }
+
+  return result;
+}
+
+function findOpeningTag(lowerText: string, lowerTag: string, start: number): number {
+  let cursor = start;
+  while (cursor < lowerText.length) {
+    const open = lowerText.indexOf(`<${lowerTag}`, cursor);
+    if (open === -1) return -1;
+    const next = lowerText.charCodeAt(open + lowerTag.length + 1);
+    if (isTagNameTerminator(next)) return open;
+    cursor = open + 1;
+  }
+  return -1;
+}
+
+function findClosingTag(lowerText: string, lowerTag: string, start: number): number {
+  let cursor = start;
+  while (cursor < lowerText.length) {
+    const close = lowerText.indexOf(`</${lowerTag}`, cursor);
+    if (close === -1) return -1;
+    const next = lowerText.charCodeAt(close + lowerTag.length + 2);
+    if (isTagNameTerminator(next)) return close;
+    cursor = close + 1;
+  }
+  return -1;
+}
+
+function isTagNameTerminator(charCode: number): boolean {
+  return (
+    Number.isNaN(charCode) ||
+    charCode === 47 ||
+    charCode === 62 ||
+    charCode === 9 ||
+    charCode === 10 ||
+    charCode === 12 ||
+    charCode === 13 ||
+    charCode === 32
+  );
 }
 
 /**
@@ -158,9 +237,8 @@ export function extractResponseText(format: string, data: unknown): string | und
  * actual translation output.
  */
 export function stripPreamble(text: string): string {
-  let result = text;
   // Strip reasoning/thinking tags first (qwen3, etc.)
-  result = result.replace(THINK_TAG_PATTERN, "");
+  let result = stripReasoningTags(text);
   for (const [pattern, replacement] of PREAMBLE_PATTERNS) {
     result = result.replace(pattern, replacement);
   }
