@@ -170,13 +170,17 @@ function protectAbbreviations(text: string): string {
 }
 
 function restoreAbbreviations(text: string): string {
-  return text.replace(new RegExp(PROTECT, "g"), ".");
+  return text.split(PROTECT).join(".");
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
 }
 
 function splitSentences(text: string): string[] {
   let protectedText = protectAbbreviations(text);
   for (const abbr of ABBREVIATIONS) {
-    const regex = new RegExp(`\\b${abbr.replace(/\./g, "\\.")}\\.`, "giu");
+    const regex = new RegExp(`\\b${escapeRegExp(abbr)}\\.`, "giu");
     protectedText = protectedText.replace(regex, (match) => match.replace(/\./g, PROTECT));
   }
   return protectedText

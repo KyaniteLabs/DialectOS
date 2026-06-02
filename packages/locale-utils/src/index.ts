@@ -316,41 +316,92 @@ export function flattenLocale(
  */
 const DANGEROUS_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 
+function assertSafeLocaleKey(key: string): void {
+  if (DANGEROUS_KEYS.has(key)) {
+    throw new SecurityError(
+      `Dangerous key "${key}" detected in locale entry`,
+      ErrorCode.INVALID_INPUT
+    );
+  }
+}
+
+function setSafeProperty(
+  target: Record<string, unknown> | unknown[],
+  key: string,
+  value: unknown
+): void {
+  assertSafeLocaleKey(key);
+  Object.defineProperty(target, key, {
+    value,
+    writable: true,
+    enumerable: true,
+    configurable: true,
+  });
+}
+
+function hasOwn(target: Record<string, unknown> | unknown[], key: string): boolean {
+  return Object.prototype.hasOwnProperty.call(target, key);
+}
+
+function readChild(
+  target: Record<string, unknown> | unknown[],
+  key: string
+): Record<string, unknown> | unknown[] {
+  const value = Reflect.get(target, key);
+  if (!value || typeof value !== "object") {
+    throw new SecurityError(
+      `Locale key "${key}" cannot be both a value and a namespace`,
+      ErrorCode.INVALID_INPUT
+    );
+  }
+  return value as Record<string, unknown> | unknown[];
+}
+
+function rejectTerminalNamespaceCollision(
+  target: Record<string, unknown> | unknown[],
+  key: string
+): void {
+  if (!hasOwn(target, key)) return;
+  const value = Reflect.get(target, key);
+  if (value && typeof value === "object") {
+    throw new SecurityError(
+      `Locale key "${key}" cannot be both a value and a namespace`,
+      ErrorCode.INVALID_INPUT
+    );
+  }
+}
+
 export function unflattenLocale(entries: I18nEntry[]): Record<string, unknown> {
   const result: Record<string, unknown> = {};
 
   for (const entry of entries) {
     const keys = entry.key.split(".");
-    let current = result;
+    let current: Record<string, unknown> | unknown[] = result;
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
-      if (DANGEROUS_KEYS.has(key)) {
-        throw new SecurityError(
-          `Dangerous key "${key}" detected in locale entry`,
-          ErrorCode.INVALID_INPUT
-        );
-      }
+      assertSafeLocaleKey(key);
       const isLast = i === keys.length - 1;
 
       if (isLast) {
         // Set the final value
-        current[key] = entry.value;
+        rejectTerminalNamespaceCollision(current, key);
+        setSafeProperty(current, key, entry.value);
       } else {
         // Create or traverse nested object/array
-        if (!(key in current)) {
+        if (!hasOwn(current, key)) {
           // Check if next key is a number (array index)
           const nextKey = keys[i + 1];
           const isNextNumeric = /^\d+$/.test(nextKey);
 
           if (isNextNumeric) {
-            current[key] = [];
+            setSafeProperty(current, key, []);
           } else {
-            current[key] = {};
+            setSafeProperty(current, key, {});
           }
         }
 
-        current = current[key] as Record<string, unknown>;
+        current = readChild(current, key);
       }
     }
   }

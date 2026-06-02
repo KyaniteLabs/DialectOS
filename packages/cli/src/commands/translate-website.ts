@@ -21,6 +21,10 @@ function validateDialects(dialects: SpanishDialect[]): void {
   }
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
+}
+
 export interface TranslateWebsiteOptions {
   baseLocale?: string;
   concurrency?: number;
@@ -254,7 +258,7 @@ export async function executeTranslateWebsite(
 
       if (range.asset.type === "locale") {
         const outputPath = range.asset.sourcePath.replace(
-          new RegExp(`${baseLocale}\\.json$`),
+          new RegExp(`${escapeRegExp(baseLocale)}\\.json$`),
           `${targetDialect}.json`
         );
 

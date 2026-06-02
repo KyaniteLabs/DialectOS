@@ -64,6 +64,16 @@ function isSafeDocPath(pathname) {
   return SAFE_DOC_EXTENSIONS.has(ext);
 }
 
+function isPathInsideDirectory(parentDir, candidatePath) {
+  const relative = path.relative(parentDir, candidatePath);
+  return relative === "" || (relative.length > 0 && !relative.startsWith("..") && !path.isAbsolute(relative));
+}
+
+function resolveStaticPath(baseDir, relativePath) {
+  const absolute = path.resolve(baseDir, relativePath);
+  return isPathInsideDirectory(baseDir, absolute) ? absolute : undefined;
+}
+
 function createRateLimiter(options = {}) {
   const maxRequests = Number(options.maxRequests || process.env.DIALECTOS_DEMO_RATE_LIMIT || 60);
   const windowMs = Number(options.windowMs || process.env.DIALECTOS_DEMO_RATE_WINDOW_MS || 60000);
@@ -99,14 +109,22 @@ function sendJson(res, status, payload) {
 
 function safeError(error) {
   const msg = error instanceof Error ? error.message : String(error);
-  // In production, never leak stack traces or internal paths
-  if (process.env.NODE_ENV === "production") {
-    // Return generic message for unexpected errors
-    if (/ENOENT|EACCES|EPERM|stack|at\s+\w+|\.js:\d+:|internal\/modules/i.test(msg)) {
-      return "Internal server error.";
-    }
+  if (error instanceof ClientInputError) {
+    return msg;
   }
-  return msg;
+  if (error instanceof SyntaxError) {
+    return "Malformed JSON body.";
+  }
+  if (/Request body too large/i.test(msg)) {
+    return msg;
+  }
+  if (/No provider configured|No translation providers|Provider not available/i.test(msg)) {
+    return msg;
+  }
+  if (/Provider output failed quality judge/i.test(msg)) {
+    return msg;
+  }
+  return "Internal server error.";
 }
 
 class ClientInputError extends Error {}
@@ -185,20 +203,13 @@ function staticPathFor(urlPath, rootDir) {
   // Check hardcoded whitelist first
   const relative = PUBLIC_STATIC_FILES.get(pathname);
   if (relative) {
-    const absolute = path.resolve(rootDir, relative);
-    if (!absolute.startsWith(rootDir + path.sep) && absolute !== rootDir) {
-      return undefined;
-    }
-    return absolute;
+    return resolveStaticPath(rootDir, relative);
   }
   // Allow safe files from docs/ directory
   if (pathname.startsWith("/docs/") && isSafeDocPath(pathname)) {
-    const relativePath = pathname.slice(1); // remove leading /
-    const absolute = path.resolve(rootDir, relativePath);
-    if (!absolute.startsWith(rootDir + path.sep) && absolute !== rootDir) {
-      return undefined;
-    }
-    return absolute;
+    const docsDir = path.join(rootDir, "docs");
+    const relativePath = pathname.slice("/docs/".length);
+    return resolveStaticPath(docsDir, relativePath);
   }
   return undefined;
 }
