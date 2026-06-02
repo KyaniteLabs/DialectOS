@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/dialectos-hero.webp" alt="DialectOS — Spanish dialect localization MCP server: translate and QA across 25 regional variants" width="100%">
+</p>
+
 <div align="center">
 
 # 🌎 DialectOS
