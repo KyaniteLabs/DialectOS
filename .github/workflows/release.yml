@@ -35,7 +35,15 @@ jobs:
         continue-on-error: true
 
       - name: Verify packages install from tarballs
-        run: node scripts/tarball-smoke.mjs
+        run: |
+          mkdir -p /tmp/dialectos-release-dry-run
+          for pkg in packages/*; do
+            [ -f "$pkg/package.json" ] || continue
+            echo "::group::tarball smoke for $pkg"
+            tarball="$(cd "$pkg" && pnpm pack --pack-destination /tmp/dialectos-release-dry-run | tail -n 1)"
+            node scripts/tarball-smoke.mjs "$tarball"
+            echo "::endgroup::"
+          done
 
       - name: Publish dry-run
         run: |
