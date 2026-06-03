@@ -25,7 +25,11 @@ node scripts/benchmark-detection.mjs --out=/tmp/dialectos-detection
 pnpm dialect:certify -- --fail-on-warnings=true --judge=true --out=/tmp/dialectos-cert
 pnpm dialect:certify:adversarial -- --fail-on-warnings=true --judge=true --out=/tmp/dialectos-adv
 pnpm dialect:certify:documents -- --live=true --policy=strict --out=/tmp/dialectos-doc-cert
-npm pack --workspaces --pack-destination /tmp/dialectos-pack
+mkdir -p /tmp/dialectos-pack
+for pkg in packages/*; do
+  [ -f "$pkg/package.json" ] || continue
+  (cd "$pkg" && pnpm pack --pack-destination /tmp/dialectos-pack)
+done
 docker compose config
 ```
 
@@ -53,5 +57,4 @@ The release notes are auto-generated from PR labels per `.github/release.yml`.
 
 ## License Note
 
-All packages are released under BSL-1.1. The Apache-2.0 conversion date is 2030-04-20.
-Production use requires a commercial license or explicit Additional Use Grant until the Change Date.
+All packages are released under Apache-2.0.
