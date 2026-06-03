@@ -45,8 +45,8 @@ for (const path of packages) {
     assert.equal(pkg.publishConfig?.access, 'public', `${path} publishConfig.access must be 'public'`);
   });
 
-  test(`${pkg.name} license is BSL-1.1`, () => {
-    assert.equal(pkg.license, 'BSL-1.1', `${path} license must be BSL-1.1`);
+  test(`${pkg.name} license is Apache-2.0`, () => {
+    assert.equal(pkg.license, 'Apache-2.0', `${path} license must be Apache-2.0`);
   });
 
   test(`${pkg.name} engines.node is >=20.0.0`, () => {
