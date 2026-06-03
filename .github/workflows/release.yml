@@ -1,13 +1,19 @@
-name: Release Dry Run
+name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish packages to npm
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
-  dry-run:
+  release:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -46,11 +52,46 @@ jobs:
           done
 
       - name: Publish dry-run
+        if: ${{ !inputs.publish }}
         run: |
-          for pkg in packages/*; do
-            [ -f "$pkg/package.json" ] || continue
-            echo "::group::npm publish --dry-run for $pkg"
-            (cd "$pkg" && npm publish --dry-run)
+          packages=(
+            packages/types
+            packages/security
+            packages/locale-utils
+            packages/markdown-parser
+            packages/providers
+            packages/cli
+            packages/mcp
+          )
+          for pkg in "${packages[@]}"; do
+            echo "::group::pnpm publish --dry-run for $pkg"
+            (cd "$pkg" && pnpm publish --dry-run --access public --no-git-checks)
+            echo "::endgroup::"
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish packages
+        if: ${{ inputs.publish }}
+        run: |
+          packages=(
+            packages/types
+            packages/security
+            packages/locale-utils
+            packages/markdown-parser
+            packages/providers
+            packages/cli
+            packages/mcp
+          )
+          for pkg in "${packages[@]}"; do
+            name="$(node -p "require('./$pkg/package.json').name")"
+            version="$(node -p "require('./$pkg/package.json').version")"
+            if npm view "$name@$version" version >/dev/null 2>&1; then
+              echo "$name@$version already exists on npm; skipping"
+              continue
+            fi
+            echo "::group::pnpm publish for $pkg"
+            (cd "$pkg" && pnpm publish --access public --no-git-checks)
             echo "::endgroup::"
           done
         env:
