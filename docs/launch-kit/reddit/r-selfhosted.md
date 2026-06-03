@@ -6,7 +6,7 @@
 
 **Body:**
 
-I've been building DialectOS — an source-available Spanish dialect translation server that runs entirely self-hosted.
+I've been building DialectOS — an open-source Spanish dialect translation server that runs entirely self-hosted.
 
 **The problem it solves:**
 
@@ -40,7 +40,7 @@ pnpm dialect:eval -- --live --provider=llm
 
 **Tech stack:** TypeScript, pnpm workspace, 7 packages, automated tests.
 
-**License:** BSL 1.1 (free for most use, becomes Apache-2.0 in 2030).
+**License:** Apache-2.0.
 
 Demo: https://kyanitelabs.github.io/DialectOS
 Repo: https://github.com/KyaniteLabs/DialectOS

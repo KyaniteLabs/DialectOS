@@ -69,7 +69,7 @@ Security matters when you're piping content through translation APIs.
 **Tweet 5:**
 automated tests. 7 packages. pnpm monorepo. TypeScript.
 
-Source available. BSL 1.1 license (Apache-2.0 on 2030-04-20).
+Open-source under Apache-2.0.
 
 If you're building multilingual products, give it a look.
 
@@ -95,7 +95,7 @@ I built DialectOS because existing translation APIs treat Spanish as a single la
 
 **Tech:** TypeScript, pnpm monorepo, automated tests
 
-**License:** BSL 1.1 (becomes Apache-2.0 on 2030-04-20)
+**License:** Apache-2.0
 
 https://github.com/KyaniteLabs/DialectOS
 
@@ -115,11 +115,11 @@ For teams building multilingual products, this means:
 - ✅ Markdown, tables, and code blocks stay intact
 - ✅ Quality gates catch semantic drift before release
 
-Source available, BSL 1.1 licensed, automated tests passing.
+Open-source under Apache-2.0, automated tests passing.
 
 https://github.com/KyaniteLabs/DialectOS
 
-#i18n #localization #mcp #ai #typescript #source-available
+#i18n #localization #mcp #ai #typescript #open-source
 
 ---
 
@@ -140,15 +140,15 @@ DialectOS translates content across 25 Spanish regional variants while preservin
 
 **Tech stack:** TypeScript, pnpm monorepo, automated tests
 
-**License:** BSL 1.1 (source available, becomes Apache-2.0 on 2030-04-20)
+**License:** Apache-2.0
 
 ---
 
 ## Email Newsletter / Blog Pitch
 
-**Subject:** New source-available tool: Spanish dialect translation for AI workflows
+**Subject:** New open-source tool: Spanish dialect translation for AI workflows
 
-DialectOS is a new source-available project that solves a problem most translation tools ignore: Spanish has 25 regional variants, and treating them as one language produces poor user experiences.
+DialectOS is a new open-source project that solves a problem most translation tools ignore: Spanish has 25 regional variants, and treating them as one language produces poor user experiences.
 
 It runs as a Model Context Protocol server, making it the first translation infrastructure designed specifically for AI assistant integration. Claude, Cursor, and any MCP client can translate to Mexican Spanish, Argentine Spanish, Colombian Spanish, and 22 more variants without wrappers or glue code.
 

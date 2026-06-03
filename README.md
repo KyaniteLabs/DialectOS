@@ -8,7 +8,7 @@
 
 **The first Model Context Protocol server built specifically for Spanish dialects.**
 
-DialectOS is a source-available Spanish dialect translation server that runs as an MCP
+DialectOS is an open-source Spanish dialect translation server that runs as an MCP
 (Model Context Protocol) tool and CLI. It translates English and other languages into
 25 regional Spanish variants — Mexican, Argentinian, Colombian, Puerto Rican, and more —
 while preserving markdown structure, enforcing glossary terms, and applying adversarial
@@ -18,7 +18,7 @@ Translate, detect, and adapt content across **25 regional Spanish variants** whi
 
 [![CI](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/KyaniteLabs/DialectOS/actions)
-[![License](https://img.shields.io/badge/license-BSL%201.1-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
 [![pnpm](https://img.shields.io/badge/pnpm-9.15.0-orange)](package.json)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
@@ -388,7 +388,7 @@ Quality Score = tokenIntegrity×25% + glossaryFidelity×30% + structureIntegrity
 ## ❓ FAQ
 
 **What is DialectOS?**
-DialectOS is a source-available translation engine for Spanish regional dialects. It runs as
+DialectOS is an open-source translation engine for Spanish regional dialects. It runs as
 an MCP server (for AI assistants like Claude) and a CLI tool for developers.
 
 **How is DialectOS different from Google Translate?**
@@ -481,7 +481,7 @@ See [`ROADMAP.md`](ROADMAP.md) for upcoming features including:
 
 ## 📄 License
 
-BSL 1.1 — see [`LICENSE`](LICENSE) for details. The Licensed Work will become available under Apache-2.0 on 2030-04-20.
+Apache-2.0 — see [`LICENSE`](LICENSE) for details.
 
 ---
 

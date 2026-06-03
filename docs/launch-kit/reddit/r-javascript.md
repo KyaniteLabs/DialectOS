@@ -48,7 +48,7 @@ if (result.negationDropped) {
 **Try it:**
 
 ```bash
-local build (packages not published yet)
+GitHub Release tarball or local source checkout
 dialectos translate "Hello world" --dialect es-MX
 ```
 

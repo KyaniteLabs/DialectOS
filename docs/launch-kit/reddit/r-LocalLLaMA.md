@@ -10,7 +10,7 @@ If you're running local models and need to translate content to Spanish dialects
 
 But local models can do much better with the right prompts.
 
-**DialectOS** is an source-available translation engine that feeds dialect-specific prompts + grammar profiles + glossary constraints to any LLM:
+**DialectOS** is an open-source translation engine that feeds dialect-specific prompts + grammar profiles + glossary constraints to any LLM:
 
 **Compatible with:**
 - LM Studio (native API)

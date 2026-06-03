@@ -16,8 +16,11 @@ If you're using Claude Desktop, Cursor, or any MCP client and want **native tran
 {
   "mcpServers": {
     "dialectos": {
-      "command": "npx",
-      "args": ["-y", "@dialectos/mcp"],
+      "command": "pnpm",
+      "args": [
+        "dlx",
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-mcp-0.3.0.tgz"
+      ],
       "env": {
         "LLM_API_URL": "https://api.openai.com/v1/chat/completions",
         "LLM_MODEL": "gpt-4o"
@@ -38,4 +41,4 @@ If you're using Claude Desktop, Cursor, or any MCP client and want **native tran
 
 **Why this matters:** Instead of copy-pasting into ChatGPT and hoping it knows Puerto Rican Spanish, you get **deterministic, tested, dialect-aware translation** with quality gates.
 
-source-available, automated tests, works with any OpenAI/Anthropic/local LLM.
+open-source, automated tests, works with any OpenAI/Anthropic/local LLM.

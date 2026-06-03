@@ -98,7 +98,7 @@ Each produces:
 ## Try It
 
 ```bash
-local build (packages not published yet)
+GitHub Release tarball or local source checkout
 dialectos translate "Do not proceed" --dialect es-MX
 # If negation drops, you'll see the quality gate fail explicitly
 ```

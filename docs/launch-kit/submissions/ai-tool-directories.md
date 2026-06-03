@@ -12,11 +12,11 @@
 **Tagline:** Spanish dialect translation server for 25 regional variants
 **Description:**
 
-DialectOS is an source-available translation engine built on the Model Context Protocol (MCP). It translates content to 25 Spanish regional variants while preserving markdown structure and applying adversarial quality gates. Works as an MCP server for Claude Desktop, Cursor, and other AI assistants.
+DialectOS is an open-source translation engine built on the Model Context Protocol (MCP). It translates content to 25 Spanish regional variants while preserving markdown structure and applying adversarial quality gates. Works as an MCP server for Claude Desktop, Cursor, and other AI assistants.
 
 **Category:** Translation / Developer Tools
 **Website:** https://github.com/KyaniteLabs/DialectOS
-**Pricing:** Free (BSL 1.1)
+**Pricing:** Free (Apache-2.0)
 
 ---
 
@@ -42,7 +42,7 @@ Translate to 25 Spanish dialects with an MCP server. DialectOS preserves markdow
 **Name:** DialectOS
 **Description:**
 
-source-available Spanish dialect translation with MCP support. 25 regional variants, structure-preserving markdown translation, adversarial quality gates, and i18n locale tools.
+open-source Spanish dialect translation with MCP support. 25 regional variants, structure-preserving markdown translation, adversarial quality gates, and i18n locale tools.
 
 **Category:** AI Translation / Developer Tools
 **Website:** https://github.com/KyaniteLabs/DialectOS
@@ -70,7 +70,7 @@ The first MCP server for Spanish dialects. Translate to 25 regional variants wit
 **Name:** DialectOS
 **Description:**
 
-Spanish dialect translation server with 25 regional variants, MCP integration, and adversarial quality gates. source-available, automated tests.
+Spanish dialect translation server with 25 regional variants, MCP integration, and adversarial quality gates. open-source, automated tests.
 
 **Category:** Translation
 **Website:** https://github.com/KyaniteLabs/DialectOS

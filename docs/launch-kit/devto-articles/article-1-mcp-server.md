@@ -91,17 +91,17 @@ Quality Score = tokenIntegrity×25% + glossaryFidelity×30% + structureIntegrity
 
 ```bash
 # MCP setup
-local build (packages not published yet)
+GitHub Release tarball or local source checkout
 
 # CLI
-local build (packages not published yet)
+GitHub Release tarball or local source checkout
 dialectos translate "Hello world" --dialect es-MX
 ```
 
-## Source-Available License
+## Open-Source License
 
 - **automated tests** across 7 packages
-- **BSL 1.1** — free for most use, becomes Apache-2.0 in 2030
+- **Apache-2.0** — open-source license
 - [GitHub](https://github.com/KyaniteLabs/DialectOS)
 - [Live Demo](https://kyanitelabs.github.io/DialectOS)
 
