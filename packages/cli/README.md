@@ -2,11 +2,15 @@
 
 CLI commands for Spanish dialect translation workflows.
 
-> Package publishing is not enabled yet. For local development, clone the repository and use `pnpm`.
+> v0.3.0 is distributed through GitHub Release tarballs, not the npm registry.
 
-## Installation (development)
+## Installation
 
 ```bash
+# Install the released CLI tarball
+pnpm add -g https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-cli-0.3.0.tgz
+
+# Or use a local source checkout
 pnpm install
 pnpm build
 ```

@@ -33,9 +33,11 @@ done
 docker compose config
 ```
 
-## npm Publish Order
+## Package Distribution
 
-Publish in dependency order:
+The default v0.3.0 distribution path is GitHub Release tarballs plus `SHA256SUMS.txt`.
+
+Attach package tarballs in dependency order:
 
 1. `@dialectos/types`
 2. `@dialectos/security`
@@ -50,7 +52,19 @@ Publish in dependency order:
 After tagging and verifying CI passes, create a GitHub Release from the tag.
 The release notes are auto-generated from PR labels per `.github/release.yml`.
 
-## Rollback / Unpublish Policy
+## Optional npm Publish Order
+
+If npm publishing is explicitly enabled later, publish in dependency order with `pnpm publish` so workspace dependencies are rewritten correctly:
+
+1. `@dialectos/types`
+2. `@dialectos/security`
+3. `@dialectos/locale-utils`
+4. `@dialectos/markdown-parser`
+5. `@dialectos/providers`
+6. `@dialectos/cli`
+7. `@dialectos/mcp`
+
+## npm Rollback / Unpublish Policy
 
 - Within 72 hours of publish: `npm unpublish <package>@<version>`
 - After 72 hours: publish a patch version with the fix; do not unpublish

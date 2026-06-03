@@ -17,7 +17,7 @@
 | 1 | **Only 1 star** | Social proof death spiral. People don't star what looks abandoned. | Hard — needs launch |
 | 2 | **Only 10/20 GitHub topics** | Missing `nlp`, `llm`, `ai`, `machine-translation`, `vscode-extension`, `es-mx`, `es-ar`, `gender-neutral`, `formality`, `chatgpt`, `claude`, `anthropic`, `openai`, `langchain`, `awesome` | Invisible in topic search | 5 min |
 | 3 | **No custom social preview image** | Default GitHub OG image is ugly. When shared on Twitter/LinkedIn/Slack, looks amateur. | Low shareability | 30 min |
-| 4 | **CITATION.cff says MIT license** | Actual repo license is BSL-1.1. Academic confusion + legal mismatch. | Credibility hit | 2 min |
+| 4 | **CITATION.cff license metadata must match** | Actual repo license is Apache-2.0. Academic confusion + legal mismatch hurts credibility. | Credibility hit | 2 min |
 | 5 | **CITATION.cff says "20 variants"** | README says 25. Inconsistency signals sloppiness to LLMs. | Trust erosion | 2 min |
 | 6 | **No Open Graph / Twitter Card tags** on docs/index.html | Sharing the demo URL produces a blank card. | Zero social virality | 10 min |
 | 7 | **No schema.org structured data** | Google doesn't know this is a SoftwareApplication. LLMs can't extract entity type. | Unindexable by AI | 20 min |
@@ -37,7 +37,7 @@
 | 16 | **No tutorial blog posts** | No "How to translate your Next.js app to Mexican Spanish with DialectOS" content. | Zero organic search traffic | 4 hrs |
 | 17 | **No Dev.to / Medium presence** | These domains rank insanely well on Google. DialectOS has zero content there. | Zero content marketing | 4 hrs |
 | 18 | **No Stack Overflow answers** | When people ask "How to translate Spanish dialects programmatically?" — you're not there. | Zero intent-based discovery | 2 hrs |
-| 19 | **Release v0.1.1 has no release notes** | The release page is empty. People checking project activity see nothing. | Looks dead | 15 min |
+| 19 | **Release v0.3.0 needs launch-quality notes** | The release page is the main package distribution surface. Thin notes waste credibility. | Looks weak | 15 min |
 | 20 | **No GitHub Wiki** | Could host extended docs, API reference, dialect guides. Another indexable surface. | Wasted SEO real estate | 2 hrs |
 
 ### 🟢 AI SEO / LLMO — THE FUTURE (Fix This Month)
@@ -63,7 +63,7 @@
 
 ```bash
 # 1. Fix CITATION.cff
-# Change: license: MIT → license: BSL-1.1
+# Change: license: MIT → license: Apache-2.0
 # Change: "20 regional variants" → "25 regional variants"
 
 # 2. Fix FUNDING.yml — remove placeholder comment, add real options
@@ -84,8 +84,8 @@ topics_to_add = [
 # Must include: DialectOS logo, tagline, key metrics (25 dialects, 17 MCP tools)
 # Upload: Repo Settings → General → Social preview
 
-# 6. Write release notes for v0.1.1
-# Go to Releases → Edit v0.1.1 → Add changelog
+# 6. Keep release notes current for v0.3.0
+# Go to Releases → Edit v0.3.0 → Add launch notes and asset links
 ```
 
 ### PHASE 1: GitHub Pages SEO (This Week, ~4 hours)
@@ -118,7 +118,7 @@ Add to `docs/index.html` `<head>`:
   "description": "The first Model Context Protocol server built specifically for Spanish dialects. Translate across 25 regional variants with structure preservation and quality gates.",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Any",
-  "softwareVersion": "0.1.1",
+  "softwareVersion": "0.3.0",
   "license": "https://github.com/KyaniteLabs/DialectOS/blob/main/LICENSE",
   "codeRepository": "https://github.com/KyaniteLabs/DialectOS",
   "programmingLanguage": ["TypeScript", "JavaScript"],
@@ -288,7 +288,7 @@ DialectOS exposes 17 translation tools through MCP.
   - instance of: software (Q7397)
   - genre: translation software (QXXX)
   - programming language: TypeScript (QXXX)
-  - license: Business Source License 1.1 (QXXX)
+  - license: Apache License 2.0 (Q13785927)
   - official website: https://github.com/KyaniteLabs/DialectOS
   - source code repository: https://github.com/KyaniteLabs/DialectOS
   - developer: Simon Gonzalez
@@ -448,7 +448,7 @@ The $500 Spanish Launch Certification is a brilliant dual-purpose tool:
 - [ ] Add 10 more GitHub topics
 - [ ] Enable GitHub Discussions
 - [ ] Create custom social preview image
-- [ ] Write release notes for v0.1.1
+- [ ] Keep release notes current for v0.3.0
 - [ ] Add OG/Twitter Card tags to docs/index.html
 - [ ] Add schema.org JSON-LD to docs/index.html
 - [ ] Create docs/robots.txt and docs/sitemap.xml
@@ -576,7 +576,7 @@ Print this. Do it in order. Don't skip steps.
 - [ ] Add 10 GitHub topics
 - [ ] Enable GitHub Discussions
 - [ ] Create and upload custom social preview image
-- [ ] Write release notes for v0.1.1
+- [ ] Keep release notes current for v0.3.0
 
 ### This Week
 - [ ] Add OG tags to docs/index.html

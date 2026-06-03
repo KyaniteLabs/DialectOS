@@ -29,12 +29,16 @@ for (const file of collateralFiles) {
   }
 }
 
-test('public docs do not claim unpublished packages or unreleased actions', () => {
+test('public docs do not claim unpublished npm packages', () => {
   for (const [file, text] of Object.entries(allContents)) {
     assert.doesNotMatch(text, /npm install -g @dialectos\/cli/iu, `${file} advertises unpublished CLI package`);
     assert.doesNotMatch(text, /npx -y @dialectos\/mcp/iu, `${file} advertises unpublished MCP package`);
-    assert.doesNotMatch(text, /KyaniteLabs\/DialectOS\/action@v0\.3\.0/iu, `${file} advertises unreleased action`);
   }
+});
+
+test('public docs may reference the released v0.3.0 GitHub Action tag', () => {
+  const text = readFileSync('docs/github-action.md', 'utf8');
+  assert.match(text, /KyaniteLabs\/DialectOS\/action@v0\.3\.0/iu);
 });
 
 test('public docs do not call BSL current version open source or production-free', () => {

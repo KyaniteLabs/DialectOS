@@ -194,7 +194,11 @@ pnpm dialect:report -- --input=audits/release-candidate-2026-04-22/model-matrix.
 ### CLI install
 
 ```bash
-# Local development (packages are not published yet)
+# Install the v0.3.0 CLI tarball from the GitHub Release
+pnpm add -g https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-cli-0.3.0.tgz
+
+# Or use a local source checkout
+pnpm install --frozen-lockfile
 pnpm build
 
 # Translate to Mexican Spanish
@@ -401,14 +405,14 @@ Yes. DialectOS is an MCP server, so Claude Desktop, Cursor, Windsurf, and other 
 clients can use its 17 translation tools natively.
 
 **Is DialectOS free?**
-It is source-available under BSL 1.1. Most non-production use is free. It becomes Apache-2.0 on 2030-04-20. See [LICENSE](LICENSE) for details.
+Yes. DialectOS v0.3.0 is released under Apache-2.0. See [LICENSE](LICENSE) for details.
 
 **What is MCP?**
 Model Context Protocol is an open standard that lets AI assistants use external tools.
 DialectOS exposes 17 translation tools through MCP so AI agents can translate natively.
 
 **Can I use DialectOS for commercial projects?**
-Commercial/production use requires a commercial license or explicit Additional Use Grant until the Change Date. See [LICENSE](LICENSE) for details.
+Yes. Apache-2.0 allows commercial use, modification, and redistribution subject to the license terms. See [LICENSE](LICENSE) for details.
 
 **How accurate is the translation?**
 DialectOS applies 4 quality gates (token integrity, glossary fidelity, structure integrity,
