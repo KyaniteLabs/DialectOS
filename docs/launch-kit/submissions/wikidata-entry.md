@@ -37,11 +37,11 @@
 | instance of (P31) | software (Q7397) | |
 | genre (P136) | translation software | Search for exact QID |
 | programming language (P277) | TypeScript (Q978185) | |
-| license (P275) | Business Source License 1.1 | May need to create this item |
+| license (P275) | Apache License 2.0 (Q13785927) | |
 | official website (P856) | https://github.com/KyaniteLabs/DialectOS | |
 | source code repository (P1324) | https://github.com/KyaniteLabs/DialectOS | |
 | developer (P178) | Simon Gonzalez | Create person item if needed |
-| software version (P348) | 0.1.1 | |
+| software version (P348) | 0.3.0 | |
 | operating system (P306) | cross-platform (Q285308) | |
 
 ---

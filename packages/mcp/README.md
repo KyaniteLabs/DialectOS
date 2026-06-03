@@ -2,6 +2,8 @@
 
 Model Context Protocol server providing 17 tools for Spanish dialect translation across 25 regional variants.
 
+> v0.3.0 is distributed through GitHub Release tarballs, not the npm registry.
+
 ## Usage
 
 Add to your MCP client configuration:
@@ -10,8 +12,11 @@ Add to your MCP client configuration:
 {
   "mcpServers": {
     "dialectos": {
-      "command": "npx",
-      "args": ["-y", "@dialectos/mcp"],
+      "command": "pnpm",
+      "args": [
+        "dlx",
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-mcp-0.3.0.tgz"
+      ],
       "env": {
         "DEEPL_AUTH_KEY": "your-key",
         "ALLOWED_LOCALE_DIRS": "/path/to/locales"
