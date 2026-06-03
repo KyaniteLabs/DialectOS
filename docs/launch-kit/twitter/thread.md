@@ -3,7 +3,7 @@
 # Twitter/X Thread: DialectOS Launch
 
 **Best time to post:** Tuesday or Thursday, 9-11 AM PT
-**Hashtags:** #buildinpublic #i18n #mcp #spanish #source-available #localization #ai #translation
+**Hashtags:** #buildinpublic #i18n #mcp #spanish #open-source #localization #ai #translation
 
 ---
 
@@ -40,7 +40,7 @@ We built support for all 25 — with quality gates that catch bad translations b
 ---
 
 ## Tweet 4 (What It Is)
-DialectOS is an source-available Spanish dialect translation server.
+DialectOS is an open-source Spanish dialect translation server.
 
 It runs as:
 - An MCP server (Claude Desktop, Cursor, etc. use it natively)
@@ -101,10 +101,10 @@ Circuit breaker + rate limiter + translation memory (SHA-256 cache).
 
 ---
 
-## Tweet 9 (source-available)
+## Tweet 9 (open-source)
 - automated tests across 7 packages
-- BSL 1.1 (free for most use)
-- Becomes Apache-2.0 in 2030
+- Apache-2.0
+- GitHub Release tarballs
 - TypeScript, pnpm workspace
 
 We test harder than we market.

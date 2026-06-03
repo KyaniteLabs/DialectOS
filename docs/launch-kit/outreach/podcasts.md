@@ -16,7 +16,7 @@
 
 Hi JS Party team,
 
-I'd love to come on the show to talk about DialectOS — an source-available Spanish dialect translation server we built as a TypeScript monorepo.
+I'd love to come on the show to talk about DialectOS — an open-source Spanish dialect translation server we built as a TypeScript monorepo.
 
 **Topics I can cover:**
 - What is MCP (Model Context Protocol) and why it matters for JS devs
@@ -40,19 +40,19 @@ Simon
 ## 2. The Changelog
 
 **Contact:** https://changelog.com/contact
-**Audience:** source-available enthusiasts
+**Audience:** open-source enthusiasts
 **Format:** Guest appearance
 
-**Subject:** source-available project pitch: DialectOS — Spanish dialect translation engine
+**Subject:** open-source project pitch: DialectOS — Spanish dialect translation engine
 
 **Body:**
 
 Hi Changelog team,
 
-I'd like to pitch DialectOS for the show — it's an source-available translation engine for Spanish regional dialects with MCP integration.
+I'd like to pitch DialectOS for the show — it's an open-source translation engine for Spanish regional dialects with MCP integration.
 
 **Why it fits The Changelog:**
-- source-available (BSL 1.1 → Apache-2.0)
+- open-source (Apache-2.0)
 - Solves a real problem with technical depth
 - Interesting architecture (provider registry, circuit breaker, quality gates)
 - Built in the open on GitHub
@@ -119,7 +119,7 @@ Simon Gonzalez
 
 Hi SE Daily team,
 
-I'd like to pitch DialectOS for an episode — it's an source-available Spanish dialect translation server built as a TypeScript monorepo.
+I'd like to pitch DialectOS for an episode — it's an open-source Spanish dialect translation server built as a TypeScript monorepo.
 
 **Topics:**
 - Monorepo architecture with pnpm workspaces
@@ -148,7 +148,7 @@ Simon Gonzalez
 
 Hi Backend Engineering Show team,
 
-I'd love to do a deep dive on DialectOS — our source-available translation server's backend architecture.
+I'd love to do a deep dive on DialectOS — our open-source translation server's backend architecture.
 
 **Architecture highlights:**
 - Provider registry with weighted fallback chains

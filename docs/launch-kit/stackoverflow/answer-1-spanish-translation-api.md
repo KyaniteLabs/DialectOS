@@ -14,10 +14,10 @@ If you need **dialect-aware Spanish translation** (not just generic "Spanish"), 
 - **DeepL** — ~5 Spanish variants (ES, MX, BR-PT, etc.)
 - **Azure Translator** — 1 Spanish option
 
-For **25 regional Spanish variants** with quality gates, consider **[DialectOS](https://github.com/KyaniteLabs/DialectOS)** — an source-available MCP server and CLI:
+For **25 regional Spanish variants** with quality gates, consider **[DialectOS](https://github.com/KyaniteLabs/DialectOS)** — an open-source MCP server and CLI:
 
 ```bash
-local build (packages not published yet)
+GitHub Release tarball or local source checkout
 dialectos translate "Hello world" --dialect es-MX
 dialectos translate "Hello world" --dialect es-AR
 dialectos translate "Hello world" --dialect es-PR
@@ -31,6 +31,6 @@ dialectos translate "Hello world" --dialect es-PR
 - Glossary enforcement
 - Adversarial quality gates (catches semantic drift, negation drops)
 - Works with OpenAI, Anthropic, DeepL, or local LLMs
-- automated tests, BSL 1.1 license
+- automated tests, Apache-2.0 license
 
 **For existing APIs:** You can use DialectOS as a wrapper — it adds dialect prompts, quality scoring, and fallback chains on top of your existing provider.

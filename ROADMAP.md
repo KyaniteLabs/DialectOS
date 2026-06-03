@@ -4,7 +4,7 @@ This document outlines the planned direction for DialectOS. It is a living docum
 
 ## 🎯 Vision
 
-Become the **most accurate source-available engine for Spanish dialect detection and adaptation**. We focus on depth over breadth: 25 Spanish variants with high-quality keyword detection, register classification, and vocabulary adaptation rules.
+Become the **most accurate open-source engine for Spanish dialect detection and adaptation**. We focus on depth over breadth: 25 Spanish variants with high-quality keyword detection, register classification, and vocabulary adaptation rules.
 
 ## 📅 Short Term (Next 1–3 Months)
 

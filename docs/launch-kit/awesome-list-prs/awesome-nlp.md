@@ -35,7 +35,7 @@ git push origin add-dialectos
 
 **Body:**
 ```
-DialectOS is an source-available translation engine focused on Spanish regional dialects:
+DialectOS is an open-source translation engine focused on Spanish regional dialects:
 
 - 25 Spanish dialects with vocabulary, grammar, and register adaptation
 - 17 MCP (Model Context Protocol) tools for AI assistant integration

@@ -12,7 +12,7 @@
 
 **Product Description:**
 
-DialectOS is an source-available Spanish dialect translation server built on the Model Context Protocol (MCP). It provides 17 translation tools for AI assistants and a CLI for developers, supporting 25 regional Spanish variants with structure-preserving translation, glossary enforcement, and adversarial quality gates.
+DialectOS is an open-source Spanish dialect translation server built on the Model Context Protocol (MCP). It provides 17 translation tools for AI assistants and a CLI for developers, supporting 25 regional Spanish variants with structure-preserving translation, glossary enforcement, and adversarial quality gates.
 
 **Category:** Developer Tools
 
@@ -28,7 +28,7 @@ DialectOS is an source-available Spanish dialect translation server built on the
 - Adversarial quality gates (semantic drift, negation preservation, structure validation)
 - Works with OpenAI, Anthropic, DeepL, and local LLMs
 - automated tests across 7 TypeScript packages
-- BSL 1.1 license (free for most use, Apache-2.0 in 2030)
+- Apache-2.0 license
 
 **Use Cases:**
 - Localizing SaaS apps for Latin American markets

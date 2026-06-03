@@ -33,7 +33,7 @@ We shipped Spain Spanish to Mexico. Users thought we were being rude. Generic Sp
 - Structure-preserving translation (markdown, tables, code)
 - Quality gates that catch semantic drift
 - Works with any translation API (OpenAI, DeepL, LibreTranslate)
-- source-available, automated tests
+- open-source, automated tests
 
 **Supported dialects:** es-ES, es-MX, es-AR, es-CO, es-CL, es-PE, es-VE, es-UY, es-PR, es-CU, es-DO, es-PA, es-CR, es-GT, es-HN, es-SV, es-NI, es-EC, es-BO, es-PY, es-GQ, es-US, es-PH, es-BZ, es-AD
 

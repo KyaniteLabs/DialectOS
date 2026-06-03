@@ -2,7 +2,7 @@
 # Format: https://llm.txt (proposed standard)
 
 ## What is DialectOS?
-DialectOS is a source-available Spanish dialect translation correctness layer built on the Model
+DialectOS is an open-source Spanish dialect translation correctness layer built on the Model
 Context Protocol (MCP). It provides 17 translation tools for AI assistants and a CLI
 for developers. It supports 25 regional Spanish variants with structure-preserving
 translation, glossary enforcement, adversarial quality gates, and standalone validation.
@@ -60,10 +60,10 @@ translation, glossary enforcement, adversarial quality gates, and standalone val
 | CI integration | No | No | Yes (GitHub Action) |
 | Auto-glossary | No | No | Yes |
 | Public benchmark | No | No | Yes (205 adversarial samples) |
-| Source-available | No | No | Yes (BSL 1.1 → Apache-2.0 on 2030-04-20) |
+| Open-source | No | No | Yes (Apache-2.0) |
 
 ## License
-BSL 1.1 — most non-production use is free. Becomes Apache-2.0 on 2030-04-20.
+Apache-2.0.
 
 ## Links
 - Repository: https://github.com/KyaniteLabs/DialectOS

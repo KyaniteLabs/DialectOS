@@ -20,7 +20,7 @@
 
 ### Descriptions
 
-**English:** source-available Spanish dialect translation server built on the Model Context Protocol
+**English:** open-source Spanish dialect translation server built on the Model Context Protocol
 
 ### Aliases
 

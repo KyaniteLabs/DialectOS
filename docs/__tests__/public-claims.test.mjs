@@ -41,10 +41,10 @@ test('public docs may reference the released v0.3.0 GitHub Action tag', () => {
   assert.match(text, /KyaniteLabs\/DialectOS\/action@v0\.3\.0/iu);
 });
 
-test('public docs do not call BSL current version open source or production-free', () => {
+test('public docs do not contain stale BSL license claims', () => {
   for (const [file, text] of Object.entries(allContents)) {
-    assert.doesNotMatch(text, /open[- ]source/iu, `${file} uses open-source for current BSL release`);
-    assert.doesNotMatch(text, /production use allowed|allows production use/iu, `${file} overstates BSL production rights`);
+    assert.doesNotMatch(text, /BSL|Business Source|Change Date|Additional Use Grant/iu, `${file} contains stale BSL-era license language`);
+    assert.doesNotMatch(text, /becomes Apache-2\.0|Apache-2\.0 in 2030|2030-04-20/iu, `${file} contains stale delayed-Apache language`);
   }
 });
 
