@@ -2,6 +2,11 @@
 
 Agent-focused guidance for the DialectOS Spanish dialect translation system.
 
+## Public Agent Skill
+- `skills/dialectos/SKILL.md` is the public skill for this repo.
+- Invoke `$dialectos` in compatible agent hosts for regional Spanish localization, markdown/API-doc preservation, locale JSON validation, glossary enforcement, formality checks, gender-neutral language, and launch certification.
+- Keep the skill aligned with `packages/cli/README.md`, `packages/mcp/README.md`, provider setup, and certification commands when those surfaces change.
+
 ## Project Structure
 
 pnpm monorepo with 7 workspace packages under `packages/`:

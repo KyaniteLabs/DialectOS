@@ -27,6 +27,7 @@ Translate, detect, and adapt content across **25 regional Spanish variants** whi
 [📖 Documentation](https://github.com/KyaniteLabs/DialectOS#readme) ·
 [🚀 Quick Start](#quick-start) ·
 [🛠️ MCP Tools](#mcp-tools) ·
+[Agent Skill](#agent-skill) ·
 [📦 Packages](#packages) ·
 [🤝 Contributing](CONTRIBUTING.md) ·
 [📋 Roadmap](ROADMAP.md)
@@ -44,6 +45,10 @@ Translate, detect, and adapt content across **25 regional Spanish variants** whi
 **AI discovery:** [`llms.txt`](llms.txt) provides a compact project summary for AI assistants and search crawlers.
 
 **Best-fit searches:** Spanish dialect translation MCP server, Spanish localization QA, Model Context Protocol translation tool, i18n validation CLI, regional Spanish translator, glossary enforcement, AI localization audit, Spanish launch certification.
+
+## Agent Skill
+
+DialectOS includes a public agent skill at [`skills/dialectos/SKILL.md`](skills/dialectos/SKILL.md). Use `$dialectos` in compatible agent hosts when you want an agent to choose the right MCP or CLI workflow for regional Spanish translation, markdown preservation, locale-file validation, glossary enforcement, register checks, and launch-readiness QA.
 
 ## Spanish Launch Certification
 

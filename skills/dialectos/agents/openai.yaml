@@ -1,0 +1,7 @@
+interface:
+  display_name: "DialectOS"
+  short_description: "Spanish dialect localization QA"
+  default_prompt: "Use $dialectos to translate, validate, and QA this content for the target Spanish dialects."
+
+policy:
+  allow_implicit_invocation: true
