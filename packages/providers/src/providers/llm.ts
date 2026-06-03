@@ -496,9 +496,14 @@ export class LLMProvider implements TranslationProvider {
   }
 
   private normalizeEndpoint(endpoint: string): string {
-    return this.apiFormat === "lmstudio"
-      ? endpoint.replace(/\/+$/, "")
-      : endpoint;
+    if (this.apiFormat !== "lmstudio") {
+      return endpoint;
+    }
+    let end = endpoint.length;
+    while (end > 0 && endpoint.charCodeAt(end - 1) === 47) {
+      end--;
+    }
+    return endpoint.slice(0, end);
   }
 
   private inferenceUrl(): string {

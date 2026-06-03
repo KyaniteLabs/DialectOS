@@ -37,6 +37,10 @@ const format = args.get("format") || "text";
 const strict = args.get("strict") === "true";
 const cliPath = args.get("cli-path") || join(process.cwd(), "packages/cli/dist/index.js");
 
+function escapeRegExp(value) {
+  return String(value).replace(/[\\^$.*+?()[\]{}|]/g, "\\$&");
+}
+
 // Detect changed files (CI mode) or scan directory (local mode)
 function detectTargetFiles() {
   if (targetPatterns.length > 0) {
@@ -119,7 +123,7 @@ function validateFile(filePath) {
   } else {
     // For markdown/text files, use positional arg + --source-file
     // Try to find a matching source file
-    const baseName = filePath.replace(new RegExp(`[-.]${dialect}`, ""), "");
+    const baseName = filePath.replace(new RegExp(`[-.]${escapeRegExp(dialect)}`, ""), "");
     if (existsSync(baseName)) {
       validateArgs.push(`--source-file=${baseName}`, `--translated-file=${filePath}`);
     } else {

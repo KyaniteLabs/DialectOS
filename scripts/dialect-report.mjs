@@ -91,8 +91,18 @@ function gradeFor(summary) {
   return "Pass";
 }
 
-function escapePipes(value) {
-  return String(value ?? "").replace(/\|/g, "\\|").replace(/\n/g, " ");
+function escapeMarkdownTableCell(value) {
+  let result = "";
+  for (const char of String(value ?? "")) {
+    if (char === "|") {
+      result += "\\|";
+    } else if (char === "\n" || char === "\r") {
+      result += " ";
+    } else {
+      result += char;
+    }
+  }
+  return result;
 }
 
 function collectSummary(results) {
@@ -190,7 +200,7 @@ function render(results) {
   lines.push("| Certification | Grade | Passed | Failed | Warnings | Dialects | Notes |");
   lines.push("| --- | --- | ---: | ---: | ---: | ---: | --- |");
   for (const result of results) {
-    lines.push(`| ${escapePipes(result.label)} | ${gradeFor(result)} | ${result.passed}/${result.total} | ${result.failed} | ${result.warnings} | ${result.dialects ?? ""} | ${result.unstable ? `${result.unstable} unstable` : result.outputVariance ? `${result.outputVariance} output variance` : ""} |`);
+    lines.push(`| ${escapeMarkdownTableCell(result.label)} | ${gradeFor(result)} | ${result.passed}/${result.total} | ${result.failed} | ${result.warnings} | ${result.dialects ?? ""} | ${result.unstable ? `${result.unstable} unstable` : result.outputVariance ? `${result.outputVariance} output variance` : ""} |`);
   }
   lines.push("");
   lines.push("## Failure details");
@@ -201,7 +211,7 @@ function render(results) {
     lines.push("| Certification | Dialect | Fixture | Severity | MQM category | Message | Output |");
     lines.push("| --- | --- | --- | --- | --- | --- | --- |");
     for (const issue of issues) {
-      lines.push(`| ${escapePipes(issue.certification)} | ${escapePipes(issue.dialect)} | ${escapePipes(issue.fixture)} | ${issue.severity} | ${issue.category} | ${escapePipes(issue.message)} | ${escapePipes(issue.output)} |`);
+      lines.push(`| ${escapeMarkdownTableCell(issue.certification)} | ${escapeMarkdownTableCell(issue.dialect)} | ${escapeMarkdownTableCell(issue.fixture)} | ${issue.severity} | ${issue.category} | ${escapeMarkdownTableCell(issue.message)} | ${escapeMarkdownTableCell(issue.output)} |`);
     }
   }
   lines.push("");

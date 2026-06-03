@@ -414,7 +414,22 @@ export function stripHtmlTags(text: string): string {
       ALLOWED_ATTR: [],
     });
   } catch {
-    return text.replace(/<[^>]*>/g, "");
+    let result = "";
+    let insideTag = false;
+    for (const char of text) {
+      if (char === "<") {
+        insideTag = true;
+        continue;
+      }
+      if (char === ">") {
+        insideTag = false;
+        continue;
+      }
+      if (!insideTag) {
+        result += char;
+      }
+    }
+    return result;
   }
 }
 

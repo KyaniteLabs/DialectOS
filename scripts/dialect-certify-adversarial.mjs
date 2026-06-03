@@ -81,6 +81,20 @@ function writeJson(path, value) {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function escapeMarkdownTableCell(value) {
+  let result = "";
+  for (const char of String(value ?? "")) {
+    if (char === "|") {
+      result += "\\|";
+    } else if (char === "\n" || char === "\r") {
+      result += " ";
+    } else {
+      result += char;
+    }
+  }
+  return result;
+}
+
 function writeFailureMatrix(summary) {
   const lines = [
     "# Adversarial Dialect Certification Matrix",
@@ -99,7 +113,7 @@ function writeFailureMatrix(summary) {
     "| --- | --- | --- | --- | --- | --- | ---: | --- | --- |",
   ];
   for (const result of summary.results) {
-    lines.push(`| ${result.run} | ${result.dialect} | ${result.fixture} | ${result.category || ""} | ${result.severity || ""} | ${result.passes ? "yes" : "no"} | ${(result.warnings.length + result.qualityWarnings.length)} | ${[...result.failures, ...result.qualityWarnings].join("; ").replace(/\|/g, "\\|")} | ${(result.output || "").replace(/\|/g, "\\|")} |`);
+    lines.push(`| ${result.run} | ${escapeMarkdownTableCell(result.dialect)} | ${escapeMarkdownTableCell(result.fixture)} | ${escapeMarkdownTableCell(result.category || "")} | ${escapeMarkdownTableCell(result.severity || "")} | ${result.passes ? "yes" : "no"} | ${(result.warnings.length + result.qualityWarnings.length)} | ${escapeMarkdownTableCell([...(result.failures || []), ...(result.qualityWarnings || [])].join("; "))} | ${escapeMarkdownTableCell(result.output || "")} |`);
   }
   if (summary.unstable.length > 0) {
     lines.push("", "## Unstable samples", "");
