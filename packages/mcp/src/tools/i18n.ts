@@ -43,6 +43,7 @@ import {
 import { ToolResult } from "../lib/types.js";
 import { createProviderRegistry } from "@dialectos/providers";
 import type { TranslateOptions } from "@dialectos/types";
+import { registerScoredTool } from "./metadata.js";
 
 // ============================================================================
 // Types
@@ -839,12 +840,24 @@ export function registerI18nTools(
   const rateLimiter = options.rateLimiter || new RateLimiter(60, 60000);
 
   // Register detect_missing_keys tool
-  server.tool(
+  registerScoredTool(
+    server,
     "detect_missing_keys",
-    "Compare two locale files and report missing keys",
     {
-      basePath: z.string().describe("Path to the base locale file"),
-      targetPath: z.string().describe("Path to the target locale file"),
+      title: "Detect missing locale keys",
+      description:
+        "Compare a base JSON locale file against a target JSON locale file and return keys present in the base but absent from the target. Reads both files only; it does not translate, create, or modify locale files.",
+      inputSchema: {
+        basePath: z.string().min(1).describe("Absolute or workspace-relative path to the complete base JSON locale file, such as locales/en.json."),
+        targetPath: z.string().min(1).describe("Absolute or workspace-relative path to the target JSON locale file to audit, such as locales/es-MX.json."),
+      },
+      annotations: {
+        title: "Detect missing locale keys",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
     },
     async (params) => {
       return handleDetectMissingKeys(params as DetectMissingKeysParams, registry, rateLimiter);
@@ -852,14 +865,26 @@ export function registerI18nTools(
   );
 
   // Register translate_missing_keys tool
-  server.tool(
+  registerScoredTool(
+    server,
     "translate_missing_keys",
-    "Translate missing keys from base locale to target locale",
     {
-      basePath: z.string().describe("Path to the base locale file"),
-      targetPath: z.string().describe("Path to the target locale file"),
-      dialect: dialectSchema.optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: providerNameSchema.optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
+      title: "Translate missing locale keys",
+      description:
+        "Fill a target JSON locale file with translated values for keys that exist in the base locale but are missing from the target. Reads both files and writes the updated target file; existing target keys are preserved.",
+      inputSchema: {
+        basePath: z.string().min(1).describe("Path to the source JSON locale file that contains the canonical key set and source-language values."),
+        targetPath: z.string().min(1).describe("Path to the JSON locale file to update with translated missing keys. This file may be modified in place."),
+        dialect: dialectSchema.optional().describe("Target Spanish dialect code. Defaults to es-ES when omitted; examples include es-MX, es-AR, and es-CO."),
+        provider: providerNameSchema.optional().describe("Translation provider to use. Omit for automatic provider selection; valid values include llm, deepl, libre, and mymemory."),
+      },
+      annotations: {
+        title: "Translate missing locale keys",
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
     },
     async (params) => {
       return handleTranslateMissingKeys(params as TranslateMissingKeysParams, registry, rateLimiter);
@@ -867,16 +892,28 @@ export function registerI18nTools(
   );
 
   // Register batch_translate_locales tool
-  server.tool(
+  registerScoredTool(
+    server,
     "batch_translate_locales",
-    "Translate base locale to multiple target dialects",
     {
-      directory: z.string().describe("Directory containing locale files"),
-      baseLocale: z.string().optional().describe("Base locale name (e.g., en, es-ES)"),
-      targets: z.array(z.string().refine((v) => ALL_SPANISH_DIALECTS.includes(v as SpanishDialect), {
-        message: "Invalid Spanish dialect code",
-      })).describe("Array of target Spanish dialect codes"),
-      provider: providerNameSchema.optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
+      title: "Batch translate locale files",
+      description:
+        "Create or update multiple Spanish JSON locale files from one base locale file in a directory. For each target dialect it writes <dialect>.json, preserves existing translated keys, translates only missing keys, and returns per-target errors without deleting files.",
+      inputSchema: {
+        directory: z.string().min(1).describe("Directory containing locale JSON files. The base file is read from this directory and target files are written here."),
+        baseLocale: z.string().min(1).optional().describe("Base locale filename without .json. Defaults to en, so the default source file is en.json."),
+        targets: z.array(z.string().refine((v) => ALL_SPANISH_DIALECTS.includes(v as SpanishDialect), {
+          message: "Invalid Spanish dialect code",
+        })).min(1).max(MAX_ARRAY_LENGTH).describe("One or more target Spanish dialect codes to generate or update, such as es-MX, es-AR, or es-CO."),
+        provider: providerNameSchema.optional().describe("Translation provider to use for all targets. Omit for automatic provider selection; valid values include llm, deepl, libre, and mymemory."),
+      },
+      annotations: {
+        title: "Batch translate locale files",
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
     },
     async (params) => {
       return handleBatchTranslateLocales(params as BatchTranslateLocalesParams, registry, rateLimiter);
@@ -884,15 +921,27 @@ export function registerI18nTools(
   );
 
   // Register manage_dialect_variants tool
-  server.tool(
+  registerScoredTool(
+    server,
     "manage_dialect_variants",
-    "Create dialect-specific variants of a locale file",
     {
-      sourcePath: z.string().describe("Path to the source locale file"),
-      variant: z.string().refine((v) => ALL_SPANISH_DIALECTS.includes(v as SpanishDialect), {
-        message: "Invalid Spanish dialect variant",
-      }).describe("Target dialect variant (e.g., es-MX, es-AR, es-CO)"),
-      outputPath: z.string().optional().describe("Output path (optional, defaults to source path)"),
+      title: "Create dialect locale variant",
+      description:
+        "Apply deterministic regional vocabulary substitutions to a JSON locale file for a specific Spanish dialect. Writes the adapted locale to outputPath when provided; otherwise overwrites sourcePath.",
+      inputSchema: {
+        sourcePath: z.string().min(1).describe("Path to the source JSON locale file whose string values should be adapted."),
+        variant: z.string().refine((v) => ALL_SPANISH_DIALECTS.includes(v as SpanishDialect), {
+          message: "Invalid Spanish dialect variant",
+        }).describe("Target Spanish dialect variant for regional vocabulary adaptation, such as es-MX, es-AR, or es-CO."),
+        outputPath: z.string().min(1).optional().describe("Destination JSON file. Omit to update the source file in place."),
+      },
+      annotations: {
+        title: "Create dialect locale variant",
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
     },
     async (params) => {
       return handleManageDialectVariants(params as ManageDialectVariantsParams, registry, rateLimiter);
@@ -900,12 +949,24 @@ export function registerI18nTools(
   );
 
   // Register check_formality tool
-  server.tool(
+  registerScoredTool(
+    server,
     "check_formality",
-    "Check locale file for formality consistency",
     {
-      localePath: z.string().describe("Path to the locale file to check"),
-      register: z.enum(["formal", "informal"]).optional().describe("Register to check for (formal or informal)"),
+      title: "Check locale formality",
+      description:
+        "Audit a JSON locale file for Spanish register consistency by flagging informal tú/vos patterns in formal copy or usted patterns in informal copy. Reads the locale file and returns issue objects; it does not rewrite text.",
+      inputSchema: {
+        localePath: z.string().min(1).describe("Path to the JSON locale file to inspect for formality issues."),
+        register: z.enum(["formal", "informal"]).optional().describe("Expected register for the locale copy. Defaults to formal when omitted."),
+      },
+      annotations: {
+        title: "Check locale formality",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
     },
     async (params) => {
       return handleCheckFormality(params as CheckFormalityParams, registry, rateLimiter);
@@ -913,12 +974,24 @@ export function registerI18nTools(
   );
 
   // Register apply_gender_neutral tool
-  server.tool(
+  registerScoredTool(
+    server,
     "apply_gender_neutral",
-    "Apply gender-neutral language strategies to a locale file",
     {
-      localePath: z.string().describe("Path to the locale file to adapt"),
-      strategy: z.enum(["latine", "elles", "x", "descriptive"]).optional().describe("Gender-neutral strategy (latine, elles, x, descriptive)"),
+      title: "Apply gender-neutral locale language",
+      description:
+        "Rewrite a JSON locale file using one gender-neutral Spanish strategy. This modifies the locale file in place and returns a count of changed entries; it does not call a translation provider.",
+      inputSchema: {
+        localePath: z.string().min(1).describe("Path to the JSON locale file to adapt in place."),
+        strategy: z.enum(["latine", "elles", "x", "descriptive"]).optional().describe("Gender-neutral strategy. Defaults to latine; options are latine, elles, x, and descriptive."),
+      },
+      annotations: {
+        title: "Apply gender-neutral locale language",
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
     },
     async (params) => {
       return handleApplyGenderNeutral(params as ApplyGenderNeutralParams, registry, rateLimiter);
