@@ -32,6 +32,7 @@ import type { ProviderRegistry } from "@dialectos/providers";
 import { ToolResult } from "../lib/types.js";
 import type { BaseToolOptions } from "../lib/types.js";
 import { createProviderRegistry } from "@dialectos/providers";
+import { registerScoredTool } from "./metadata.js";
 
 // Re-export for backward compatibility
 export { createProviderRegistry };
@@ -485,56 +486,100 @@ export function registerDocsTools(
   // Create rate limiter if not provided
   const rateLimiter = options.rateLimiter || new RateLimiter(60, 60000);
 
-  // Register translate_markdown tool
-  server.tool(
+  registerScoredTool(
+    server,
     "translate_markdown",
-    "Translate a markdown file while preserving structure (code blocks, links, etc.)",
     {
-      filePath: z.string().describe("Path to the markdown file to translate"),
-      dialect: dialectSchema.optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: providerNameSchema.optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
-      formal: z.boolean().optional().describe("Use formal tone (for languages that distinguish formal/informal)"),
-      informal: z.boolean().optional().describe("Use informal tone (for languages that distinguish formal/informal)"),
+      title: "Translate Markdown file",
+      description:
+        "Read a Markdown file, translate translatable prose into a Spanish dialect, and return reconstructed Markdown while preserving code blocks, links, and non-translatable sections. Reads the file only; it does not overwrite the source file.",
+      inputSchema: {
+        filePath: z.string().min(1).describe("Path to the Markdown file to read and translate."),
+        dialect: dialectSchema.optional().describe("Target Spanish dialect code. Defaults to es-ES when omitted; examples include es-MX, es-AR, and es-CO."),
+        provider: providerNameSchema.optional().describe("Translation provider to use. Omit for automatic provider selection; valid values include llm, deepl, libre, and mymemory."),
+        formal: z.boolean().optional().describe("Request formal Spanish register. Do not set both formal and informal."),
+        informal: z.boolean().optional().describe("Request informal Spanish register. Do not set both informal and formal."),
+      },
+      annotations: {
+        title: "Translate Markdown file",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
     },
     async (params) => {
       return handleTranslateMarkdown(params as TranslateMarkdownParams, registry, rateLimiter);
     }
   );
 
-  // Register extract_translatable tool
-  server.tool(
+  registerScoredTool(
+    server,
     "extract_translatable",
-    "Extract translatable text from a markdown file (excludes code blocks, HTML)",
     {
-      filePath: z.string().describe("Path to the markdown file to analyze"),
+      title: "Extract translatable Markdown text",
+      description:
+        "Read a Markdown file and return only the prose sections considered safe to translate, excluding code blocks and other protected structure. This is a read-only analysis tool and does not call a translation provider.",
+      inputSchema: {
+        filePath: z.string().min(1).describe("Path to the Markdown file to inspect for translatable sections."),
+      },
+      annotations: {
+        title: "Extract translatable Markdown text",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
     },
     async (params) => {
       return handleExtractTranslatable(params as ExtractTranslatableParams, registry, rateLimiter);
     }
   );
 
-  // Register translate_api_docs tool
-  server.tool(
+  registerScoredTool(
+    server,
     "translate_api_docs",
-    "Translate API documentation markdown with optimized handling for tables and lists",
     {
-      filePath: z.string().describe("Path to the API documentation markdown file"),
-      dialect: dialectSchema.optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: providerNameSchema.optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
+      title: "Translate API documentation",
+      description:
+        "Read API documentation Markdown and translate prose into a Spanish dialect with documentation context for tables, lists, endpoints, and technical terms. Returns translated Markdown and errors; it does not modify the file.",
+      inputSchema: {
+        filePath: z.string().min(1).describe("Path to the API documentation Markdown file to read and translate."),
+        dialect: dialectSchema.optional().describe("Target Spanish dialect code. Defaults to es-ES when omitted."),
+        provider: providerNameSchema.optional().describe("Translation provider to use. Omit for automatic provider selection; valid values include llm, deepl, libre, and mymemory."),
+      },
+      annotations: {
+        title: "Translate API documentation",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
     },
     async (params) => {
       return handleTranslateApiDocs(params as TranslateApiDocsParams, registry, rateLimiter);
     }
   );
 
-  // Register create_bilingual_doc tool
-  server.tool(
+  registerScoredTool(
+    server,
     "create_bilingual_doc",
-    "Create a side-by-side bilingual document with original and translated sections",
     {
-      filePath: z.string().describe("Path to the markdown file to translate"),
-      dialect: dialectSchema.optional().describe("Spanish dialect code (e.g., es-ES, es-MX, es-AR)"),
-      provider: providerNameSchema.optional().describe("Translation provider name (llm, deepl, libre, mymemory)"),
+      title: "Create bilingual Markdown document",
+      description:
+        "Read a Markdown file and return a bilingual document that pairs original sections with Spanish translations. The result is returned as Markdown text; the source file is read only and not overwritten.",
+      inputSchema: {
+        filePath: z.string().min(1).describe("Path to the Markdown file to read and convert into a bilingual document."),
+        dialect: dialectSchema.optional().describe("Target Spanish dialect code for translated sections. Defaults to es-ES when omitted."),
+        provider: providerNameSchema.optional().describe("Translation provider to use. Omit for automatic provider selection; valid values include llm, deepl, libre, and mymemory."),
+      },
+      annotations: {
+        title: "Create bilingual Markdown document",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
     },
     async (params) => {
       return handleCreateBilingualDoc(params as CreateBilingualDocParams, registry, rateLimiter);
