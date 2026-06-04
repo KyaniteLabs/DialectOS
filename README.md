@@ -96,9 +96,38 @@ Spanish is not one language — it's **25 regional variants** with different voc
 
 ## 🚀 Quick Start
 
-> **Note:** DialectOS packages are not yet published to npm. Setup requires cloning the repo and building from source (~2–5 minutes first time).
+> **Install note:** DialectOS v0.3.0 is distributed through GitHub Release tarballs, not the npm registry. Use the released MCP/CLI tarballs for agent and command-line installs; clone the repo only for local development or the browser demo.
+
+### MCP setup
+
+Add the released MCP server to Claude Desktop, Cursor, or any MCP client:
+
+```json
+{
+  "mcpServers": {
+    "dialectos": {
+      "command": "pnpm",
+      "args": [
+        "dlx",
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-mcp-0.3.0.tgz"
+      ],
+      "env": {
+        "LLM_API_URL": "https://your-llm-gateway/v1/chat/completions",
+        "LLM_MODEL": "your-dialect-capable-model",
+        "LLM_API_KEY": "your-key-if-required",
+        "LLM_API_FORMAT": "openai",
+        "ALLOWED_LOCALE_DIRS": "/path/to/locales"
+      }
+    }
+  }
+}
+```
+
+For local development from a source checkout, run `pnpm build` and point your MCP client at `packages/mcp/dist/index.js`.
 
 ### Full-app browser demo
+
+The browser demo requires a source checkout.
 
 The browser demo is no longer a fake/static rule replacer. It calls a local
 DialectOS backend, and that backend calls the configured provider stack.
@@ -115,29 +144,6 @@ Open `http://127.0.0.1:8080`.
 
 For the beginner container walkthrough, see
 [`docs/full-app-demo.md`](docs/full-app-demo.md).
-
-### Local MCP setup
-
-After `pnpm build`, add to your Claude Desktop, Cursor, or any MCP client:
-
-```json
-{
-  "mcpServers": {
-    "dialectos": {
-      "command": "node",
-      "args": ["packages/mcp/dist/index.js"],
-      "comment": "Local development setup — see README for clone and build instructions.",
-      "env": {
-        "LLM_API_URL": "https://your-llm-gateway/v1/chat/completions",
-        "LLM_MODEL": "your-dialect-capable-model",
-        "LLM_API_KEY": "your-key-if-required",
-        "LLM_API_FORMAT": "openai",
-        "ALLOWED_LOCALE_DIRS": "/path/to/locales"
-      }
-    }
-  }
-}
-```
 
 ### Recommended certified models
 

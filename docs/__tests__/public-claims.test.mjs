@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 
 const files = ['README.md', 'SECURITY.md', '.llm', 'ROADMAP.md'];
 const contents = Object.fromEntries(files.map((file) => [file, readFileSync(file, 'utf8')]));
+const cliReadme = readFileSync('packages/cli/README.md', 'utf8');
 
 function walk(dir) {
   return readdirSync(dir).flatMap((name) => {
@@ -39,6 +40,22 @@ test('public docs do not claim unpublished npm packages', () => {
 test('public docs may reference the released v0.3.0 GitHub Action tag', () => {
   const text = readFileSync('docs/github-action.md', 'utf8');
   assert.match(text, /KyaniteLabs\/DialectOS\/action@v0\.3\.0/iu);
+});
+
+test('public install docs point users to release tarballs before source checkout', () => {
+  const rootLlms = readFileSync('llms.txt', 'utf8');
+  const docsLlms = readFileSync('docs/llms.txt', 'utf8');
+
+  assert.doesNotMatch(contents['README.md'], /Setup requires cloning the repo and building from source/iu);
+  assert.match(contents['README.md'], /GitHub Release tarballs/iu);
+  assert.match(contents['README.md'], /dialectos-mcp-0\.3\.0\.tgz/iu);
+  assert.match(rootLlms, /GitHub Release tarballs/iu);
+  assert.match(docsLlms, /GitHub Release tarballs/iu);
+});
+
+test('CLI README command examples use the installed dialectos binary', () => {
+  assert.doesNotMatch(cliReadme, /^node packages\/cli\/dist\/index\.js/mu);
+  assert.match(cliReadme, /\bdialectos translate "Hello world" --dialect es-MX\b/u);
 });
 
 test('public docs do not contain stale BSL license claims', () => {
