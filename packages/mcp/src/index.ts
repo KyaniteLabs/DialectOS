@@ -11,7 +11,8 @@
  * - Bilingual document creation (create_bilingual_doc)
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { registerDocsTools } from "./tools/docs.js";
@@ -76,8 +77,22 @@ async function main(): Promise<void> {
   // No need to log anything as stdout/stderr are used for the protocol
 }
 
+function isCurrentFileEntrypoint(): boolean {
+  const entrypoint = process.argv[1];
+
+  if (!entrypoint) {
+    return false;
+  }
+
+  try {
+    return import.meta.url === pathToFileURL(realpathSync(entrypoint)).href;
+  } catch {
+    return import.meta.url === pathToFileURL(entrypoint).href;
+  }
+}
+
 // Start the server if this file is run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (isCurrentFileEntrypoint()) {
   main().catch((error) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error(JSON.stringify({ level: "fatal", error: "MCP_STARTUP_FAILED", message }));
