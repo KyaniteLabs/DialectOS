@@ -17,7 +17,7 @@ pnpm build
 
 ## Commands
 
-The examples below use the installed `dialectos` binary. For a source checkout, run `pnpm build` first and replace `dialectos` with `node packages/cli/dist/index.js`.
+The examples below use the installed `dialectos` binary. For a source checkout, run `pnpm build` first and replace `dialectos` with `node packages/cli/dist/cli.js`.
 
 ### Translation
 
