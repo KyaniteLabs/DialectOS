@@ -2,4 +2,4 @@
 # introspection checks. Installs the published package and launches the stdio server.
 FROM node:22-slim
 RUN npm install -g @espanol/mcp
-ENTRYPOINT ["espanol-mcp"]
+ENTRYPOINT ["node", "/usr/local/lib/node_modules/@espanol/mcp/dist/index.js"]
