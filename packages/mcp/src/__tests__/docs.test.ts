@@ -193,6 +193,33 @@ describe("MCP Docs Tools", () => {
       expect(toolNames).toContain("translate_api_docs");
       expect(toolNames).toContain("create_bilingual_doc");
     });
+
+    it("should describe markdown and API-doc routing clearly for MCP discovery", async () => {
+      const { registerDocsTools } = await import("../tools/docs.js");
+      const mockServer = {
+        registerTool: vi.fn(),
+        tool: vi.fn(),
+      };
+
+      registerDocsTools(mockServer as any, { registry: mockRegistry });
+
+      const configs = new Map(
+        vi.mocked(mockServer.registerTool).mock.calls.map(([name, config]) => [
+          name,
+          config as { description: string },
+        ])
+      );
+      const markdown = configs.get("translate_markdown")!.description.toLowerCase();
+      const apiDocs = configs.get("translate_api_docs")!.description.toLowerCase();
+
+      expect(markdown).toContain("ordinary markdown");
+      expect(markdown).toContain("use translate_readme");
+      expect(markdown).toContain("use translate_api_docs");
+      expect(apiDocs).toContain("endpoint");
+      expect(apiDocs).toContain("http methods");
+      expect(apiDocs).toContain("status codes");
+      expect(apiDocs).toContain("not general markdown");
+    });
   });
 
   describe("translate_markdown tool", () => {

@@ -197,6 +197,31 @@ describe("MCP Translator Tools", () => {
       expect(toolNames).toContain("list_dialects");
       expect(toolNames).toContain("research_regional_term");
     });
+
+    it("should describe translate_readme as README-specific for MCP discovery", async () => {
+      const { registerTranslatorTools } = await import("../tools/translator.js");
+      const mockServer = {
+        registerTool: vi.fn(),
+        tool: vi.fn(),
+      };
+
+      registerTranslatorTools(mockServer as any, { registry: mockRegistry });
+
+      const tools = new Map(
+        vi.mocked(mockServer.registerTool).mock.calls.map(([name, config]) => [
+          name,
+          config as { description: string },
+        ])
+      );
+      const description = tools.get("translate_readme")!.description.toLowerCase();
+
+      expect(description).toContain("repository readme");
+      expect(description).toContain("badges");
+      expect(description).toContain("install");
+      expect(description).toContain("license");
+      expect(description).toContain("use translate_markdown");
+      expect(description).toContain("use translate_api_docs");
+    });
   });
 
   describe("translate_text tool", () => {

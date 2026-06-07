@@ -492,7 +492,7 @@ export function registerDocsTools(
     {
       title: "Translate Markdown file",
       description:
-        "Read a Markdown file, translate translatable prose into a Spanish dialect, and return reconstructed Markdown while preserving code blocks, links, and non-translatable sections. Reads the file only; it does not overwrite the source file.",
+        "Read an ordinary Markdown file, translate translatable prose into a Spanish dialect, and return reconstructed Markdown while preserving code blocks, links, and non-translatable sections. Use this for general Markdown pages, articles, or docs; use translate_readme for repository README files with badges/install/license sections, and use translate_api_docs for endpoint/reference documentation. Reads the file only, may call the selected translation provider under the configured rate limiter, and does not overwrite the source file.",
       inputSchema: {
         filePath: z.string().min(1).describe("Path to the Markdown file to read and translate."),
         dialect: dialectSchema.optional().describe("Target Spanish dialect code. Defaults to es-ES when omitted; examples include es-MX, es-AR, and es-CO."),
@@ -542,7 +542,7 @@ export function registerDocsTools(
     {
       title: "Translate API documentation",
       description:
-        "Read API documentation Markdown and translate prose into a Spanish dialect with documentation context for tables, lists, endpoints, and technical terms. Returns translated Markdown and errors; it does not modify the file.",
+        "Read API documentation Markdown and translate prose into a Spanish dialect with documentation context for endpoints, HTTP methods, route paths, parameters, status codes, code examples, tables, lists, and technical terms. Use this for API/reference docs, not general Markdown or repository README pages. Returns translated Markdown and errors; it may call the selected translation provider under the configured rate limiter and does not modify the file.",
       inputSchema: {
         filePath: z.string().min(1).describe("Path to the API documentation Markdown file to read and translate."),
         dialect: dialectSchema.optional().describe("Target Spanish dialect code. Defaults to es-ES when omitted."),
