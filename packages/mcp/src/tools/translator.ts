@@ -141,7 +141,7 @@ export function registerTranslatorTools(
     {
       title: "Translate README Markdown",
       description:
-        "Read a README Markdown file, translate translatable prose into a Spanish dialect, and return translated Markdown with code blocks and structure preserved. Reads the file only; it does not overwrite the README.",
+        "Read a repository README Markdown file, translate translatable prose into a Spanish dialect, and return translated Markdown while preserving badges, install commands, usage examples, contribution sections, license text, code blocks, and structure. Use translate_markdown for ordinary Markdown pages, and use translate_api_docs for endpoint/reference documentation. Reads the file only, may call the selected translation provider under the configured rate limiter, and does not overwrite the README.",
       inputSchema: {
         filePath: z.string().min(1).describe("Path to the README Markdown file to read and translate."),
         dialect: dialectSchema.optional().describe("Target Spanish dialect code. Defaults to es-ES when omitted."),
