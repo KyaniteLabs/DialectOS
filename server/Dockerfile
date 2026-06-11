@@ -1,4 +1,4 @@
-FROM node:20-slim AS builder
+FROM node:26-slim AS builder
 
 ENV PNPM_HOME="/pnpm" \
     PATH="$PNPM_HOME:$PATH"
@@ -12,7 +12,7 @@ COPY docs/ ./docs/
 RUN pnpm install --frozen-lockfile
 RUN pnpm build
 
-FROM node:20-slim AS runtime
+FROM node:26-slim AS runtime
 
 ENV NODE_ENV=production \
     PORT=8080
