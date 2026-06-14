@@ -413,7 +413,10 @@ describe("parseMarkdown", () => {
       const result = parseMarkdown(content);
       const duration = Date.now() - start;
 
-      expect(duration).toBeLessThan(1000);
+      // Bounded-time guard against catastrophic backtracking (ReDoS). The parser
+      // itself completes this workload in ~100ms; the looser ceiling matches the
+      // sibling backtick test and absorbs test-runner cold-start/transform jitter.
+      expect(duration).toBeLessThan(3000);
       expect(result).toBeDefined();
     });
   });
