@@ -22,7 +22,7 @@
     "@dialectos/security": "workspace:*",
     "@dialectos/types": "workspace:*",
     "isomorphic-dompurify": "^3.16.0",
-    "marked": "^18.0.5",
+    "marked": "^18.0.6",
     "zod": "^4.4.3"
   },
   "devDependencies": {
