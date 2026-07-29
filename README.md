@@ -1,25 +1,28 @@
-# 🌎 DialectOS
+# DialectOS
 
-The first Model Context Protocol server built specifically for Spanish dialects.
+Spanish dialect localization MCP server and CLI. Translate across 25 regional variants with register control, structure preservation, and QA gates.
+
+**Who it is for:** product and content teams shipping Spanish that must sound right for a region — not generic machine Spanish.
+
+**What you get:** an MCP server + CLI path for dialect-aware translation with QA gates.
 
 ## Try it
 
 ```bash
-For local development from a source checkout, run `pnpm build` and point your MCP client at `packages/mcp/dist/index.js`.
-### Full-app browser demo
-The browser demo requires a source checkout.
-The browser demo is no longer a fake/static rule replacer. It calls a local
-DialectOS backend, and that backend calls the configured provider stack.
+git clone https://github.com/KyaniteLabs/DialectOS.git
+cd DialectOS
+pnpm install && pnpm build
+# point your MCP client at packages/mcp/dist/index.js
 ```
+
+Docs site: [kyanitelabs.github.io/DialectOS](https://kyanitelabs.github.io/DialectOS/)
 
 ## Docs
 
-- [![CI](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml/badge.svg)
-- [📖 Documentation](https://github.com/KyaniteLabs/DialectOS#readme)
-- [🤝 Contributing](CONTRIBUTING.md)
-- [📋 Roadmap](ROADMAP.md)
-- [`skills/dialectos/SKILL.md`](skills/dialectos/SKILL.md)
+- [Skill pack](skills/dialectos/SKILL.md)
+- [Contributing](CONTRIBUTING.md)
+- [Roadmap](ROADMAP.md)
 
 ## License
 
-See [LICENSE](LICENSE).
+Apache-2.0. See [LICENSE](LICENSE).
