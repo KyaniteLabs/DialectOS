@@ -72,7 +72,7 @@ export function registerTranslatorTools(
     {
       title: "Translate text to Spanish dialect",
       description:
-        "Translate a short text string from English into one Spanish regional dialect and return the translated text plus provider metadata. This does not read or write files; it may call the selected translation provider.",
+        "Translate a short text string from English into one Spanish regional dialect and return the translated text plus provider metadata. This does not read or write files; it may call the selected translation provider. Use when translating inline strings or UI copy; for whole files use translate_markdown, translate_readme, or translate_api_docs.",
       inputSchema: {
         text: z.string().min(1).describe("Source text to translate. Plain text only; for Markdown files use translate_markdown or translate_readme."),
         dialect: dialectSchema.optional().describe("Target Spanish dialect code. Defaults to es-ES when omitted; examples include es-MX, es-AR, and es-CO."),
@@ -97,7 +97,7 @@ export function registerTranslatorTools(
     {
       title: "Detect Spanish dialect",
       description:
-        "Analyze Spanish text and rank likely regional dialects using vocabulary, grammar, and weighted scoring across 25 variants. Returns the detected dialect, confidence signals, and evidence; it does not translate or modify text.",
+        "Analyze Spanish text and rank likely regional dialects using vocabulary, grammar, and weighted scoring across 25 variants. Returns the detected dialect, confidence signals, and evidence; it does not translate or modify text. Use when you need to identify which regional Spanish a given text samples before choosing a target dialect.",
       inputSchema: {
         text: z.string().min(1).describe("Spanish text to analyze for regional dialect signals."),
       },
@@ -118,7 +118,7 @@ export function registerTranslatorTools(
     {
       title: "Translate code comments",
       description:
-        "Translate English // and /* */ comments inside a code snippet into a Spanish dialect while leaving executable code unchanged. Returns a translated code string and comment-level error list; it does not write files.",
+        "Translate English // and /* */ comments inside a code snippet into a Spanish dialect while leaving executable code unchanged. Returns a translated code string and comment-level error list; it does not write files. Use when localising in-source comments; pass the code snippet from a read of the source file.",
       inputSchema: {
         code: z.string().min(1).describe("Source code text containing comments to translate. The tool only rewrites comments detected in this string."),
         dialect: dialectSchema.optional().describe("Target Spanish dialect code for translated comments. Defaults to es-ES when omitted."),
@@ -166,7 +166,7 @@ export function registerTranslatorTools(
     {
       title: "Search translation glossary",
       description:
-        "Search DialectOS's built-in technical and business glossary for matching source terms and localized Spanish equivalents. Returns matching glossary records and count; it does not call external services or modify glossary data.",
+        "Search DialectOS's built-in technical and business glossary for matching source terms and localized Spanish equivalents. Returns matching glossary records and count; it does not call external services or modify glossary data. Use when checking whether DialectOS has a canonical Spanish rendering for a technical or business term before translating.",
       inputSchema: {
         query: z.string().min(1).describe("Term, phrase, or keyword to search in the built-in glossary."),
       },
@@ -187,7 +187,7 @@ export function registerTranslatorTools(
     {
       title: "Research regional Spanish term",
       description:
-        "Generate a source-backed proposal for how a concept is expressed across selected Spanish dialects. Returns candidate terms, confidence, and sources; it does not mutate runtime translation data.",
+        "Generate a source-backed proposal for how a concept is expressed across selected Spanish dialects. Returns candidate terms, confidence, and sources; it does not mutate runtime translation data. Use when a concept may render differently across regions and you need evidence-backed options before translating.",
       inputSchema: {
         concept: z.string().min(1).describe("Concept or phrase to research, such as orange juice or mobile app onboarding."),
         dialects: z.string().min(1).describe("Comma-separated Spanish dialect codes to research, such as es-PR,es-MX."),
@@ -210,7 +210,7 @@ export function registerTranslatorTools(
     {
       title: "List supported Spanish dialects",
       description:
-        "Return all 25 Spanish dialect codes supported by DialectOS with names and short descriptions. This is a read-only catalog lookup and does not require a translation provider.",
+        "Return all 25 Spanish dialect codes supported by DialectOS with names and short descriptions. This is a read-only catalog lookup and does not require a translation provider. Use when you need the valid dialect codes to pass to the dialect parameter of any translate_* or locale tool.",
       inputSchema: {},
       annotations: {
         title: "List supported Spanish dialects",
