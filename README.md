@@ -456,7 +456,7 @@ Add this badge to your project if you use DialectOS for translation:
 Validate Spanish translations in CI on every pull request:
 
 ```yaml
-- uses: KyaniteLabs/DialectOS/action@v0.3.0
+- uses: KyaniteLabs/DialectOS@v0.3.0
   with:
     dialect: es-MX
     source-dir: locales/en
@@ -471,7 +471,7 @@ strategy:
   matrix:
     dialect: [es-ES, es-MX, es-AR, es-CO]
 steps:
-  - uses: KyaniteLabs/DialectOS/action@v0.3.0
+  - uses: KyaniteLabs/DialectOS@v0.3.0
     with:
       dialect: ${{ matrix.dialect }}
       fail-on-blocking: true

@@ -63,7 +63,7 @@ Become the **most accurate open-source engine for Spanish dialect detection and 
 ### v0.3.0 (2026-04-27)
 - [x] **`dialectos validate`** — Standalone translation validation with quality gates, semantic check, and output judge
 - [x] **Translation corpus** — Dialect-indexed JSONL storage for translations and corrections with CLI commands
-- [x] **Public benchmark suite** — 205 adversarial samples across 25 dialects and 13 categories with benchmark runner
+- [x] **Public benchmark suite** — 250 adversarial samples across 25 dialects and 13 categories with benchmark runner
 - [x] **GitHub Action** — Composite CI action for PR translation validation with multi-dialect matrix
 - [x] **Auto-glossary from corrections** — Suggestion engine + `dialectos glossary suggest/diff` commands
 - [x] **Automated tests** across 7 packages

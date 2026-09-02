@@ -18,7 +18,7 @@ translation, glossary enforcement, adversarial quality gates, and standalone val
 - Translation memory with SHA-256 keyed caching
 - Translation corpus — dialect-indexed JSONL storage for translations and corrections
 - Auto-glossary — learns terminology corrections from user feedback
-- Public benchmark — 205 adversarial samples across 25 dialects and 13 categories
+- Public benchmark — 250 adversarial samples across 25 dialects and 13 categories
 - GitHub Action — CI validation on every pull request
 - Automated tests across 7 packages
 
@@ -59,7 +59,7 @@ translation, glossary enforcement, adversarial quality gates, and standalone val
 | Standalone validation | No | No | Yes |
 | CI integration | No | No | Yes (GitHub Action) |
 | Auto-glossary | No | No | Yes |
-| Public benchmark | No | No | Yes (205 adversarial samples) |
+| Public benchmark | No | No | Yes (250 adversarial samples) |
 | Open-source | No | No | Yes (Apache-2.0) |
 
 ## License

@@ -38,7 +38,7 @@ test('public docs do not claim unpublished npm packages', () => {
 
 test('public docs may reference the released v0.3.0 GitHub Action tag', () => {
   const text = readFileSync('docs/github-action.md', 'utf8');
-  assert.match(text, /KyaniteLabs\/DialectOS\/action@v0\.3\.0/iu);
+  assert.match(text, /KyaniteLabs\/DialectOS@v0\.3\.0/iu);
 });
 
 test('public install docs point users to release tarballs before source checkout', () => {
