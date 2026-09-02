@@ -21,7 +21,7 @@ Translate, detect, and adapt content across **25 regional Spanish variants** whi
 [![CI](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
-[![pnpm](https://img.shields.io/badge/pnpm-11.12.0-orange)](package.json)
+[![pnpm](https://img.shields.io/badge/pnpm-11.25.0-orange)](package.json)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 
 [📖 Documentation](https://github.com/KyaniteLabs/DialectOS#readme) ·
