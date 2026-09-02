@@ -21,8 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed duplicate `export *` in providers index
 
 #### Dialectal Dictionary Overhaul
-
-#### Dialectal Dictionary Overhaul
 - Stripped 500 mechanically propagated entries to pan-Hispanic only (no fake dialect variation)
 - Added 58 new high-dialectal-variation concepts across 4 batches with genuine per-dialect variants
 - Made `variants` field optional on `DictionaryEntry` — entries with no dialect variation use `panHispanic` only
@@ -43,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Body**: belly_stomach (panza/barriga/guata/buche)
 - **Transport**: car_informal (coche/auto/carro), swimming_pool (piscina/pila), highway (autopista/autovía/carretera), shower (ducha/regadera), gasoline (gasolina/nafta/bencina), subway (metro/subte)
 
-## [0.3.0] - 2026-04-27
+## [0.3.0] - 2026-06-03
 
 ### Added
 
