@@ -19,12 +19,10 @@ quality gates that catch semantic drift before it reaches users.
 Translate, detect, and adapt content across **25 regional Spanish variants** while preserving markdown structure, code comments, and locale file formatting.
 
 [![CI](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/KyaniteLabs/DialectOS/actions)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
 [![pnpm](https://img.shields.io/badge/pnpm-11.12.0-orange)](package.json)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
-[![Security](https://img.shields.io/badge/security-hardened-success)](https://github.com/KyaniteLabs/DialectOS/security)
 
 [📖 Documentation](https://github.com/KyaniteLabs/DialectOS#readme) ·
 [🚀 Quick Start](#quick-start) ·
