@@ -100,6 +100,20 @@ Spanish is not one language — it's **25 regional variants** with different voc
 
 > **Install note:** DialectOS v0.3.0 is distributed through GitHub Release tarballs, not the npm registry. Use the released MCP/CLI tarballs for agent and command-line installs; clone the repo only for local development or the browser demo.
 
+### Configure a provider
+
+DialectOS translates through a provider you configure — with no provider env set, translation commands have nothing to run. Pick one:
+
+| Provider | Minimal env | Notes |
+|----------|-------------|-------|
+| **MyMemory** (easiest — keyless) | `ENABLE_MYMEMORY=1` | No key, no URL; public endpoint with modest rate limits |
+| Local LLM (OpenAI-compatible, e.g. LM Studio/OpenAI-compatible server) | `LLM_API_URL=http://127.0.0.1:1234/v1/chat/completions` `LLM_MODEL=<model>` `LLM_ALLOW_LOCAL=1` | Keyless locally; `LLM_API_FORMAT=openai` is the default |
+| LM Studio native API | `LM_STUDIO_URL=http://127.0.0.1:1234` `LLM_MODEL=<model>` `LLM_API_FORMAT=lmstudio` | Keyless; model loads just-in-time |
+| DeepL | `DEEPL_AUTH_KEY=<key>` | Paid API key |
+| LibreTranslate | `LIBRETRANSLATE_URL=<url>` | Your instance; optional `LIBRETRANSLATE_API_KEY` |
+
+All providers can be combined; DialectOS uses them with fallback + circuit breaking. See [Providers](#incremental-provider-certification) below for certified model recommendations.
+
 ### MCP setup
 
 Add the released MCP server to Claude Desktop, Cursor, or any MCP client:
