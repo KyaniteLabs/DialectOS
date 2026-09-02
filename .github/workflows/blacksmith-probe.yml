@@ -1,3 +1,8 @@
+# NOTE: intentionally left disabled (disabled_manually). This workflow exists
+# solely to probe the paid Blacksmith complementary runner
+# (probe_label: complementary-runner-probe), so it cannot be moved to
+# ubuntu-latest without losing its purpose. Re-enable only if/when paid
+# Blacksmith runners are approved again.
 name: Blacksmith Probe
 
 on:
