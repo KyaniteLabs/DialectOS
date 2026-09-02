@@ -17,7 +17,6 @@ function walk(dir) {
 const launchKitFiles = walk('docs/launch-kit');
 const collateralFiles = [
   'docs/social-launch-kit.md',
-  'docs/SEO-AI-SEO-MASTERPLAN.md',
   ...launchKitFiles,
 ];
 

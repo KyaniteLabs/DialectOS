@@ -266,7 +266,6 @@ Not-tested: vulnerability remediation deferred to security phase"
 **Files:**
 - Modify: `docs/launch-kit/**`
 - Modify: `docs/social-launch-kit.md`
-- Modify: `docs/SEO-AI-SEO-MASTERPLAN.md`
 - Modify: `docs/launch-kit/submissions/**`
 - Test: `docs/__tests__/public-claims.test.mjs`
 
@@ -286,7 +285,7 @@ function walk(dir) {
 }
 ```
 
-Then include `docs/launch-kit`, `docs/social-launch-kit.md`, and `docs/SEO-AI-SEO-MASTERPLAN.md`.
+Then include `docs/launch-kit` and `docs/social-launch-kit.md`.
 
 **Step 2: Run failure**
 
@@ -318,7 +317,7 @@ Expected: no unauthorized stale claims outside the remediation plan.
 **Step 5: Commit**
 
 ```bash
-git add docs/launch-kit docs/social-launch-kit.md docs/SEO-AI-SEO-MASTERPLAN.md docs/__tests__/public-claims.test.mjs
+git add docs/launch-kit docs/social-launch-kit.md docs/__tests__/public-claims.test.mjs
 git commit -m "Quarantine launch collateral until proof gates pass
 
 Constraint: current collateral repeats false npm, action, test-count, and license claims.
