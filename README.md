@@ -22,7 +22,7 @@ Translate, detect, and adapt content across **25 regional Spanish variants** whi
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/KyaniteLabs/DialectOS/actions)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
-[![pnpm](https://img.shields.io/badge/pnpm-9.15.0-orange)](package.json)
+[![pnpm](https://img.shields.io/badge/pnpm-11.12.0-orange)](package.json)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 [![Security](https://img.shields.io/badge/security-hardened-success)](https://github.com/KyaniteLabs/DialectOS/security)
 
@@ -77,7 +77,7 @@ DialectOS is available as a paid Spanish localization launch audit. We certify y
 | Translation validation (any provider) | ❌ | ❌ | ✅ **`dialectos validate` — standalone correctness check** |
 | GitHub CI integration | ❌ | ❌ | ✅ **Composite action for PR validation** |
 | Auto-glossary from corrections | ❌ | ❌ | ✅ **Learns from user feedback** |
-| Public benchmark suite | ❌ | ❌ | ✅ **205 adversarial samples across 25 dialects** |
+| Public benchmark suite | ❌ | ❌ | ✅ **250 adversarial samples across 25 dialects** |
 
 ---
 
@@ -252,7 +252,7 @@ git clone https://github.com/KyaniteLabs/DialectOS.git
 cd DialectOS
 pnpm install
 pnpm build
-pnpm test        # 662+ tests passing
+pnpm test        # 1,498 tests passing (as of v0.3.0+main)
 ```
 
 ---
@@ -294,15 +294,15 @@ pnpm test        # 662+ tests passing
 
 | Package | Version | Description | Tests |
 |---------|---------|-------------|-------|
-| [`@dialectos/mcp`](packages/mcp) | `0.3.0` | 17 MCP tools (stdio server) | 93 |
+| [`@dialectos/mcp`](packages/mcp) | `0.3.0` | 17 MCP tools (stdio server) | 95 |
 | [`@dialectos/cli`](packages/cli) | `0.3.0` | CLI: translate, validate, corpus, benchmark, glossary | 569 |
-| [`@dialectos/providers`](packages/providers) | `0.3.0` | LLM, DeepL, LibreTranslate, MyMemory with circuit breaker + corpus | 152 |
+| [`@dialectos/providers`](packages/providers) | `0.3.0` | LLM, DeepL, LibreTranslate, MyMemory with circuit breaker + corpus | 304 |
 | [`@dialectos/security`](packages/security) | `0.3.0` | Rate limiting, SSRF protection, sanitization | 68 |
-| [`@dialectos/types`](packages/types) | `0.3.0` | Shared TypeScript types + glossary, profile, certification, and quality data | 54 |
-| [`@dialectos/locale-utils`](packages/locale-utils) | `0.3.0` | Locale file diff/merge utilities | 55 |
-| [`@dialectos/markdown-parser`](packages/markdown-parser) | `0.3.0` | Structure-preserving markdown parser | 74 |
+| [`@dialectos/types`](packages/types) | `0.3.0` | Shared TypeScript types + glossary, profile, certification, and quality data | 207 |
+| [`@dialectos/locale-utils`](packages/locale-utils) | `0.3.0` | Locale file diff/merge utilities | 58 |
+| [`@dialectos/markdown-parser`](packages/markdown-parser) | `0.3.0` | Structure-preserving markdown parser | 79 |
 
-**662+ tests across 7 packages plus docs contracts, demo-server contracts, and static-hardening checks**
+**1,498 tests (as of v0.3.0+main) across 7 packages plus docs contracts, demo-server contracts, and static-hardening checks**
 
 ---
 
@@ -444,7 +444,7 @@ Add this badge to your project if you use DialectOS for translation:
 Validate Spanish translations in CI on every pull request:
 
 ```yaml
-- uses: KyaniteLabs/DialectOS/action  # Planned — version pinning unavailable until first release
+- uses: KyaniteLabs/DialectOS/action@v0.3.0
   with:
     dialect: es-MX
     source-dir: locales/en
@@ -459,7 +459,7 @@ strategy:
   matrix:
     dialect: [es-ES, es-MX, es-AR, es-CO]
 steps:
-  - uses: KyaniteLabs/DialectOS/action  # Planned — version pinning unavailable until first release
+  - uses: KyaniteLabs/DialectOS/action@v0.3.0
     with:
       dialect: ${{ matrix.dialect }}
       fail-on-blocking: true
