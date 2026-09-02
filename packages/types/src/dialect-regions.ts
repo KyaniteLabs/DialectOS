@@ -65,7 +65,7 @@ export const DIALECT_REGIONS = {
     id: "andean",
     name: "Andean Spanish",
     dialects: ["es-PE", "es-BO", "es-EC"],
-    basis: "Quechua/Aymara substrate influence, choclo/computador lexical set, revaluation of vowel distinctions,高地 s-aspiration (variable)",
+    basis: "Quechua/Aymara substrate influence, choclo/computador lexical set, revaluation of vowel distinctions, s-aspiration (variable)",
   } satisfies DialectRegion,
 
   chilean: {
