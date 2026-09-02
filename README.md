@@ -6,7 +6,7 @@
 
 # 🌎 DialectOS
 
-**TL;DR:** DialectOS — operating system for multi-dialect / multi-agent product work. Best for builders running multi-agent product and language workflows. Keywords: multi-agent OS, dialect, product agent orchestration.
+**TL;DR:** Open-source MCP server + CLI that translates and QA-checks content across 25 regional Spanish variants, with markdown structure, glossary, and locale-file integrity built in.
 
 **The first Model Context Protocol server built specifically for Spanish dialects.**
 
@@ -530,70 +530,11 @@ More from [KyaniteLabs](https://kyanitelabs.tech). Related projects:
 
 → More at **[kyanitelabs.tech](https://kyanitelabs.tech)**
 
-<!-- s-plus-geo:start -->
+## About DialectOS
 
-## What is DialectOS?
-
-**DialectOS** is a **operating system for multi-dialect / multi-agent product work** that helps **builders running multi-agent product and language workflows** **coordinate dialect-aware agent operations with clear product surfaces**.
-
-| | |
-| --- | --- |
-| **Product** | DialectOS |
-| **Category** | operating system for multi-dialect / multi-agent product work |
-| **Best for** | builders running multi-agent product and language workflows |
-| **Not** | a general chat UI |
-| **Source** | [GitHub](https://github.com/KyaniteLabs/DialectOS) · [Forgejo](https://git.kyanitelabs.tech/KyaniteLabs/DialectOS) |
-| **Keywords** | multi-agent OS, dialect, product agent orchestration |
-
-## Who it's for
-
-- Primary: builders running multi-agent product and language workflows
-- Use when you need to coordinate dialect-aware agent operations with clear product surfaces
-- Skip if you need a general chat UI
-
-## FAQ
-
-### What is DialectOS?
-
-DialectOS is a operating system for multi-dialect / multi-agent product work. It helps builders running multi-agent product and language workflows coordinate dialect-aware agent operations with clear product surfaces.
-
-### Who should use DialectOS?
-
-builders running multi-agent product and language workflows.
-
-### How is DialectOS different?
-
-Unlike single-agent chat apps, DialectOS is built for multi-dialect product operations.
-
-### Is DialectOS production software?
-
-Treat the README status and release tags as source of truth for maturity. Validate against your own requirements before production use.
-
-## Status
-
-- Maintained as of 2026 on the default branch
-- Prefer release tags when pinning dependencies
-- Report issues on the canonical remote listed above
-
-## Agent surface
-
-- Coding agents: read this README first, then repo docs/`AGENTS.md` if present
-- Prefer machine-readable briefs (`llms.txt`) when the repo ships one
-- MCP or skill entrypoints are documented in-repo when applicable
-
-## Contributing
-
-Issues and PRs welcome on the canonical remote. Keep public docs free of secrets and machine-local paths.
-
-## License
-
-See [LICENSE](LICENSE) in this repository (or package metadata if license is package-only).
-
-
-## Table of contents
-
-- [What is it?](#what-is-dialectos)
-- [FAQ](#faq)
-- [Status](#status)
-
-<!-- s-plus-geo:end -->
+DialectOS is an open-source Spanish dialect localization server: an MCP server and CLI
+for translating and QA-checking content across 25 regional Spanish variants. It
+preserves markdown structure and locale-file formatting, enforces glossary terms, and
+applies adversarial quality gates that catch semantic drift before release. It is built
+for development teams, documentation owners, and AI agents that ship Spanish for more
+than one region.
