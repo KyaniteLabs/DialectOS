@@ -1,8 +1,0 @@
-node_modules/
-dist/
-*.tsbuildinfo
-coverage/
-.DS_Store
-docs-espanol-mcp/
-i18n-espanol-mcp/
-traductor-mcp/
