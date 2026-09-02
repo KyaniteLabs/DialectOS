@@ -524,7 +524,7 @@ Made with ❤️ by KyaniteLabs and contributors.
 
 More from [KyaniteLabs](https://kyanitelabs.tech). Related projects:
 
-- **[mcp-video](https://github.com/KyaniteLabs/mcp-video)** — guardrailed video-editing MCP server for AI agents
+- **[kinocut](https://github.com/KyaniteLabs/kinocut)** — guardrailed video-editing MCP server for AI agents
 - **[Epoch](https://github.com/KyaniteLabs/Epoch)** — time-estimation MCP server (PERT) for AI agents
 - **[checkyourself](https://github.com/KyaniteLabs/checkyourself)** — local-first production-readiness checks for AI-built code
 
