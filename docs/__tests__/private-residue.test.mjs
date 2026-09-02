@@ -2,7 +2,11 @@ import { execSync } from 'node:child_process';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-const PRIVATE_IP = '100.66.225.85';
+// Documentation placeholder in RFC 6598 shared address space (100.64.0.0/10),
+// the range Tailscale assigns node IPs from. It preserves the detection shape
+// (any tracked file naming a 100.64/10 endpoint is flagged) without shipping a
+// real private endpoint in the test itself.
+const PRIVATE_IP = '100.64.0.1';
 
 function trackedFiles() {
   const output = execSync('git ls-files', { encoding: 'utf8' });
