@@ -23,7 +23,7 @@
     "@dialectos/types": "workspace:*",
     "isomorphic-dompurify": "^3.16.0",
     "marked": "^18.0.5",
-    "zod": "^4.4.3"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
