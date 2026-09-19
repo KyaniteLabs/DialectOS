@@ -22,7 +22,7 @@
     "@dialectos/security": "^0.3.0",
     "@dialectos/types": "^0.3.0",
     "isomorphic-dompurify": "^3.16.0",
-    "marked": "^18.0.5",
+    "marked": "^18.0.13",
     "zod": "^4.4.3"
   },
   "devDependencies": {
