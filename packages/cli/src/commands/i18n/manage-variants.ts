@@ -2,15 +2,29 @@
  * i18n manage-variants command handler
  * Creates dialect-specific variants of locale files
  *
- * Adaptation rules cover 200+ everyday vocabulary differences across
- * all 25 Spanish dialects: technology, transport, food, household,
- * clothing, and regional slang.
+ * Wave 2 (2026-09-19): the naive per-dialect regex table was replaced by
+ * the shared deterministic engine (applyLexicalSubstitution from
+ * @dialectos/providers) — the same engine the MCP tool uses. That fixes
+ * the CLI's three tabulated defects in one move:
+ * - "el ordenador" now adapts to "la computadora" (article gender agrees
+ *   with the substituted noun; the old table produced "el computadora")
+ * - the vosotros possessive bug ("vuestra" → "sua" via a bad $1 capture)
+ *   is gone; the pronominal rules are explicit and correct below
+ * - no-op rules ("maletero" → "maletero" in es-CL/es-VE/es-PR) no longer
+ *   exist; whatever the shared dictionary doesn't cover simply passes
+ *   through instead of pretending to adapt
+ *
+ * Verb conjugations ("conduce" → "maneja") were dropped on purpose: the
+ * deterministic engine substitutes lexicon (nouns/concepts), including the
+ * infinitive "conducir" → "manejar"; conjugated forms belong to the
+ * LLM-backed translation pipeline, not to a regex table.
  */
 
 import type { SpanishDialect, I18nEntry, VariantResult } from "@dialectos/types";
-import { ALL_SPANISH_DIALECTS } from "@dialectos/types";
+import { ALL_SPANISH_DIALECTS, DEFAULT_DIALECT } from "@dialectos/types";
 import { readLocaleFile, writeLocaleFile } from "@dialectos/locale-utils";
 import { validateFilePath } from "@dialectos/security";
+import { applyLexicalSubstitution, applyCase } from "@dialectos/providers";
 
 /**
  * Options for the manage-variants command
@@ -24,363 +38,19 @@ export interface ManageVariantsOptions {
   output: string;
 }
 
-// ============================================================================
-// Core vocabulary differences by semantic category
-// ============================================================================
-
-/** 2nd person plural: Spain uses vosotros; Americas use ustedes */
-const VOSOTROS_ADAPTATION = [
-  { from: /\bvosotros\b/gi, to: "ustedes", description: "2nd person plural pronoun" },
-  { from: /\bvuestro(a|s)?\b/gi, to: "su$1", description: "2nd person plural possessive" },
-];
-
-/** Technology & devices */
-const TECH_ADAPTATIONS: Record<SpanishDialect, Array<{ from: RegExp; to: string; description: string }>> = {
-  "es-ES": [],
-  "es-MX": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bbolígrafo(s)?\b/gi, to: "pluma$1", description: "pen" },
-    { from: /\bfrigorífico\b/gi, to: "refrigerador", description: "refrigerator" },
-    { from: /\bfrigoríficos\b/gi, to: "refrigeradores", description: "refrigerator" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bzumo(s)?\b/gi, to: "jugo$1", description: "juice" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bjudía\b/gi, to: "frijol", description: "bean" },
-    { from: /\bjudías\b/gi, to: "frijoles", description: "bean" },
-    { from: /\bcacahuete(s)?\b/gi, to: "cacahuate$1", description: "peanut" },
-    { from: /\bmaletero\b/gi, to: "cajuela", description: "trunk" },
-    { from: /\bmaleteros\b/gi, to: "cajuelas", description: "trunk" },
-    { from: /\bconducir\b/gi, to: "manejar", description: "drive" },
-    { from: /\bconduzco\b/gi, to: "manejo", description: "drive (1st person)" },
-    { from: /\bconduce\b/gi, to: "maneja", description: "drive (3rd person)" },
-    { from: /\bconducen\b/gi, to: "manejan", description: "drive (3rd person pl)" },
-    { from: /\bconducimos\b/gi, to: "manejamos", description: "drive (1st person pl)" },
-    { from: /\bconducido\b/gi, to: "manejado", description: "driven" },
-  ],
-  "es-AR": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "auto$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bpiso(s)?\b/gi, to: "departamento$1", description: "apartment" },
-    { from: /\bfrigorífico(s)?\b/gi, to: "heladera$1", description: "refrigerator" },
-    { from: /\bgafas\b/gi, to: "anteojos", description: "glasses" },
-    { from: /\bfresa(s)?\b/gi, to: "frutilla$1", description: "strawberry" },
-    { from: /\bjudía\b/gi, to: "poroto", description: "bean" },
-    { from: /\bjudías\b/gi, to: "porotos", description: "bean" },
-    { from: /\bcacahuete\b/gi, to: "maní", description: "peanut" },
-    { from: /\bcacahuetes\b/gi, to: "maníes", description: "peanut" },
-    { from: /\bmaletero\b/gi, to: "baúl", description: "trunk" },
-    { from: /\bmaleteros\b/gi, to: "baúles", description: "trunk" },
-    { from: /\bconducir\b/gi, to: "manejar", description: "drive" },
-    { from: /\bconduzco\b/gi, to: "manejo", description: "drive (1st person)" },
-    { from: /\bconduce\b/gi, to: "maneja", description: "drive (3rd person)" },
-    { from: /\bconducen\b/gi, to: "manejan", description: "drive (3rd person pl)" },
-    { from: /\bconducimos\b/gi, to: "manejamos", description: "drive (1st person pl)" },
-    { from: /\bconducido\b/gi, to: "manejado", description: "driven" },
-  ],
-  "es-CO": [
-    { from: /\bordenador\b/gi, to: "computador", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadores", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bbolígrafo(s)?\b/gi, to: "esfero$1", description: "pen" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía\b/gi, to: "frijol", description: "bean" },
-    { from: /\bjudías\b/gi, to: "frijoles", description: "bean" },
-    { from: /\bcacahuete\b/gi, to: "maní", description: "peanut" },
-    { from: /\bcacahuetes\b/gi, to: "maníes", description: "peanut" },
-    { from: /\bplátano\b/gi, to: "banano", description: "banana" },
-    { from: /\bmaletero\b/gi, to: "maletero", description: "trunk" },
-    { from: /\bconducir\b/gi, to: "manejar", description: "drive" },
-    { from: /\bconduzco\b/gi, to: "manejo", description: "drive (1st person)" },
-    { from: /\bconduce\b/gi, to: "maneja", description: "drive (3rd person)" },
-    { from: /\bconducen\b/gi, to: "manejan", description: "drive (3rd person pl)" },
-  ],
-  "es-CU": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bpiso(s)?\b/gi, to: "apartamento$1", description: "apartment" },
-    { from: /\bautobús\b/gi, to: "guagua", description: "bus" },
-    { from: /\bautobuses\b/gi, to: "guaguas", description: "bus" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "habichuela$1", description: "bean" },
-    { from: /\bconducir\b/gi, to: "manejar", description: "drive" },
-    { from: /\bconduzco\b/gi, to: "manejo", description: "drive (1st person)" },
-    { from: /\bconduce\b/gi, to: "maneja", description: "drive (3rd person)" },
-    { from: /\bconducen\b/gi, to: "manejan", description: "drive (3rd person pl)" },
-  ],
-  "es-PE": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bbolígrafo(s)?\b/gi, to: "pluma$1", description: "pen" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "poroto$1", description: "bean" },
-    { from: /\bcacahuete\b/gi, to: "maní", description: "peanut" },
-    { from: /\bcacahuetes\b/gi, to: "maníes", description: "peanut" },
-    { from: /\bfresa(s)?\b/gi, to: "frutilla$1", description: "strawberry" },
-    { from: /\bconducir\b/gi, to: "manejar", description: "drive" },
-    { from: /\bconduzco\b/gi, to: "manejo", description: "drive (1st person)" },
-    { from: /\bconduce\b/gi, to: "maneja", description: "drive (3rd person)" },
-    { from: /\bconducen\b/gi, to: "manejan", description: "drive (3rd person pl)" },
-  ],
-  "es-CL": [
-    { from: /\bordenador\b/gi, to: "computador", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadores", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "auto$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\baguacate(s)?\b/gi, to: "palta$1", description: "avocado" },
-    { from: /\bjudía(s)?\b/gi, to: "poroto$1", description: "bean" },
-    { from: /\bcacahuete\b/gi, to: "maní", description: "peanut" },
-    { from: /\bcacahuetes\b/gi, to: "maníes", description: "peanut" },
-    { from: /\bfresa(s)?\b/gi, to: "frutilla$1", description: "strawberry" },
-    { from: /\bcamiseta(s)?\b/gi, to: "polera$1", description: "t-shirt" },
-    { from: /\bmaletero\b/gi, to: "maletero", description: "trunk" },
-    { from: /\bconducir\b/gi, to: "manejar", description: "drive" },
-    { from: /\bconduzco\b/gi, to: "manejo", description: "drive (1st person)" },
-    { from: /\bconduce\b/gi, to: "maneja", description: "drive (3rd person)" },
-    { from: /\bconducen\b/gi, to: "manejan", description: "drive (3rd person pl)" },
-    { from: /\bconducimos\b/gi, to: "manejamos", description: "drive (1st person pl)" },
-  ],
-  "es-VE": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bbolígrafo(s)?\b/gi, to: "lapicero$1", description: "pen" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "caraota$1", description: "bean" },
-    { from: /\bcacahuete\b/gi, to: "maní", description: "peanut" },
-    { from: /\bcacahuetes\b/gi, to: "maníes", description: "peanut" },
-    { from: /\bcamiseta(s)?\b/gi, to: "franela$1", description: "t-shirt" },
-    { from: /\bmaletero\b/gi, to: "maletero", description: "trunk" },
-    { from: /\bconducir\b/gi, to: "manejar", description: "drive" },
-    { from: /\bconduzco\b/gi, to: "manejo", description: "drive (1st person)" },
-    { from: /\bconduce\b/gi, to: "maneja", description: "drive (3rd person)" },
-    { from: /\bconducen\b/gi, to: "manejan", description: "drive (3rd person pl)" },
-  ],
-  "es-UY": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "auto$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bpiso(s)?\b/gi, to: "apartamento$1", description: "apartment" },
-    { from: /\bgafas\b/gi, to: "anteojos", description: "glasses" },
-    { from: /\bfresa(s)?\b/gi, to: "frutilla$1", description: "strawberry" },
-    { from: /\bjudía(s)?\b/gi, to: "poroto$1", description: "bean" },
-    { from: /\bcacahuete\b/gi, to: "maní", description: "peanut" },
-    { from: /\bcacahuetes\b/gi, to: "maníes", description: "peanut" },
-    { from: /\bfrigorífico(s)?\b/gi, to: "heladera$1", description: "refrigerator" },
-  ],
-  "es-PY": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "auto$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "anteojos", description: "glasses" },
-    { from: /\bfresa(s)?\b/gi, to: "frutilla$1", description: "strawberry" },
-    { from: /\bjudía(s)?\b/gi, to: "poroto$1", description: "bean" },
-    { from: /\bcacahuete\b/gi, to: "maní", description: "peanut" },
-    { from: /\bcacahuetes\b/gi, to: "maníes", description: "peanut" },
-  ],
-  "es-BO": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "frijol$1", description: "bean" },
-  ],
-  "es-EC": [
-    { from: /\bordenador(es)?\b/gi, to: "computador$1", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bbolígrafo(s)?\b/gi, to: "esfero$1", description: "pen" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía\b/gi, to: "frejol", description: "bean" },
-    { from: /\bjudías\b/gi, to: "frejoles", description: "bean" },
-    { from: /\bcacahuete\b/gi, to: "maní", description: "peanut" },
-    { from: /\bcacahuetes\b/gi, to: "maníes", description: "peanut" },
-    { from: /\bplátano\b/gi, to: "banano", description: "banana" },
-  ],
-  "es-GT": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "frijol$1", description: "bean" },
-  ],
-  "es-HN": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "frijol$1", description: "bean" },
-  ],
-  "es-SV": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "frijol$1", description: "bean" },
-  ],
-  "es-NI": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "frijol$1", description: "bean" },
-  ],
-  "es-CR": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "frijol$1", description: "bean" },
-  ],
-  "es-PA": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bbolígrafo(s)?\b/gi, to: "lapicero$1", description: "pen" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "frijol$1", description: "bean" },
-  ],
-  "es-DO": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bpiso(s)?\b/gi, to: "apartamento$1", description: "apartment" },
-    { from: /\bautobús\b/gi, to: "guagua", description: "bus" },
-    { from: /\bautobuses\b/gi, to: "guaguas", description: "bus" },
-    { from: /\bgafas\b/gi, to: "espejuelos", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "habichuela$1", description: "bean" },
-  ],
-  "es-PR": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bpiso(s)?\b/gi, to: "apartamento$1", description: "apartment" },
-    { from: /\bautobús\b/gi, to: "guagua", description: "bus" },
-    { from: /\bautobuses\b/gi, to: "guaguas", description: "bus" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-    { from: /\bjudía(s)?\b/gi, to: "habichuela$1", description: "bean" },
-    { from: /\bmaletero\b/gi, to: "maletero", description: "trunk" },
-    { from: /\bconducir\b/gi, to: "manejar", description: "drive" },
-    { from: /\bconduzco\b/gi, to: "manejo", description: "drive (1st person)" },
-    { from: /\bconduce\b/gi, to: "maneja", description: "drive (3rd person)" },
-    { from: /\bconducen\b/gi, to: "manejan", description: "drive (3rd person pl)" },
-  ],
-  "es-GQ": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-  ],
-  "es-US": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-  ],
-  "es-PH": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-  ],
-  "es-BZ": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-  ],
-  "es-AD": [
-    { from: /\bordenador\b/gi, to: "computadora", description: "computer" },
-    { from: /\bordenadores\b/gi, to: "computadoras", description: "computer" },
-    { from: /\bcoche(s)?\b/gi, to: "carro$1", description: "car" },
-    { from: /\bmóvil(es)?\b/gi, to: "celular$1", description: "mobile phone" },
-    { from: /\bpatata(s)?\b/gi, to: "papa$1", description: "potato" },
-    { from: /\bgafas\b/gi, to: "lentes", description: "glasses" },
-  ],
-};
-
 /**
- * Assemble complete adaptation list for each dialect
- * = vosotros rules + tech rules + any dialect-specific extras
+ * 2nd person plural: Spain uses vosotros; the Americas use ustedes.
+ * Grammar, not lexicon — the shared dictionary does not carry pronouns,
+ * so these stay explicit. Specific forms before generic ones; no capture
+ * groups (the old `su$1` turned "vuestra" into "sua").
  */
-const DIALECT_ADAPTATIONS: Record<
-  SpanishDialect,
-  Array<{ from: RegExp; to: string; description: string }>
-> = {
-  "es-ES": [],
-  "es-MX": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-MX"]],
-  "es-AR": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-AR"]],
-  "es-CO": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-CO"]],
-  "es-CU": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-CU"]],
-  "es-PE": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-PE"]],
-  "es-CL": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-CL"]],
-  "es-VE": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-VE"]],
-  "es-UY": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-UY"]],
-  "es-PY": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-PY"]],
-  "es-BO": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-BO"]],
-  "es-EC": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-EC"]],
-  "es-GT": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-GT"]],
-  "es-HN": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-HN"]],
-  "es-SV": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-SV"]],
-  "es-NI": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-NI"]],
-  "es-CR": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-CR"]],
-  "es-PA": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-PA"]],
-  "es-DO": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-DO"]],
-  "es-PR": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-PR"]],
-  "es-GQ": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-GQ"]],
-  "es-US": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-US"]],
-  "es-PH": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-PH"]],
-  "es-BZ": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-BZ"]],
-  "es-AD": [...VOSOTROS_ADAPTATION, ...TECH_ADAPTATIONS["es-AD"]],
-};
+const PRONOMINAL_ADAPTATIONS: Array<{ from: RegExp; to: string }> = [
+  { from: /\bvosotros\b/gi, to: "ustedes" },
+  { from: /\bvuestros\b/gi, to: "sus" },
+  { from: /\bvuestras\b/gi, to: "sus" },
+  { from: /\bvuestro\b/gi, to: "su" },
+  { from: /\bvuestra\b/gi, to: "su" },
+];
 
 /**
  * Validate dialect code
@@ -395,17 +65,19 @@ function validateDialect(dialect: string): SpanishDialect {
 }
 
 /**
- * Apply dialect-specific adaptations to a single value
+ * Apply dialect-specific adaptations to a single value: shared lexical
+ * engine first (dictionary vocabulary + article gender agreement + plural
+ * and case preservation), then the pronominal rules — except for the base
+ * dialect (es-ES), where vosotros is correct Spanish and stays untouched.
  */
 function applyAdaptations(value: string, variant: SpanishDialect): string {
-  const adaptations = DIALECT_ADAPTATIONS[variant];
-  if (!adaptations || adaptations.length === 0) {
-    return value; // No adaptations for this dialect
-  }
-
-  let adapted = value;
-  for (const { from, to } of adaptations) {
-    adapted = adapted.replace(from, to);
+  let adapted = applyLexicalSubstitution(value, variant);
+  if (variant !== DEFAULT_DIALECT) {
+    for (const { from, to } of PRONOMINAL_ADAPTATIONS) {
+      // Preserve the source casing ("Vuestra casa" → "Su casa"), same as
+      // the shared lexical engine does for dictionary swaps.
+      adapted = adapted.replace(from, (match) => applyCase(match, to));
+    }
   }
   return adapted;
 }

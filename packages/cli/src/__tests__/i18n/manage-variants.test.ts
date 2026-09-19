@@ -35,6 +35,67 @@ describe("i18n manage-variants command", () => {
   });
 
   describe("dialect adaptations", () => {
+    it("wave2: article gender agrees with the substituted noun — never 'el computadora'", async () => {
+      const sourceEntries: I18nEntry[] = [
+        { key: "device.computer", value: "Guarda tus archivos en el ordenador." },
+        { key: "device.computers", value: "Guarda tus archivos en los ordenadores." },
+      ];
+
+      mockReadLocaleFile.mockReturnValue(sourceEntries);
+      mockWriteLocaleFile.mockImplementation(() => {});
+
+      await executeManageVariants({
+        source: "/path/to/es-ES.json",
+        variant: "es-MX",
+        output: "/path/to/es-MX.json",
+      });
+
+      const writtenEntries = mockWriteLocaleFile.mock.calls[0][1] as I18nEntry[];
+      expect(writtenEntries[0].value).toContain("la computadora");
+      expect(writtenEntries[0].value).not.toContain("el computadora");
+      expect(writtenEntries[1].value).toContain("las computadoras");
+    });
+
+    it("wave2: vuestra adapts to su (not 'sua' — the old $1 bug), vuestros to sus", async () => {
+      const sourceEntries: I18nEntry[] = [
+        { key: "poss.house", value: "Vuestra casa es grande" },
+        { key: "poss.cars", value: "Vuestros coches son nuevos" },
+      ];
+
+      mockReadLocaleFile.mockReturnValue(sourceEntries);
+      mockWriteLocaleFile.mockImplementation(() => {});
+
+      await executeManageVariants({
+        source: "/path/to/es-ES.json",
+        variant: "es-MX",
+        output: "/path/to/es-MX.json",
+      });
+
+      const writtenEntries = mockWriteLocaleFile.mock.calls[0][1] as I18nEntry[];
+      expect(writtenEntries[0].value).toContain("Su casa");
+      expect(writtenEntries[0].value).not.toContain("sua");
+      expect(writtenEntries[1].value).toContain("Sus carros");
+    });
+
+    it("wave2: the shared engine keeps papa homographs' articles intact", async () => {
+      const sourceEntries: I18nEntry[] = [
+        { key: "food.potato", value: "La patata está sabrosa" },
+      ];
+
+      mockReadLocaleFile.mockReturnValue(sourceEntries);
+      mockWriteLocaleFile.mockImplementation(() => {});
+
+      await executeManageVariants({
+        source: "/path/to/es-ES.json",
+        variant: "es-AR",
+        output: "/path/to/es-AR.json",
+      });
+
+      const writtenEntries = mockWriteLocaleFile.mock.calls[0][1] as I18nEntry[];
+      expect(writtenEntries[0].value).toContain("La papa");
+      expect(writtenEntries[0].value).not.toContain("El papa");
+    });
+
     it("should apply vosotros → ustedes for Latin American variants", async () => {
       const sourceEntries: I18nEntry[] = [
         { key: "greeting", value: "Hola vosotros" },
@@ -307,7 +368,9 @@ describe("i18n manage-variants command", () => {
 
       expect(mockWriteLocaleFile).toHaveBeenCalled();
       const writtenEntries = mockWriteLocaleFile.mock.calls[0][1] as I18nEntry[];
-      expect(writtenEntries[0].value).toContain("ustedes");
+      // wave2: casing is preserved ("Vosotros" → "Ustedes"), and article
+      // gender agrees with the substituted noun.
+      expect(writtenEntries[0].value).toContain("Ustedes");
       expect(writtenEntries[0].value).toContain("su");
       expect(writtenEntries[0].value).toContain("computadora");
       expect(writtenEntries[0].value).toContain("carro");
