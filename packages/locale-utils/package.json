@@ -21,7 +21,7 @@
   "dependencies": {
     "@dialectos/security": "^0.3.0",
     "@dialectos/types": "^0.3.0",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
