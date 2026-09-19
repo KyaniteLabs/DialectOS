@@ -1,6 +1,6 @@
 {
   "name": "@dialectos/providers",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Translation providers with strategy pattern, circuit breaker, and retry logic",
   "type": "module",
   "main": "dist/index.js",
@@ -19,8 +19,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@dialectos/security": "workspace:*",
-    "@dialectos/types": "workspace:*",
+    "@dialectos/security": "^0.3.0",
+    "@dialectos/types": "^0.3.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

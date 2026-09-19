@@ -20,26 +20,31 @@ export type NounGender = "m" | "f";
 // Nouns ending in -a that are MASCULINE (exception to the -a = feminine rule)
 const MASC_A_ENDINGS: ReadonlySet<string> = new Set([
   "mapa", "problema", "sistema", "tema", "idioma", "drama", "clima",
-  "programa", "planeta", "poema", "tema", "lema", "diagrama", "telegrama",
-  "fantasma", "papa", "aroma", "axioma", "cinema", "croma", "dogma",
+  "programa", "planeta", "poema", "lema", "diagrama", "telegrama",
+  "fantasma", "aroma", "axioma", "cinema", "croma", "dogma",
   "ema", "enigma", "epigrama", "esquema", "estigma", "estratega",
   "guru", "huracan", "lingua", "monarca", "paraguas", "piloto",
   "sofa", "taxista", "testigo", "tranvia", "turista", "atleta",
   "artista", "optimista", "periodista", "pianista", "ventilador",
+  // NOTE: "papa" (potato) is intentionally NOT here — it is feminine in the
+  // food sense ("la papa"); only the Pope is "el Papa".
 ]);
 
 // Nouns ending in -o or consonant that are FEMININE (exception to the -o = masculine rule)
 const FEM_EXCEPTIONS: ReadonlySet<string> = new Set([
-  "mano", "foto", "moto", "radio", "flor", "labor", "color", "calor",
-  "sal", "val", "miel", "piel", "cual", "vall", "suerte", "noche",
-  "calle", "llave", "base", "clase", "clave", "especie", "face",
-  "frase", "gente", "latin", "ley", "luz", "mente", "muerte",
-  "nariz", "nube", "parte", "paz", "piedra", "pez", "prey",
-  "prueba", "purga", "red", "serie", "sed", "sed", "sidra",
+  "mano", "foto", "moto", "radio", "flor", "labor",
+  "sal", "miel", "piel",
+  "suerte", "noche",
+  "calle", "llave", "base", "clase", "clave", "especie",
+  "frase", "gente", "ley", "luz", "mente", "muerte",
+  "nariz", "nube", "parte", "paz", "piedra", "pez",
+  "prueba", "purga", "red", "serie", "sed", "sidra",
   "simiente", "sorpresa", "tarde", "torre", "trampa",
   // Dialect-specific nouns with tricky gender
   "guagua",  // feminine in Cuba/DR/PR/Canarias (bus)
   "plata",   // feminine (money/silver) — not actually an exception but often confused
+  // NOTE: "color" and "calor" are masculine ("el color", "el calor") and are
+  // resolved correctly by the -or morphological rule; do not list them here.
 ]);
 
 // Direct gender map for nouns that don't follow any reliable rule.
@@ -80,6 +85,10 @@ function singularize(word: string): string {
   return word;
 }
 
+const ACCENT_MAP: Record<string, string> = {
+  á: "a", é: "e", í: "i", ó: "o", ú: "u", ü: "u",
+};
+
 /**
  * Resolve the grammatical gender of a Spanish noun.
  *
@@ -91,15 +100,19 @@ function singularize(word: string): string {
  * Returns undefined for words that aren't recognizable as Spanish nouns.
  */
 export function resolveNounGender(noun: string): NounGender | undefined {
-  const lower = noun.toLowerCase().replace(/[áéíóúñ]/g, (c) => c);
+  const lower = noun.toLowerCase();
+  // Unaccented twin: override keys and exception lists are stored without
+  // accents ("autobus"), so lookups must normalize "autobús" -> "autobus".
+  // Morphological suffix checks below keep the accented form (ción, ón).
+  const plain = lower.replace(/[áéíóúü]/g, (c) => ACCENT_MAP[c] ?? c);
 
   // 1. Check explicit overrides
-  const override = GENDER_OVERRIDES.get(lower);
+  const override = GENDER_OVERRIDES.get(plain);
   if (override) return override;
 
   // 2. Singularize if plural and try again
-  const singular = singularize(lower);
-  if (singular !== lower) {
+  const singular = singularize(plain);
+  if (singular !== plain) {
     const singularOverride = GENDER_OVERRIDES.get(singular);
     if (singularOverride) return singularOverride;
     // Check exceptions with singular form
@@ -114,10 +127,11 @@ export function resolveNounGender(noun: string): NounGender | undefined {
 
   // Strip articles if present (e.g., "la casa" → "casa")
   const stripped = lower.replace(/^(el|la|los|las|un|una|unos|unas)\s+/, "");
+  const strippedPlain = plain.replace(/^(el|la|los|las|un|una|unos|unas)\s+/, "");
 
   // 2. Check exception lists
-  if (MASC_A_ENDINGS.has(stripped)) return "m";
-  if (FEM_EXCEPTIONS.has(stripped)) return "f";
+  if (MASC_A_ENDINGS.has(strippedPlain)) return "m";
+  if (FEM_EXCEPTIONS.has(strippedPlain)) return "f";
 
   // 3. Morphological rules
   if (stripped.endsWith("o")) return "m";
@@ -125,6 +139,7 @@ export function resolveNounGender(noun: string): NounGender | undefined {
 
   // Feminine suffixes
   if (/(?:ción|sión|dad|tad|tud|umbre|icie|eza|encia|ancia|logía|grafía)$/.test(stripped)) return "f";
+  if (/(?:cion|sion)$/.test(strippedPlain)) return "f";
 
   // Masculine suffixes
   if (/(?:aje|or|ón|án|és|al|il|ar|ero|orio|ico|ismo|ista)$/.test(stripped)) return "m";

@@ -19,6 +19,7 @@ import { registerDocsTools } from "./tools/docs.js";
 import { registerI18nTools } from "./tools/i18n.js";
 import { registerTranslatorTools } from "./tools/translator.js";
 import { setupGlobalHandlers } from "./lib/error-handler.js";
+import { createNullParamsGuard } from "./lib/null-params-guard.js";
 import { loadConfig, getConfigPath, type MCPConfig } from "./lib/config.js";
 import { createProviderRegistry } from "@dialectos/providers";
 import { RateLimiter } from "@dialectos/security";
@@ -70,7 +71,12 @@ async function main(): Promise<void> {
   setupGlobalHandlers();
   const server = createServer(loadConfig(getConfigPath()));
 
-  const transport = new StdioServerTransport();
+  // JSON-RPC 2.0 requires a response for every request with an id, but the
+  // MCP SDK silently drops requests whose params is explicit JSON null. The
+  // guard answers those directly with -32602 and keeps them away from the SDK.
+  const paramsGuard = createNullParamsGuard();
+  process.stdin.pipe(paramsGuard);
+  const transport = new StdioServerTransport(paramsGuard);
   await server.connect(transport);
 
   // Server is now running and listening for MCP messages
