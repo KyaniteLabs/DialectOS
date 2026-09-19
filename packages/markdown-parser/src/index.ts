@@ -13,7 +13,6 @@
  */
 
 import { marked, type Token } from "marked";
-import DOMPurify from "isomorphic-dompurify";
 import {
   type MarkdownSection,
   type MarkdownSectionType,

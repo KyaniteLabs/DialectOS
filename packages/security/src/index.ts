@@ -16,7 +16,23 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as crypto from "node:crypto";
-import DOMPurify from "isomorphic-dompurify";
+import { createRequire } from "node:module";
+
+// Lazy DOMPurify (cold-start diet, review wave 2): isomorphic-dompurify
+// pulls in jsdom at import time (~1.4-7s), but sanitization never runs at
+// server startup. Loading it on first use keeps the stdio server's cold
+// start light; the module instance is cached after the first call.
+type DOMPurifyInstance = typeof import("isomorphic-dompurify").default;
+let domPurifyInstance: DOMPurifyInstance | undefined;
+
+function getDOMPurify(): DOMPurifyInstance {
+  if (!domPurifyInstance) {
+    const req = createRequire(import.meta.url);
+    domPurifyInstance = req("isomorphic-dompurify").default as DOMPurifyInstance;
+  }
+  return domPurifyInstance;
+}
+
 
 // ============================================================================
 // Constants
@@ -391,7 +407,7 @@ export function validateNoControlChars(input: string): void {
  */
 export function sanitizeHtml(html: string): string {
   try {
-    return DOMPurify.sanitize(html, {
+    return getDOMPurify().sanitize(html, {
       USE_PROFILES: { html: true },
       ALLOW_DATA_ATTR: false,
     });
@@ -409,7 +425,7 @@ export function sanitizeHtml(html: string): string {
  */
 export function stripHtmlTags(text: string): string {
   try {
-    return DOMPurify.sanitize(text, {
+    return getDOMPurify().sanitize(text, {
       ALLOWED_TAGS: [],
       ALLOWED_ATTR: [],
     });
