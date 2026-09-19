@@ -1,6 +1,6 @@
 {
   "name": "dialectos",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "Spanish dialect localization MCP server and CLI for 25 regional variants, glossary enforcement, structure preservation, and QA gates.",
   "type": "module",

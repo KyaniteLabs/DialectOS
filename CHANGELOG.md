@@ -5,6 +5,17 @@ All notable changes to DialectOS are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-09-19
+
+### Fixed
+
+Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026-09-19 — `REFUTE 4/10`):
+
+- **Protocol survival (H1):** `tools/call` (and every method) with `params: null` is now answered with a JSON-RPC `-32602 Invalid params` response instead of being silently dropped by the MCP SDK. A line-wise stdin guard (`mcp/src/lib/null-params-guard.ts`) intercepts explicit-null-params requests before the transport sees them; all other traffic passes through untouched.
+- **Grammar (core value):** `manage_dialect_variants` now runs the shared deterministic engine (`applyLexicalSubstitution` from `@dialectos/providers`) instead of a naive word-swap table, so article gender agrees with the substituted noun — "el ordenador" → "la computadora", never "el computadora" — with plural ("los ordenadores" → "las computadoras") and case preservation. Also fixed the noun-gender resolver: accent normalization now actually strips accents (accented lookups used to miss the unaccented override keys), "papa" is no longer mis-listed as masculine (would have produced "el papa" from "la patata"), and "color"/"calor" are no longer mis-listed as feminine.
+- **Data-loss trap:** `manage_dialect_variants` no longer overwrites `sourcePath` by default. Without `outputPath` it writes a sibling variant file (`<stem>-<variant>.json`, or `<variant>.json` when the source stem is a locale code) and reports it as `outputPath` in the response; rewriting the source in place now requires an explicit `overwrite: true` opt-in. Multi-variant workflows no longer destroy their base locale.
+- **Publish readiness:** all `@dialectos/*` internal dependencies now use real semver ranges (`^0.3.0`) instead of `workspace:*`, so packed tarballs are installable from any registry (`npm pack` manifests no longer carry the unsupported `workspace:` protocol; `npm install <tarball>` no longer fails with EUNSUPPORTEDPROTOCOL). `linkWorkspacePackages: true` keeps pnpm linking local packages in the workspace during development, and the lockfile is regenerated so `pnpm install --frozen-lockfile` (CI) passes from a fresh clone.
+
 ## [Unreleased]
 
 ### Changed

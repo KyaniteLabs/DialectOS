@@ -84,27 +84,33 @@ vi.mock("@dialectos/security", () => {
   };
 });
 
-vi.mock("@dialectos/providers", () => ({
-  ProviderRegistry: vi.fn(function() {
-    return {
+vi.mock("@dialectos/providers", async () => {
+  // Keep the real deterministic engine (applyLexicalSubstitution etc.) so
+  // gender-agreement regressions are exercised through the tool handlers.
+  const actual = await vi.importActual<typeof import("@dialectos/providers")>("@dialectos/providers");
+  return {
+    ...actual,
+    ProviderRegistry: vi.fn(function() {
+      return {
+        get: vi.fn(),
+        getAuto: vi.fn(),
+        register: vi.fn(),
+        prepareRequest: vi.fn().mockReturnValue({ sourceLang: "en", targetLang: "es-ES", options: {}, warnings: [] }),
+      };
+    }),
+    createProviderRegistry: vi.fn().mockReturnValue({
       get: vi.fn(),
       getAuto: vi.fn(),
       register: vi.fn(),
       prepareRequest: vi.fn().mockReturnValue({ sourceLang: "en", targetLang: "es-ES", options: {}, warnings: [] }),
-    };
-  }),
-  createProviderRegistry: vi.fn().mockReturnValue({
-    get: vi.fn(),
-    getAuto: vi.fn(),
-    register: vi.fn(),
-      prepareRequest: vi.fn().mockReturnValue({ sourceLang: "en", targetLang: "es-ES", options: {}, warnings: [] }),
-  }),
-  getDefaultProviderRegistry: vi.fn(),
-  DeepLProvider: vi.fn(),
-  LibreTranslateProvider: vi.fn(),
-  MyMemoryProvider: vi.fn(),
-  LLMProvider: vi.fn(),
-}));
+    }),
+    getDefaultProviderRegistry: vi.fn(),
+    DeepLProvider: vi.fn(),
+    LibreTranslateProvider: vi.fn(),
+    MyMemoryProvider: vi.fn(),
+    LLMProvider: vi.fn(),
+  };
+});
 
 import {
   readLocaleFile,
@@ -437,9 +443,119 @@ describe("MCP i18n Tools", () => {
       const parsedResult = JSON.parse(result.content[0].text);
       expect(parsedResult.adapted).toBe(false);
       expect(parsedResult.changes).toEqual([]);
+      // The base dialect is a no-op: nothing may be written.
+      expect(writeLocaleFile).not.toHaveBeenCalled();
     });
 
-    it("should apply adaptations for newly supported dialects", async () => {
+    it("regression: adapts article gender — never 'el computadora' (adversarial finding 2)", async () => {
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "computer", value: "Guarda tus archivos en el ordenador." },
+        { key: "computers", value: "Guarda tus archivos en los ordenadores." },
+        { key: "car", value: "El coche es nuevo" },
+      ]);
+
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = { tool: vi.fn() };
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+      const dialectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "manage_dialect_variants"
+      );
+      const handler = dialectCall![3];
+
+      for (const variant of ["es-MX", "es-AR"] as const) {
+        vi.mocked(writeLocaleFile).mockClear();
+        await handler({ sourcePath: "/test/es.json", variant, outputPath: `/test/out-${variant}.json` } as any);
+        const writtenEntries = vi.mocked(writeLocaleFile).mock.calls[0][1];
+        const byKey = Object.fromEntries(writtenEntries.map((e: any) => [e.key, e.value]));
+        expect(byKey.computer).toBe("Guarda tus archivos en la computadora.");
+        expect(byKey.computer).not.toContain("el computadora");
+        expect(byKey.computers).toBe("Guarda tus archivos en las computadoras.");
+        // coche is masculine and swaps to a masculine term (auto/carro): the
+        // article must survive unchanged, capitalization included.
+        expect(byKey.car).toMatch(/^El (auto|carro) es nuevo$/);
+      }
+    });
+
+    it("regression: does not overwrite sourcePath by default (adversarial finding 3)", async () => {
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "computer", value: "Guarda tus archivos en el ordenador." },
+      ]);
+      vi.mocked(validateJsonPath).mockReturnValue("/tmp/locales/es.json");
+
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = { tool: vi.fn() };
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+      const dialectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "manage_dialect_variants"
+      );
+      const handler = dialectCall![3];
+
+      // No outputPath, no overwrite: a sibling variant file must be written,
+      // never the source itself.
+      const result = await handler({ sourcePath: "/tmp/locales/es.json", variant: "es-MX" } as any);
+      const parsedResult = JSON.parse(result.content[0].text);
+
+      expect(writeLocaleFile).toHaveBeenCalledTimes(1);
+      const [writtenPath] = vi.mocked(writeLocaleFile).mock.calls[0];
+      expect(writtenPath).not.toBe("/tmp/locales/es.json");
+      expect(writtenPath).toBe("/tmp/locales/es-MX.json");
+      // The response reports where the variant landed, without absolute paths.
+      expect(parsedResult.outputPath).toBe("es-MX.json");
+      expect(parsedResult.outputPath).not.toContain("/tmp/locales");
+    });
+
+    it("regression: overwrite is an explicit opt-in that rewrites sourcePath", async () => {
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "computer", value: "Guarda tus archivos en el ordenador." },
+      ]);
+      vi.mocked(validateJsonPath).mockReturnValue("/tmp/locales/es.json");
+
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = { tool: vi.fn() };
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+      const dialectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "manage_dialect_variants"
+      );
+      const handler = dialectCall![3];
+
+      await handler({ sourcePath: "/tmp/locales/es.json", variant: "es-MX", overwrite: true } as any);
+
+      expect(writeLocaleFile).toHaveBeenCalledTimes(1);
+      const [writtenPath] = vi.mocked(writeLocaleFile).mock.calls[0];
+      expect(writtenPath).toBe("/tmp/locales/es.json");
+    });
+
+    it("regression: multi-variant workflows no longer self-destruct", async () => {
+      // Regionalize the same base to two variants back to back: the second
+      // call must still find the base vocabulary intact (adversarial
+      // finding 3's demonstrated consequence).
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "computer", value: "Guarda tus archivos en el ordenador." },
+      ]);
+      vi.mocked(validateJsonPath).mockReturnValue("/tmp/locales/es.json");
+
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = { tool: vi.fn() };
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+      const dialectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "manage_dialect_variants"
+      );
+      const handler = dialectCall![3];
+
+      const first = await handler({ sourcePath: "/tmp/locales/es.json", variant: "es-MX" } as any);
+      const second = await handler({ sourcePath: "/tmp/locales/es.json", variant: "es-AR" } as any);
+
+      const firstResult = JSON.parse(first.content[0].text);
+      const secondResult = JSON.parse(second.content[0].text);
+      expect(firstResult.adapted).toBe(true);
+      expect(secondResult.adapted).toBe(true);
+      // The base content handed to the second call was never mutated.
+      expect(readLocaleFile).toHaveBeenCalledWith("/tmp/locales/es.json");
+      const writtenPaths = vi.mocked(writeLocaleFile).mock.calls.map((c) => c[0]);
+      expect(writtenPaths).toEqual(["/tmp/locales/es-MX.json", "/tmp/locales/es-AR.json"]);
+    });
+
+    it("should apply adaptations with correct article gender for newly supported dialects", async () => {
       vi.mocked(readLocaleFile).mockReturnValue([
         { key: "computer", value: "El ordenador está en el coche" },
       ]);
@@ -464,7 +580,8 @@ describe("MCP i18n Tools", () => {
 
       const writtenEntries = vi.mocked(writeLocaleFile).mock.calls[0][1];
       expect(writtenEntries).toEqual([
-        { key: "computer", value: "El computadora está en el carro" },
+        // "El computadora" was the pre-fix output — articles must agree.
+        { key: "computer", value: "La computadora está en el carro" },
       ]);
     });
   });

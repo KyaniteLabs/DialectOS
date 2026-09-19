@@ -1,6 +1,6 @@
 {
   "name": "@dialectos/mcp",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "MCP adapter for DialectOS — thin wrapper around CLI/core",
   "type": "module",
   "main": "dist/index.js",
@@ -21,11 +21,11 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@dialectos/locale-utils": "workspace:*",
-    "@dialectos/markdown-parser": "workspace:*",
-    "@dialectos/providers": "workspace:*",
-    "@dialectos/security": "workspace:*",
-    "@dialectos/types": "workspace:*",
+    "@dialectos/locale-utils": "^0.3.0",
+    "@dialectos/markdown-parser": "^0.3.0",
+    "@dialectos/providers": "^0.3.0",
+    "@dialectos/security": "^0.3.0",
+    "@dialectos/types": "^0.3.0",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "zod": "^4.4.3"
   },

@@ -1,5 +1,9 @@
 packages:
   - 'packages/*'
+# Internal @dialectos/* dependencies use real semver ranges (^0.3.0) so packed
+# tarballs are installable from any registry. This flag keeps pnpm linking the
+# local workspace packages during development instead of hitting the registry.
+linkWorkspacePackages: true
 allowBuilds:
   esbuild: true
 overrides:

@@ -12,7 +12,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { existsSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 import { z } from "zod";
 import type {
   SpanishDialect,
@@ -21,7 +21,7 @@ import type {
   FormalityIssue,
   GenderNeutralStrategy,
 } from "@dialectos/types";
-import { dialectSchema, providerNameSchema, ALL_SPANISH_DIALECTS } from "@dialectos/types";
+import { dialectSchema, providerNameSchema, ALL_SPANISH_DIALECTS, DEFAULT_DIALECT } from "@dialectos/types";
 import {
   readLocaleFile,
   writeLocaleFile,
@@ -39,6 +39,7 @@ import {
 } from "@dialectos/security";
 import {
   ProviderRegistry,
+  applyLexicalSubstitution,
 } from "@dialectos/providers";
 import { ToolResult } from "../lib/types.js";
 import { createProviderRegistry } from "@dialectos/providers";
@@ -72,6 +73,8 @@ interface ManageDialectVariantsParams {
   sourcePath: string;
   variant: SpanishDialect;
   outputPath?: string;
+  /** Explicit opt-in to rewrite sourcePath in place. Defaults to false. */
+  overwrite?: boolean;
 }
 
 interface CheckFormalityParams {
@@ -85,91 +88,35 @@ interface ApplyGenderNeutralParams {
 }
 
 // ============================================================================
-// Dialect Adaptation Maps
+// Dialect Variant Output Path
 // ============================================================================
 
 /**
- * Region-specific vocabulary replacements for major Spanish dialects
+ * Derive a safe output path for a dialect variant when the caller did not
+ * provide one. The source file is never the target: the variant lands next
+ * to it. When the source stem is itself a locale code (es.json), the variant
+ * becomes the locale code (es-MX.json); otherwise the variant is appended
+ * (locale.json -> locale.es-MX.json).
  */
-const DIALECT_ADAPTATIONS: Record<string, Record<string, string>> = {
-  "es-MX": {
-    "ordenador": "computadora",
-    "coche": "auto",
-    "aparcar": "estacionar",
-    "autobús": "camión",
-    "patata": "papa",
-    "zumbar": "llamar",
-    "pastel": "pastel",
-    "piso": "departamento",
-    "bañarse": "bañarse",
-    "coger": "agarrar",
-    "prisas": "prisas",
-    "dinero": "dinero",
-  },
-  "es-AR": {
-    "ordenador": "computadora",
-    "coche": "auto",
-    "aparcar": "estacionar",
-    "autobús": "colectivo",
-    "patata": "papa",
-    "zumbar": "llamar",
-    "pastel": "torta",
-    "piso": "departamento",
-    "bañarse": "ducharse",
-    "coger": "tomar",
-    "prisas": "apuro",
-    "dinero": "plata",
-  },
-  "es-CO": {
-    "ordenador": "computador",
-    "coche": "carro",
-    "aparcar": "parquear",
-    "autobús": "bus",
-    "patata": "papa",
-    "zumbar": "llamar",
-    "pastel": "pastel",
-    "piso": "apartamento",
-    "bañarse": "bañarse",
-    "coger": "tomar",
-    "prisas": "prisa",
-    "dinero": "dinero",
-  },
-  "es-GQ": {
-    "ordenador": "computadora",
-    "coche": "carro",
-    "móvil": "celular",
-    "patata": "papa",
-    "gafas": "lentes",
-  },
-  "es-US": {
-    "ordenador": "computadora",
-    "coche": "carro",
-    "móvil": "celular",
-    "patata": "papa",
-    "gafas": "lentes",
-  },
-  "es-PH": {
-    "ordenador": "computadora",
-    "coche": "carro",
-    "móvil": "celular",
-    "patata": "papa",
-    "gafas": "lentes",
-  },
-  "es-BZ": {
-    "ordenador": "computadora",
-    "coche": "carro",
-    "móvil": "celular",
-    "patata": "papa",
-    "gafas": "lentes",
-  },
-  "es-AD": {
-    "ordenador": "computadora",
-    "coche": "carro",
-    "móvil": "celular",
-    "patata": "papa",
-    "gafas": "lentes",
-  },
-};
+function deriveVariantOutputPath(sourcePath: string, variant: string): string {
+  const dir = dirname(sourcePath);
+  const stem = basename(sourcePath, ".json");
+  const nextStem = /^[a-z]{2}(-[A-Z]{2})?$/.test(stem) ? variant : `${stem}-${variant}`;
+  return join(dir, `${nextStem}.json`);
+}
+
+/**
+ * Render a resolved path for the tool response without leaking local
+ * absolute paths: relative to the process cwd when inside it, otherwise
+ * just the file name.
+ */
+function reportPath(resolvedPath: string): string {
+  const rel = relative(process.cwd(), resolvedPath);
+  if (rel.startsWith("..")) {
+    return basename(resolvedPath);
+  }
+  return rel;
+}
 
 // ============================================================================
 // Formality Detection Patterns
@@ -575,6 +522,15 @@ async function handleBatchTranslateLocales(
 
 /**
  * Handle manage_dialect_variants tool
+ *
+ * Applies the shared deterministic lexical substitution engine
+ * (dialect vocabulary + article gender agreement, e.g. "el ordenador" ->
+ * "la computadora", never "el computadora").
+ *
+ * Output handling (data-loss protection): the source file is rewritten only
+ * when the caller explicitly sets overwrite to true. By default the adapted
+ * copy is written next to the source as <stem>-<variant>.json (or
+ * <variant>.json when the source stem is a locale code).
  */
 async function handleManageDialectVariants(
   params: ManageDialectVariantsParams,
@@ -594,11 +550,8 @@ async function handleManageDialectVariants(
     // Read source locale
     const sourceEntries = readLocaleFile(sourcePath);
 
-    // Get dialect adaptations
-    const adaptations = DIALECT_ADAPTATIONS[params.variant];
-    if (!adaptations) {
-      // No adaptations for this dialect (e.g., es-ES is base)
-      const outputPath = params.outputPath || sourcePath;
+    // The base dialect has no regional adaptations to apply from a base file
+    if (params.variant === DEFAULT_DIALECT) {
       return {
         content: [
           {
@@ -612,23 +565,26 @@ async function handleManageDialectVariants(
       };
     }
 
-    // Apply adaptations
+    // Apply adaptations through the shared engine (gender-aware)
     const changes: string[] = [];
     const adaptedEntries = sourceEntries.map((entry) => {
-      let newValue = entry.value;
-      for (const [source, target] of Object.entries(adaptations)) {
-        const escaped = source.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const regex = new RegExp(`\\b${escaped}\\b`, "gi");
-        if (regex.test(newValue)) {
-          newValue = newValue.replace(regex, target);
-          changes.push(`${entry.key}: ${source} -> ${target}`);
-        }
+      const original = String(entry.value);
+      const adapted = applyLexicalSubstitution(original, params.variant);
+      if (adapted !== original) {
+        changes.push(`${entry.key}: ${original} -> ${adapted}`);
       }
-      return { ...entry, value: newValue };
+      return { ...entry, value: adapted };
     });
 
-    // Write output
-    const outputPath = params.outputPath || sourcePath;
+    // Resolve the output path. The source is only rewritten on explicit opt-in.
+    let outputPath: string;
+    if (params.outputPath) {
+      outputPath = validateJsonPath(params.outputPath);
+    } else if (params.overwrite === true) {
+      outputPath = sourcePath;
+    } else {
+      outputPath = deriveVariantOutputPath(sourcePath, params.variant);
+    }
     writeLocaleFile(outputPath, adaptedEntries);
 
     return {
@@ -638,6 +594,7 @@ async function handleManageDialectVariants(
           text: JSON.stringify({
             adapted: changes.length > 0,
             changes,
+            outputPath: reportPath(outputPath),
           }),
         },
       ],
@@ -927,18 +884,19 @@ export function registerI18nTools(
     {
       title: "Create dialect locale variant",
       description:
-        "Apply deterministic regional vocabulary substitutions to a JSON locale file for a specific Spanish dialect. Writes the adapted locale to outputPath when provided; otherwise overwrites sourcePath.",
+        "Apply deterministic regional vocabulary substitutions (with article gender agreement, e.g. el ordenador -> la computadora) to a JSON locale file for a specific Spanish dialect. Writes the adapted locale to outputPath when provided; without outputPath it writes a sibling variant file (<stem>-<variant>.json, or <variant>.json when the source stem is a locale code) and never touches the source. The source file is rewritten in place only when overwrite is explicitly set to true.",
       inputSchema: {
-        sourcePath: z.string().min(1).describe("Path to the source JSON locale file whose string values should be adapted."),
+        sourcePath: z.string().min(1).describe("Path to the source JSON locale file whose string values should be adapted. The source is never modified unless overwrite is true."),
         variant: z.string().refine((v) => ALL_SPANISH_DIALECTS.includes(v as SpanishDialect), {
           message: "Invalid Spanish dialect variant",
         }).describe("Target Spanish dialect variant for regional vocabulary adaptation, such as es-MX, es-AR, or es-CO."),
-        outputPath: z.string().min(1).optional().describe("Destination JSON file. Omit to update the source file in place."),
+        outputPath: z.string().min(1).optional().describe("Destination JSON file for the adapted locale. When omitted, a sibling variant file is written next to the source instead of overwriting it."),
+        overwrite: z.boolean().optional().describe("Explicit opt-in to rewrite sourcePath in place. Destructive: destroys the base locale, which breaks multi-variant workflows. Defaults to false."),
       },
       annotations: {
         title: "Create dialect locale variant",
         readOnlyHint: false,
-        destructiveHint: true,
+        destructiveHint: false,
         idempotentHint: true,
         openWorldHint: false,
       },

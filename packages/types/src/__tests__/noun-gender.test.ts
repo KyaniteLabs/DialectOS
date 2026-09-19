@@ -33,6 +33,26 @@ describe("resolveNounGender", () => {
     expect(resolveNounGender("ordenador")).toBe("m");
   });
 
+  it("regression: resolves accented nouns against the unaccented override keys", () => {
+    // The override map stores plain keys ("autobus"); accented input used to
+    // miss them because the accent-stripping replace was a no-op.
+    expect(resolveNounGender("autobús")).toBe("m");
+    expect(resolveNounGender("camión")).toBe("m");
+    expect(resolveNounGender("móvil")).toBe("m");
+    expect(resolveNounGender("conexión")).toBe("f");
+    expect(resolveNounGender("camiones")).toBe("m"); // accented-free plural via singularize
+  });
+
+  it("regression: papa is feminine (food), color and calor are masculine", () => {
+    // "papa" was wrongly in the masculine -a exception list, which would have
+    // turned "la patata" into "el papa" during dialect substitution.
+    expect(resolveNounGender("papa")).toBe("f");
+    expect(articleMatchesNoun("la", "papa")).toBe(true);
+    expect(articleMatchesNoun("el", "papa")).toBe(false);
+    expect(resolveNounGender("color")).toBe("m");
+    expect(resolveNounGender("calor")).toBe("m");
+  });
+
   it("returns f for -ción nouns", () => {
     expect(resolveNounGender("configuracion")).toBe("f");
     expect(resolveNounGender("aplicacion")).toBe("f");
