@@ -394,6 +394,9 @@ describe("MCP i18n Tools", () => {
 
   describe("manage_dialect_variants tool", () => {
     it("should apply dialect-specific adaptations", async () => {
+      // Identity path validation so distinct source/output paths stay distinct
+      // (the F2 same-destination guard compares them).
+      vi.mocked(validateJsonPath).mockImplementation((p: string) => p);
       const { registerI18nTools } = await import("../tools/i18n.js");
       const mockServer = {
         tool: vi.fn(),
@@ -448,6 +451,7 @@ describe("MCP i18n Tools", () => {
     });
 
     it("regression: adapts article gender — never 'el computadora' (adversarial finding 2)", async () => {
+      vi.mocked(validateJsonPath).mockImplementation((p: string) => p);
       vi.mocked(readLocaleFile).mockReturnValue([
         { key: "computer", value: "Guarda tus archivos en el ordenador." },
         { key: "computers", value: "Guarda tus archivos en los ordenadores." },
@@ -525,6 +529,36 @@ describe("MCP i18n Tools", () => {
       expect(writtenPath).toBe("/tmp/locales/es.json");
     });
 
+    it("F2 regression: variant equal to the source's own dialect errors instead of rewriting the source", async () => {
+      // deriveVariantOutputPath("es-MX.json", "es-MX") degenerates to the
+      // source itself; the tool must refuse rather than silently rewrite it.
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "computer", value: "Guarda tus archivos en la computadora." },
+      ]);
+      vi.mocked(validateJsonPath).mockReturnValue("/tmp/locales/es-MX.json");
+
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = { tool: vi.fn() };
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+      const dialectCall = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "manage_dialect_variants"
+      );
+      const handler = dialectCall![3];
+
+      const result = await handler({ sourcePath: "/tmp/locales/es-MX.json", variant: "es-MX" } as any);
+
+      expect(result.isError).toBe(true);
+      const parsed = JSON.parse(result.content[0].text);
+      expect(parsed.message).toContain("resolves to the source file itself");
+      expect(writeLocaleFile).not.toHaveBeenCalled();
+
+      // Explicit opt-in still rewrites in place.
+      const optIn = await handler({ sourcePath: "/tmp/locales/es-MX.json", variant: "es-MX", overwrite: true } as any);
+      expect(optIn.isError).toBeUndefined();
+      expect(writeLocaleFile).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(writeLocaleFile).mock.calls[0][0]).toBe("/tmp/locales/es-MX.json");
+    });
+
     it("regression: multi-variant workflows no longer self-destruct", async () => {
       // Regionalize the same base to two variants back to back: the second
       // call must still find the base vocabulary intact (adversarial
@@ -556,6 +590,7 @@ describe("MCP i18n Tools", () => {
     });
 
     it("should apply adaptations with correct article gender for newly supported dialects", async () => {
+      vi.mocked(validateJsonPath).mockImplementation((p: string) => p);
       vi.mocked(readLocaleFile).mockReturnValue([
         { key: "computer", value: "El ordenador está en el coche" },
       ]);

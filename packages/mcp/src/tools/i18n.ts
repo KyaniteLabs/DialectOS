@@ -585,6 +585,17 @@ async function handleManageDialectVariants(
     } else {
       outputPath = deriveVariantOutputPath(sourcePath, params.variant);
     }
+    // F2 (review wave 2): when the variant equals the source file's own
+    // dialect code, the derived sibling degenerates into the source itself
+    // ("es-MX.json" + es-MX) — and an explicit outputPath equal to the
+    // source does the same. Rewriting it would violate the tool's own
+    // "never touches the source unless overwrite: true" contract.
+    if (outputPath === sourcePath && params.overwrite !== true) {
+      throw new Error(
+        `variant ${params.variant} resolves to the source file itself (${basename(sourcePath)}); ` +
+          `pass overwrite: true to adapt it in place, or outputPath for an explicit destination`
+      );
+    }
     writeLocaleFile(outputPath, adaptedEntries);
 
     return {
