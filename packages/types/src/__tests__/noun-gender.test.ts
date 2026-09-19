@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resolveNounGender, articleMatchesNoun, definiteArticle, indefiniteArticle } from "../noun-gender.js";
+import { resolveNounGender, articleMatchesNoun, definiteArticle, indefiniteArticle, isAmbiguousNoun } from "../noun-gender.js";
 
 describe("resolveNounGender", () => {
   it("returns m for -o nouns", () => {
@@ -43,14 +43,50 @@ describe("resolveNounGender", () => {
     expect(resolveNounGender("camiones")).toBe("m"); // accented-free plural via singularize
   });
 
-  it("regression: papa is feminine (food), color and calor are masculine", () => {
-    // "papa" was wrongly in the masculine -a exception list, which would have
-    // turned "la patata" into "el papa" during dialect substitution.
-    expect(resolveNounGender("papa")).toBe("f");
-    expect(articleMatchesNoun("la", "papa")).toBe(true);
-    expect(articleMatchesNoun("el", "papa")).toBe(false);
+  it("regression: papa is an ambiguous homograph; color and calor are masculine", () => {
+    // CEO rule, 2026-09-19: "el papa" (the Pope) / "la papa" (the potato) /
+    // "el papá" (the dad) are three different words, all correct as written.
+    // Wave 1 had pinned "papa" to feminine, which made the engine flag and
+    // rewrite the also-correct "el papa". Resolving to undefined makes every
+    // consumer preserve the source article verbatim.
+    expect(resolveNounGender("papa")).toBeUndefined();
+    expect(articleMatchesNoun("el", "papa")).toBeUndefined();
+    expect(articleMatchesNoun("la", "papa")).toBeUndefined();
+    expect(isAmbiguousNoun("papa")).toBe(true);
+    // Wave-1 fix kept: color/calor resolve masculine via the -or rule and
+    // are NOT listed in FEM_EXCEPTIONS.
     expect(resolveNounGender("color")).toBe("m");
     expect(resolveNounGender("calor")).toBe("m");
+  });
+
+  it("accent-sensitive keys: papá (dad) is masculine — a different word from papa", () => {
+    expect(resolveNounGender("papá")).toBe("m");
+    expect(articleMatchesNoun("el", "papá")).toBe(true);
+    expect(articleMatchesNoun("la", "papá")).toBe(false);
+    expect(isAmbiguousNoun("papá")).toBe(false);
+    // Plurals: "los papás" (dads) stays masculine, "las papas" (potatoes)
+    // inherits the ambiguity of its singular.
+    expect(resolveNounGender("papás")).toBe("m");
+    expect(resolveNounGender("papas")).toBeUndefined();
+    expect(isAmbiguousNoun("papas")).toBe(true);
+  });
+
+  it("other CEO-listed homographs are ambiguous (corpus/behavior-backed)", () => {
+    // "cometa" is a real corpus term (concept "kite_toy"); the -a rule used
+    // to resolve it as feminine, wrongly flagging "el cometa" (astronomy).
+    expect(isAmbiguousNoun("cometa")).toBe(true);
+    expect(resolveNounGender("cometa")).toBeUndefined();
+    expect(resolveNounGender("cometas")).toBeUndefined();
+    // "guía": RAE amb. (el guía the male guide / la guía the guidebook);
+    // the -a rule used to flag "el guía".
+    expect(isAmbiguousNoun("guía")).toBe(true);
+    expect(resolveNounGender("guía")).toBeUndefined();
+    expect(resolveNounGender("guías")).toBeUndefined();
+    // "frente" (la frente forehead / el frente front) and "orden" (la orden
+    // command / el orden order): no reliable rule today; listed so a future
+    // rule or override can never pin them to a single gender.
+    expect(isAmbiguousNoun("frente")).toBe(true);
+    expect(isAmbiguousNoun("orden")).toBe(true);
   });
 
   it("returns f for -ción nouns", () => {

@@ -14,7 +14,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-import { resolveNounGender, type NounGender } from "@dialectos/types";
+import { resolveNounGender, isAmbiguousNoun, type NounGender } from "@dialectos/types";
 import { spanishPluralize } from "./morphology.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -35,8 +35,23 @@ export interface AgreementWarning {
   suggestion: string;
 }
 
+/**
+ * Informational note (never a correction) for gender homographs whose
+ * article carries meaning: "el papa" (the Pope) / "la papa" (the potato) /
+ * "el papá" (the dad). The engine preserves the source article verbatim
+ * and surfaces this note instead. CEO rule, 2026-09-19.
+ */
+export interface AgreementNote {
+  type: "ambiguous-gender";
+  found: string;
+  noun: string;
+  message: string;
+}
+
 export interface AgreementResult {
   warnings: AgreementWarning[];
+  /** Informational ambiguity notes — never affect `passed`, never rewritten. */
+  notes: AgreementNote[];
   passed: boolean;
 }
 
@@ -61,6 +76,7 @@ const NOUN_ADJ_RE = /\b(?:el|la|los|las|un|una|unos|unas|del|al)\s+([a-záéíó
  */
 export function validateAgreement(text: string): AgreementResult {
   const warnings: AgreementWarning[] = [];
+  const notes: AgreementNote[] = [];
 
   const articleMatches = [...text.matchAll(ARTICLE_NOUN_RE)];
 
@@ -69,6 +85,21 @@ export function validateAgreement(text: string): AgreementResult {
     const noun = match[2].toLowerCase();
 
     if (_looksLikeNonNoun(noun)) continue;
+
+    // Ambiguous homographs ("el papa"/"la papa"/"el papá"): the article
+    // itself distinguishes meanings, so it is NEVER wrong and NEVER
+    // rewritten. Emit an informational note and skip all checks for
+    // this noun (including number: the engine declares itself out of
+    // scope for the whole word, not just its gender).
+    if (isAmbiguousNoun(noun)) {
+      notes.push({
+        type: "ambiguous-gender",
+        found: `${match[1]} ${match[2]}`,
+        noun,
+        message: `"${match[2]}" is a gender homograph (e.g. "el papa" the Pope vs "la papa" the potato): the original article was preserved.`,
+      });
+      continue;
+    }
 
     const gender = resolveNounGender(noun);
     if (!gender) continue;
@@ -156,6 +187,7 @@ export function validateAgreement(text: string): AgreementResult {
 
   return {
     warnings,
+    notes,
     passed: warnings.length === 0,
   };
 }

@@ -30,6 +30,23 @@ const MASC_A_ENDINGS: ReadonlySet<string> = new Set([
   // food sense ("la papa"); only the Pope is "el Papa".
 ]);
 
+// Homograph nouns whose ARTICLE carries meaning: the same spelling is a
+// different word depending on the article, so no single gender can be
+// resolved. For these the engine must NEVER rewrite the article —
+// `resolveNounGender` returns undefined so every consumer preserves the
+// source article verbatim, and the agreement validator surfaces an
+// informational note instead of a correction.
+//
+// CEO rule, 2026-09-19: "el papa" (the Pope) / "la papa" (the potato) /
+// "el papá" (the dad) are three different words, all correct as written.
+const AMBIGUOUS_NOUNS: ReadonlySet<string> = new Set([
+  "papa",   // el papa (Pope) / la papa (potato) — real dialectal swap (concept "potato": patata/papa)
+  "cometa", // el cometa (astronomy) / la cometa (kite) — corpus term (concept "kite_toy")
+  "guía",   // el guía (male guide) / la guía (female guide, guidebook) — RAE: amb.
+  "frente", // la frente (forehead) / el frente (battle/political front) — no rule today; listed to stay safe
+  "orden",  // la orden (command, religious order) / el orden (order/sequence) — no rule today; listed to stay safe
+]);
+
 // Nouns ending in -o or consonant that are FEMININE (exception to the -o = masculine rule)
 const FEM_EXCEPTIONS: ReadonlySet<string> = new Set([
   "mano", "foto", "moto", "radio", "flor", "labor",
@@ -93,11 +110,17 @@ const ACCENT_MAP: Record<string, string> = {
  * Resolve the grammatical gender of a Spanish noun.
  *
  * Priority:
- * 1. Explicit override map (known tricky nouns)
- * 2. Exception lists (masculine -a nouns, feminine -o/consonant nouns)
- * 3. Morphological rules (-o → m, -a → f, -ción/-dad → f, -aje/-or → m, etc.)
+ * 1. Accent-sensitive overrides — keys stored WITH an accent are distinct
+ *    words ("papá" = dad, masculine), not spelling variants of the
+ *    unaccented twin ("papa" = ambiguous homograph)
+ * 2. Ambiguous homographs — never resolved; the article is meaning-bearing
+ *    ("el papa"/"la papa") and consumers must preserve it verbatim
+ * 3. Explicit override map (unaccented keys: "autobús" → "autobus")
+ * 4. Exception lists (masculine -a nouns, feminine -o/consonant nouns)
+ * 5. Morphological rules (-o → m, -a → f, -ción/-dad → f, -aje/-or → m, etc.)
  *
- * Returns undefined for words that aren't recognizable as Spanish nouns.
+ * Returns undefined for words that aren't recognizable as Spanish nouns
+ * and for ambiguous homographs (use `isAmbiguousNoun` to tell them apart).
  */
 export function resolveNounGender(noun: string): NounGender | undefined {
   const lower = noun.toLowerCase();
@@ -106,11 +129,32 @@ export function resolveNounGender(noun: string): NounGender | undefined {
   // Morphological suffix checks below keep the accented form (ción, ón).
   const plain = lower.replace(/[áéíóúü]/g, (c) => ACCENT_MAP[c] ?? c);
 
-  // 1. Check explicit overrides
+  // 1. Accent-sensitive override lookup: the verbatim accented form is a
+  //    DIFFERENT WORD ("papá" the dad), checked before accent normalization
+  //    and before the ambiguity check below.
+  const accentedOverride = GENDER_OVERRIDES.get(lower);
+  if (accentedOverride) return accentedOverride;
+
+  // 2. Ambiguous homographs ("el papa"/"la papa"): exact, accent-preserving
+  //    match only — never match the unaccented twin of a different word.
+  //    Checked before the unaccented override path so stale data in
+  //    gender-overrides.json can never re-enable article rewriting here.
+  if (AMBIGUOUS_NOUNS.has(lower)) return undefined;
+
+  // 3. Explicit overrides (unaccented keys)
   const override = GENDER_OVERRIDES.get(plain);
   if (override) return override;
 
-  // 2. Singularize if plural and try again
+  // 4. Singularize if plural and try again. The accented singular carries
+  //    word identity ("papás" → "papá" → masculine; "papas" → "papa" →
+  //    ambiguous), so it is checked before the unaccented singular.
+  const singularAccented = singularize(lower);
+  if (singularAccented !== lower) {
+    const singularAccentedOverride = GENDER_OVERRIDES.get(singularAccented);
+    if (singularAccentedOverride) return singularAccentedOverride;
+    if (AMBIGUOUS_NOUNS.has(singularAccented)) return undefined;
+  }
+
   const singular = singularize(plain);
   if (singular !== plain) {
     const singularOverride = GENDER_OVERRIDES.get(singular);
@@ -148,6 +192,24 @@ export function resolveNounGender(noun: string): NounGender | undefined {
   // -i, -u are rare for nouns
 
   return undefined;
+}
+
+/**
+ * Check if a noun is a gender homograph whose article carries meaning
+ * ("el papa" the Pope / "la papa" the potato / "el papá" the dad).
+ *
+ * Consumers must preserve the source article of these nouns verbatim
+ * and, where they report diagnostics, emit an informational note
+ * instead of a correction.
+ */
+export function isAmbiguousNoun(noun: string): boolean {
+  const lower = noun.toLowerCase();
+  if (AMBIGUOUS_NOUNS.has(lower)) return true;
+  // Plural forms ("las papas", "las guías") inherit the ambiguity of
+  // their singular; singularize preserves accents, so "papás" (dads)
+  // singularizes to "papá", which is NOT ambiguous.
+  const singular = singularize(lower);
+  return singular !== lower && AMBIGUOUS_NOUNS.has(singular);
 }
 
 /**

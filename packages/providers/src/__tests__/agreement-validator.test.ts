@@ -71,6 +71,53 @@ describe("validateAgreement", () => {
   });
 });
 
+describe("ambiguous homographs (CEO rule 2026-09-19)", () => {
+  it("preserves el papa (the Pope): no warning, note emitted, still passes", () => {
+    const result = validateAgreement("El papa llegó a Roma.");
+    expect(result.warnings.filter((w) => w.found.toLowerCase().includes("papa"))).toHaveLength(0);
+    expect(result.passed).toBe(true);
+    const note = result.notes.find((n) => n.noun === "papa");
+    expect(note).toBeDefined();
+    expect(note?.type).toBe("ambiguous-gender");
+    expect(note?.found.toLowerCase()).toBe("el papa");
+  });
+
+  it("preserves la papa (the potato): no warning, note emitted", () => {
+    const result = validateAgreement("La papa está sabrosa.");
+    expect(result.warnings).toHaveLength(0);
+    expect(result.notes.some((n) => n.noun === "papa")).toBe(true);
+  });
+
+  it("preserves el papá (the dad): agrees as masculine, no ambiguity note", () => {
+    const result = validateAgreement("El papá llegó tarde.");
+    expect(result.warnings).toHaveLength(0);
+    expect(result.notes.some((n) => n.noun === "papá")).toBe(false);
+  });
+
+  it("still fixes genuine mismatches like el computadora", () => {
+    const result = validateAgreement("El computadora está rota.");
+    expect(result.warnings.some((w) => w.type === "gender" && w.found.toLowerCase().includes("computadora"))).toBe(true);
+    expect(result.notes).toHaveLength(0);
+  });
+
+  it("applyAgreementFixes never rewrites ambiguous articles", () => {
+    expect(applyAgreementFixes("El papa llegó a Roma.")).toBe("El papa llegó a Roma.");
+    expect(applyAgreementFixes("La papa está sabrosa.")).toBe("La papa está sabrosa.");
+    expect(applyAgreementFixes("El papá llegó tarde.")).toBe("El papá llegó tarde.");
+  });
+
+  it("applyAgreementFixes still fixes el computadora to la computadora", () => {
+    expect(applyAgreementFixes("El computadora está rota.")).toContain("la computadora");
+  });
+
+  it("color and calor remain masculine (wave-1 regression kept)", () => {
+    expect(applyAgreementFixes("El color y el calor del verano.")).toBe("El color y el calor del verano.");
+    const fixed = applyAgreementFixes("la color y la calor");
+    expect(fixed).toContain("el color");
+    expect(fixed).toContain("el calor");
+  });
+});
+
 describe("applyAgreementFixes", () => {
   it("fixes el computadora to la computadora", () => {
     const fixed = applyAgreementFixes("El computadora está rota.");

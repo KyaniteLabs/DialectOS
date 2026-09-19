@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+Gender homographs: the engine never rewrites articles of nouns whose article
+carries meaning (CEO rule, 2026-09-19):
+
+- **Ambiguity set (`AMBIGUOUS_NOUNS` + `isAmbiguousNoun`):** "el papa" (the
+  Pope) / "la papa" (the potato) / "el papá" (the dad) are three different
+  words, all correct as written. `resolveNounGender` now returns `undefined`
+  for homographs — `papa` (real corpus swap patata/papa), `cometa` (corpus
+  term, kite_toy), `guía` (RAE amb.), `frente`, `orden` — so agreement fixes
+  and lexical-substitution article fixing preserve the source article
+  verbatim instead of "correcting" one correct form into another.
+- **Accent-sensitive gender keys:** overrides stored with an accent are
+  distinct words, not spelling variants — "papá" (m, dad) resolves before
+  accent normalization and before the ambiguity check, including plurals
+  ("los papás" stays masculine; "las papas" inherits the ambiguity).
+- **Informational notes:** `validateAgreement` emits an `AgreementNote`
+  (`type: "ambiguous-gender"`) for homographs instead of a correction;
+  notes never affect `passed` and are never applied by
+  `applyAgreementFixes`.
+
 Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026-09-19 — `REFUTE 4/10`):
 
 - **Protocol survival (H1):** `tools/call` (and every method) with `params: null` is now answered with a JSON-RPC `-32602 Invalid params` response instead of being silently dropped by the MCP SDK. A line-wise stdin guard (`mcp/src/lib/null-params-guard.ts`) intercepts explicit-null-params requests before the transport sees them; all other traffic passes through untouched.

@@ -42,7 +42,7 @@ export type { ExtractionResult } from "./sentinel-extraction.js";
 
 // Agreement validation
 export { validateAgreement, applyAgreementFixes } from "./agreement-validator.js";
-export type { AgreementWarning, AgreementResult } from "./agreement-validator.js";
+export type { AgreementWarning, AgreementNote, AgreementResult } from "./agreement-validator.js";
 
 // Post-processing
 export { normalizePunctuation } from "./punctuation-normalizer.js";
