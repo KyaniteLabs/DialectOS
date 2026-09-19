@@ -41,7 +41,9 @@ function findBalancedEnd(source, startIndex, openChar, closeChar) {
 
 function extractConstArray(file, name) {
   const source = fs.readFileSync(file, 'utf8');
-  const start = source.indexOf(`export const ${name}`);
+  // Prefer the exported form; fall back to a module-local const.
+  let start = source.indexOf(`export const ${name}`);
+  if (start === -1) start = source.indexOf(`const ${name}`);
   if (start === -1) throw new Error(`Could not find ${name}`);
   const assignment = source.indexOf('=', start);
   if (assignment === -1) throw new Error(`Could not find assignment for ${name}`);
@@ -62,14 +64,33 @@ const m = path.join(__dirname, '../packages/cli/src/commands/i18n/manage-variant
 
 // Extract source-backed demo blocks by symbol name so generated docs do not
 // silently drift when implementation line numbers change.
+// Wave 2: manage-variants now delegates vocabulary to the shared engine
+// (@dialectos/providers), which cannot run in a browser demo — the demo
+// keeps detection (full) plus the pronominal rules (source-backed), and
+// ships a clearly-labeled reduced preview for lexical adaptation.
 const blocks = [
   extractConstArray(d, 'DIALECT_METADATA'),
   extractFunction(d, 'getWordBoundaries'),
   extractFunction(d, 'detectDialect'),
-  getLines(m, 32, 35),     // VOSOTROS_ADAPTATION
-  getLines(m, 38, 348),    // TECH_ADAPTATIONS
-  getLines(m, 354, 383),   // DIALECT_ADAPTATIONS
-  getLines(m, 400, 411),   // applyAdaptations
+  extractConstArray(m, 'PRONOMINAL_ADAPTATIONS'),
+  `// DEMO-ONLY (reduced preview): the real lexical engine lives in
+// @dialectos/providers (applyLexicalSubstitution) and reads the shared
+// dialectal dictionary; it cannot run standalone in the browser. This
+// preview applies the source-backed pronominal rules to every variant
+// except the base dialect (es-ES), mirroring the CLI's applyAdaptations.
+const ALL_SPANISH_DIALECTS = ["es-ES","es-MX","es-AR","es-CO","es-CU","es-PE","es-CL","es-VE","es-UY","es-PY","es-BO","es-EC","es-GT","es-HN","es-SV","es-NI","es-CR","es-PA","es-DO","es-PR","es-GQ","es-US","es-PH","es-BZ","es-AD"];
+const DIALECT_ADAPTATIONS = {};
+for (const code of ALL_SPANISH_DIALECTS) {
+  DIALECT_ADAPTATIONS[code] = code === 'es-ES' ? [] : PRONOMINAL_ADAPTATIONS;
+}
+function applyAdaptations(value, variant) {
+  const adaptations = DIALECT_ADAPTATIONS[variant] || [];
+  let adapted = value;
+  for (const rule of adaptations) {
+    adapted = adapted.replace(rule.from, rule.to);
+  }
+  return adapted;
+}`,
 ];
 
 function stripTS(code) {
