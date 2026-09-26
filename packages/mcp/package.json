@@ -26,7 +26,7 @@
     "@dialectos/providers": "^0.3.0",
     "@dialectos/security": "^0.3.0",
     "@dialectos/types": "^0.3.0",
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.30.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {
