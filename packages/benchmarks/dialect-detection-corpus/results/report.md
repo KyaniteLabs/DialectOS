@@ -1,7 +1,7 @@
 # Dialect Detection Benchmark Report
 
 - **Date**: 2026-05-10T19:14:19.779Z
-- **Corpus**: /Users/simongonzalezdecruz/workspaces/kyanite-labs/DialectOS/packages/benchmarks/dialect-detection-corpus/samples.json
+- **Corpus**: ~/workspaces/kyanite-labs/DialectOS/packages/benchmarks/dialect-detection-corpus/samples.json
 - **Total samples**: 250
 - **Top-1 correct**: 137
 - **Top-3 correct**: 158
