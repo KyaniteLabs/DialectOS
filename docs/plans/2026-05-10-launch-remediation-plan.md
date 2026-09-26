@@ -1393,7 +1393,7 @@ Not-tested: very large website performance after staging writes"
 **Files:**
 - Modify: `packages/providers/src/translation-memory.ts`
 - Modify: `packages/providers/src/translation-corpus.ts`
-- Modify: `packages/cli/src/lib/telemetry-store.ts`
+- Modify: the CLI telemetry store
 - Modify: `packages/providers/src/bulk/engine.ts`
 - Tests: existing provider/CLI tests plus new failure-path tests
 

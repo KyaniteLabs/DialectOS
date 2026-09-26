@@ -39,7 +39,7 @@ Extract `verb-conjugations.ts` data to `verb-conjugations.json` following the sa
 
 **cli** (19 untested files):
 - `lib/validate-translation.ts`, `lib/idiom-detection.ts`, `lib/dialect-info.ts`
-- `lib/structure-validator.ts`, `lib/quality-score.ts`, `lib/telemetry-store.ts`
+- `lib/structure-validator.ts`, `lib/quality-score.ts`, the telemetry store
 - `lib/glossary-enforcement.ts`, `lib/glossary-data.ts`, `lib/translation-memory.ts`
 - `lib/output.ts`
 - `commands/serve.ts`, `commands/translate-website.ts`, `commands/research.ts`, `commands/benchmark.ts`
