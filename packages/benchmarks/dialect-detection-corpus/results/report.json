@@ -1,6 +1,6 @@
 {
   "generatedAt": "2026-05-10T19:14:19.779Z",
-  "corpusPath": "/Users/simongonzalezdecruz/workspaces/kyanite-labs/DialectOS/packages/benchmarks/dialect-detection-corpus/samples.json",
+  "corpusPath": "~/workspaces/kyanite-labs/DialectOS/packages/benchmarks/dialect-detection-corpus/samples.json",
   "total": 250,
   "top1Correct": 137,
   "top3Correct": 158,
