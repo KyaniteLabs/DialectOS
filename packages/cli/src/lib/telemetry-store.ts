@@ -69,7 +69,7 @@ export class TelemetryStore {
       }
     }
 
-    return path.join(this.dir, `telemetry-${new Date().toISOString().slice(0, 10)}.jsonl`);
+    return path.join(this.dir, `telemetry_${new Date().toISOString().slice(0, 10)}.jsonl`);
   }
 
   write(event: TelemetryEvent): void {
@@ -82,7 +82,7 @@ export class TelemetryStore {
         if (stats.size >= this.maxFileSize) {
           this.currentFile = path.join(
             this.dir,
-            `telemetry-${new Date().toISOString().slice(0, 10)}-${Date.now()}.jsonl`
+            `telemetry_${new Date().toISOString().slice(0, 10)}-${Date.now()}.jsonl`
           );
         }
       } catch {
