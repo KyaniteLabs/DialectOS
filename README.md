@@ -6,7 +6,7 @@
 
 # 🌎 DialectOS
 
-**TL;DR:** DialectOS — operating system for multi-dialect / multi-agent product work. Best for builders running multi-agent product and language workflows. Keywords: multi-agent OS, dialect, product agent orchestration.
+**TL;DR:** DialectOS — open-source MCP server and CLI for translating and QA-checking content across 25 regional Spanish variants. Best for AI agents, documentation teams, and app developers localizing into Spanish.
 
 **The first Model Context Protocol server built specifically for Spanish dialects.**
 
@@ -22,7 +22,7 @@ Translate, detect, and adapt content across **25 regional Spanish variants** whi
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/KyaniteLabs/DialectOS/actions)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
-[![pnpm](https://img.shields.io/badge/pnpm-9.15.0-orange)](package.json)
+[![pnpm](https://img.shields.io/badge/pnpm-11.12.0-orange)](package.json)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 [![Security](https://img.shields.io/badge/security-hardened-success)](https://github.com/KyaniteLabs/DialectOS/security)
 
@@ -444,7 +444,7 @@ Add this badge to your project if you use DialectOS for translation:
 Validate Spanish translations in CI on every pull request:
 
 ```yaml
-- uses: KyaniteLabs/DialectOS/action  # Planned — version pinning unavailable until first release
+- uses: KyaniteLabs/DialectOS@v0.3.0
   with:
     dialect: es-MX
     source-dir: locales/en
@@ -459,7 +459,7 @@ strategy:
   matrix:
     dialect: [es-ES, es-MX, es-AR, es-CO]
 steps:
-  - uses: KyaniteLabs/DialectOS/action  # Planned — version pinning unavailable until first release
+  - uses: KyaniteLabs/DialectOS@v0.3.0
     with:
       dialect: ${{ matrix.dialect }}
       fail-on-blocking: true
@@ -512,7 +512,7 @@ Made with ❤️ by KyaniteLabs and contributors.
 
 More from [KyaniteLabs](https://kyanitelabs.tech). Related projects:
 
-- **[mcp-video](https://github.com/KyaniteLabs/mcp-video)** — guardrailed video-editing MCP server for AI agents
+- **[kinocut](https://github.com/KyaniteLabs/kinocut)** — guardrailed video-editing MCP server for AI agents (formerly mcp-video)
 - **[Epoch](https://github.com/KyaniteLabs/Epoch)** — time-estimation MCP server (PERT) for AI agents
 - **[checkyourself](https://github.com/KyaniteLabs/checkyourself)** — local-first production-readiness checks for AI-built code
 
@@ -522,36 +522,36 @@ More from [KyaniteLabs](https://kyanitelabs.tech). Related projects:
 
 ## What is DialectOS?
 
-**DialectOS** is a **operating system for multi-dialect / multi-agent product work** that helps **builders running multi-agent product and language workflows** **coordinate dialect-aware agent operations with clear product surfaces**.
+**DialectOS** is an open-source **Spanish dialect translation server** that runs as an MCP tool and CLI. It translates into 25 regional Spanish variants while preserving markdown structure, enforcing glossary terms, and applying adversarial quality gates that catch semantic drift.
 
 | | |
 | --- | --- |
 | **Product** | DialectOS |
-| **Category** | operating system for multi-dialect / multi-agent product work |
-| **Best for** | builders running multi-agent product and language workflows |
-| **Not** | a general chat UI |
-| **Source** | [GitHub](https://github.com/KyaniteLabs/DialectOS) · [Forgejo](https://git.kyanitelabs.tech/KyaniteLabs/DialectOS) |
-| **Keywords** | multi-agent OS, dialect, product agent orchestration |
+| **Category** | Spanish dialect translation and localization-QA MCP server and CLI |
+| **Best for** | AI agents, documentation teams, app developers, and support teams localizing into regional Spanish |
+| **Not** | a general-purpose machine-translation API for many languages |
+| **Source** | [GitHub](https://github.com/KyaniteLabs/DialectOS) · [Forgejo](https://git.kyanitelabs.tech/KyaniteLabs/DialectOS) (private, maintainers only) |
+| **Keywords** | Spanish dialect translation MCP server, Spanish localization QA, regional Spanish translator, glossary enforcement, i18n validation CLI |
 
 ## Who it's for
 
-- Primary: builders running multi-agent product and language workflows
-- Use when you need to coordinate dialect-aware agent operations with clear product surfaces
-- Skip if you need a general chat UI
+- Primary: AI agents, documentation teams, app developers, and support teams localizing into regional Spanish
+- Use when you need to translate or validate content for specific Spanish dialects while preserving markdown and locale-file structure and enforcing glossaries
+- Skip if you need a general-purpose machine-translation API for many languages
 
 ## FAQ
 
 ### What is DialectOS?
 
-DialectOS is a operating system for multi-dialect / multi-agent product work. It helps builders running multi-agent product and language workflows coordinate dialect-aware agent operations with clear product surfaces.
+**DialectOS** is an open-source **Spanish dialect translation server** that runs as an MCP tool and CLI. It translates into 25 regional Spanish variants while preserving markdown structure, enforcing glossary terms, and applying adversarial quality gates that catch semantic drift.
 
 ### Who should use DialectOS?
 
-builders running multi-agent product and language workflows.
+AI agents, documentation teams, app developers, and support teams localizing into regional Spanish.
 
 ### How is DialectOS different?
 
-Unlike single-agent chat apps, DialectOS is built for multi-dialect product operations.
+Unlike generic machine translation, DialectOS treats Spanish as 25 regional variants and gates output on token, glossary, structure, and semantic checks.
 
 ### Is DialectOS production software?
 
@@ -561,7 +561,7 @@ Treat the README status and release tags as source of truth for maturity. Valida
 
 - Maintained as of 2026 on the default branch
 - Prefer release tags when pinning dependencies
-- Report issues on the canonical remote listed above
+- Report issues on [GitHub](https://github.com/KyaniteLabs/DialectOS/issues)
 
 ## Agent surface
 
@@ -571,17 +571,10 @@ Treat the README status and release tags as source of truth for maturity. Valida
 
 ## Contributing
 
-Issues and PRs welcome on the canonical remote. Keep public docs free of secrets and machine-local paths.
+Issues and PRs welcome on [GitHub](https://github.com/KyaniteLabs/DialectOS). Keep public docs free of secrets and machine-local paths.
 
 ## License
 
 See [LICENSE](LICENSE) in this repository (or package metadata if license is package-only).
-
-
-## Table of contents
-
-- [What is it?](#what-is-dialectos)
-- [FAQ](#faq)
-- [Status](#status)
 
 <!-- s-plus-geo:end -->
