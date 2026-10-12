@@ -1,17 +1,17 @@
 ---
 name: dialectos
-description: Use DialectOS for Spanish dialect translation, localization QA, i18n locale-file validation, glossary enforcement, register/formality checks, gender-neutral language, and launch certification across regional Spanish variants through MCP or CLI.
+description: Use DialectOS to translate and QA Spanish across 25 regional dialect variants. Covers markdown/docs translation that preserves structure, i18n locale validation, glossary enforcement, formality checks, and launch certification via MCP or CLI.
 ---
 
 # DialectOS
 
-Use DialectOS when an agent needs regional Spanish localization that preserves structure and checks quality, not generic translation. It supports 25 Spanish dialect variants, glossary enforcement, markdown preservation, locale-file workflows, and adversarial quality gates.
+Use DialectOS when an agent needs regional Spanish localization that preserves structure and checks quality, not generic translation. It supports 25 Spanish dialect variants (`packages/types/src/dialect-profiles.ts`), glossary enforcement, markdown preservation, locale-file workflows, and adversarial quality gates.
 
 ## Start Here
 
 - Read `../../README.md` for quick start, provider setup, supported workflows, and certification commands.
 - Read `../../packages/cli/README.md` for CLI commands.
-- Read `../../packages/mcp/README.md` for MCP tools and client configuration.
+- Read `../../packages/mcp/README.md` for the 17 MCP tools and client configuration.
 - Use `../../llms.txt` for a compact public summary when another agent needs project context.
 
 ## Choose A Surface
@@ -20,17 +20,20 @@ Use DialectOS when an agent needs regional Spanish localization that preserves s
 - CLI: best for local docs, README translation, locale JSON validation, benchmark runs, certification, and report generation.
 - Demo/server workflows: use only when the user explicitly wants the browser demo or local provider testing.
 
-## Workflow
+## Default path (do this first)
 
-1. Identify source type: plain text, markdown, API docs, README, locale JSON, glossary, or certification artifact.
-2. Identify target dialects such as `es-MX`, `es-AR`, `es-CO`, `es-ES`, `es-PR`, or the user-specified set.
-3. Preserve structure. For markdown, API docs, and locale JSON, use DialectOS structure-aware commands/tools rather than generic translation.
+1. Identify the source type: plain text, markdown, API docs, README, locale JSON, glossary, or certification artifact.
+2. Identify the target dialects (`es-MX`, `es-AR`, `es-CO`, `es-ES`, `es-PR`, or the user-specified set; `dialectos dialects list` enumerates all 25).
+3. Preserve structure. For markdown, API docs, and locale JSON, use the structure-aware commands/tools rather than generic translation:
+   - markdown/README: `dialectos translate-readme <input> --dialect <d> [--output <file>]` (resumable checkpoints, structure validation, `--glossary-mode strict`).
+   - API docs: `dialectos translate-api-docs <input> --dialect <d> --output <file>`.
+   - locale JSON: `dialectos i18n detect-missing <base> <target>` then `dialectos i18n translate-keys <base> <target> --dialect <d>`.
 4. Apply QA:
-   - validate semantic correctness,
+   - validate semantic correctness (`dialectos validate --source ... --translated ... --dialect <d>`, `--strict` exits nonzero on any issue),
    - check placeholder and key preservation,
-   - enforce glossary terms,
-   - check formal/informal register,
-   - run adversarial or document certification for launch-critical work.
+   - enforce glossary terms (`--glossary-file`, `--glossary-mode strict`),
+   - check formal/informal register (`dialectos i18n check-formality`),
+   - run adversarial or document certification for launch-critical work (`scripts/dialect-certify*.mjs`, gated by `scripts/launch-gate.mjs`).
 5. Report dialect-specific risks plainly: semantic drift, register mismatch, regional term mismatch, placeholder loss, glossary conflict, or launch readiness.
 
 ## CLI Examples
@@ -64,7 +67,7 @@ dialectos dialects list
 }
 ```
 
-## Guardrails
+## Cautions
 
 - Do not collapse all Spanish into generic "Spanish"; always name the target dialect.
 - Do not translate code, placeholders, links, JSON keys, or markdown structure unless the DialectOS workflow explicitly says it is safe.
