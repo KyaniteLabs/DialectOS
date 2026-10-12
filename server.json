@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "tech.kyanitelabs.dialectos",
+  "name": "tech.kyanitelabs/dialectos",
   "title": "DialectOS",
   "description": "Spanish dialect translation MCP server for 25 regional variants with glossary enforcement and adversarial quality gates.",
   "version": "0.1.0",
