@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 jobs:
   ci:
-    uses: KyaniteLabs/.github/.forgejo/workflows/ci-profile.yml@fc3497dc98bf1bf8f283c70bcbf4d88a49aa1505
+    uses: KyaniteLabs/.github/.forgejo/workflows/ci-profile.yml@0209ffe2feb69190760cc31491a097fea174550f
     with:
       artifact_paths: |
         .ci-results/
