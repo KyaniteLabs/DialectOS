@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "test_globs": ["packages/*/src/**/*.test.ts", "docs/__tests__/*.test.mjs", "scripts/__tests__/*.test.mjs"],
+  "dependency_files": ["pnpm-lock.yaml", "pnpm-workspace.yaml", "package.json"],
+  "junit_reports": [
+    "packages/types/.ci-results/tests.xml",
+    "packages/security/.ci-results/tests.xml",
+    "packages/locale-utils/.ci-results/tests.xml",
+    "packages/markdown-parser/.ci-results/tests.xml",
+    "packages/providers/.ci-results/tests.xml",
+    "packages/cli/.ci-results/tests.xml",
+    "packages/mcp/.ci-results/tests.xml"
+  ],
+  "steps": [
+    {"name": "Install declared pnpm and frozen workspace", "phase": "install", "argv": ["bash", "-euo", "pipefail", "-c", "npm install --global pnpm@11.12.0 && pnpm install --frozen-lockfile"], "timeout_seconds": 600},
+    {"name": "Verify generated demo", "phase": "verify", "argv": ["pnpm", "check:generated"]},
+    {"name": "Build all workspace packages", "phase": "build", "argv": ["pnpm", "build"]},
+    {"name": "Run static checks and all workspace tests", "phase": "test", "argv": ["pnpm", "test", "--reporter=default", "--reporter=junit", "--outputFile.junit=.ci-results/tests.xml"], "timeout_seconds": 1800},
+    {"name": "Exercise built package binary", "phase": "acceptance", "argv": ["node", "scripts/ci-artifact-smoke.mjs"]}
+  ]
+}
