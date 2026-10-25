@@ -5,6 +5,8 @@ All notable changes to DialectOS are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
 ## [0.3.1] - 2026-09-19
 
 ### Fixed
@@ -15,8 +17,6 @@ Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026
 - **Grammar (core value):** `manage_dialect_variants` now runs the shared deterministic engine (`applyLexicalSubstitution` from `@dialectos/providers`) instead of a naive word-swap table, so article gender agrees with the substituted noun — "el ordenador" → "la computadora", never "el computadora" — with plural ("los ordenadores" → "las computadoras") and case preservation. Also fixed the noun-gender resolver: accent normalization now actually strips accents (accented lookups used to miss the unaccented override keys), "papa" is no longer mis-listed as masculine (would have produced "el papa" from "la patata"), and "color"/"calor" are no longer mis-listed as feminine.
 - **Data-loss trap:** `manage_dialect_variants` no longer overwrites `sourcePath` by default. Without `outputPath` it writes a sibling variant file (`<stem>-<variant>.json`, or `<variant>.json` when the source stem is a locale code) and reports it as `outputPath` in the response; rewriting the source in place now requires an explicit `overwrite: true` opt-in. Multi-variant workflows no longer destroy their base locale.
 - **Publish readiness:** all `@dialectos/*` internal dependencies now use real semver ranges (`^0.3.0`) instead of `workspace:*`, so packed tarballs are installable from any registry (`npm pack` manifests no longer carry the unsupported `workspace:` protocol; `npm install <tarball>` no longer fails with EUNSUPPORTEDPROTOCOL). `linkWorkspacePackages: true` keeps pnpm linking local packages in the workspace during development, and the lockfile is regenerated so `pnpm install --frozen-lockfile` (CI) passes from a fresh clone.
-
-## [Unreleased]
 
 ### Changed
 
@@ -30,8 +30,6 @@ Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026
 - Reorganized `@dialectos/types` index with clear separation between pure types and runtime data modules
 - Exported `extractResponseText` from providers for testability
 - Fixed duplicate `export *` in providers index
-
-#### Dialectal Dictionary Overhaul
 
 #### Dialectal Dictionary Overhaul
 - Stripped 500 mechanically propagated entries to pan-Hispanic only (no fake dialect variation)
