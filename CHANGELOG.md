@@ -67,7 +67,7 @@ Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026
 
 ### Changed
 #### Architecture refactoring and dictionary overhaul (moved here from [0.3.1] during the Layer 5 audit)
-- These changes (7d311c1, c820e7e) are ancestors of the 177af57 main cut that produced the v0.3.0 release artifacts on 2026-06-03, so they shipped in v0.3.0; the v0.3.0 tag was later re-cut to 7e616fd (privity wave G4).
+- These changes (7d311c1, c820e7e) are ancestors of the 177af57 main cut that produced the v0.3.0 release artifacts on 2026-06-03 UTC (commit dated 2026-06-02 19:41 −0700), so they shipped in v0.3.0; the v0.3.0 tag was later re-cut to 7e616fd (privity wave G4). The relocation also dropped a duplicate empty "Dialectal Dictionary Overhaul" heading that sat above the real one.
 
 #### Architecture Refactoring
 - Extracted shared morphology helpers (`applyCase`, `spanishPluralize`) to `providers/src/morphology.ts` — deduplicated from 3 files
