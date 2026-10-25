@@ -7,6 +7,7 @@
  * The binary entry point is cli.ts.
  */
 
+import { createRequire } from "node:module";
 import { Command } from "commander";
 import { executeTranslate } from "./commands/translate.js";
 import { createTranslateReadmeCommand } from "./commands/translate-readme.js";
@@ -36,10 +37,13 @@ import { resolvePolicy, type PolicyProfile } from "./lib/translation-policy.js";
 const program = new Command();
 
 // CLI metadata
+const { version: cliVersion } = createRequire(import.meta.url)(
+  "../package.json",
+) as { version: string };
 program
   .name("dialectos")
   .description("Spanish translation CLI with dialect awareness")
-  .version("0.3.0");
+  .version(cliVersion);
 
 // Translate command
 program

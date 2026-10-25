@@ -292,17 +292,19 @@ pnpm test        # 662+ tests passing
 
 ## 📦 Packages
 
-| Package | Version | Description | Tests |
+| Package | Version (source) | Description | Tests |
 |---------|---------|-------------|-------|
-| [`@dialectos/mcp`](packages/mcp) | `0.3.0` | 17 MCP tools (stdio server) | 93 |
-| [`@dialectos/cli`](packages/cli) | `0.3.0` | CLI: translate, validate, corpus, benchmark, glossary | 569 |
-| [`@dialectos/providers`](packages/providers) | `0.3.0` | LLM, DeepL, LibreTranslate, MyMemory with circuit breaker + corpus | 152 |
-| [`@dialectos/security`](packages/security) | `0.3.0` | Rate limiting, SSRF protection, sanitization | 68 |
-| [`@dialectos/types`](packages/types) | `0.3.0` | Shared TypeScript types + glossary, profile, certification, and quality data | 54 |
-| [`@dialectos/locale-utils`](packages/locale-utils) | `0.3.0` | Locale file diff/merge utilities | 55 |
-| [`@dialectos/markdown-parser`](packages/markdown-parser) | `0.3.0` | Structure-preserving markdown parser | 74 |
+| [`@dialectos/mcp`](packages/mcp) | `0.3.1` | 17 MCP tools (stdio server) | 93 |
+| [`@dialectos/cli`](packages/cli) | `0.3.1` | CLI: translate, validate, corpus, benchmark, glossary | 569 |
+| [`@dialectos/providers`](packages/providers) | `0.3.1` | LLM, DeepL, LibreTranslate, MyMemory with circuit breaker + corpus | 152 |
+| [`@dialectos/security`](packages/security) | `0.3.1` | Rate limiting, SSRF protection, sanitization | 68 |
+| [`@dialectos/types`](packages/types) | `0.3.1` | Shared TypeScript types + glossary, profile, certification, and quality data | 54 |
+| [`@dialectos/locale-utils`](packages/locale-utils) | `0.3.1` | Locale file diff/merge utilities | 55 |
+| [`@dialectos/markdown-parser`](packages/markdown-parser) | `0.3.1` | Structure-preserving markdown parser | 74 |
 
 **662+ tests across 7 packages plus docs contracts, demo-server contracts, and static-hardening checks**
+
+> Package versions above are the **source** tree (0.3.1, unreleased). The **latest release is v0.3.0** — install paths elsewhere in this README point at v0.3.0 artifacts.
 
 ---
 
