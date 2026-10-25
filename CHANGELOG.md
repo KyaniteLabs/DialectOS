@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.1] - 2026-09-19
+## [0.3.1] - Unreleased (staged; no tag or artifact yet)
 
 ### Fixed
 
@@ -17,40 +17,6 @@ Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026
 - **Grammar (core value):** `manage_dialect_variants` now runs the shared deterministic engine (`applyLexicalSubstitution` from `@dialectos/providers`) instead of a naive word-swap table, so article gender agrees with the substituted noun — "el ordenador" → "la computadora", never "el computadora" — with plural ("los ordenadores" → "las computadoras") and case preservation. Also fixed the noun-gender resolver: accent normalization now actually strips accents (accented lookups used to miss the unaccented override keys), "papa" is no longer mis-listed as masculine (would have produced "el papa" from "la patata"), and "color"/"calor" are no longer mis-listed as feminine.
 - **Data-loss trap:** `manage_dialect_variants` no longer overwrites `sourcePath` by default. Without `outputPath` it writes a sibling variant file (`<stem>-<variant>.json`, or `<variant>.json` when the source stem is a locale code) and reports it as `outputPath` in the response; rewriting the source in place now requires an explicit `overwrite: true` opt-in. Multi-variant workflows no longer destroy their base locale.
 - **Publish readiness:** all `@dialectos/*` internal dependencies now use real semver ranges (`^0.3.0`) instead of `workspace:*`, so packed tarballs are installable from any registry (`npm pack` manifests no longer carry the unsupported `workspace:` protocol; `npm install <tarball>` no longer fails with EUNSUPPORTEDPROTOCOL). `linkWorkspacePackages: true` keeps pnpm linking local packages in the workspace during development, and the lockfile is regenerated so `pnpm install --frozen-lockfile` (CI) passes from a fresh clone.
-
-### Changed
-
-#### Architecture Refactoring
-- Extracted shared morphology helpers (`applyCase`, `spanishPluralize`) to `providers/src/morphology.ts` — deduplicated from 3 files
-- Removed hidden dependency: `@dialectos/locale-utils` no longer re-exports `@dialectos/security` symbols
-- Added compile-time completeness check for dialect metadata (all 25 dialects validated)
-- Removed 3 pass-through factory wrappers — CLI and MCP now import directly from `@dialectos/providers`
-- Extracted inline data to JSON files: garbage patterns, false friends, accent fixes, word lists, gender overrides
-- Split `llm.ts` (955 lines) into 3 focused modules: `llm.ts` (class + wire protocol), `llm-prompts.ts` (prompt construction), `llm-response.ts` (response extraction + sanitization)
-- Reorganized `@dialectos/types` index with clear separation between pure types and runtime data modules
-- Exported `extractResponseText` from providers for testability
-- Fixed duplicate `export *` in providers index
-
-#### Dialectal Dictionary Overhaul
-- Stripped 500 mechanically propagated entries to pan-Hispanic only (no fake dialect variation)
-- Added 58 new high-dialectal-variation concepts across 4 batches with genuine per-dialect variants
-- Made `variants` field optional on `DictionaryEntry` — entries with no dialect variation use `panHispanic` only
-- Added null safety throughout `dialectal-vocabulary.ts` and tests for optional `variants`
-- Fixed 11 orphaned entries that lost both `panHispanic` and `variants` during stripping
-- **Total: 833 concepts** — 333 with real dialect variation (3–17 distinct terms), 500 pan-Hispanic
-
-#### New high-variation concepts
-- **Food**: drinking_straw (pajita/pitillo/popote/sorbete), sweet_potato (batata/camote/boniato), passion_fruit (maracuyá/cherimola/parchita), caramel_spread (dulce de leche/manjar/cajeta), soft_drink (refresco/gaseosa/soda), popsicle (helado/paleta/chupachicos), hot_dog (pancho/completo/jote), popcorn (pochoclo/pororó/cabritas/canguil/cancha/crispeta/cotufas), avocado (aguacate/palta), peach (melocotón/durazno), corn (elote/choclo/jojoto/mazorca), bean (frijol/judía/poroto/caraota/habichuela), banana (banana/plátano/cambur/guineo)
-- **Household**: baby_bottle (biberón/mamadera/chupete/tetero), pacifier (chupete/bobo/chupón), light_switch (interruptor/llave/boton), dustpan (recogedor/elefante/.palette), adhesive_tape (cinta/tela/pega), stroller (cochecito/carriola/carrito), blender (licuadora/batidora)
-- **Transport**: flat_tire (pinchazo/llanta ponchada/bomba), car_horn (bocina/cláxon/pito), drivers_license (carnet/licencia/registro/libreta)
-- **Social**: cool_awesome (chévere/bacán/padre/copado/brutal), snobby_person (pijo/figurita/cheto/sifrino/fresa), guy_dude (sujeto/tipo/chabón/ese/cabro), bribe (mordida/coima/soborno/peaje), boyfriend_girlfriend (novio/chamuyo/jevo/pretendiente/ennovio), money_slang (plata/lana/pasta/pisto/chavos), informal_address (tío/che/parcero/pana/güey/mae/asere), being_broke (sin un peso/pelado/sin una luca/sin un duro), lots_of (harto/pila/chin/chingo), party_celebration (carrete/rumba/parranda)
-- **Actions**: to_hitchhike (hacer dedo/hacer botella/pedir aventón/raite), to_get_angry (enojarse/enfadarse/calentarse/arrecharse), to_get_drunk (emborracharse/curarse/chuparse/mamarse), to_steal_slang (afanar/pitiar/piar), to_work_slang (chambear/laburar/currar), to_leave_slang (rajarse/pirarse), to_miss_someone (extrañar/echar de menos), to_chat (platicar/charlar), to_drink (beber/tomar)
-- **People**: kid_informal (pibe/chamo/chaval/cabro/chibolo/patajo/cipote), cop_informal (yuta/paco/tomba/tombo/tira/pasma), blonde_person (rubio/mona/chele), bandaid (tirita/curita/afterito)
-- **Education**: to_fail_class (reprobar/suspender/desaprobar/perder), skip_class (hacer la cimarra/jugar a la pelota/hacerse el loco), homework (tarea/deberes)
-- **Medicine**: hangover (resaca/cruda/goma/guayabo/ratón), common_cold (resfriado/catarro/resfrío), street_food_stall (carrito/puesto/kiosko/colmado)
-- **Clothing**: bra (sujetador/corpiño/sostén), flip_flops (chanclas/ojotas/chancletas), jacket (chaqueta/chamarra/campera)
-- **Body**: belly_stomach (panza/barriga/guata/buche)
-- **Transport**: car_informal (coche/auto/carro), swimming_pool (piscina/pila), highway (autopista/autovía/carretera), shower (ducha/regadera), gasoline (gasolina/nafta/bencina), subway (metro/subte)
 
 ## [0.3.0] - 2026-04-27
 
@@ -100,6 +66,41 @@ Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026
 - Correction capture wired into validate and translate commands
 
 ### Changed
+#### Architecture refactoring and dictionary overhaul (moved here from [0.3.1] during the Layer 5 audit)
+- These changes (7d311c1, c820e7e) are ancestors of the 177af57 main cut that produced the v0.3.0 release artifacts on 2026-06-03, so they shipped in v0.3.0; the v0.3.0 tag was later re-cut to 7e616fd (privity wave G4).
+
+#### Architecture Refactoring
+- Extracted shared morphology helpers (`applyCase`, `spanishPluralize`) to `providers/src/morphology.ts` — deduplicated from 3 files
+- Removed hidden dependency: `@dialectos/locale-utils` no longer re-exports `@dialectos/security` symbols
+- Added compile-time completeness check for dialect metadata (all 25 dialects validated)
+- Removed 3 pass-through factory wrappers — CLI and MCP now import directly from `@dialectos/providers`
+- Extracted inline data to JSON files: garbage patterns, false friends, accent fixes, word lists, gender overrides
+- Split `llm.ts` (955 lines) into 3 focused modules: `llm.ts` (class + wire protocol), `llm-prompts.ts` (prompt construction), `llm-response.ts` (response extraction + sanitization)
+- Reorganized `@dialectos/types` index with clear separation between pure types and runtime data modules
+- Exported `extractResponseText` from providers for testability
+- Fixed duplicate `export *` in providers index
+
+#### Dialectal Dictionary Overhaul
+- Stripped 500 mechanically propagated entries to pan-Hispanic only (no fake dialect variation)
+- Added 58 new high-dialectal-variation concepts across 4 batches with genuine per-dialect variants
+- Made `variants` field optional on `DictionaryEntry` — entries with no dialect variation use `panHispanic` only
+- Added null safety throughout `dialectal-vocabulary.ts` and tests for optional `variants`
+- Fixed 11 orphaned entries that lost both `panHispanic` and `variants` during stripping
+- **Total: 833 concepts** — 333 with real dialect variation (3–17 distinct terms), 500 pan-Hispanic
+
+#### New high-variation concepts
+- **Food**: drinking_straw (pajita/pitillo/popote/sorbete), sweet_potato (batata/camote/boniato), passion_fruit (maracuyá/cherimola/parchita), caramel_spread (dulce de leche/manjar/cajeta), soft_drink (refresco/gaseosa/soda), popsicle (helado/paleta/chupachicos), hot_dog (pancho/completo/jote), popcorn (pochoclo/pororó/cabritas/canguil/cancha/crispeta/cotufas), avocado (aguacate/palta), peach (melocotón/durazno), corn (elote/choclo/jojoto/mazorca), bean (frijol/judía/poroto/caraota/habichuela), banana (banana/plátano/cambur/guineo)
+- **Household**: baby_bottle (biberón/mamadera/chupete/tetero), pacifier (chupete/bobo/chupón), light_switch (interruptor/llave/boton), dustpan (recogedor/elefante/.palette), adhesive_tape (cinta/tela/pega), stroller (cochecito/carriola/carrito), blender (licuadora/batidora)
+- **Transport**: flat_tire (pinchazo/llanta ponchada/bomba), car_horn (bocina/cláxon/pito), drivers_license (carnet/licencia/registro/libreta)
+- **Social**: cool_awesome (chévere/bacán/padre/copado/brutal), snobby_person (pijo/figurita/cheto/sifrino/fresa), guy_dude (sujeto/tipo/chabón/ese/cabro), bribe (mordida/coima/soborno/peaje), boyfriend_girlfriend (novio/chamuyo/jevo/pretendiente/ennovio), money_slang (plata/lana/pasta/pisto/chavos), informal_address (tío/che/parcero/pana/güey/mae/asere), being_broke (sin un peso/pelado/sin una luca/sin un duro), lots_of (harto/pila/chin/chingo), party_celebration (carrete/rumba/parranda)
+- **Actions**: to_hitchhike (hacer dedo/hacer botella/pedir aventón/raite), to_get_angry (enojarse/enfadarse/calentarse/arrecharse), to_get_drunk (emborracharse/curarse/chuparse/mamarse), to_steal_slang (afanar/pitiar/piar), to_work_slang (chambear/laburar/currar), to_leave_slang (rajarse/pirarse), to_miss_someone (extrañar/echar de menos), to_chat (platicar/charlar), to_drink (beber/tomar)
+- **People**: kid_informal (pibe/chamo/chaval/cabro/chibolo/patajo/cipote), cop_informal (yuta/paco/tomba/tombo/tira/pasma), blonde_person (rubio/mona/chele), bandaid (tirita/curita/afterito)
+- **Education**: to_fail_class (reprobar/suspender/desaprobar/perder), skip_class (hacer la cimarra/jugar a la pelota/hacerse el loco), homework (tarea/deberes)
+- **Medicine**: hangover (resaca/cruda/goma/guayabo/ratón), common_cold (resfriado/catarro/resfrío), street_food_stall (carrito/puesto/kiosko/colmado)
+- **Clothing**: bra (sujetador/corpiño/sostén), flip_flops (chanclas/ojotas/chancletas), jacket (chaqueta/chamarra/campera)
+- **Body**: belly_stomach (panza/barriga/guata/buche)
+- **Transport**: car_informal (coche/auto/carro), swimming_pool (piscina/pila), highway (autopista/autovía/carretera), shower (ducha/regadera), gasoline (gasolina/nafta/bencina), subway (metro/subte)
+
 - All 7 packages bumped from `0.2.0` to `0.3.0`
 - Adversarial fixture test updated with 3 new categories and critical threshold raised to 50
 
