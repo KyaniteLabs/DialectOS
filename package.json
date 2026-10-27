@@ -11,6 +11,7 @@
     "demo": "pnpm build && node scripts/demo-server.mjs",
     "test:coverage": "pnpm -r test:coverage",
     "clean": "pnpm -r clean",
+    "pack:release": "node scripts/pack-release-tarballs.mjs",
     "dialect:eval": "node scripts/dialect-eval.mjs",
     "dialect:certify": "node scripts/dialect-certify.mjs",
     "dialect:certify:adversarial": "node scripts/dialect-certify-adversarial.mjs",

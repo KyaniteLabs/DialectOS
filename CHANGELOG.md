@@ -5,9 +5,16 @@ All notable changes to DialectOS are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.3.1] - 2026-09-19
+## [0.3.1] - 2026-10-27
 
 ### Fixed
+
+Operator-path ship blockers from the 2026-10-26 portfolio audit (L1#1, L1#5, L1#6, L2#19–22):
+
+- **Install path:** GitHub Release CLI/MCP tarballs now bundle the five unpublished `@dialectos/{types,security,locale-utils,markdown-parser,providers}` packages (`bundleDependencies` + hoisted public npm deps). `pnpm add -g <cli.tgz>` / `pnpm dlx <mcp.tgz>` no longer 404 on the registry. Packer: `scripts/pack-release-tarballs.mjs`. npm publishing remains CEO-gated and is not claimed.
+- **Dialect gate:** `dialectos validate --dialect xx-XX` now exits non-zero with an actionable error that names the unknown dialect and points at `dialectos dialects list`. Unknown codes are no longer silently scored as PASS.
+- **CLI surface:** `validate` accepts `--translated <text>` in addition to the positional argument, matching the README example.
+- **One version story:** `server.json` is 0.3.1 and points at the GitHub tarball URL (no unpublished `@kyanitelabs/dialectos` npm identifier). README, CHANGELOG, llms.txt, package.json, and CLI `--version` agree on 0.3.1.
 
 Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026-09-19 — `REFUTE 4/10`):
 
@@ -230,6 +237,7 @@ Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026
 - Structured JSON error handling
 - Graceful shutdown on SIGINT/SIGTERM
 
+[0.3.1]: https://github.com/KyaniteLabs/DialectOS/releases/tag/v0.3.1
 [0.3.0]: https://github.com/KyaniteLabs/DialectOS/releases/tag/v0.3.0
 [0.2.0]: https://github.com/KyaniteLabs/DialectOS/releases/tag/v0.2.0
 [0.1.0]: https://github.com/KyaniteLabs/DialectOS/releases/tag/v0.1.0

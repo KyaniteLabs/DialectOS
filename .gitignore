@@ -11,6 +11,7 @@ env.hostinger
 *.pem
 *.key
 *.tgz
+dist-release/
 
 # Translation checkpoints
 *.checkpoint.json

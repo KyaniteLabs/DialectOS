@@ -57,7 +57,7 @@ dialectos dialects list
       "command": "pnpm",
       "args": [
         "dlx",
-        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-mcp-0.3.0.tgz"
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
       ],
       "env": {
         "ALLOWED_LOCALE_DIRS": "/path/to/locales"
