@@ -3,7 +3,7 @@
   "name": "tech.kyanitelabs/dialectos",
   "title": "DialectOS",
   "description": "Spanish dialect translation MCP server for 25 regional variants with glossary enforcement and adversarial quality gates.",
-  "version": "0.1.0",
+  "version": "0.3.1",
   "websiteUrl": "https://github.com/KyaniteLabs/DialectOS",
   "repository": {
     "url": "https://github.com/KyaniteLabs/DialectOS",
@@ -12,9 +12,19 @@
   "packages": [
     {
       "registryType": "npm",
-      "identifier": "@kyanitelabs/dialectos",
-      "version": "0.1.0",
-      "runtimeHint": "npx",
+      "identifier": "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz",
+      "version": "0.3.1",
+      "runtimeHint": "pnpm",
+      "runtimeArguments": [
+        {
+          "type": "positional",
+          "value": "dlx"
+        },
+        {
+          "type": "positional",
+          "value": "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
+        }
+      ],
       "transport": {
         "type": "stdio"
       }

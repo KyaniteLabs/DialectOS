@@ -2,7 +2,7 @@
 
 Model Context Protocol server providing 17 tools for Spanish dialect translation across 25 regional variants.
 
-> v0.3.0 is distributed through GitHub Release tarballs, not the npm registry.
+> v0.3.1 is distributed through GitHub Release tarballs, not the npm registry. The tarball bundles unpublished `@dialectos/*` workspace packages.
 
 ## Usage
 
@@ -15,7 +15,7 @@ Add to your MCP client configuration:
       "command": "pnpm",
       "args": [
         "dlx",
-        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-mcp-0.3.0.tgz"
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
       ],
       "env": {
         "DEEPL_AUTH_KEY": "your-key",

@@ -4,7 +4,7 @@
 
 DialectOS helps AI agents and localization teams translate, validate, and certify Spanish content across regional dialects while preserving structure, glossary terms, placeholders, and locale files.
 
-Distribution: v0.3.0 MCP and CLI installs use GitHub Release tarballs; npm registry packages are not published yet.
+Distribution: v0.3.1 MCP and CLI installs use GitHub Release tarballs that bundle unpublished `@dialectos/*` workspace packages; npm registry packages are not published yet.
 
 ## Use cases
 - Spanish dialect translation for AI agents

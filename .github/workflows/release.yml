@@ -51,6 +51,9 @@ jobs:
             echo "::endgroup::"
           done
 
+      - name: Pack bundled GitHub-release tarballs
+        run: node scripts/pack-release-tarballs.mjs /tmp/dialectos-github-release
+
       - name: Publish dry-run
         if: ${{ !inputs.publish }}
         run: |
