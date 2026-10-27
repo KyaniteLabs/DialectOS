@@ -8,26 +8,5 @@
   "repository": {
     "url": "https://github.com/KyaniteLabs/DialectOS",
     "source": "github"
-  },
-  "packages": [
-    {
-      "registryType": "npm",
-      "identifier": "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz",
-      "version": "0.3.1",
-      "runtimeHint": "pnpm",
-      "runtimeArguments": [
-        {
-          "type": "positional",
-          "value": "dlx"
-        },
-        {
-          "type": "positional",
-          "value": "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
-        }
-      ],
-      "transport": {
-        "type": "stdio"
-      }
-    }
-  ]
+  }
 }
