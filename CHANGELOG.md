@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Release tarballs runtime-broken on clean machines (2026-10-27 defect):** `npm install -g dialectos-cli-0.3.1.tgz` exited 0 but every CLI invocation crashed with `ERR_MODULE_NOT_FOUND: isomorphic-dompurify` — npm silently skips installing any dependency that is also declared by a `bundleDependencies` package ("deps of bundled deps" are assumed present), so the previous hoist-only strategy left `isomorphic-dompurify`, `zod`, `marked` and the whole `jsdom` tree as empty directories. `scripts/pack-release-tarballs.mjs` now vendors the full transitive closure (resolved by a real `npm install`) into the tarball and verifies every bundled/nested package is present in the packed artifact; the release tarballs now install fully offline. New `scripts/tarball-install-smoke.mjs` gates releases on the defect bar: pristine-prefix offline install → `--version` prints → unknown dialect fails closed with an actionable error → known dialect passes. The v0.3.1 GitHub release assets were rebuilt and SHA256SUMS.txt replaced accordingly.
+
 ### docs: dated licence-history note (wording only; terms unchanged)
 
 - Added [LICENSING.md](LICENSING.md) recording the MIT → BSL-1.1 → Apache-2.0 sequence with dates, stating that GitHub release `v0.2.0` (2026-04-27) shipped BSL-1.1, and that an MIT → BSL → Apache sequence does not automatically reach previously published MIT-licensed copies. No licence file or grant was changed. Deprecating the v0.2.0 source archives remains a CEO-gated release act and was not performed.

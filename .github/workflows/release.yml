@@ -54,6 +54,13 @@ jobs:
       - name: Pack bundled GitHub-release tarballs
         run: node scripts/pack-release-tarballs.mjs /tmp/dialectos-github-release
 
+      - name: Smoke tarballs via pristine offline install (defect bar 2026-10-27)
+        run: |
+          cli="$(ls /tmp/dialectos-github-release/dialectos-cli-*.tgz)"
+          mcp="$(ls /tmp/dialectos-github-release/dialectos-mcp-*.tgz)"
+          [ "$(echo "$cli" | wc -l)" = 1 ] && [ "$(echo "$mcp" | wc -l)" = 1 ]
+          node scripts/tarball-install-smoke.mjs "$cli" "$mcp"
+
       - name: Publish dry-run
         if: ${{ !inputs.publish }}
         run: |
