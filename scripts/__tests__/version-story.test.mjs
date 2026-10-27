@@ -20,10 +20,15 @@ test("current version is one story across public metadata", () => {
 });
 
 test("server.json does not claim an unpublished npm package", () => {
-  const identifier = server.packages?.[0]?.identifier ?? "";
-  assert.doesNotMatch(identifier, /@kyanitelabs\/dialectos/);
-  assert.match(identifier, new RegExp(`dialectos-mcp-${version}\\.tgz`));
-  assert.equal(server.packages[0].version, version);
+  // Repo-only record until act ② publishes real @dialectos/* packages (#249):
+  // the registry rejects raw tarball URLs, so packages may only bind npm
+  // identifiers, and any entry must carry the current version.
+  const packages = server.packages ?? [];
+  for (const { identifier = "", version: packageVersion } of packages) {
+    assert.doesNotMatch(identifier, /@kyanitelabs\/dialectos/);
+    assert.doesNotMatch(identifier, /^https?:\/\//);
+    assert.equal(packageVersion, version);
+  }
 });
 
 test("validate CLI example matches the released surface (no --translated-only lie)", () => {
