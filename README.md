@@ -494,7 +494,7 @@ See [`ROADMAP.md`](ROADMAP.md) for upcoming features including:
 
 ## 📄 License
 
-Apache-2.0 — see [`LICENSE`](LICENSE) for details.
+Apache-2.0 — see [`LICENSE`](LICENSE) for details. Dated relicensing history of published releases: [`LICENSING.md`](LICENSING.md).
 
 ---
 

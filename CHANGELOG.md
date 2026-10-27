@@ -5,6 +5,12 @@ All notable changes to DialectOS are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### docs: dated licence-history note (wording only; terms unchanged)
+
+- Added [LICENSING.md](LICENSING.md) recording the MIT → BSL-1.1 → Apache-2.0 sequence with dates, stating that GitHub release `v0.2.0` (2026-04-27) shipped BSL-1.1, and that an MIT → BSL → Apache sequence does not automatically reach previously published MIT-licensed copies. No licence file or grant was changed. Deprecating the v0.2.0 source archives remains a CEO-gated release act and was not performed.
+
 ## [0.3.1] - 2026-10-27
 
 ### Fixed
