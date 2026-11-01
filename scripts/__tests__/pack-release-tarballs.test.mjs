@@ -82,7 +82,7 @@ test("pack-release-tarballs emits cli and mcp tarballs with the full dep closure
   }
 });
 
-test("packed cli tarball installs offline and runs (defect bar 2026-10-27)", { timeout: 300_000 }, () => {
+test("packed cli tarball installs offline and runs (defect bar 2026-10-27)", { timeout: 420_000 }, () => {
   const outdir = ensurePacked();
   const cliPkg = JSON.parse(readFileSync(join(ROOT, "packages/cli/package.json"), "utf8"));
   const mcpPkg = JSON.parse(readFileSync(join(ROOT, "packages/mcp/package.json"), "utf8"));
@@ -94,10 +94,16 @@ test("packed cli tarball installs offline and runs (defect bar 2026-10-27)", { t
       join(outdir, `dialectos-cli-${cliPkg.version}.tgz`),
       join(outdir, `dialectos-mcp-${mcpPkg.version}.tgz`),
     ],
-    { encoding: "utf8", cwd: ROOT, timeout: 240_000 },
+    { encoding: "utf8", cwd: ROOT, timeout: 360_000 },
   );
   assert.equal(smoke.status, 0, smoke.stderr || smoke.stdout);
   assert.match(smoke.stdout, /receipt 2 OK/);
   assert.match(smoke.stdout, /receipt 3 OK/);
   assert.match(smoke.stdout, /receipt 4 OK/);
+  // pnpm legs: the README-documented install path at the repo-pinned pnpm.
+  assert.match(smoke.stdout, /pnpm CLI receipt 1 OK/u);
+  assert.match(smoke.stdout, /pnpm CLI receipt 2 OK/u);
+  assert.match(smoke.stdout, /pnpm CLI receipt 3 OK/u);
+  assert.match(smoke.stdout, /pnpm CLI receipt 4 OK/u);
+  assert.match(smoke.stdout, /pnpm MCP initialize OK/u);
 });
