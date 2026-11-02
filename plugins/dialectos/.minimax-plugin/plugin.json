@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "name": "kyanite-dialectos",
+  "displayName": "DialectOS",
+  "version": "0.3.1",
+  "description": "Use DialectOS to translate and QA Spanish across 25 regional dialect variants.",
+  "author": "Kyanite Labs",
+  "category": "Productivity",
+  "exampleQueries": [
+    "Translate this docs page into Mexican Spanish and run the QA gate",
+    "Detect the regional variant of this Spanish text"
+  ],
+  "apps": [],
+  "mcpServers": [
+    "dialectos.mcp.json"
+  ],
+  "skills": [
+    "skills/dialectos/SKILL.md"
+  ]
+}
