@@ -2,7 +2,7 @@
 
 Model Context Protocol server providing 17 tools for Spanish dialect translation across 25 regional variants.
 
-> v0.3.1 is distributed through GitHub Release tarballs, not the npm registry. The tarball bundles unpublished `@dialectos/*` workspace packages.
+> v0.3.1 is distributed as GitHub Release tarballs. `GET https://registry.npmjs.org/@kyanitelabs/dialectos` and `GET https://registry.npmjs.org/dialectos` both return 404 — there is no npm package. The tarball bundles the private `@dialectos/*` workspace packages.
 
 ## Usage
 
