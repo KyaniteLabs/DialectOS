@@ -1,0 +1,44 @@
+name: dialectos
+version: "0.1.0"
+manifest_version: 2
+description: "DialectOS for Hermes: regional Spanish localization across 25 dialect variants with QA gates. Adds a pre_llm_call dialect brief when a message asks for Spanish/localization, a post_tool_call QA ledger, /dialectos (detect/list/translate/validate/status/help), dialectos_translate / dialectos_detect / dialectos_validate / dialectos_list_dialects tools, and a bundled dialectos skill. Disclosure — shells out to the DialectOS v0.3.1 CLI via `npx -y --package=https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-cli-0.3.1.tgz dialectos` (downloads the GitHub Release tarball on first run; needs Node >=20); translate sends text to the selected provider (`auto` uses whichever LLM/DeepL/LibreTranslate/MyMemory provider you configured; none is configured by default); provider keys (LLM_API_KEY, DEEPL_AUTH_KEY, LIBRETRANSLATE_API_KEY) and activation/endpoint settings (ENABLE_MYMEMORY, LLM_ALLOW_LOCAL, LM_STUDIO_URL) are read only through Hermes secret scope; cache, corpus and QA ledger live under <HERMES_HOME>/plugin-data/dialectos/; child env is scrubbed (parent environment is never passed through); detect/list/validate run offline."
+author: "Kyanite Labs"
+license: Apache-2.0
+homepage: https://github.com/KyaniteLabs/DialectOS/tree/main/plugins/dialectos-hermes
+tags: [spanish, localization, i18n, dialects, translation, qa]
+requires_hermes: ">=0.21.6"
+requires_env: []
+provides_tools:
+  - dialectos_translate
+  - dialectos_detect
+  - dialectos_validate
+  - dialectos_list_dialects
+provides_hooks:
+  - pre_llm_call
+  - post_tool_call
+hooks:
+  - pre_llm_call
+  - post_tool_call
+config_schema:
+  dialectos_command:
+    type: str
+    default: "npx -y --package=https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-cli-0.3.1.tgz dialectos"
+    description: "Command prefix for the DialectOS CLI (e.g. 'dialectos' if installed globally from the release tarball)."
+  default_dialect:
+    type: str
+    default: "es-MX"
+  provider:
+    type: str
+    default: "auto"
+    description: "Translation provider: auto | llm | deepl | libre | mymemory."
+  inject_on_spanish:
+    type: bool
+    default: true
+    description: "Inject a dialect/QA brief when the user asks for Spanish (not bare localize/i18n for other languages)."
+  allow_translate_slash_on_gateway:
+    type: bool
+    default: false
+    description: "When false, /dialectos translate is refused on gateway platforms (it sends text to a network provider)."
+  timeout_seconds:
+    type: int
+    default: 120
