@@ -8,7 +8,9 @@ Surfaces:
   skill          -> skills/dialectos/SKILL.md
 
 Child processes get a scrubbed env; cache, corpus and the QA ledger live under
-<HERMES_HOME>/plugin-data/dialectos/ via plugins.plugin_storage. Only public ctx.* APIs.
+<HERMES_HOME>/plugin-data/dialectos/ via plugins.plugin_storage. Registration uses
+ctx.* APIs; runtime seams also include gateway.session_context and agent.secret_scope.
+Those imports are compatibility-sensitive, not a public-API-only guarantee.
 
 Validate is plain-text only (v0.3.1 enables markdown structure checks only for .md file
 args; inline fences false-fail the output judge). Pass a real source for semantic QA.
@@ -181,7 +183,8 @@ def _on_gateway() -> bool:
     """True when this turn arrives over a human messaging surface.
 
     Hermes v0.21.6 binds platform/source in task-local ContextVars, so ask the
-    runtime. Any failure other than ImportError fails closed (treated as messaging).
+    runtime. Missing runtime context fails closed unless the environment explicitly
+    identifies a known non-messaging surface; an absent identity is not permission.
     """
     try:
         from gateway.session_context import session_is_messaging_surface
@@ -190,7 +193,8 @@ def _on_gateway() -> bool:
             os.environ.get("HERMES_PLATFORM") or os.environ.get("HERMES_SESSION_PLATFORM") or "",
             os.environ.get("HERMES_SESSION_SOURCE") or "",
         )
-        return any(str(v).strip().lower() not in _NON_MESSAGING for v in idents)
+        explicit = [str(v).strip().lower() for v in idents if str(v).strip()]
+        return not explicit or any(v not in _NON_MESSAGING for v in explicit)
     try:
         return bool(session_is_messaging_surface())
     except Exception:
