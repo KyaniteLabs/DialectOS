@@ -36,6 +36,12 @@ def test_complete_json_not_nested_fragment(plugin, fake_cli):
     assert plugin.run_dialectos([], expect_json=True)["ok"] is False
 
 
+@pytest.mark.parametrize("suffix", ["untrusted trailing text", "[1,2]", "Validation failed with 1 blocking issue(s). EXTRA"])
+def test_reject_unknown_json_trailer(plugin, fake_cli, suffix):
+    fake_cli(f"print('{{}}' + {suffix!r})")
+    assert plugin.run_dialectos([], expect_json=True)["ok"] is False
+
+
 def test_slash_real_metadata_is_complete(plugin, fake_cli):
     payload = json.loads((Path(__file__).parent / "fixtures/dialects-v0.3.1.json").read_text())
     assert len(payload) == 25
