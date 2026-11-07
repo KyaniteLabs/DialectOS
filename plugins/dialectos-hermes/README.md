@@ -9,7 +9,7 @@ Regional Spanish localization across **25 dialect variants** with QA gates — i
 | `/dialectos detect\|list\|translate\|validate\|status\|help` | Text-only slash; no file paths, `serve`, corpus export or benchmarks. `validate` needs `<source> :: <translated>`. `translate` is refused on gateway platforms unless `allow_translate_slash_on_gateway: true` |
 | `dialectos_translate` | Translate to a dialect (network provider) |
 | `dialectos_detect` | Offline dialect detection |
-| `dialectos_validate` | Offline plain-text QA gate (leakage, formality); **source required**; markdown/fences rejected |
+| `dialectos_validate` | Offline QA; **source required**; fenced QA needs repaired reviewed CLI source (default release false-fails); register advisory |
 | `dialectos_list_dialects` | The 25 variants |
 | Skill `dialectos:dialectos` | Pick → translate → validate workflow |
 
@@ -46,9 +46,9 @@ Requires **Node ≥ 20** and `npx` on PATH.
 - First call is slow (tarball download); offline machines need a pre-installed `dialectos`.
 - Free providers (MyMemory/Libre) only take base `es`; dialect shaping is then post-processing — configure an LLM provider for best dialect fidelity.
 - Source/detection input is capped at 8000 chars; validation accepts translated text up to 100000 chars (`MAX_OUT`). Successful translations are not silently truncated; oversized tool/slash results return an explicit size error.
-- Validate is plain text only. The pinned v0.3.1 output judge rejects code fences unconditionally, including `.md` file mode; file-mode structure checking does not bypass that rejection. Fenced-document QA is not supported by this workflow.
+- Validation writes bounded inline documents to private temporary `.md` files under profile-local plugin data, enabling existing structure checks; files are removed on success or failure. The default v0.3.1 output judge still false-fails code fences. This PR repairs the CLI source judge (byte-identical source-aware fences); explicitly configure `dialectos_command` to that reviewed build to exercise the repair. The released default pin is unchanged; do not claim repaired-source results describe that release. Register flags and hooks are advisory, not an expected-register blocking contract.
 - `/dialectos list` renders all 25 code/name pairs; the agent list tool retains full metadata.
-- Validation uses inline CLI arguments; OS byte limits can reject very large Unicode inputs even below the character cap, with an explicit startup error.
+- Validation uses private temporary files rather than large text argv; no user-facing file-path API is exposed. Files are plaintext while the subprocess runs (owner-only directory), removed afterwards; a hard host/process crash can leave residue under plugin data for owner cleanup.
 - No Desktop pane or banner/screenshots yet.
 
 License: Apache-2.0 (same as DialectOS).

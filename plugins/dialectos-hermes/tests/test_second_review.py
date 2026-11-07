@@ -79,12 +79,10 @@ def test_brief_cannot_override_non_spanish_target(plugin, message):
     assert brief is None or ("Only if" in brief["context"] and "non-Spanish target" in brief["context"])
 
 
-def test_fence_error_does_not_promise_file_bypass(plugin):
-    with pytest.raises(ValueError) as exc:
-        plugin.validate("```hola```", "es-MX", "Hello")
-    assert "unless" not in str(exc.value)
-    assert "unconditional" in str(exc.value)
-    assert "with .md files" not in plugin.VALIDATE_SCHEMA["description"]
+def test_fence_transport_does_not_promise_release_bypass(plugin, fake_cli):
+    fake_cli("print(json.dumps({'valid': False})); sys.exit(1)")
+    assert plugin.validate("```hola```", "es-MX", "Hello")['data']['valid'] is False
+    assert "v0.3.1" in plugin.VALIDATE_SCHEMA["description"]
 
 
 @pytest.mark.parametrize("provider", [None, "auto", ""])

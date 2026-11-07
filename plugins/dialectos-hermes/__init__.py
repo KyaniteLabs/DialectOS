@@ -12,8 +12,9 @@ Child processes get a scrubbed env; cache, corpus and the QA ledger live under
 ctx.* APIs; runtime seams also include gateway.session_context and agent.secret_scope.
 Those imports are compatibility-sensitive, not a public-API-only guarantee.
 
-Validate is plain-text only (v0.3.1 enables markdown structure checks only for .md file
-args; inline fences false-fail the output judge). Pass a real source for semantic QA.
+Validate uses private bounded temporary .md files for structural QA. The default
+v0.3.1 CLI still false-fails fences; reviewed source must be explicitly configured.
+Pass a real source for semantic QA; register controls remain advisory.
 """
 
 from __future__ import annotations
@@ -65,7 +66,6 @@ _SPANISH_RE = re.compile(
     r")",
     re.IGNORECASE,
 )
-_FENCE_RE = re.compile(r"```")
 
 # Mirrors gateway.session_context.NON_MESSAGING_SESSION_SURFACES (Hermes v0.21.6).
 _NON_MESSAGING = frozenset({
@@ -400,16 +400,6 @@ def _text(val: Any, field: str = "text", limit: int = MAX_TEXT) -> str:
     return t
 
 
-def _plain_text(val: Any, field: str) -> str:
-    t = _text(val, field, MAX_OUT if field == "translated" else MAX_TEXT)
-    if _FENCE_RE.search(t):
-        raise ValueError(
-            f"{field} contains a markdown code fence; dialectos_validate is plain-text only "
-            "(v0.3.1 fence rejection is unconditional, including .md file mode)"
-        )
-    return t
-
-
 # --- operations -------------------------------------------------------------
 
 def detect(text: str) -> Dict[str, Any]:
@@ -448,14 +438,22 @@ def validate(translated: str, dialect: Optional[str] = None, source: Optional[st
             "source is required for dialectos_validate (empty source always fails v0.3.1 semantic QA). "
             "Pass the original English/source text, or use the DialectOS CLI for dialect-only workflows."
         )
-    args = [
-        "validate",
-        "--dialect", _dialect(dialect),
-        "--translated", _plain_text(translated, "translated"),
-        "--source", _plain_text(source, "source"),
-        "--format", "json",
-    ]
-    res = run_dialectos(args, expect_json=True)
+    _text(translated, "translated", MAX_OUT)
+    _text(source, "source")
+    translated_text = str(translated)
+    source_text = str(source)
+    if len(translated_text) > MAX_OUT or len(source_text) > MAX_TEXT:
+        raise ValueError("document exceeds inline QA size limits")
+    args = ["validate", "--dialect", _dialect(dialect), "--format", "json"]
+    # All inline documents go through private bounded files: enables CLI markdown
+    # structure checks without exposing a user-facing path API or argv-size limits.
+    # Released v0.3.1 still false-fails fences; only reviewed source fixes that judge.
+    with tempfile.TemporaryDirectory(prefix="qa-", dir=str(_data_dir())) as temp:
+        src = Path(temp) / "source.md"
+        dst = Path(temp) / "translated.md"
+        src.write_text(source_text, encoding="utf-8", newline="")
+        dst.write_text(translated_text, encoding="utf-8", newline="")
+        res = run_dialectos(args + ["--source-file", str(src), "--translated-file", str(dst)], expect_json=True)
     # validate exits non-zero on blocking issues but still prints JSON — that's a verdict, not a crash
     if isinstance(res.get("data"), dict) and type(res["data"].get("valid")) is bool:
         res["ok"] = True
@@ -475,7 +473,8 @@ _BRIEF = (
     "pick the target regional variant (es-MX, es-AR, es-ES, es-CO, … — `dialectos_list_dialects`), "
     "use `dialectos_detect` on any source Spanish, select an explicit provider (no auto fallback), translate with `dialectos_translate`, and run "
     "`dialectos_validate` on the result with the original source text before presenting it. "
-    "Validate is plain text only (no markdown fences); state the dialect and formality (tú/vos/usted) you used."
+    "Fenced QA needs explicitly configured reviewed CLI source; the default v0.3.1 still false-fails fences. "
+    "Register is advisory; state the dialect and formality (tú/vos/usted) you used."
 )
 
 
@@ -566,7 +565,7 @@ DETECT_SCHEMA = {
 }
 VALIDATE_SCHEMA = {
     "name": "dialectos_validate",
-    "description": "QA-gate a plain-text Spanish translation against a target dialect (offline): dialect leakage, formality, glossary/token checks. Requires the original source text (empty source always fails semantic QA). Plain text only — markdown/code fences are rejected unconditionally by v0.3.1, including .md file mode. Returns issues and a pass/fail verdict.",
+    "description": "Offline Spanish QA against a dialect with original source required. Bounded inline documents use private temporary .md files for structure checks. The default v0.3.1 CLI still false-fails code fences: repaired reviewed source must be explicitly configured for fenced QA. Register controls are advisory, not a blocking expected-register contract. Returns issues and a pass/fail verdict.",
     "parameters": {
         "type": "object",
         "properties": {
@@ -621,7 +620,7 @@ _HELP = (
     "  /dialectos translate <es-XX> <english text>              Translate (network provider; CLI/TUI only by default)\n"
     "  /dialectos validate <es-XX> <source> :: <spanish text>   Offline plain-text QA (source required)\n"
     "  /dialectos status                                        Last QA ledger entries\n"
-    "No file paths, serve, corpus export or benchmark from slash. Validate is plain text only."
+    "No file paths, serve, corpus export or benchmark from slash. Fenced QA needs reviewed CLI source; default v0.3.1 still false-fails fences. Register is advisory."
 )
 
 

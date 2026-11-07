@@ -142,19 +142,18 @@ def test_scrubbed_env_forwards_mymemory_and_local_llm(plugin, runtime, monkeypat
     assert "UNRELATED_SECRET" not in env
 
 
-# --- P2 (5): plain-text validate contract — fences rejected, no false fail ----
+# --- File transport does not override a failing released CLI verdict ---------
 
-def test_validate_rejects_fenced_markdown(plugin, fake_cli):
-    fake_cli("print('should-not-run'); sys.exit(0)")
+def test_validate_retains_cli_fence_failure(plugin, fake_cli):
+    fake_cli("print(json.dumps({'valid': False, 'blockingIssues': ['fence']})); sys.exit(1)")
     fenced = "Hola mundo\n```\nconst x = 1;\n```"
-    with pytest.raises(ValueError, match="plain text|markdown|fence"):
-        plugin.validate(fenced, "es-MX", source="Hello world\n```\nconst x = 1;\n```")
+    result = plugin.validate(fenced, "es-MX", source="Hello world\n```\nconst x = 1;\n```")
+    assert result['ok'] is True and result['data']['valid'] is False
 
 
-def test_validate_tool_description_is_plain_text_only(plugin):
+def test_validate_description_discloses_released_pin_limit(plugin):
     desc = plugin.VALIDATE_SCHEMA["description"].lower()
-    assert "plain text" in desc or "plain-text" in desc
-    assert "markdown" not in desc or "not markdown" in desc or "plain" in desc
+    assert "v0.3.1" in desc and "fence" in desc
 
 
 # --- P2 (6): no silent truncation of successful translations ------------------

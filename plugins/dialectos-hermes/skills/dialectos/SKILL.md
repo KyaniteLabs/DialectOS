@@ -18,6 +18,6 @@ Use when the user wants Spanish for a specific audience (Mexico, Argentina, Spai
 
 ## Limits
 
-- Validate is **plain text only**, accepting translations up to 100000 chars and sources up to 8000 chars. Markdown/code fences are rejected unconditionally by the v0.3.1 output judge, even with `.md` files. File-mode structure checks do not bypass this; do not promise fenced-document QA through the pinned CLI.
+- Validate accepts translations up to 100000 chars and sources up to 8000 chars via private temporary `.md` files (cleaned after subprocess completion). The default v0.3.1 still false-fails fences. Fenced QA requires explicitly configured reviewed source with the source-aware byte-identical code-block judge; do not promise release support or change the pin silently. Formal/informal flags and hooks remain advisory, not a blocking expected-register contract; no live-provider proof is implied by offline QA.
 - Whole files, README/API-docs translation, i18n key diffing, glossaries and certification run via the DialectOS CLI directly (`dialectos translate-readme`, `dialectos i18n …`) — not exposed as Hermes tools in v0.1.0.
 - Never claim a translation is "certified" from this plugin alone.
