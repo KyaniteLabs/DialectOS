@@ -112,7 +112,7 @@ def test_list_dialects_returns_all_25(plugin, fake_cli):
 def test_translate_preserves_prose_containing_json(plugin, fake_cli):
     prose = 'Estado:\n{"status":"bien"}\nFin de la traducción.'
     fake_cli(f"print({prose!r})")
-    res = plugin.translate("Status: ok", "es-MX")
+    res = plugin.translate("Status: ok", "es-MX", provider="llm")
     assert res["ok"] is True
     assert res.get("text") == prose
     assert res.get("data") is None or "status" not in (res.get("data") or {})
@@ -162,7 +162,7 @@ def test_validate_tool_description_is_plain_text_only(plugin):
 def test_long_translation_is_not_silently_cut(plugin, fake_cli):
     body = "á" * 9599
     fake_cli(f"print({body!r})")
-    res = plugin.translate("x" * 7499, "es-MX")
+    res = plugin.translate("x" * 7499, "es-MX", provider="llm")
     assert res["ok"] is True
     assert res["text"] == body
     assert len(res["text"]) == 9599

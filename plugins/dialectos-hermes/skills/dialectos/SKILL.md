@@ -12,12 +12,12 @@ Use when the user wants Spanish for a specific audience (Mexico, Argentina, Spai
 1. **Pick the dialect.** Ask or infer the audience. `dialectos_list_dialects` enumerates codes (`es-MX`, `es-AR`, `es-ES`, …). Default is the plugin's `default_dialect` (es-MX).
 2. **Pick formality.** `formal: true` → usted; `false` → tú (or vos for voseo dialects like es-AR). Say which you chose.
 3. **Detect** existing Spanish with `dialectos_detect` before rewriting it.
-4. **Translate** with `dialectos_translate` (≤ 8000 chars per call; split long docs by section). This sends text to the configured provider — don't send secrets or private data unless the user agreed.
+4. **Translate** with `dialectos_translate` (≤ 8000 source chars per call; split long docs by section). Select an explicit `llm`, `deepl`, `libre`, or `mymemory` provider in settings or the call; missing selection and `auto` are refused, with no automatic fallback. This sends text to that provider — don't send secrets or private data unless the user agreed.
 5. **QA gate:** always run `dialectos_validate` with both `translated` **and** `source` (the original text). Empty source always fails v0.3.1 semantic QA. Fix blocking issues and re-validate before presenting.
 6. Present: translation, dialect + formality, and the validate verdict.
 
 ## Limits
 
-- Validate is **plain text only**. Markdown/code fences are rejected here (v0.3.1 treats fences as protocol errors unless you pass `.md` files). Whole-file / README / structure-preserving QA stays on the DialectOS CLI.
+- Validate is **plain text only**, accepting translations up to 100000 chars and sources up to 8000 chars. Markdown/code fences are rejected unconditionally by the v0.3.1 output judge, even with `.md` files. File-mode structure checks do not bypass this; do not promise fenced-document QA through the pinned CLI.
 - Whole files, README/API-docs translation, i18n key diffing, glossaries and certification run via the DialectOS CLI directly (`dialectos translate-readme`, `dialectos i18n …`) — not exposed as Hermes tools in v0.1.0.
 - Never claim a translation is "certified" from this plugin alone.

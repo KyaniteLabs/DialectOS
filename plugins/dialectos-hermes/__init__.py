@@ -37,12 +37,12 @@ RELEASE_TGZ = "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1
 DEFAULTS: Dict[str, Any] = {
     "dialectos_command": f"npx -y --package={RELEASE_TGZ} dialectos",
     "default_dialect": "es-MX",
-    "provider": "auto",
+    "provider": "",
     "inject_on_spanish": True,
     "allow_translate_slash_on_gateway": False,
     "timeout_seconds": 120,
 }
-PROVIDERS = {"auto", "llm", "deepl", "libre", "mymemory"}
+PROVIDERS = {"llm", "deepl", "libre", "mymemory"}
 DIALECT_RE = re.compile(r"^es-[A-Z]{2}$")
 MAX_TEXT = 8000
 MAX_OUT = 100_000
@@ -320,6 +320,8 @@ def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: 
         )
     except FileNotFoundError as exc:
         return {"ok": False, "error": f"dialectos not runnable (need Node >=20 + npx): {exc}"}
+    except OSError as exc:
+        return {"ok": False, "error": f"dialectos could not start (OS command/argument limits may apply): {exc}"}
     try:
         out_s, err_s = proc.communicate(stdin, timeout=int(_cfg("timeout_seconds")))
     except subprocess.TimeoutExpired:
@@ -347,19 +349,15 @@ def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: 
         return {"ok": False, "exit": proc.returncode, "error": err[-800:] or f"exit {proc.returncode}"}
     res: Dict[str, Any] = {"ok": proc.returncode == 0, "exit": proc.returncode}
     if expect_json:
-        # Prefer '[' before '{' so a dialects list is not collapsed to its first object.
-        data: Any = None
-        for opener in ("[", "{"):
-            i = out.find(opener)
-            if i >= 0:
-                try:
-                    data, _end = json.JSONDecoder().raw_decode(out[i:])
-                    break
-                except json.JSONDecodeError:
-                    continue
-        if data is not None:
+        # Decode only the root at offset zero. v0.3.1 appends a human status
+        # line to failed validation reports; never search nested JSON openers.
+        try:
+            data, end = json.JSONDecoder().raw_decode(out)
+            trailer = out[end:].strip()
+            if trailer and not re.fullmatch(r"Validation failed with \d+ blocking issue\(s\)\.", trailer):
+                raise json.JSONDecodeError("unexpected JSON trailer", out, end)
             res["data"] = data
-        else:
+        except json.JSONDecodeError:
             res["text"] = out
             if proc.returncode == 0:
                 res["ok"] = False
@@ -387,23 +385,23 @@ def _dialect(val: Any) -> str:
     return d
 
 
-def _text(val: Any, field: str = "text") -> str:
+def _text(val: Any, field: str = "text", limit: int = MAX_TEXT) -> str:
     t = str(val or "").strip()
     if not t:
         raise ValueError(f"{field} is required")
-    if len(t) > MAX_TEXT:
-        raise ValueError(f"{field} exceeds {MAX_TEXT} chars; use the DialectOS CLI for documents")
+    if len(t) > limit:
+        raise ValueError(f"{field} exceeds {limit} chars; use the DialectOS CLI for documents")
     if t.startswith("-"):
         t = " " + t  # never let text be parsed as a CLI flag
     return t
 
 
 def _plain_text(val: Any, field: str) -> str:
-    t = _text(val, field)
+    t = _text(val, field, MAX_OUT if field == "translated" else MAX_TEXT)
     if _FENCE_RE.search(t):
         raise ValueError(
             f"{field} contains a markdown code fence; dialectos_validate is plain-text only "
-            "(v0.3.1 treats fences as protocol errors unless you pass .md files via the DialectOS CLI)"
+            "(v0.3.1 fence rejection is unconditional, including .md file mode)"
         )
     return t
 
@@ -415,14 +413,23 @@ def detect(text: str) -> Dict[str, Any]:
 
 
 def list_dialects() -> Dict[str, Any]:
-    return run_dialectos(["dialects", "list", "--format", "json"], expect_json=True)
+    res = run_dialectos(["dialects", "list", "--format", "json"], expect_json=True)
+    if "data" in res:
+        data = res["data"]
+        if not isinstance(data, list) or not all(
+            isinstance(d, dict) and isinstance(d.get("code"), str) and isinstance(d.get("name"), str)
+            for d in data
+        ):
+            res.pop("data")
+            res.update(ok=False, error="expected dialect metadata array with code/name fields")
+    return res
 
 
 def translate(text: str, dialect: Optional[str] = None, formal: Optional[bool] = None,
               provider: Optional[str] = None) -> Dict[str, Any]:
-    prov = str(provider or _cfg("provider")).strip().lower()
+    prov = str(_cfg("provider") if provider is None else provider).strip().lower()
     if prov not in PROVIDERS:
-        raise ValueError(f"provider must be one of {sorted(PROVIDERS)}")
+        raise ValueError(f"select an explicit provider in settings or this call: {sorted(PROVIDERS)}; auto fallback is disabled")
     args = ["translate", "--dialect", _dialect(dialect), "--provider", prov]
     if formal is True:
         args.append("--formal")
@@ -446,17 +453,23 @@ def validate(translated: str, dialect: Optional[str] = None, source: Optional[st
     ]
     res = run_dialectos(args, expect_json=True)
     # validate exits non-zero on blocking issues but still prints JSON — that's a verdict, not a crash
-    if "data" in res:
+    if isinstance(res.get("data"), dict) and type(res["data"].get("valid")) is bool:
         res["ok"] = True
+    elif "data" in res:
+        res.pop("data")
+        res["ok"] = False
+        res["error"] = "expected validation report object with a boolean valid verdict"
     return res
 
 
 # --- hooks ------------------------------------------------------------------
 
 _BRIEF = (
-    "[DialectOS] This request involves Spanish localization. Do not default to generic Spanish: "
+    "[DialectOS] Only if the requested target is Spanish, apply the following workflow. "
+    "Never override an explicit non-Spanish target, or interpret source-language mentions or negations as target intent. "
+    "For a Spanish target, do not default to generic Spanish: "
     "pick the target regional variant (es-MX, es-AR, es-ES, es-CO, … — `dialectos_list_dialects`), "
-    "use `dialectos_detect` on any source Spanish, translate with `dialectos_translate`, and run "
+    "use `dialectos_detect` on any source Spanish, select an explicit provider (no auto fallback), translate with `dialectos_translate`, and run "
     "`dialectos_validate` on the result with the original source text before presenting it. "
     "Validate is plain text only (no markdown fences); state the dialect and formality (tú/vos/usted) you used."
 )
@@ -477,13 +490,18 @@ def _issue_counts(report: Dict[str, Any]) -> tuple[int, int]:
     judge_issues = judge.get("issues") if isinstance(judge.get("issues"), list) else []
     judge_blocking = judge.get("blockingIssues") if isinstance(judge.get("blockingIssues"), list) else []
     top_blocking = report.get("blockingIssues") if isinstance(report.get("blockingIssues"), list) else []
-    # Prefer the richer of the two blocking lists; count unique by string form.
-    blocking_msgs = {json.dumps(x, sort_keys=True, default=str) for x in (judge_blocking + top_blocking)}
-    all_msgs = {json.dumps(x, sort_keys=True, default=str) for x in (judge_issues + top_blocking)}
+    # Rich issues and top-level strings share an exact message identity.
+    def identity(issue: Any) -> str:
+        if isinstance(issue, dict) and isinstance(issue.get("message"), str):
+            return issue["message"]
+        return issue if isinstance(issue, str) else json.dumps(issue, sort_keys=True, default=str)
+
+    blocking_msgs = {identity(x) for x in (judge_blocking + top_blocking)}
+    all_msgs = {identity(x) for x in (judge_issues + judge_blocking + top_blocking)}
     # Legacy top-level "issues" if a future CLI adds it.
     legacy = report.get("issues") if isinstance(report.get("issues"), list) else []
     for x in legacy:
-        all_msgs.add(json.dumps(x, sort_keys=True, default=str))
+        all_msgs.add(identity(x))
     return len(all_msgs), len(blocking_msgs)
 
 
@@ -544,11 +562,11 @@ DETECT_SCHEMA = {
 }
 VALIDATE_SCHEMA = {
     "name": "dialectos_validate",
-    "description": "QA-gate a plain-text Spanish translation against a target dialect (offline): dialect leakage, formality, glossary/token checks. Requires the original source text (empty source always fails semantic QA). Plain text only — markdown/code fences are rejected (use the DialectOS CLI with .md files for structure-preserving QA). Returns issues and a pass/fail verdict.",
+    "description": "QA-gate a plain-text Spanish translation against a target dialect (offline): dialect leakage, formality, glossary/token checks. Requires the original source text (empty source always fails semantic QA). Plain text only — markdown/code fences are rejected unconditionally by v0.3.1, including .md file mode. Returns issues and a pass/fail verdict.",
     "parameters": {
         "type": "object",
         "properties": {
-            "translated": {"type": "string", "description": "Plain-text Spanish translation (<= 8000 chars)."},
+            "translated": {"type": "string", "description": "Plain-text Spanish translation (<= 100000 chars)."},
             "source": {"type": "string", "description": "Original source text (required for semantic QA)."},
             "dialect": {"type": "string"},
         },
@@ -634,7 +652,12 @@ def _slash(raw_args: str) -> str:
         return f"Unknown or blocked subcommand `{cmd}`. Allowed: {', '.join(sorted(_SAFE_SLASH))}."
     try:
         if cmd == "list":
-            return _fmt(list_dialects())
+            res = list_dialects()
+            if res.get("ok") and isinstance(res.get("data"), list):
+                return _fmt({"ok": True, "text": "\n".join(
+                    f"{d['code']} — {d['name']}" for d in res["data"]
+                )})
+            return _fmt(res)
         if cmd == "status":
             return json.dumps(_load_json(_ledger_path(), [])[-10:], indent=2)
         if cmd == "detect":

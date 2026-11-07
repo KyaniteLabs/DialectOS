@@ -25,7 +25,7 @@ Requires **Node ≥ 20** and `npx` on PATH.
 ## Disclosure
 
 - **Downloads code:** first use runs `npx -y --package=https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-cli-0.3.1.tgz dialectos` (DialectOS is distributed as GitHub Release tarballs, not on npm). Override with `dialectos_command` (e.g. `dialectos` after `pnpm add -g <tarball>`).
-- **Network:** `detect`, `list`, `validate` are offline. `translate` sends the text to the chosen provider: `auto` picks whichever provider you configured (LLM endpoint, DeepL, LibreTranslate, or MyMemory). **With no provider configured, translate returns "No translation providers are currently available"**; detect/validate still work.
+- **Network:** `detect`, `list`, `validate` are offline. `translate` sends text only to an explicitly selected provider (`llm`, `deepl`, `libre`, or `mymemory`), supplied in settings or the tool call. Missing selection and `auto` are refused before spawning; there is no automatic provider fallback. Slash translation requires the provider setting. Detect/validate still work without a provider.
 - **Secrets / provider activation:** `LLM_API_KEY`, `LLM_API_URL`, `LLM_ENDPOINT`, `LLM_MODEL`, `LLM_API_FORMAT`, `DEEPL_AUTH_KEY`, `DEEPL_API_URL`, `LIBRETRANSLATE_URL`, `LIBRETRANSLATE_API_KEY`, plus activation/endpoint settings `ENABLE_MYMEMORY`, `LLM_ALLOW_LOCAL`, `LM_STUDIO_URL`, are read only via Hermes secret scope and passed only to the DialectOS child. The child gets a scrubbed env (PATH/HOME/locale/proxy/npm cache + those scoped values), never full `os.environ`. MyMemory only registers when `ENABLE_MYMEMORY=1`; localhost/Ollama endpoints need `LLM_ALLOW_LOCAL=1` (and `LM_STUDIO_URL` when applicable).
 - **Local data:** cache, corpus and `qa_ledger.json` live under `<HERMES_HOME>/plugin-data/dialectos/` (per profile). Nothing else is written; corpus recording is off.
 - **No telemetry.** No background jobs; nothing runs unless a hook matches or you call a tool/slash.
@@ -36,7 +36,7 @@ Requires **Node ≥ 20** and `npx` on PATH.
 |---|---|---|
 | `dialectos_command` | `npx -y --package=<v0.3.1 tgz> dialectos` | CLI prefix |
 | `default_dialect` | `es-MX` | `es-XX` |
-| `provider` | `auto` | `auto\|llm\|deepl\|libre\|mymemory` |
+| `provider` | empty (translation disabled) | Explicit `llm\|deepl\|libre\|mymemory`; `auto` refused |
 | `inject_on_spanish` | `true` | pre_llm_call brief |
 | `allow_translate_slash_on_gateway` | `false` | gateway safety |
 | `timeout_seconds` | `120` | per CLI call |
@@ -45,8 +45,10 @@ Requires **Node ≥ 20** and `npx` on PATH.
 
 - First call is slow (tarball download); offline machines need a pre-installed `dialectos`.
 - Free providers (MyMemory/Libre) only take base `es`; dialect shaping is then post-processing — configure an LLM provider for best dialect fidelity.
-- Input text is capped at 8000 chars per call; successful translations are not silently truncated (oversized results return an explicit size error).
-- Validate is plain text only; markdown/code structure QA stays on the DialectOS CLI with `.md` files.
+- Source/detection input is capped at 8000 chars; validation accepts translated text up to 100000 chars (`MAX_OUT`). Successful translations are not silently truncated; oversized tool/slash results return an explicit size error.
+- Validate is plain text only. The pinned v0.3.1 output judge rejects code fences unconditionally, including `.md` file mode; file-mode structure checking does not bypass that rejection. Fenced-document QA is not supported by this workflow.
+- `/dialectos list` renders all 25 code/name pairs; the agent list tool retains full metadata.
+- Validation uses inline CLI arguments; OS byte limits can reject very large Unicode inputs even below the character cap, with an explicit startup error.
 - No Desktop pane or banner/screenshots yet.
 
 License: Apache-2.0 (same as DialectOS).
