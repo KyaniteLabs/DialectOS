@@ -61,12 +61,14 @@ const EXPLANATION_PATTERNS = [
 
 const ENGLISH_FUNCTION_WORDS = /\b(the|before|after|from|your|with|without|support|payment|office|package|file|room|guests|arrive|deployment|message|this|english|sentence|should|remain|impossible)\b/i;
 
-// Retain raw line endings, delimiters and infostrings: counts cannot prove preservation.
+// Retain delimiters, infostrings and content: counts cannot prove preservation.
+// CRLF is normalised to LF and each block's final line terminator is ignored, because
+// providers and the plugin trim trailing whitespace and emit LF.
 function fencedBlocks(text: string): string[] {
   const blocks: string[] = [];
   let block: string | undefined;
   let delimiter = "";
-  for (const line of text.match(/[^\n]*\n|[^\n]+$/g) || []) {
+  for (const line of text.replace(/\r\n/g, "\n").match(/[^\n]*\n|[^\n]+$/g) || []) {
     const content = line.replace(/\r?\n$/, "");
     if (block === undefined) {
       const start = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(content);
@@ -78,12 +80,12 @@ function fencedBlocks(text: string): string[] {
       block += line;
       const end = /^ {0,3}(`{3,}|~{3,})[ \t]*$/.exec(content);
       if (end && end[1][0] === delimiter[0] && end[1].length >= delimiter.length) {
-        blocks.push(block);
+        blocks.push(block.replace(/\n$/, ""));
         block = undefined;
       }
     }
   }
-  if (block !== undefined) blocks.push(block);
+  if (block !== undefined) blocks.push(block.replace(/\n$/, ""));
   return blocks;
 }
 

@@ -24,6 +24,21 @@ describe("output judge", () => {
       const output = 'Abre {name}.\n```js\nconst x = 1;\n```\n';
       expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues).toEqual([]);
     });
+    it(`accepts a trailing code block when only the final newline is missing for ${dialect}`, () => {
+      const source = 'Open {name}.\n```js\nconst x = 1;\n```\n';
+      const output = 'Abre {name}.\n```js\nconst x = 1;\n```';
+      expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues).toEqual([]);
+    });
+    it(`accepts CRLF sources against LF output for ${dialect}`, () => {
+      const source = 'Open {name}.\r\n```js\r\nconst x = 1;\r\n```\r\n';
+      const output = 'Abre {name}.\n```js\nconst x = 1;\n```\n';
+      expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues).toEqual([]);
+    });
+    it(`still rejects changed content inside a CRLF fence for ${dialect}`, () => {
+      const source = 'Open {name}.\r\n```js\r\nconst x = 1;\r\n```\r\n';
+      const output = 'Abre {name}.\n```js\nconst x = 2;\n```';
+      expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues.length).toBeGreaterThan(0);
+    });
   }
   it("blocks prompt leakage and explanations", () => {
     const result = judgeTranslationOutput(
