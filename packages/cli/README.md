@@ -2,7 +2,7 @@
 
 CLI commands for Spanish dialect translation workflows.
 
-> v0.3.1 is distributed through GitHub Release tarballs, not the npm registry. The tarball bundles unpublished `@dialectos/*` workspace packages.
+> v0.3.1 is distributed as GitHub Release tarballs. `GET https://registry.npmjs.org/@kyanitelabs/dialectos` and `GET https://registry.npmjs.org/dialectos` both return 404 — there is no npm package. The tarball bundles the unpublished `@dialectos/*` workspace packages.
 
 ## Installation
 

@@ -98,7 +98,7 @@ Spanish is not one language — it's **25 regional variants** with different voc
 
 ## 🚀 Quick Start
 
-> **Install note:** DialectOS v0.3.1 is distributed through GitHub Release tarballs, not the npm registry. The CLI and MCP tarballs bundle the unpublished `@dialectos/*` workspace packages, so a single `pnpm add -g` / `pnpm dlx` command works without a registry publish. Clone the repo only for local development or the browser demo.
+> **Install note:** DialectOS v0.3.1 is distributed as GitHub Release tarballs. `GET https://registry.npmjs.org/@kyanitelabs/dialectos` and `GET https://registry.npmjs.org/dialectos` both return **404** — there is no npm package. The CLI and MCP tarballs bundle the unpublished `@dialectos/*` workspace packages, so a single `pnpm add -g` / `pnpm dlx` of the tarball URL works. Clone the repo only for local development or the browser demo.
 
 ### MCP setup
 
