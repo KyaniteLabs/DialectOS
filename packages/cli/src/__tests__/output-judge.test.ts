@@ -2,6 +2,44 @@ import { describe, expect, it } from "vitest";
 import { judgeTranslationOutput } from "../lib/output-judge.js";
 
 describe("output judge", () => {
+  for (const dialect of ["es-MX", "es-AR"] as const) {
+    for (const [name, output] of [
+      ["added wrapper", '```markdown\nAbre {name}.\n```js\nconst x = 1;\n```\n```\n'],
+      ["mutated code", 'Abre {name}.\n```js\nconst x = 2;\n```\n'],
+      ["changed infostring", 'Abre {name}.\n```ts\nconst x = 1;\n```\n'],
+      ["removed block", 'Abre {name}.'],
+      ["missing placeholder", 'Abre.\n```js\nconst x = 1;\n```\n'],
+    ]) {
+      it(`rejects ${name} for ${dialect}`, () => {
+        const source = 'Open {name}.\n```js\nconst x = 1;\n```\n';
+        expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues.length).toBeGreaterThan(0);
+      });
+    }
+    it(`rejects new tilde fences for ${dialect}`, () => {
+      expect(judgeTranslationOutput({ source: 'Open {name}.' }, dialect,
+        '~~~markdown\nAbre {name}.\n~~~').blockingIssues.length).toBeGreaterThan(0);
+    });
+    it(`preserves source fences byte-identically for ${dialect}`, () => {
+      const source = 'Open {name}.\n```js\nconst x = 1;\n```\n';
+      const output = 'Abre {name}.\n```js\nconst x = 1;\n```\n';
+      expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues).toEqual([]);
+    });
+    it(`accepts a trailing code block when only the final newline is missing for ${dialect}`, () => {
+      const source = 'Open {name}.\n```js\nconst x = 1;\n```\n';
+      const output = 'Abre {name}.\n```js\nconst x = 1;\n```';
+      expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues).toEqual([]);
+    });
+    it(`accepts CRLF sources against LF output for ${dialect}`, () => {
+      const source = 'Open {name}.\r\n```js\r\nconst x = 1;\r\n```\r\n';
+      const output = 'Abre {name}.\n```js\nconst x = 1;\n```\n';
+      expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues).toEqual([]);
+    });
+    it(`still rejects changed content inside a CRLF fence for ${dialect}`, () => {
+      const source = 'Open {name}.\r\n```js\r\nconst x = 1;\r\n```\r\n';
+      const output = 'Abre {name}.\n```js\nconst x = 2;\n```';
+      expect(judgeTranslationOutput({ source }, dialect, output).blockingIssues.length).toBeGreaterThan(0);
+    });
+  }
   it("blocks prompt leakage and explanations", () => {
     const result = judgeTranslationOutput(
       { source: "Pick up the file.", forbiddenOutputTerms: [] },
