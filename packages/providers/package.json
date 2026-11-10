@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && cp src/data/*.json dist/data/ 2>/dev/null || mkdir -p dist/data && cp src/data/*.json dist/data/",
+    "build": "tsc && mkdir -p dist/data && cp src/data/*.json dist/data/",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

@@ -31,3 +31,5 @@ benchmark_report.md
 .omc/
 .claude/
 packages/benchmarks/dialect-detection-corpus/results/
+# Generated CI verification evidence
+.ci-results/
