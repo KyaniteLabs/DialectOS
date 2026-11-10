@@ -94,7 +94,7 @@ run("Run strict document certification", [
 
 // 10. Package smoke
 run("Pack CLI package", ["sh", "-c", "cd packages/cli && pnpm pack --pack-destination /tmp"]);
-run("Verify packages install from tarballs", ["node", "scripts/tarball-smoke.mjs", "/tmp/dialectos-cli-0.3.0.tgz"]);
+run("Verify packages install from tarballs", ["node", "scripts/tarball-smoke.mjs", "/tmp/dialectos-cli-0.3.1.tgz"]);
 
 // 11. Docker checks
 if (!noDocker) {

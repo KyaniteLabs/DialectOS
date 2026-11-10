@@ -56,11 +56,38 @@ const EXPLANATION_PATTERNS = [
   /\bsure,? i can help/i,
   /\bokay,? i understand/i,
   /\blet'?s begin/i,
-  /```/,
   /^\s*<<<\s*$/m,
 ];
 
 const ENGLISH_FUNCTION_WORDS = /\b(the|before|after|from|your|with|without|support|payment|office|package|file|room|guests|arrive|deployment|message|this|english|sentence|should|remain|impossible)\b/i;
+
+// Retain delimiters, infostrings and content: counts cannot prove preservation.
+// CRLF is normalised to LF and each block's final line terminator is ignored, because
+// providers and the plugin trim trailing whitespace and emit LF.
+function fencedBlocks(text: string): string[] {
+  const blocks: string[] = [];
+  let block: string | undefined;
+  let delimiter = "";
+  for (const line of text.replace(/\r\n/g, "\n").match(/[^\n]*\n|[^\n]+$/g) || []) {
+    const content = line.replace(/\r?\n$/, "");
+    if (block === undefined) {
+      const start = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(content);
+      if (start) {
+        delimiter = start[1];
+        block = line;
+      }
+    } else {
+      block += line;
+      const end = /^ {0,3}(`{3,}|~{3,})[ \t]*$/.exec(content);
+      if (end && end[1][0] === delimiter[0] && end[1].length >= delimiter.length) {
+        blocks.push(block.replace(/\n$/, ""));
+        block = undefined;
+      }
+    }
+  }
+  if (block !== undefined) blocks.push(block.replace(/\n$/, ""));
+  return blocks;
+}
 
 function unique(values: string[]): string[] {
   return [...new Set(values)];
@@ -131,6 +158,13 @@ export function judgeTranslationOutput(
       severity: "critical",
       message: "Output appears to include internal prompt, policy, or context text.",
     });
+  }
+
+  const sourceBlocks = fencedBlocks(sample.source);
+  const outputBlocks = fencedBlocks(output);
+  if (JSON.stringify(sourceBlocks) !== JSON.stringify(outputBlocks)) {
+    issues.push({ category: "provider-protocol", severity: "major",
+      message: "Fenced code blocks must be preserved byte-identically; added, removed or changed blocks are not allowed." });
   }
 
   if (EXPLANATION_PATTERNS.some((pattern) => pattern.test(trimmed))) {

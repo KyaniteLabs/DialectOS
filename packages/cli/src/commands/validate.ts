@@ -5,6 +5,7 @@ import { validateTranslation } from "../lib/validate-translation.js";
 import { loadGlossary } from "../lib/glossary-enforcement.js";
 import { loadProtectedTokens } from "../lib/token-protection.js";
 import { writeOutput, writeError, writeInfo } from "../lib/output.js";
+import { assertKnownDialect } from "../lib/assert-known-dialect.js";
 
 export interface ValidateOptions {
   sourceFile?: string;
@@ -69,7 +70,8 @@ export async function executeValidate(
   translatedText: string | undefined,
   options: ValidateOptions
 ): Promise<void> {
-  const { dialect, format, strict } = options;
+  const dialect = assertKnownDialect(options.dialect);
+  const { format, strict } = options;
 
   // Load glossary
   const glossary = await loadGlossary(options.glossaryFile);

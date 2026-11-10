@@ -7,7 +7,7 @@
  * The binary entry point is cli.ts.
  */
 
-import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 import { Command } from "commander";
 import { executeTranslate } from "./commands/translate.js";
 import { createTranslateReadmeCommand } from "./commands/translate-readme.js";
@@ -33,17 +33,19 @@ import { SecurityError, createSafeError } from "@dialectos/security";
 import type { SpanishDialect, ProviderName } from "@dialectos/types";
 import { parse, format } from "node:path";
 import { resolvePolicy, type PolicyProfile } from "./lib/translation-policy.js";
+import { assertKnownDialect } from "./lib/assert-known-dialect.js";
+
+const packageJson = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf-8")
+) as { version: string };
 
 const program = new Command();
 
 // CLI metadata
-const { version: cliVersion } = createRequire(import.meta.url)(
-  "../package.json",
-) as { version: string };
 program
   .name("dialectos")
   .description("Spanish translation CLI with dialect awareness")
-  .version(cliVersion);
+  .version(packageJson.version);
 
 // Translate command
 program
@@ -90,10 +92,11 @@ Examples:
 program
   .command("validate")
   .description("Validate existing Spanish translations against quality checks")
-  .argument("[translated]", "Translated text to validate (use --translated-file for files)")
+  .argument("[translated]", "Translated text to validate (use --translated or --translated-file)")
   .requiredOption("--dialect <dialect>", "Spanish dialect to validate against (e.g., es-ES, es-MX, es-AR)")
   .option("--source-file <path>", "Source (original) file for comparison")
   .option("--source <text>", "Source text for comparison")
+  .option("--translated <text>", "Translated text (alternative to the positional argument)")
   .option("--translated-file <path>", "Translated file to validate")
   .option("--glossary-file <file>", "JSON glossary file for terminology checks")
   .option("--protect-tokens <file>", "JSON file with protected tokens")
@@ -104,10 +107,10 @@ program
   .action(async (translated, cmdOptions) => {
     try {
       const sourceText = cmdOptions.source;
-      await executeValidate(sourceText, translated, {
+      await executeValidate(sourceText, translated ?? cmdOptions.translated, {
         sourceFile: cmdOptions.sourceFile,
         translatedFile: cmdOptions.translatedFile,
-        dialect: cmdOptions.dialect as SpanishDialect,
+        dialect: assertKnownDialect(cmdOptions.dialect),
         glossaryFile: cmdOptions.glossaryFile,
         protectTokens: cmdOptions.protectTokens,
         format: cmdOptions.format,

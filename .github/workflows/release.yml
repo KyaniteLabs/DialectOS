@@ -21,6 +21,8 @@ jobs:
           persist-credentials: false
 
       - uses: pnpm/action-setup@ac6db6d3c1f721f886538a378a2d73e85697340a # v6
+        with:
+          standalone: true
 
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
@@ -50,6 +52,16 @@ jobs:
             node scripts/tarball-smoke.mjs "$tarball"
             echo "::endgroup::"
           done
+
+      - name: Pack bundled GitHub-release tarballs
+        run: node scripts/pack-release-tarballs.mjs /tmp/dialectos-github-release
+
+      - name: Smoke tarballs via pristine offline install (defect bar 2026-10-27)
+        run: |
+          cli="$(ls /tmp/dialectos-github-release/dialectos-cli-*.tgz)"
+          mcp="$(ls /tmp/dialectos-github-release/dialectos-mcp-*.tgz)"
+          [ "$(echo "$cli" | wc -l)" = 1 ] && [ "$(echo "$mcp" | wc -l)" = 1 ]
+          node scripts/tarball-install-smoke.mjs "$cli" "$mcp"
 
       - name: Publish dry-run
         if: ${{ !inputs.publish }}
