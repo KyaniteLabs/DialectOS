@@ -37,9 +37,9 @@ test('public docs do not claim unpublished npm packages', () => {
   }
 });
 
-test('public docs may reference the released v0.3.0 GitHub Action tag', () => {
+test('public docs may reference the released v0.3.1 GitHub Action tag', () => {
   const text = readFileSync('docs/github-action.md', 'utf8');
-  assert.match(text, /KyaniteLabs\/DialectOS@v0\.3\.0/iu);
+  assert.match(text, /KyaniteLabs\/DialectOS@v0\.3\.1/iu);
 });
 
 test('public install docs point users to release tarballs before source checkout', () => {
@@ -48,7 +48,7 @@ test('public install docs point users to release tarballs before source checkout
 
   assert.doesNotMatch(contents['README.md'], /Setup requires cloning the repo and building from source/iu);
   assert.match(contents['README.md'], /GitHub Release tarballs/iu);
-  assert.match(contents['README.md'], /dialectos-mcp-0\.3\.0\.tgz/iu);
+  assert.match(contents['README.md'], /dialectos-mcp-0\.3\.1\.tgz/iu);
   assert.match(rootLlms, /GitHub Release tarballs/iu);
   assert.match(docsLlms, /GitHub Release tarballs/iu);
 });

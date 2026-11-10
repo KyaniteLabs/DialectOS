@@ -7,9 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.1] - Unreleased (staged; no tag or artifact yet)
+### Added
+
+- **pnpm install legs in the release smoke gate (2026-11-01):** `scripts/tarball-install-smoke.mjs` now also gates the install commands the README documents — `pnpm add -g <cli.tgz>` and `pnpm dlx <mcp.tgz>` — against the same locally packed tarballs the npm legs use (file paths only, no GitHub release URL fetches). pnpm runs at the repo-pinned `pnpm@11.1.1`, resolved from the root `packageManager` field: a PATH pnpm is used only when it reports exactly the pin, otherwise the pin is bootstrapped via `npm install -g pnpm@<pin>`, and a resolved binary that is not exactly the pin fails the gate (unpinned "latest" is not acceptable — 11.12.0 is a deprecated, known-broken release for both paths). Each pnpm leg runs in a pristine sandbox with the sandbox global bin dir (`PNPM_HOME/bin`) prepended to `PATH` (otherwise pnpm exits `ERR_PNPM_GLOBAL_BIN_DIR_NOT_IN_PATH`) and pnpm's global/store/cache/state/data dirs pinned inside the sandbox so constrained CI hosts are covered. Receipts: `dialectos --version` prints the tarball manifest's own version; `validate --dialect xx-XX` exits non-zero naming the dialect and pointing at `dialectos dialects list`; `validate --dialect es-MX` passes; `pnpm dlx` answers a JSON-RPC `initialize` with `serverInfo` `@dialectos/mcp` at the tarball version. The existing npm offline legs are unchanged; the gate fails when any documented leg fails.
 
 ### Fixed
+
+- **Release tarballs runtime-broken on clean machines (2026-10-27 defect):** `npm install -g dialectos-cli-0.3.1.tgz` exited 0 but every CLI invocation crashed with `ERR_MODULE_NOT_FOUND: isomorphic-dompurify` — npm silently skips installing any dependency that is also declared by a `bundleDependencies` package ("deps of bundled deps" are assumed present), so the previous hoist-only strategy left `isomorphic-dompurify`, `zod`, `marked` and the whole `jsdom` tree as empty directories. `scripts/pack-release-tarballs.mjs` now vendors the full transitive closure (resolved by a real `npm install`) into the tarball and verifies every bundled/nested package is present in the packed artifact; the release tarballs now install fully offline. New `scripts/tarball-install-smoke.mjs` gates releases on the defect bar: pristine-prefix offline install → `--version` prints → unknown dialect fails closed with an actionable error → known dialect passes. The v0.3.1 GitHub release assets were rebuilt and SHA256SUMS.txt replaced accordingly.
+
+### docs: dated licence-history note (wording only; terms unchanged)
+
+- Added [LICENSING.md](LICENSING.md) recording the MIT → BSL-1.1 → Apache-2.0 sequence with dates, stating that GitHub release `v0.2.0` (2026-04-27) shipped BSL-1.1, and that an MIT → BSL → Apache sequence does not automatically reach previously published MIT-licensed copies. No licence file or grant was changed. Deprecating the v0.2.0 source archives remains a CEO-gated release act and was not performed.
+
+## [0.3.1] - 2026-10-27
+
+### Fixed
+
+Operator-path ship blockers from the 2026-10-26 portfolio audit (L1#1, L1#5, L1#6, L2#19–22):
+
+- **Install path:** GitHub Release CLI/MCP tarballs now bundle the five unpublished `@dialectos/{types,security,locale-utils,markdown-parser,providers}` packages (`bundleDependencies` + hoisted public npm deps). `pnpm add -g <cli.tgz>` / `pnpm dlx <mcp.tgz>` no longer 404 on the registry. Packer: `scripts/pack-release-tarballs.mjs`. npm publishing remains CEO-gated and is not claimed.
+- **Dialect gate:** `dialectos validate --dialect xx-XX` now exits non-zero with an actionable error that names the unknown dialect and points at `dialectos dialects list`. Unknown codes are no longer silently scored as PASS.
+- **CLI surface:** `validate` accepts `--translated <text>` in addition to the positional argument, matching the README example.
+- **One version story:** `server.json` is 0.3.1 and points at the GitHub tarball URL (no unpublished `@kyanitelabs/dialectos` npm identifier). README, CHANGELOG, llms.txt, package.json, and CLI `--version` agree on 0.3.1.
 
 Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026-09-19 — `REFUTE 4/10`):
 
@@ -229,6 +248,7 @@ Fixes for the four adversarial break-protocol findings (CGO adversary lane, 2026
 - Structured JSON error handling
 - Graceful shutdown on SIGINT/SIGTERM
 
+[0.3.1]: https://github.com/KyaniteLabs/DialectOS/releases/tag/v0.3.1
 [0.3.0]: https://github.com/KyaniteLabs/DialectOS/releases/tag/v0.3.0
 [0.2.0]: https://github.com/KyaniteLabs/DialectOS/releases/tag/v0.2.0
 [0.1.0]: https://github.com/KyaniteLabs/DialectOS/releases/tag/v0.1.0

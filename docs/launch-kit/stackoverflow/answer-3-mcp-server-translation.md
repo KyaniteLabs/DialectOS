@@ -19,7 +19,7 @@ If you're using Claude Desktop, Cursor, or any MCP client and want **native tran
       "command": "pnpm",
       "args": [
         "dlx",
-        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-mcp-0.3.0.tgz"
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
       ],
       "env": {
         "LLM_API_URL": "https://api.openai.com/v1/chat/completions",

@@ -98,7 +98,7 @@ Spanish is not one language — it's **25 regional variants** with different voc
 
 ## 🚀 Quick Start
 
-> **Install note:** DialectOS v0.3.0 is distributed through GitHub Release tarballs, not the npm registry. Use the released MCP/CLI tarballs for agent and command-line installs; clone the repo only for local development or the browser demo.
+> **Install note:** DialectOS v0.3.1 is distributed as GitHub Release tarballs. `GET https://registry.npmjs.org/@kyanitelabs/dialectos` and `GET https://registry.npmjs.org/dialectos` both return **404** — there is no npm package. The CLI and MCP tarballs bundle the unpublished `@dialectos/*` workspace packages, so a single `pnpm add -g` / `pnpm dlx` of the tarball URL works. Clone the repo only for local development or the browser demo.
 
 ### MCP setup
 
@@ -111,7 +111,7 @@ Add the released MCP server to Claude Desktop, Cursor, or any MCP client:
       "command": "pnpm",
       "args": [
         "dlx",
-        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-mcp-0.3.0.tgz"
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
       ],
       "env": {
         "LLM_API_URL": "https://your-llm-gateway/v1/chat/completions",
@@ -207,8 +207,8 @@ pnpm dialect:report -- --input=audits/release-candidate-2026-04-22/model-matrix.
 ### CLI install
 
 ```bash
-# Install the v0.3.0 CLI tarball from the GitHub Release
-pnpm add -g https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.0/dialectos-cli-0.3.0.tgz
+# Install the v0.3.1 CLI tarball from the GitHub Release
+pnpm add -g https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-cli-0.3.1.tgz
 
 # Or use a local source checkout
 pnpm install --frozen-lockfile
@@ -420,7 +420,7 @@ Yes. DialectOS is an MCP server, so Claude Desktop, Cursor, Windsurf, and other 
 clients can use its 17 translation tools natively.
 
 **Is DialectOS free?**
-Yes. DialectOS v0.3.0 is released under Apache-2.0. See [LICENSE](LICENSE) for details.
+Yes. DialectOS v0.3.1 is released under Apache-2.0. See [LICENSE](LICENSE) for details.
 
 **What is MCP?**
 Model Context Protocol is an open standard that lets AI assistants use external tools.
@@ -446,7 +446,7 @@ Add this badge to your project if you use DialectOS for translation:
 Validate Spanish translations in CI on every pull request:
 
 ```yaml
-- uses: KyaniteLabs/DialectOS@v0.3.0
+- uses: KyaniteLabs/DialectOS@v0.3.1
   with:
     dialect: es-MX
     source-dir: locales/en
@@ -461,7 +461,7 @@ strategy:
   matrix:
     dialect: [es-ES, es-MX, es-AR, es-CO]
 steps:
-  - uses: KyaniteLabs/DialectOS@v0.3.0
+  - uses: KyaniteLabs/DialectOS@v0.3.1
     with:
       dialect: ${{ matrix.dialect }}
       fail-on-blocking: true
@@ -496,7 +496,7 @@ See [`ROADMAP.md`](ROADMAP.md) for upcoming features including:
 
 ## 📄 License
 
-Apache-2.0 — see [`LICENSE`](LICENSE) for details.
+Apache-2.0 — see [`LICENSE`](LICENSE) for details. Dated relicensing history of published releases: [`LICENSING.md`](LICENSING.md).
 
 ---
 
