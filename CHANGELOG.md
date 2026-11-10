@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Circuit breaker double-counting and stolen half-open probe (2026-11-10):** when a provider owns its circuit breaker (DeepL, LLM, LibreTranslate, MyMemory), `ProviderRegistry` shared it but still claimed the half-open probe in `isAvailable()`/`getAuto()` and recorded every outcome a second time. A recovered backend could never close the circuit through `translateWithFallback` (the provider's own `canExecute()` was refused and the refusal re-opened it), and N failures counted as 2N. The registry now only peeks (`CircuitBreaker.wouldAllow()`) and does not re-record for provider-owned breakers; `CachedProvider` forwards `getCircuitBreaker()` so caching no longer creates a second, desynchronized breaker.
+- **`TranslationMemory.set()` resolved before its entry was on disk** when another write was in flight. A coalesced `set()` now resolves after the persist pass that includes it.
+
+### Changed
+
+- Circuit breaker and translation-memory persist lifecycles are now explicit state machines (`CIRCUIT_STATES`/`CIRCUIT_TRANSITIONS`, `PERSIST_STATES`/`PERSIST_TRANSITIONS`) with a single guarded transition function each; bulk checkpoints are built by one `buildBulkCheckpoint()` (on-disk v2 format unchanged).
+
 ### Added
 
 - **pnpm install legs in the release smoke gate (2026-11-01):** `scripts/tarball-install-smoke.mjs` now also gates the install commands the README documents — `pnpm add -g <cli.tgz>` and `pnpm dlx <mcp.tgz>` — against the same locally packed tarballs the npm legs use (file paths only, no GitHub release URL fetches). pnpm runs at the repo-pinned `pnpm@11.1.1`, resolved from the root `packageManager` field: a PATH pnpm is used only when it reports exactly the pin, otherwise the pin is bootstrapped via `npm install -g pnpm@<pin>`, and a resolved binary that is not exactly the pin fails the gate (unpinned "latest" is not acceptable — 11.12.0 is a deprecated, known-broken release for both paths). Each pnpm leg runs in a pristine sandbox with the sandbox global bin dir (`PNPM_HOME/bin`) prepended to `PATH` (otherwise pnpm exits `ERR_PNPM_GLOBAL_BIN_DIR_NOT_IN_PATH`) and pnpm's global/store/cache/state/data dirs pinned inside the sandbox so constrained CI hosts are covered. Receipts: `dialectos --version` prints the tarball manifest's own version; `validate --dialect xx-XX` exits non-zero naming the dialect and pointing at `dialectos dialects list`; `validate --dialect es-MX` passes; `pnpm dlx` answers a JSON-RPC `initialize` with `serverInfo` `@dialectos/mcp` at the tarball version. The existing npm offline legs are unchanged; the gate fails when any documented leg fails.

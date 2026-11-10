@@ -33,6 +33,32 @@ const DEFAULT_RETRY_DELAY_MS = 1000;
 const DEFAULT_CHECKPOINT_INTERVAL = 50;
 const CHECKPOINT_VERSION = 2;
 
+/**
+ * Build the persisted checkpoint from the per-item terminal states
+ * (each item is pending → succeeded | failed exactly once).
+ *
+ * Single place that serializes a checkpoint: the periodic and final saves
+ * used to build it from two copy-pasted literals. Field names and values are
+ * unchanged (v2 on disk). `completedIds` is redundant with `completedResults`
+ * and is not read back by the engine; it is still written for byte-compatibility
+ * with existing checkpoint files and external readers.
+ */
+export function buildBulkCheckpoint(
+  successes: readonly BulkTranslationSuccess[],
+  failures: readonly BulkTranslationFailure[],
+  totalItems: number,
+  now: Date = new Date()
+): BulkCheckpoint {
+  return {
+    version: CHECKPOINT_VERSION,
+    createdAt: now.toISOString(),
+    completedIds: successes.map((s) => s.item.id),
+    completedResults: successes.map((s) => ({ id: s.item.id, result: s.result })),
+    failedItems: [...failures],
+    totalItems,
+  };
+}
+
 /** Result of processing a single deduplicated group of items. */
 interface ProcessedGroup {
   successes: BulkTranslationSuccess[];
@@ -193,14 +219,10 @@ export class BulkTranslationEngine {
       ) {
         await Promise.all([...inFlight]);
         inFlight.length = 0;
-        const ok = await this.saveCheckpoint(this.checkpointPath, {
-          version: CHECKPOINT_VERSION,
-          createdAt: new Date().toISOString(),
-          completedIds: successes.map((s) => s.item.id),
-          completedResults: successes.map((s) => ({ id: s.item.id, result: s.result })),
-          failedItems: failures,
-          totalItems: items.length,
-        });
+        const ok = await this.saveCheckpoint(
+          this.checkpointPath,
+          buildBulkCheckpoint(successes, failures, items.length)
+        );
         if (!ok) {
           checkpointWarnings.push(`Failed to save checkpoint to ${this.checkpointPath}`);
         }
@@ -214,14 +236,10 @@ export class BulkTranslationEngine {
 
     // Final checkpoint
     if (this.checkpointPath) {
-      const ok = await this.saveCheckpoint(this.checkpointPath, {
-        version: CHECKPOINT_VERSION,
-        createdAt: new Date().toISOString(),
-        completedIds: successes.map((s) => s.item.id),
-        completedResults: successes.map((s) => ({ id: s.item.id, result: s.result })),
-        failedItems: failures,
-        totalItems: items.length,
-      });
+      const ok = await this.saveCheckpoint(
+        this.checkpointPath,
+        buildBulkCheckpoint(successes, failures, items.length)
+      );
       if (!ok) {
         checkpointWarnings.push(`Failed to save checkpoint to ${this.checkpointPath}`);
       }

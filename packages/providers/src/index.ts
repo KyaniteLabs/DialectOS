@@ -11,13 +11,27 @@ export * from "./types.js";
 export { applyCase, spanishPluralize } from "./morphology.js";
 
 // Circuit breaker and retry
-export { CircuitBreaker } from "./circuit-breaker.js";
+export {
+  CircuitBreaker,
+  CIRCUIT_STATES,
+  CIRCUIT_TRANSITIONS,
+  IllegalCircuitTransitionError,
+  isCircuitState,
+  isLegalCircuitTransition,
+} from "./circuit-breaker.js";
+export type { CircuitState, CircuitBreakerSnapshot } from "./circuit-breaker.js";
 export { RetryPolicy } from "./retry.js";
 export { ProviderRegistry } from "./registry.js";
+export type { BreakerOwner } from "./registry.js";
 
 // Translation memory and caching
-export { TranslationMemory } from "./translation-memory.js";
-export type { CachedTranslation, TranslationMemoryOptions } from "./translation-memory.js";
+export {
+  TranslationMemory,
+  PERSIST_STATES,
+  PERSIST_TRANSITIONS,
+  IllegalPersistTransitionError,
+} from "./translation-memory.js";
+export type { CachedTranslation, TranslationMemoryOptions, PersistState } from "./translation-memory.js";
 export { CachedProvider } from "./cached-provider.js";
 
 // Providers
