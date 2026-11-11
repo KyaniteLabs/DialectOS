@@ -16,6 +16,9 @@ def bridge(monkeypatch):
     events.broadcast_plugin_event = lambda *args: calls.append(args)
     monkeypatch.setitem(sys.modules, "hermes_cli", hermes)
     monkeypatch.setitem(sys.modules, "hermes_cli.plugin_events", events)
+    # Broadcasts only run where a TUI gateway (and so a Desktop listener) is loaded.
+    monkeypatch.setitem(sys.modules, "tui_gateway", ModuleType("tui_gateway"))
+    monkeypatch.setitem(sys.modules, "tui_gateway.server", ModuleType("tui_gateway.server"))
     return events, calls
 
 
@@ -144,3 +147,17 @@ def test_show_uses_real_hermes_v023_event_bridge(plugin, monkeypatch):
     out = plugin._tool_show({'view': 'by_dialect', 'item_id': 'es-AR'})
     assert json.loads(out)['ok'] is True
     assert frames == [('plugin.dialectos.view.set', {'view': 'by_dialect', 'item_id': 'es-AR'})]
+
+
+@pytest.mark.skipif(not os.environ.get('HERMES023_PATH'), reason='set HERMES023_PATH to real Hermes source')
+def test_tool_calls_outside_the_tui_keep_stdout_on_stdout(plugin, monkeypatch):
+    """Roast r4 X-R4-1: importing the real bridge loads tui_gateway.server, which swaps
+    sys.stdout to stderr, so "hermes chat -q" answers would leave on stderr."""
+    monkeypatch.syspath_prepend(os.environ['HERMES023_PATH'])
+    for name in ('hermes_cli', 'hermes_cli.plugin_events', 'tui_gateway', 'tui_gateway.server'):
+        monkeypatch.delitem(sys.modules, name, raising=False)
+    stdout, excepthook = sys.stdout, sys.excepthook
+    plugin._on_post_tool('dialectos_detect', {}, {'ok': True})
+    assert json.loads(plugin._tool_show({'view': 'check'}))['ok'] is True
+    assert 'tui_gateway.server' not in sys.modules
+    assert sys.stdout is stdout and sys.excepthook is excepthook

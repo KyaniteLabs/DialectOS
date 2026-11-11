@@ -6,7 +6,6 @@ import hashlib
 import io
 import json
 import shutil
-import sys
 import tarfile
 import threading
 import urllib.error
@@ -251,6 +250,13 @@ def test_guards_block_changed_decimal_magnitude_and_sign(plugin, passing_cli, so
     ("Enter code 0042.", "Ingresa el código 42."),
     ("Meet at 4 pm.", "Nos vemos a las 4 de la mañana."),
     ("Meet at 9 pm.", "Nos vemos a las 9 de la tarde y 9 de la noche."),
+    # "un/una" must not hide a dose the translation added (roast r4).
+    ("Take 1 tablet with water.", "Tome 2 comprimidos con un vaso de agua."),
+    ("Take 1 tablet.", "Tome 3 comprimidos una vez."),
+    ("Wait 4 hours.", "Espera 4 horas, o 6 horas."),
+    ("100 days", "ciento veinte días"),
+    ("The rate is 1.125 euros.", "La tarifa es 1125 euros."),
+    ("The rate is 1.125 euros.", "La tarifa es 1.125,00 euros."),
 ])
 def test_adversarial_numbers_and_times_are_not_lost(plugin, passing_cli, source, translated):
     data = _verdict(plugin, translated, source)
@@ -270,6 +276,30 @@ def test_adversarial_numbers_and_times_are_not_lost(plugin, passing_cli, source,
     ("Dinner at 9:30 pm.", "Cena a las 9:30 de la noche."),
     ("The shift ends at 12 am.", "El turno termina a las 12 de la noche."),
     ("Leave at 6 am.", "Sal a las 6 de la mañana."),
+    # Durations are numbers, not clock times (roast r4).
+    ("Take 1-2 tablets every 4-6 hours.", "Tome 1-2 comprimidos cada 4-6 horas."),
+    ("Wait 2 hours.", "Espera 2 horas."),
+    ("It takes 10 hours.", "Tarda 10 h."),
+    ("It lasts 1 hour.", "Dura 1 hora."),
+    ("The store opens at 14:00.", "La tienda abre a las 14 h."),
+    ("The store opens at 14:00.", "La tienda abre 14 h."),
+    ("Dose: 0.500 mg.", "Dosis: 0,5 mg."),
+    ("Take three tablets.", "Tome 3 comprimidos."),
+    ("Rated 100 percent.", "Calificado ciento por ciento."),
+    ("Total is 1.5 euros.", "El total es 1,50 euros."),
+    ("The rate is 1.125 euros.", "La tarifa es 1,125 euros."),
+    ("There are 1,125 pages.", "Hay 1.125 páginas."),
+    ("There are 1,125 pages.", "Hay 1125 páginas."),
+    ("Upgrade to version 2.10.", "Actualiza a la versión 2.10."),
+    # Roast r4 (Fable): durations, English day periods and leading zeros.
+    ("The trip takes 3 hours.", "El viaje dura 3 horas."),
+    ("Take one tablet every 6 hours.", "Tome un comprimido cada 6 horas."),
+    ("Support replies within 12 hours.", "El soporte responde en 12 horas."),
+    ("It lasts 1.5 hours.", "Dura 1,5 horas."),
+    ("I worked 5 hours at 3 pm.", "Trabajé 5 horas a las 15:00."),
+    ("Come at 8 in the morning.", "Ven a las 8 de la mañana."),
+    ("Call at 9 at night.", "Llama a las 21:00."),
+    ("Meeting on 05/03/2026.", "Reunión el 5/3/2026."),
 ])
 def test_equivalent_signed_and_spelled_numbers_pass(plugin, passing_cli, source, translated):
     data = _verdict(plugin, translated, source)

@@ -32,6 +32,7 @@ import shlex
 import shutil
 import signal
 import subprocess
+import sys
 import tarfile
 import tempfile
 import urllib.request
@@ -39,7 +40,7 @@ import threading
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -265,6 +266,11 @@ def _broadcast_pane_event(event: str, payload: Dict[str, Any]) -> None:
             raise ValueError("ledger count is out of range")
     else:
         raise ValueError("unknown Desktop event or invalid payload")
+    # The bridge imports tui_gateway.server, which swaps sys.stdout to stderr process-wide.
+    # Without a loaded TUI gateway there is no Desktop listener here, so skip the import and
+    # keep "hermes chat -q" answers and stream-json output on stdout.
+    if "tui_gateway.server" not in sys.modules:
+        return
     try:
         from hermes_cli.plugin_events import broadcast_plugin_event
     except ImportError:
@@ -688,8 +694,16 @@ _URL_RE = re.compile(r"https?://\S+")
 _NUM_RE = re.compile(r"(?<![\w.,])[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?![\w])")
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 _TIME_12H_RE = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?m\.?(?!\w)", re.I)
-_TIME_24H_RE = re.compile(r"(?<!\d)([01]?\d|2[0-3])(?::([0-5]\d)|\s*h(?:oras?)?)(?!\w)", re.I)
+_TIME_24H_RE = re.compile(r"(?<!\d)([01]?\d|2[0-3])[:h]([0-5]\d)(?!\w)", re.I)
+# "17 h" and "las 17 horas" are clock times, but "cada 4-6 horas" is a duration. A bare
+# hour counts as a time only after "la/las" or when the source has that same clock time.
+_TIME_ES_HOUR_RE = re.compile(
+    r"(?<![\w\d])(?:(?P<art>las?)\s+)?(?P<h>[01]?\d|2[0-3])\s*h(?:oras?)?(?!\w)", re.I)
 # Spanish day periods: "4 de la tarde" is 16:00, "12 de la noche" is midnight.
+# English day periods: "8 in the morning" is 08:00, "3 in the afternoon" is 15:00.
+_TIME_EN_PERIOD_RE = re.compile(
+    r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s+(?:o'clock\s+)?(?:in\s+the\s+(morning|afternoon|evening)|at\s+(night))(?!\w)",
+    re.I)
 _TIME_ES_PERIOD_RE = re.compile(
     r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s+(?:de\s+la\s+(mañana|madrugada|tarde|noche)|del\s+(mediod[ií]a))(?!\w)",
     re.I)
@@ -732,7 +746,31 @@ _ES_SPELLED = {
     "60": ("sesenta",), "70": ("setenta",), "80": ("ochenta",), "90": ("noventa",),
     "100": ("cien", "ciento"), "1000": ("mil",),
 }
+# English number words in the source, so "three tablets" -> "3 comprimidos" is not a new number.
+_EN_SPELLED = {
+    str(i): (w,) for i, w in enumerate(
+        "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen "
+        "fifteen sixteen seventeen eighteen nineteen twenty".split())
+}
+_EN_SPELLED.update({"30": ("thirty",), "40": ("forty",), "50": ("fifty",), "60": ("sixty",),
+                    "70": ("seventy",), "80": ("eighty",), "90": ("ninety",), "12": ("twelve", "dozen"),
+                    "100": ("hundred",), "1000": ("thousand",)})
+_ES_NUMBER_WORDS = frozenset(w for forms in _ES_SPELLED.values() for f in forms for w in f.split()) | {"mil"}
 _MIN_WORDS_FOR_LANG = 6
+
+
+def _spelled_alone(form: str, normalized: str) -> bool:
+    """True when the spelled number appears as a whole number, not the start of a larger one.
+
+    "ciento veinte" is 120, so "ciento" only counts as 100 when no number word follows it."""
+    padded = " " + re.sub(r"[^\w]+", " ", form.casefold()).strip() + " "
+    start = normalized.find(padded)
+    while start != -1:
+        rest = normalized[start + len(padded):].split(" ", 1)[0]
+        if rest not in _ES_NUMBER_WORDS - {"y"} or form.casefold() != "ciento":
+            return True
+        start = normalized.find(padded, start + 1)
+    return False
 _MIN_CHARS_FOR_LENGTH = 80
 _SHORT_RATIO = 0.5
 
@@ -741,32 +779,57 @@ def _prose(text: str) -> str:
     return _INLINE_CODE_RE.sub(" ", _FENCE_RE.sub(" ", text))
 
 
-def _numbers(text: str) -> List[str]:
-    """Digits of each number, ignoring thousands/decimal separator style (1,000.5 == 1.000,5)."""
+_VERSION_CUE_RE = re.compile(r"(?:\bv|\bversi[oó]n|\brelease|\bbuild|\brev)\.?\s*$", re.I)
+
+
+def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
+    """Each number as (text, readings), ignoring separator style (1,000.5 == 1.000,5).
+
+    "1.125" is a decimal in English and 1125 in Spain, so a translated "1.125" or "1,125"
+    keeps both readings. The source is read the English way ("." decimal, "," grouping), so
+    "1.125 euros" -> "1125 euros" no longer passes. Insignificant fraction zeros are dropped
+    (1.5 == 1,50) except after a version cue, where 2.10 never matches 2.1."""
     numbers = []
-    for match in _NUM_RE.finditer(_URL_RE.sub(" ", text)):
+    scrubbed = _URL_RE.sub(" ", text)
+    for match in _NUM_RE.finditer(scrubbed):
         raw = match.group(0).replace(" ", "").replace(" ", "").replace(" ", "")
         sign = "-" if raw.startswith(("-", "−")) else ""
         raw = raw.lstrip("+-−")
-        separators = [i for i, char in enumerate(raw) if char in ",."]
-        if "," in raw and "." in raw:
-            decimal_at = max(i for i, char in enumerate(raw) if char in ",.")
-        elif len(separators) == 1:
-            right_digits = len(raw) - separators[0] - 1
-            decimal_at = separators[0] if right_digits != 3 or raw[:separators[0]] == "0" else None
-        else:
-            decimal_at = None
-        if decimal_at is None:
-            integer, fraction = re.sub(r"[,.]", "", raw), ""
-        else:
+        is_version = bool(_VERSION_CUE_RE.search(scrubbed[:match.start()]))
+
+        def value(decimal_at):
+            if decimal_at is None:
+                digits = re.sub(r"[,.]", "", raw)
+                # A two-digit day or month ("05/03") equals "5/3"; a code like 0042 stays 0042.
+                return sign + (digits[1:] if len(digits) == 2 and digits[0] == "0" else digits)
             integer = re.sub(r"[,.]", "", raw[:decimal_at])
             fraction = raw[decimal_at + 1:]
-        numbers.append(sign + integer + ("." + fraction if fraction else ""))
+            if not is_version:
+                fraction = fraction.rstrip("0")
+            return sign + integer + ("." + fraction if fraction else "")
+
+        separators = [i for i, char in enumerate(raw) if char in ",."]
+        if "," in raw and "." in raw:
+            readings = {value(max(separators))}
+        elif len(separators) == 1:
+            at = separators[0]
+            if len(raw) - at - 1 != 3 or raw[:at] == "0":
+                readings = {value(at)}
+            elif source:
+                readings = {value(at if raw[at] == "." else None)}
+            else:
+                readings = {value(at), value(None)}
+        else:
+            readings = {value(None)}
+        numbers.append((match.group(0).strip(), frozenset(readings)))
     return numbers
 
 
-def _time_matches(text: str):
-    """Return explicit 12-hour and 24-hour times as (canonical minutes, span)."""
+def _time_matches(text: str, source_minutes=()):
+    """Return explicit 12-hour and 24-hour times as (canonical minutes, span).
+
+    source_minutes lists the source's clock times; a bare "N h" in the translation is a time
+    only when it renders one of them (otherwise it is a duration and stays a number)."""
     matches = []
     occupied = []
     for match in _TIME_12H_RE.finditer(text):
@@ -785,18 +848,38 @@ def _time_matches(text: str):
         minute = int(match.group(2) or "0")
         matches.append((hour * 60 + minute, match.span()))
         occupied.append(match.span())
+    for match in _TIME_EN_PERIOD_RE.finditer(text):
+        hour = int(match.group(1)) % 12
+        period = (match.group(3) or match.group(4)).lower()
+        if period in ("afternoon", "evening") or (period == "night" and hour > 4):
+            hour += 12
+        matches.append((hour * 60 + int(match.group(2) or "0"), match.span()))
+        occupied.append(match.span())
     for match in _TIME_24H_RE.finditer(text):
         span = match.span()
         if any(span[0] < end and start < span[1] for start, end in occupied):
             continue
         matches.append((int(match.group(1)) * 60 + int(match.group(2) or "0"), span))
+        occupied.append(span)
+    unclaimed = list(source_minutes)
+    for minute, _ in matches:
+        if minute in unclaimed:
+            unclaimed.remove(minute)
+    for match in _TIME_ES_HOUR_RE.finditer(text):
+        span = match.span("h")[0], match.end()
+        if any(span[0] < end and start < span[1] for start, end in occupied):
+            continue
+        minute = int(match.group("h")) * 60
+        if match.group("art"):
+            matches.append((minute, span))
+        elif minute in unclaimed:
+            unclaimed.remove(minute)
+            matches.append((minute, span))
     return matches
 
 
-def _without_times(source: str, translated: str):
+def _without_times(source: str, translated: str, src_times, dst_times):
     """Remove explicit times so the caller can compare their canonical values."""
-    src_times = _time_matches(source)
-    dst_times = _time_matches(translated)
 
     def strip(text, times):
         chars = list(text)
@@ -820,31 +903,55 @@ def _language_guess(text: str) -> Optional[str]:
 def _guard_issues(source: str, translated: str) -> List[str]:
     src, dst = _prose(source), _prose(translated)
     issues: List[str] = []
-    src_times = sorted(minute for minute, _ in _time_matches(src))
-    dst_times = sorted(minute for minute, _ in _time_matches(dst))
+    src_matches = _time_matches(src)
+    dst_matches = _time_matches(dst, [minute for minute, _ in src_matches])
+    src_times = sorted(minute for minute, _ in src_matches)
+    dst_times = sorted(minute for minute, _ in dst_matches)
     if src_times != dst_times and (src_times or dst_times):
         issues.append("Times from the source are missing or changed.")
-    src_numbers, dst_numbers = _without_times(src, dst)
-    missing = list(_numbers(src_numbers))
-    for n in _numbers(dst_numbers):
-        if n in missing:
-            missing.remove(n)
+    src_numbers, dst_numbers = _without_times(src, dst, src_matches, dst_matches)
+    missing = list(_numbers(src_numbers, source=True))
+    extra = []
+    for label, readings in _numbers(dst_numbers):
+        hit = next((m for m in missing if m[1] == readings), None) or \
+            next((m for m in missing if m[1] & readings), None)
+        if hit is not None:
+            missing.remove(hit)
+        else:
+            extra.append((label, readings))
     for cold in re.finditer(r"(?<!\w)(\d+(?:[.,]\d+)?)\s*(?:grados?|°)\s+bajo\s+cero\b", dst, re.I):
-        for magnitude in _numbers(cold.group(1)):
-            signed = "-" + magnitude
-            if signed in missing:
-                missing.remove(signed)
+        for label, magnitude in _numbers(cold.group(1)):
+            signed = frozenset("-" + v for v in magnitude)
+            src_hit = next((m for m in missing if m[1] & signed), None)
+            dst_hit = next((e for e in extra if e[1] == magnitude), None)
+            if src_hit is not None and dst_hit is not None:
+                missing.remove(src_hit)
+                extra.remove(dst_hit)
+    if extra:
+        # A digit the source spelled out ("three tablets" -> "3 comprimidos") is not new.
+        normalized_src = " " + re.sub(r"[^\w]+", " ", src.casefold()) + " "
+        for item in list(extra):
+            forms = [f for v in sorted(item[1]) for f in _EN_SPELLED.get(v, ()) + _ES_SPELLED.get(v, ())]
+            form = next((f for f in forms if _spelled_alone(f, normalized_src)), None)
+            if form is not None:
+                extra.remove(item)
+                padded = " " + re.sub(r"[^\w]+", " ", form.casefold()).strip() + " "
+                normalized_src = normalized_src.replace(padded, " ", 1)
     if missing:
         normalized_dst = " " + re.sub(r"[^\w]+", " ", dst.casefold()) + " "
-        for n in list(missing):
-            spelled = next((form for form in _ES_SPELLED.get(n, ())
-                            if " " + re.sub(r"[^\w]+", " ", form.casefold()).strip() + " " in normalized_dst), None)
+        for item in list(missing):
+            forms = [f for v in sorted(item[1]) for f in _ES_SPELLED.get(v, ())]
+            spelled = next((form for form in forms if _spelled_alone(form, normalized_dst)), None)
             if spelled is not None:
-                missing.remove(n)
+                missing.remove(item)
                 normalized_form = " " + re.sub(r"[^\w]+", " ", spelled.casefold()).strip() + " "
                 normalized_dst = normalized_dst.replace(normalized_form, " ", 1)
     if missing:
-        issues.append("Numbers from the source are missing or changed: " + ", ".join(sorted(set(missing))[:8]))
+        labels = sorted({label for label, _ in missing})
+        issues.append("Numbers from the source are missing or changed: " + ", ".join(labels[:8]))
+    if extra:
+        labels = sorted({label for label, _ in extra})
+        issues.append("Numbers in the translation are not in the source: " + ", ".join(labels[:8]))
     lang = _language_guess(dst)
     if lang:
         issues.append(f"Translation reads as {lang}, not Spanish.")

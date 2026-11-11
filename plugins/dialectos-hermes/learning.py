@@ -296,7 +296,8 @@ class LearningStore:
                            alternates.get(variant, []) if isinstance(alternates, dict) else alternates):
                 if isinstance(source, list):
                     accepted.extend(t for t in source if isinstance(t, str) and t.strip())
-        return {_normalize(form) for term in accepted for form in term.split('/')}
+        # A slash term ("guapo/guapa") is shown whole, so accept it whole as well as either half.
+        return {_normalize(form) for term in accepted for form in [term, *term.split('/')]}
 
     def answer(self, concept, variant, answer):
         self.dictionary()

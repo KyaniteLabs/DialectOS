@@ -61,3 +61,15 @@ def test_direct_address_miss_shape_is_captured(plugin):
     store = make_store(plugin)
     store.capture({'addressForms': {'passed': False, 'expected': 'vos', 'found': 'tú'}}, 'es-AR')
     assert [c['concept'] for c in store.cards('es-AR')] == ['address_singular']
+
+
+def test_the_slash_term_the_card_shows_is_a_correct_answer(plugin):
+    """Roast r4 D-R4-5: "guapo/guapa" is shown whole, so typing it whole is right too."""
+    store = make_store(plugin)
+    entries = store.dictionary()
+    concept, variant, term = next((k, v, t['term']) for k, e in entries.items()
+                                  for v, t in e.get('variants', {}).items() if '/' in t['term'])
+    for answer in (term, term.split('/')[0], term.split('/')[1]):
+        assert store.answer(concept, variant, answer)['correct'] is True, answer
+        store.path.unlink()
+    assert store.answer(concept, variant, 'definitely wrong')['correct'] is False
