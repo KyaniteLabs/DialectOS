@@ -19,11 +19,21 @@ test('action.yml validate step references ci-validate.mjs via action_path', () =
   );
 });
 
-test('action.yml passes --cli-path pointing to action_path', () => {
+test('action.yml passes --cli-path pointing to the CLI binary, not the library entry', () => {
   assert.ok(
-    action.includes('--cli-path="${{ github.action_path }}/packages/cli/dist/index.js"'),
-    'validate step must pass --cli-path via action_path'
+    action.includes('--cli-path="$DIALECTOS_ACTION_PATH/packages/cli/dist/cli.js"'),
+    'validate step must pass --cli-path to packages/cli/dist/cli.js via action_path'
   );
+  assert.doesNotMatch(action, /dist\/index\.js/u, 'dist/index.js is the library entry; running it validates nothing');
+});
+
+test('action.yml never interpolates inputs directly into the run script', () => {
+  // A run step is `run:` plus every following line indented deeper than it (block or single-line form).
+  const runBlocks = [...action.matchAll(/^( *)run:(.*(?:\n\1 +.*)*)/gmu)].map((m) => m[2]);
+  assert.ok(runBlocks.length >= 2, `expected the build and validate run blocks, found ${runBlocks.length}`);
+  for (const block of runBlocks) {
+    assert.doesNotMatch(block, /\$\{\{\s*inputs\./u, 'pass inputs through env, not ${{ inputs.* }} in run');
+  }
 });
 
 test('action.yml references only existing scripts', () => {

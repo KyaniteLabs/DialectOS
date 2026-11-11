@@ -5,8 +5,8 @@
  * legitimate redirects (e.g. HTTP→HTTPS, path changes).
  *
  * Each redirect hop is validated against the original allow-list before
- * the request is sent. Sensitive headers are stripped on cross-origin
- * redirects to prevent credential leakage.
+ * the request is sent. On cross-origin redirects every header outside a
+ * small safe allowlist is dropped, so no credential header can leak.
  */
 
 export interface FetchWithRedirectsOptions {
@@ -18,20 +18,26 @@ export interface FetchWithRedirectsOptions {
   init?: RequestInit;
 }
 
-const SENSITIVE_HEADERS = new Set([
-  "authorization",
-  "cookie",
-  "proxy-authorization",
-  "www-authenticate",
+/**
+ * Headers allowed to cross an origin boundary on redirect. Everything else is
+ * dropped: auth comes in many spellings (authorization, x-api-key, api-key,
+ * x-goog-api-key, cookies, vendor tokens), so a blocklist always misses one.
+ */
+const CROSS_ORIGIN_SAFE_HEADERS = new Set([
+  "accept",
+  "accept-language",
+  "content-language",
+  "content-type",
+  "user-agent",
 ]);
 
-function stripSensitiveHeaders(init: RequestInit): RequestInit {
+export function stripSensitiveHeaders(init: RequestInit): RequestInit {
   if (!init.headers) return init;
-  const headers = new Headers(init.headers);
-  for (const name of SENSITIVE_HEADERS) {
-    headers.delete(name);
-  }
-  return { ...init, headers };
+  const kept = new Headers();
+  new Headers(init.headers).forEach((value, name) => {
+    if (CROSS_ORIGIN_SAFE_HEADERS.has(name.toLowerCase())) kept.set(name, value);
+  });
+  return { ...init, headers: kept };
 }
 
 function isSameOrigin(a: string, b: string): boolean {
@@ -49,7 +55,7 @@ function isSameOrigin(a: string, b: string): boolean {
  *
  * - Uses `redirect: "manual"` on the underlying fetch to stay in control.
  * - Validates every hop with the caller-supplied `validateUrl`.
- * - Strips sensitive headers on cross-origin redirects.
+ * - Drops all non-allowlisted headers on cross-origin redirects.
  * - Returns the final non-redirect Response.
  * - Throws on excessive redirects or validation failure.
  */
@@ -90,7 +96,7 @@ export async function fetchWithRedirects(
       // Resolve relative URLs against the current URL
       const nextUrl = new URL(location, currentUrl).href;
 
-      // Strip sensitive headers on cross-origin redirect
+      // Drop credentials (any non-allowlisted header) on cross-origin redirect
       if (!isSameOrigin(currentUrl, nextUrl)) {
         currentInit = stripSensitiveHeaders(currentInit);
       }

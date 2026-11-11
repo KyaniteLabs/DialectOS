@@ -33,7 +33,9 @@ jobs:
 |-------|----------|---------|-------------|
 | `dialect` | Yes | `es-ES` | Spanish dialect code (e.g., es-ES, es-MX, es-AR, es-CO) |
 | `source-dir` | No | `.` | Directory containing translation files |
-| `target-patterns` | No | `""` | Comma-separated glob patterns for translated files |
+| `target-patterns` | No | `""` | Comma-separated globs (`**`, `*`, `?`) for translated files. A pattern without `/` matches file names at any depth; one with `/` matches paths relative to `source-dir`. If explicit patterns match nothing, the Action fails |
+| `allow-empty` | No | `false` | Pass instead of failing when `target-patterns` match no files |
+| `locale-base` | No | `""` | Source-language locale JSON (e.g. `locales/en.json`). It supplies the source text for each key, so dropped placeholders are caught |
 | `glossary-file` | No | `""` | Path to JSON glossary for terminology checks |
 | `fail-on-blocking` | No | `true` | Fail on blocking issues vs. any issue |
 | `format` | No | `text` | Output format: text or json |
