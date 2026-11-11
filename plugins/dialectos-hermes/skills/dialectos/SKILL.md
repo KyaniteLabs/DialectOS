@@ -19,5 +19,5 @@ Use when the user wants Spanish for a specific audience (Mexico, Argentina, Spai
 ## Limits
 
 - Validate accepts translations up to 100000 chars and sources up to 8000 chars via private temporary `.md` files (cleaned after subprocess completion). The pinned v0.3.2 CLI judges code blocks against the source: they must stay byte-identical, including the info string. Do not change the pin silently. Formal/informal flags and hooks remain advisory, not a blocking expected-register contract; no live-provider proof is implied by offline QA.
-- Whole files, README/API-docs translation, i18n key diffing, glossaries and certification run via the DialectOS CLI directly (`dialectos translate-readme`, `dialectos i18n …`) — not exposed as Hermes tools in v0.1.0.
+- Whole files, README/API-docs translation, i18n key diffing, glossaries and certification run via the DialectOS CLI directly (`dialectos translate-readme`, `dialectos i18n …`) — not exposed as Hermes tools.
 - Never claim a translation is "certified" from this plugin alone.

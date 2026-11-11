@@ -99,7 +99,7 @@ function Verdict({ check }) {
   if (!check.ok && check.valid == null) return jsx('p', { className: 'dos-err', role: 'alert', children: `Check could not run: ${check.error || 'unknown error'}` })
   const blocking = (check.issues || []).filter(i => i.blocking)
   const v = check.valid === true && !blocking.length ? 'pass' : blocking.length ? 'block' : 'adv'
-  const label = v === 'pass' ? 'Passed the checks' : v === 'block' ? `${blocking.length} blocking issue${blocking.length === 1 ? '' : 's'}` : 'Did not pass'
+  const label = v === 'pass' ? 'Passed the form checks (meaning not checked)' : v === 'block' ? `${blocking.length} blocking issue${blocking.length === 1 ? '' : 's'}` : 'Did not pass'
   return jsxs('div', { style: { display: 'grid', gap: 8 }, children: [
     jsxs('div', { className: 'dos-row', children: [
       jsxs('span', { className: 'dos-verdict', 'data-v': v, children: [jsx('i', {}), label] }),
@@ -270,7 +270,7 @@ function DialectosPage({ ctx }) {
         fact('Provider', s ? (s.provider ? PROVIDER_NAMES[s.provider] : 'none · translate off') : '…', s && !s.provider),
         fact('Default', s?.default_dialect || '…'),
         fact('Chat hint', s ? (s.inject_on_spanish ? 'on' : 'off') : '…'),
-        s && !s.runner_found ? fact('Runner', 'Node/npx not found', true) : null
+        s && !s.runner_found ? fact('Runner', 'Node not found', true) : null
       ] })
     ] }),
     status.isError ? jsx(ErrorState, { title: 'DialectOS backend unavailable', description: 'Turn on the DialectOS plugin, then reopen this page.' }) : null,

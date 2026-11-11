@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **The Hermes plugin no longer downloads DialectOS on every call.** The old default ran `npx --package=<release URL>`, which fetched the 6 MB tarball on each call and failed after about 70 seconds without a network, so "detect, list and validate run offline" was not true. The plugin now downloads the v0.3.2 tarball once, refuses it unless it matches a pinned sha256, unpacks it under `plugin-data/dialectos/cli/` and runs it with `node`. A tarball placed in the data folder installs it without internet. A saved copy of the old `npx` default is read as the new default. The docs now say Node 22.13, which the CLI needs.
+- **`dialectos_validate` no longer passes French, changed numbers or a mostly missing translation.** The CLI passed all three. The plugin now blocks a translation that drops or changes a number from the source, reads as English, French, Portuguese or Italian, or is under half the source's length. The page says "Passed the form checks (meaning not checked)", because a reversed claim still passes.
+
 ### Changed
 
 - **Hermes plugin 0.2.1 runs the v0.3.2 CLI.** The plugin now downloads the v0.3.2 release tarball instead of v0.3.1, so translations that contain code blocks pass the check when the blocks match the source. Its README, tool descriptions and bundled skill drop the "fix not yet released" notes.

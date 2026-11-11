@@ -12,8 +12,12 @@ Child processes get a scrubbed env; cache, corpus and the QA ledger live under
 ctx.* APIs; runtime seams also include gateway.session_context and agent.secret_scope.
 Those imports are compatibility-sensitive, not a public-API-only guarantee.
 
+The CLI is the pinned v0.3.2 release tarball: downloaded once, checked against its
+sha256 and run with node from plugin-data/dialectos/cli/ (no npx, offline after that).
+
 Validate uses private bounded temporary .md files for structural QA. The pinned
-v0.3.2 CLI checks code fences against the source (fixed after v0.3.1).
+v0.3.2 CLI checks code fences against the source (fixed after v0.3.1). Plugin guards add
+number, language and length checks; none of the checks see meaning.
 Pass a real source for semantic QA; register controls remain advisory.
 """
 
@@ -23,10 +27,14 @@ import json
 import logging
 import os
 import re
+import hashlib
 import shlex
+import shutil
 import signal
 import subprocess
+import tarfile
 import tempfile
+import urllib.request
 import threading
 import time
 from contextlib import contextmanager
@@ -36,9 +44,20 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 PLUGIN_NAME = "dialectos"
-RELEASE_TGZ = "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-cli-0.3.2.tgz"
+RELEASE_VERSION = "0.3.2"
+RELEASE_NAME = f"dialectos-cli-{RELEASE_VERSION}.tgz"
+RELEASE_TGZ = f"https://github.com/KyaniteLabs/DialectOS/releases/download/v{RELEASE_VERSION}/{RELEASE_NAME}"
+# The release asset is mutable on GitHub; this pins the exact bytes the plugin will run.
+RELEASE_SHA256 = "34742940b5a06f5ef8581b5be657b3ce1c0f43d11de7621c210494c4d4de981b"
+RELEASE_MAX_BYTES = 32 * 1024 * 1024
+NODE_MIN = (22, 13)
+# What earlier versions saved as the default. It re-downloaded the tarball on every call,
+# so it is read as "use the verified local copy".
+LEGACY_NPX_COMMAND = f"npx -y --package={RELEASE_TGZ} dialectos"
 DEFAULTS: Dict[str, Any] = {
-    "dialectos_command": f"npx -y --package={RELEASE_TGZ} dialectos",
+    # Empty: download the pinned release once, check its sha256, unpack it under
+    # plugin-data and run it with node. Detect, list and validate then work offline.
+    "dialectos_command": "",
     "default_dialect": "es-MX",
     "provider": "",
     "inject_on_spanish": True,
@@ -282,7 +301,7 @@ def _descendants(pid: int) -> List[int]:
 
 
 def _kill_tree(proc: "subprocess.Popen[str]") -> None:
-    """Terminate the CLI and everything it spawned (npx -> CLI -> provider work)."""
+    """Terminate the CLI and everything it spawned (runner -> CLI -> provider work)."""
     if os.name == "nt":
         subprocess.run(["taskkill", "/PID", str(proc.pid), "/T", "/F"], capture_output=True)
         try:
@@ -321,8 +340,160 @@ def _kill_tree(proc: "subprocess.Popen[str]") -> None:
         pass
 
 
+# --- pinned CLI release -----------------------------------------------------
+
+class CliUnavailable(RuntimeError):
+    """The managed DialectOS CLI could not be found, fetched or verified."""
+
+
+_NODE_CHECKED: Dict[str, bool] = {}
+_INSTALL_LOCK = threading.Lock()
+
+
+def _managed() -> bool:
+    cmd = str(_cfg("dialectos_command") or "").strip()
+    return not cmd or cmd == LEGACY_NPX_COMMAND
+
+
+def _release_dir() -> Path:
+    return _data_dir() / "cli" / RELEASE_VERSION
+
+
+def _release_entry() -> Path:
+    return _release_dir() / "package" / "dist" / "cli.js"
+
+
+def release_installed() -> bool:
+    marker = _release_dir() / ".sha256"
+    try:
+        return _release_entry().is_file() and marker.read_text(encoding="utf-8").strip() == RELEASE_SHA256
+    except OSError:
+        return False
+
+
+def _download_release(dest: Path, timeout: float) -> None:
+    """Fetch the pinned tarball into *dest* (bounded size; proxies from the env)."""
+    req = urllib.request.Request(RELEASE_TGZ, headers={"User-Agent": "dialectos-hermes"})
+    with urllib.request.urlopen(req, timeout=timeout) as resp, open(dest, "wb") as fh:
+        total = 0
+        while True:
+            chunk = resp.read(1 << 16)
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > RELEASE_MAX_BYTES:
+                raise CliUnavailable(f"DialectOS release is larger than {RELEASE_MAX_BYTES} bytes; refusing it")
+            fh.write(chunk)
+
+
+def _safe_extract(tgz: Path, into: Path) -> None:
+    """Unpack only regular files and directories that stay inside *into*."""
+    root = into.resolve()
+    with tarfile.open(tgz, "r:gz") as tar:
+        members = tar.getmembers()
+        for m in members:
+            target = (root / m.name).resolve()
+            if not (m.isfile() or m.isdir()) or (target != root and root not in target.parents):
+                raise CliUnavailable(f"DialectOS release has an unsafe entry ({m.name!r}); refusing it")
+        for m in members:
+            m.mode = (0o755 if m.isdir() else 0o644)
+            if hasattr(tarfile, "data_filter"):
+                tar.extract(m, root, filter="data")
+            else:  # Python < 3.12: members were checked above
+                tar.extract(m, root)
+
+
+def _ensure_release(timeout: float) -> Path:
+    """Return the verified CLI entry, downloading and unpacking it once if needed.
+
+    A copy of the tarball placed at plugin-data/dialectos/<RELEASE_NAME> is used instead of
+    the network, which is how machines without internet install it. Either way the bytes
+    must match RELEASE_SHA256.
+    """
+    if release_installed():
+        return _release_entry()
+    with _INSTALL_LOCK, _locked(_data_dir() / "cli" / "install"):
+        if release_installed():
+            return _release_entry()
+        parent = _data_dir() / "cli"
+        parent.mkdir(parents=True, exist_ok=True)
+        work = Path(tempfile.mkdtemp(prefix=".install-", dir=str(parent)))
+        try:
+            local = _data_dir() / RELEASE_NAME
+            tgz = work / RELEASE_NAME
+            if local.is_file():
+                shutil.copyfile(local, tgz)
+            else:
+                try:
+                    _download_release(tgz, timeout)
+                except CliUnavailable:
+                    raise
+                except Exception as exc:
+                    raise CliUnavailable(
+                        f"could not download DialectOS {RELEASE_VERSION} ({type(exc).__name__}: {exc}). "
+                        f"Offline? Put {RELEASE_NAME} in {_data_dir()} or set dialectos_command."
+                    ) from exc
+            digest = hashlib.sha256(tgz.read_bytes()).hexdigest()
+            if digest != RELEASE_SHA256:
+                raise CliUnavailable(
+                    f"DialectOS {RELEASE_VERSION} tarball does not match its pinned sha256 "
+                    f"(got {digest[:12]}…); refusing to run it"
+                )
+            staged = work / "tree"
+            staged.mkdir()
+            _safe_extract(tgz, staged)
+            if not (staged / "package" / "dist" / "cli.js").is_file():
+                raise CliUnavailable("DialectOS release has no package/dist/cli.js")
+            (staged / ".sha256").write_text(RELEASE_SHA256 + "\n", encoding="utf-8")
+            dest = _release_dir()
+            if dest.exists():
+                shutil.rmtree(dest)
+            os.replace(staged, dest)
+        finally:
+            shutil.rmtree(work, ignore_errors=True)
+    return _release_entry()
+
+
+def _node_binary() -> str:
+    node = shutil.which("node")
+    if not node:
+        raise CliUnavailable(f"DialectOS needs Node {NODE_MIN[0]}.{NODE_MIN[1]} or later on PATH")
+    if node not in _NODE_CHECKED:
+        try:
+            out = subprocess.run([node, "-p", "process.versions.node"], capture_output=True,
+                                 text=True, timeout=15, env=_scrubbed_env()).stdout.strip()
+            ver = tuple(int(x) for x in out.split(".")[:2])
+            _NODE_CHECKED[node] = ver >= NODE_MIN
+        except Exception:
+            _NODE_CHECKED[node] = True  # unknown version: let the CLI speak for itself
+        if not _NODE_CHECKED[node]:
+            raise CliUnavailable(
+                f"DialectOS needs Node {NODE_MIN[0]}.{NODE_MIN[1]} or later; {node} is {out or 'older'}"
+            )
+    elif not _NODE_CHECKED[node]:
+        raise CliUnavailable(f"DialectOS needs Node {NODE_MIN[0]}.{NODE_MIN[1]} or later")
+    return node
+
+
+def _cli_command(timeout: float) -> List[str]:
+    if not _managed():
+        return shlex.split(str(_cfg("dialectos_command")))
+    node = _node_binary()
+    return [node, str(_ensure_release(timeout))]
+
+
+def _timeout() -> int:
+    try:
+        return max(1, int(_cfg("timeout_seconds")))
+    except (TypeError, ValueError):
+        return int(DEFAULTS["timeout_seconds"])
+
+
 def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: bool = False) -> Dict[str, Any]:
-    cmd = shlex.split(str(_cfg("dialectos_command"))) + args
+    try:
+        cmd = _cli_command(_timeout()) + args
+    except CliUnavailable as exc:
+        return {"ok": False, "error": str(exc)}
     popen_kw: Dict[str, Any] = {}
     if os.name == "nt":
         popen_kw["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP  # type: ignore[attr-defined]
@@ -340,11 +511,11 @@ def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: 
             **popen_kw,
         )
     except FileNotFoundError as exc:
-        return {"ok": False, "error": f"dialectos not runnable (need Node >=20 + npx): {exc}"}
+        return {"ok": False, "error": f"dialectos not runnable (need Node {NODE_MIN[0]}.{NODE_MIN[1]}+): {exc}"}
     except OSError as exc:
         return {"ok": False, "error": f"dialectos could not start (OS command/argument limits may apply): {exc}"}
     try:
-        out_s, err_s = proc.communicate(stdin, timeout=int(_cfg("timeout_seconds")))
+        out_s, err_s = proc.communicate(stdin, timeout=_timeout())
     except subprocess.TimeoutExpired:
         _kill_tree(proc)
         try:
@@ -368,6 +539,14 @@ def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: 
     err = (err_s or "").strip()
     if proc.returncode != 0 and not out:
         return {"ok": False, "exit": proc.returncode, "error": err[-800:] or f"exit {proc.returncode}"}
+    # One output limit for every mode. JSON replies used to skip it, so the page's detect route
+    # could return an unbounded payload while prose replies were refused.
+    if len(out) > MAX_OUT:
+        return {
+            "ok": False,
+            "error": f"dialectos output exceeds {MAX_OUT} chars ({len(out)}); use the DialectOS CLI for documents",
+            "truncated": True,
+        }
     res: Dict[str, Any] = {"ok": proc.returncode == 0, "exit": proc.returncode}
     if expect_json:
         # Decode only the root at offset zero. The CLI appends a human status
@@ -385,12 +564,6 @@ def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: 
                 res["error"] = "expected JSON from dialectos"
     else:
         # Translation / non-JSON stdout is prose — never fish JSON fragments out of it.
-        if len(out) > MAX_OUT:
-            return {
-                "ok": False,
-                "error": f"dialectos output exceeds {MAX_OUT} chars ({len(out)}); use the DialectOS CLI for documents",
-                "truncated": True,
-            }
         res["text"] = out
     if err:
         res["stderr"] = err[-400:]
@@ -415,6 +588,113 @@ def _text(val: Any, field: str = "text", limit: int = MAX_TEXT) -> str:
     if t.startswith("-"):
         t = " " + t  # never let text be parsed as a CLI flag
     return t
+
+
+# --- plugin-side QA guards ----------------------------------------------------
+# The v0.3.2 CLI passes a French translation, changed numbers and a translation that
+# drops most of the source. These checks are deterministic and run on every verdict.
+# None of them can see meaning: a sentence that now says the opposite still passes.
+
+GUARD_SCOPE = (
+    "Checks form, not meaning: numbers, language, length, links, placeholders, code blocks and "
+    "dialect markers. It cannot tell when a sentence now says the opposite; read the result "
+    "or back-translate it for that."
+)
+_FENCE_RE = re.compile(r"(?ms)^\s*(```|~~~).*?^\s*\1[^\n]*$")
+_INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
+_URL_RE = re.compile(r"https?://\S+")
+_NUM_RE = re.compile(r"(?<![\w.,])\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?![\w])")
+_WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
+_ES_WORDS = frozenset(
+    "el la los las de del y en que es un una por para con se no su sus al lo como más pero "
+    "le les ya o este esta estos estas ese esa eso porque entre cuando muy sin sobre también "
+    "me hasta hay donde desde todo todos nos durante uno unos ni contra ante ellos esto antes "
+    "algunos qué otro otra otros otras él tanto mucho nada cual poco ella estar algo nosotros "
+    "tu tú usted ustedes vos son está están fue ser tiene puede hacer después aquí así".split()
+)
+# Words that are common in each language and are not Spanish words.
+_OTHER_WORDS: Dict[str, frozenset] = {
+    "English": frozenset(
+        "the and of to is are in for with on at by this that it be you your will after within "
+        "from have has was were not or an as its their they we our can which".split()),
+    "French": frozenset(
+        "le et est des du pour dans pas sur au aux avec ce qui il elle sont après sous vous "
+        "nous je les une ou mais cette ces être avoir fait leur très".split()) - _ES_WORDS,
+    "Portuguese": frozenset(
+        "o os as da do das dos não em uma ao na no você mais mas é são pelo pela isso também "
+        "muito seu sua foi tem".split()) - _ES_WORDS,
+    "Italian": frozenset(
+        "il gli della di che è per non sono del alla dei delle questo anche più ma come nel "
+        "una lo ha i entro dopo nella degli sul questa essere ogni solo".split()) - _ES_WORDS,
+}
+# Small numbers a translator may spell out ("3 to 5" -> "de tres a cinco").
+_ES_SPELLED = {
+    "0": ("cero",), "1": ("uno", "una", "un", "primer", "primero", "primera"), "2": ("dos",),
+    "3": ("tres",), "4": ("cuatro",), "5": ("cinco",), "6": ("seis",), "7": ("siete",),
+    "8": ("ocho",), "9": ("nueve",), "10": ("diez",), "11": ("once",), "12": ("doce",),
+}
+_MIN_WORDS_FOR_LANG = 6
+_MIN_CHARS_FOR_LENGTH = 80
+_SHORT_RATIO = 0.5
+
+
+def _prose(text: str) -> str:
+    return _INLINE_CODE_RE.sub(" ", _FENCE_RE.sub(" ", text))
+
+
+def _numbers(text: str) -> List[str]:
+    """Digits of each number, ignoring thousands/decimal separator style (1,000.5 == 1.000,5)."""
+    return [re.sub(r"\D", "", m.group(0)) for m in _NUM_RE.finditer(_URL_RE.sub(" ", text))]
+
+
+def _language_guess(text: str) -> Optional[str]:
+    words = [w.lower() for w in _WORD_RE.findall(text)]
+    if len(words) < _MIN_WORDS_FOR_LANG:
+        return None
+    es = sum(w in _ES_WORDS for w in words)
+    best, hits = max(((name, sum(w in vocab for w in words)) for name, vocab in _OTHER_WORDS.items()),
+                     key=lambda kv: kv[1])
+    return best if hits >= 2 and hits > es else None
+
+
+def _guard_issues(source: str, translated: str) -> List[str]:
+    src, dst = _prose(source), _prose(translated)
+    issues: List[str] = []
+    missing = list(_numbers(src))
+    for n in _numbers(dst):
+        if n in missing:
+            missing.remove(n)
+    if missing:
+        words = [w.lower() for w in _WORD_RE.findall(dst)]
+        for n in list(missing):
+            spelled = next((w for w in words if w in _ES_SPELLED.get(n, ())), None)
+            if spelled:
+                missing.remove(n)
+                words.remove(spelled)
+    if missing:
+        issues.append("Numbers from the source are missing or changed: " + ", ".join(sorted(set(missing))[:8]))
+    lang = _language_guess(dst)
+    if lang:
+        issues.append(f"Translation reads as {lang}, not Spanish.")
+    src_len, dst_len = len(src.strip()), len(dst.strip())
+    if src_len >= _MIN_CHARS_FOR_LENGTH and dst_len < src_len * _SHORT_RATIO:
+        issues.append(
+            f"Translation is {round(100 * dst_len / src_len)}% of the source's length; part of it may be missing."
+        )
+    return issues
+
+
+def _apply_guards(report: Dict[str, Any], source: str, translated: str) -> None:
+    """Merge guard failures into the CLI report as blocking issues (never flips a fail to pass)."""
+    issues = _guard_issues(source, translated)
+    report["pluginGuards"] = {"passed": not issues, "issues": issues, "scope": GUARD_SCOPE}
+    if not issues:
+        return
+    report["valid"] = False
+    top = report.get("blockingIssues")
+    if not isinstance(top, list):
+        top = []
+    report["blockingIssues"] = top + [i for i in issues if i not in top]
 
 
 # --- operations -------------------------------------------------------------
@@ -474,6 +754,7 @@ def validate(translated: str, dialect: Optional[str] = None, source: Optional[st
     # validate exits non-zero on blocking issues but still prints JSON — that's a verdict, not a crash
     if isinstance(res.get("data"), dict) and type(res["data"].get("valid")) is bool:
         res["ok"] = True
+        _apply_guards(res["data"], source_text, translated_text)
     elif "data" in res:
         res.pop("data")
         res["ok"] = False
@@ -540,6 +821,10 @@ def _on_post_tool(tool_name: str = "", args: Optional[Dict[str, Any]] = None, re
         dialect = (args or {}).get("dialect")
         if not dialect:
             dialect = _cfg("default_dialect")
+        # The ledger is verdict-only: store a dialect code, never a raw rejected argument
+        # (a caller can put any text in that field before validation refuses it).
+        if not (isinstance(dialect, str) and DIALECT_RE.match(dialect)):
+            dialect = "invalid"
         entry: Dict[str, Any] = {
             "ts": int(time.time()),
             "tool": tool_name,
@@ -582,7 +867,7 @@ DETECT_SCHEMA = {
 }
 VALIDATE_SCHEMA = {
     "name": "dialectos_validate",
-    "description": "Offline Spanish QA against a dialect with original source required. Bounded inline documents use private temporary .md files for structure checks. The pinned v0.3.2 CLI requires code fences to match the source byte for byte. Register controls are advisory, not a blocking expected-register contract. Returns issues and a pass/fail verdict.",
+    "description": "Offline Spanish QA against a dialect with original source required. Bounded inline documents use private temporary .md files for structure checks. The pinned v0.3.2 CLI requires code fences to match the source byte for byte. Register controls are advisory, not a blocking expected-register contract. The plugin also blocks changed or missing numbers, a translation that reads as English/French/Portuguese/Italian, and one under half the source's length. It checks form, not meaning: a reversed claim still passes. Returns issues and a pass/fail verdict.",
     "parameters": {
         "type": "object",
         "properties": {
