@@ -134,4 +134,4 @@ Reply to Tweet 2: "What's the most surprising Spanish regional word you've encou
 
 Reply to Tweet 6: "We caught GPT-4 translating 'Do not proceed' as 'Procede inmediatamente' — the exact opposite. That's why the negation gate exists."
 
-Reply to Tweet 9: "Fun fact: We have more tests (746) than stars (1). Help us fix that ratio? 😂"
+Reply to Tweet 9: "Fun fact: We have more tests (1,500+) than stars (1). Help us fix that ratio? 😂"

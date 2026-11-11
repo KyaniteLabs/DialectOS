@@ -16,6 +16,8 @@ async function serperSearch(query: string): Promise<RegionalResearchSource[]> {
   if (!apiKey) return [];
   const response = await fetch("https://google.serper.dev/search", {
     method: "POST",
+    // A fixed API endpoint never needs a redirect; following one would carry x-api-key along.
+    redirect: "error",
     headers: {
       "x-api-key": apiKey,
       "content-type": "application/json",

@@ -252,7 +252,7 @@ git clone https://github.com/KyaniteLabs/DialectOS.git
 cd DialectOS
 pnpm install
 pnpm build
-pnpm test        # 662+ tests passing
+pnpm test        # 1,500+ tests passing
 ```
 
 ---
@@ -302,7 +302,9 @@ pnpm test        # 662+ tests passing
 | [`@dialectos/locale-utils`](packages/locale-utils) | `0.3.1` | Locale file diff/merge utilities | 55 |
 | [`@dialectos/markdown-parser`](packages/markdown-parser) | `0.3.1` | Structure-preserving markdown parser | 74 |
 
-**662+ tests across 7 packages plus docs contracts, demo-server contracts, and static-hardening checks**
+**1,500+ tests across 7 packages plus docs contracts, demo-server contracts, and static-hardening checks**
+
+> Package versions above match the latest GitHub release, **v0.3.1**.
 
 > Package versions above are the **source** tree (0.3.1, unreleased). The **latest release is v0.3.0** — install paths elsewhere in this README point at v0.3.0 artifacts.
 

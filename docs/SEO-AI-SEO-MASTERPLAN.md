@@ -419,7 +419,7 @@ MCP is THE hottest topic in AI tooling right now (April 2026). Being "the first 
 - Compare against non-MCP translation tools
 - Target MCP-specific communities (r/mcp, MCP Discord, etc.)
 
-### Secret Weapon #3: The 746 Tests Badge
+### Secret Weapon #3: The 1,500+ Tests Badge
 Your test count is insane for a 0.1.0 project. Flaunt it:
 - "automated tests passing" badge in README
 - "More tests than stars" self-deprecating tweet

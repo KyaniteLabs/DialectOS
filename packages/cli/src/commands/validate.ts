@@ -4,7 +4,7 @@ import type { SpanishDialect, ValidationReport } from "@dialectos/types";
 import { validateTranslation } from "../lib/validate-translation.js";
 import { loadGlossary } from "../lib/glossary-enforcement.js";
 import { loadProtectedTokens } from "../lib/token-protection.js";
-import { writeOutput, writeError, writeInfo } from "../lib/output.js";
+import { writeOutput } from "../lib/output.js";
 import { assertKnownDialect } from "../lib/assert-known-dialect.js";
 
 export interface ValidateOptions {
@@ -127,7 +127,8 @@ export async function executeValidate(
     : report.outputJudge.blockingIssues.length > 0 || !report.valid;
 
   if (shouldFail) {
-    writeInfo(`\nValidation failed with ${report.blockingIssues.length} blocking issue(s).`);
+    // stderr, so `--format json` stdout stays parseable.
+    process.stderr.write(`\nValidation failed with ${report.blockingIssues.length} blocking issue(s).\n`);
     process.exit(1);
   }
 }
@@ -159,24 +160,27 @@ async function executeLocaleValidation(
       isMarkdown: false,
     });
     reports.push({ key, report });
-    if (!report.valid) anyBlocking = true;
+    const failsKey = strict
+      ? !report.valid || report.outputJudge.issues.length > 0
+      : !report.valid;
+    if (failsKey) anyBlocking = true;
   }
 
   if (format === "json") {
-    writeOutput(JSON.stringify(reports, null, 2));
+    writeOutput(JSON.stringify(reports, null, 2) + "\n");
   } else {
     const total = reports.length;
     const passed = reports.filter((r) => r.report.valid).length;
-    writeOutput(`Locale validation: ${passed}/${total} keys passed for ${dialect}`);
-
+    const lines = [`Locale validation: ${passed}/${total} keys passed for ${dialect}`];
     for (const { key, report } of reports) {
       if (!report.valid) {
-        writeOutput(`\n  [FAIL] ${key}:`);
+        lines.push(`  [FAIL] ${key}:`);
         for (const issue of report.blockingIssues) {
-          writeOutput(`    - ${issue}`);
+          lines.push(`    - ${issue}`);
         }
       }
     }
+    writeOutput(lines.join("\n") + "\n");
   }
 
   if (anyBlocking) {

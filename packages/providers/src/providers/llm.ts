@@ -336,12 +336,18 @@ export class LLMProvider implements TranslationProvider {
       throw new Error("LLM response exceeds maximum allowed size");
     }
 
-    const data = (await Promise.race([
-      response.json(),
-      new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("Response body timed out")), this.timeoutMs);
-      }),
-    ])) as unknown;
+    let bodyTimer: ReturnType<typeof setTimeout> | undefined;
+    let data: unknown;
+    try {
+      data = (await Promise.race([
+        response.json(),
+        new Promise<never>((_, reject) => {
+          bodyTimer = setTimeout(() => reject(new Error("Response body timed out")), this.timeoutMs);
+        }),
+      ])) as unknown;
+    } finally {
+      clearTimeout(bodyTimer);
+    }
 
     const rawText = extractResponseText(this.apiFormat, data);
     const translatedText = stripPreamble(rawText || "");
@@ -513,10 +519,10 @@ export class LLMProvider implements TranslationProvider {
   }
 
   private async ensureLMStudioModelLoaded(headers: Record<string, string>, signal: AbortSignal): Promise<void> {
-    const listResponse = await fetch(`${this.endpoint}/api/v1/models`, {
-      method: "GET",
-      headers,
-      signal,
+    const validateUrl = (url: string) => validateLLMEndpoint(url, this.allowLocal);
+    const listResponse = await fetchWithRedirects(`${this.endpoint}/api/v1/models`, {
+      init: { method: "GET", headers, signal },
+      validateUrl,
     });
     if (!listResponse.ok) {
       throw new Error(`LM Studio models API error: ${listResponse.statusText}`);
@@ -531,14 +537,17 @@ export class LLMProvider implements TranslationProvider {
       return;
     }
 
-    const loadResponse = await fetch(`${this.endpoint}/api/v1/models/load`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        model: this.model,
-        ...this.lmStudioLoadConfig,
-      }),
-      signal,
+    const loadResponse = await fetchWithRedirects(`${this.endpoint}/api/v1/models/load`, {
+      init: {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          model: this.model,
+          ...this.lmStudioLoadConfig,
+        }),
+        signal,
+      },
+      validateUrl,
     });
     if (!loadResponse.ok) {
       throw new Error(`LM Studio load API error: ${loadResponse.statusText}`);

@@ -33,6 +33,14 @@ inputs:
     description: "Treat all issues (not just blocking) as failures"
     required: false
     default: "false"
+  locale-base:
+    description: "Source-language locale JSON (e.g. locales/en.json) used as the source text for locale files"
+    required: false
+    default: ""
+  allow-empty:
+    description: "Pass when target-patterns match no files (default: fail, since an empty match is usually a misconfiguration)"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -45,7 +53,7 @@ runs:
     - name: Setup Node
       uses: actions/setup-node@v4
       with:
-        node-version: "20"
+        node-version: "22"
         cache: "pnpm"
 
     - name: Build DialectOS
@@ -55,13 +63,26 @@ runs:
 
     - name: Validate translations
       shell: bash
+      env:
+        DIALECTOS_DIALECT: ${{ inputs.dialect }}
+        DIALECTOS_SOURCE_DIR: ${{ inputs.source-dir }}
+        DIALECTOS_TARGET_PATTERNS: ${{ inputs.target-patterns }}
+        DIALECTOS_GLOSSARY_FILE: ${{ inputs.glossary-file }}
+        DIALECTOS_LOCALE_BASE: ${{ inputs.locale-base }}
+        DIALECTOS_FAIL_ON_BLOCKING: ${{ inputs.fail-on-blocking }}
+        DIALECTOS_FORMAT: ${{ inputs.format }}
+        DIALECTOS_STRICT: ${{ inputs.strict }}
+        DIALECTOS_ALLOW_EMPTY: ${{ inputs.allow-empty }}
+        DIALECTOS_ACTION_PATH: ${{ github.action_path }}
       run: |
         node "${{ github.action_path }}/scripts/ci-validate.mjs" \
-          --dialect="${{ inputs.dialect }}" \
-          --source-dir="${{ inputs.source-dir }}" \
-          --target-patterns="${{ inputs.target-patterns }}" \
-          --glossary-file="${{ inputs.glossary-file }}" \
-          --fail-on-blocking="${{ inputs.fail-on-blocking }}" \
-          --format="${{ inputs.format }}" \
-          --strict="${{ inputs.strict }}" \
-          --cli-path="${{ github.action_path }}/packages/cli/dist/index.js"
+          --dialect="$DIALECTOS_DIALECT" \
+          --source-dir="$DIALECTOS_SOURCE_DIR" \
+          --target-patterns="$DIALECTOS_TARGET_PATTERNS" \
+          --glossary-file="$DIALECTOS_GLOSSARY_FILE" \
+          --locale-base="$DIALECTOS_LOCALE_BASE" \
+          --fail-on-blocking="$DIALECTOS_FAIL_ON_BLOCKING" \
+          --format="$DIALECTOS_FORMAT" \
+          --strict="$DIALECTOS_STRICT" \
+          --allow-empty="$DIALECTOS_ALLOW_EMPTY" \
+          --cli-path="$DIALECTOS_ACTION_PATH/packages/cli/dist/cli.js"
