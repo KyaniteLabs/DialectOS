@@ -1,0 +1,13 @@
+{
+  "name": "dialectos",
+  "label": "DialectOS",
+  "description": "Spanish for the region you mean: detect, translate and check into 25 variants, with the QA verdicts the agent recorded.",
+  "icon": "Languages",
+  "version": "0.2.0",
+  "api": "plugin_api.py",
+  "tab": {
+    "path": "/dialectos",
+    "position": "after:sessions"
+  },
+  "entry": "dist/index.js"
+}

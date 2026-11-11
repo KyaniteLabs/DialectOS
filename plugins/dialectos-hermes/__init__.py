@@ -79,9 +79,22 @@ _THREAD_LOCK = threading.Lock()
 
 # --- config / storage -------------------------------------------------------
 
+def _settings_from_config() -> Dict[str, Any]:
+    """plugins.entries.dialectos.settings from config.yaml, for the dashboard/desktop
+    backend, which runs without the agent's PluginContext."""
+    try:
+        from hermes_cli.config import load_config
+
+        entry = ((load_config() or {}).get("plugins") or {}).get("entries") or {}
+        settings = (entry.get(PLUGIN_NAME) or {}).get("settings") or {}
+        return settings if isinstance(settings, dict) else {}
+    except Exception:
+        return {}
+
+
 def _cfg(key: str) -> Any:
     try:
-        val = _ctx.get_config(key, None) if _ctx is not None else None
+        val = _ctx.get_config(key, None) if _ctx is not None else _settings_from_config().get(key)
     except Exception:
         val = None
     return DEFAULTS[key] if val is None else val

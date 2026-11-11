@@ -12,6 +12,7 @@ Regional Spanish localization across **25 dialect variants** with advisory QA ch
 | `dialectos_validate` | Offline QA; **source required**; fenced QA needs repaired reviewed CLI source (default release false-fails); register advisory |
 | `dialectos_list_dialects` | The 25 variants |
 | Skill `dialectos:dialectos` | Pick → translate → validate workflow |
+| DialectOS page | In the Hermes desktop app (sidebar and ⌘K) and the web dashboard tab: detect, translate into a picked variant with an automatic check, check any source/translation pair, the 25 variants, and the QA ledger per dialect. Needs Hermes ≥ 0.23.0 |
 
 ## Install
 
@@ -25,9 +26,9 @@ Requires **Node ≥ 20** and `npx` on PATH.
 ## Disclosure
 
 - **Downloads code:** first use runs `npx -y --package=https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-cli-0.3.1.tgz dialectos` (DialectOS is distributed as GitHub Release tarballs, not on npm). Override with `dialectos_command` (e.g. `dialectos` after `pnpm add -g <tarball>`).
-- **Network:** `detect`, `list`, `validate` are offline. `translate` sends text only to an explicitly selected provider (`llm`, `deepl`, `libre`, or `mymemory`), supplied in settings or the tool call. Missing selection and `auto` are refused before spawning; there is no automatic provider fallback. Slash translation requires the provider setting. Detect/validate still work without a provider.
+- **Network:** `detect`, `list`, `validate` are offline. `translate` sends text only to an explicitly selected provider (`llm`, `deepl`, `libre`, or `mymemory`), supplied in settings or the tool call. Missing selection and `auto` are refused before spawning; there is no automatic provider fallback. Slash translation and the page's Translate button require the provider setting; the page sends text only when you press Translate. Detect/validate still work without a provider.
 - **Secrets / provider activation:** `LLM_API_KEY`, `LLM_API_URL`, `LLM_ENDPOINT`, `LLM_MODEL`, `LLM_API_FORMAT`, `DEEPL_AUTH_KEY`, `DEEPL_API_URL`, `LIBRETRANSLATE_URL`, `LIBRETRANSLATE_API_KEY`, plus activation/endpoint settings `ENABLE_MYMEMORY`, `LLM_ALLOW_LOCAL`, `LM_STUDIO_URL`, are read only via Hermes secret scope and passed only to the DialectOS child. The child gets a scrubbed env (PATH/HOME/locale/proxy/npm cache + those scoped values), never full `os.environ`. MyMemory only registers when `ENABLE_MYMEMORY=1`; localhost/Ollama endpoints need `LLM_ALLOW_LOCAL=1` (and `LM_STUDIO_URL` when applicable).
-- **Local data:** cache, corpus and `qa_ledger.json` live under `<HERMES_HOME>/plugin-data/dialectos/` (per profile). Nothing else is written; corpus recording is off.
+- **Local data:** cache, corpus and `qa_ledger.json` live under `<HERMES_HOME>/plugin-data/dialectos/` (per profile). Page actions add the same verdict-only rows, marked `via: page`. Nothing else is written; corpus recording is off.
 - **No telemetry.** No background jobs; nothing runs unless a hook matches or you call a tool/slash.
 
 ## Settings (`plugins.entries.dialectos.settings`)
@@ -50,6 +51,7 @@ Requires **Node ≥ 20** and `npx` on PATH.
 - `/dialectos list` renders all 25 code/name pairs; the agent list tool retains full metadata.
 - Validation uses private temporary files rather than large text argv; no user-facing file-path API is exposed. Files are plaintext while the subprocess runs (owner-only directory), removed afterwards; a hard host/process crash can leave residue under plugin data for owner cleanup.
 - QA checks are advisory, not proof of meaning. The v0.3.1 checks can pass a translation whose meaning changed (for example a flipped negation or a wrong dictionary sense). Read the output before you use it.
-- No Desktop pane or banner/screenshots yet.
+- The desktop page and dashboard tab need Hermes 0.23.0 or later. On older versions only the hook, tools, slash command and skill load.
+- No catalog banner or screenshots yet.
 
 License: Apache-2.0 (same as DialectOS).
