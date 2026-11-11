@@ -129,7 +129,7 @@ jobs:
       - name: Hermes dialectos plugin regressions (Python)
         run: |
           python3 -m venv "$RUNNER_TEMP/dialectos-hermes-venv"
-          "$RUNNER_TEMP/dialectos-hermes-venv/bin/pip" install --quiet "pytest==8.4.2" "PyYAML==6.0.3" "packaging==26.0" "python-dotenv==1.2.2" "rich==14.3.3" "ruamel.yaml==0.18.16" "httpx==0.28.1" "requests==2.33.0"
+          "$RUNNER_TEMP/dialectos-hermes-venv/bin/pip" install --quiet "pytest==8.4.2" "PyYAML==6.0.3" "packaging==26.0" "python-dotenv==1.2.2" "rich==14.3.3" "ruamel.yaml==0.18.16" "httpx==0.28.1" "requests==2.33.0" "fastapi==0.162.0"
           "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" -m pytest plugins/dialectos-hermes/tests -q
 
       - name: Minimum runtime registration and native validator (offline)
@@ -137,5 +137,5 @@ jobs:
           HERMES_HOME: ${{ runner.temp }}/dialectos-disposable-profile
           PYTHONPATH: ${{ github.workspace }}/.hermes-test-runtime
         run: |
-          "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" plugins/dialectos-hermes/runtime_smoke.py "$PYTHONPATH" "$HERMES_HOME"
+          "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" plugins/dialectos-hermes/tests/smoke/runtime_smoke.py "$PYTHONPATH" "$HERMES_HOME"
           "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" -c "from hermes_cli.plugins_cmd_catalog import cmd_validate; cmd_validate('plugins/dialectos-hermes', as_json=True)"

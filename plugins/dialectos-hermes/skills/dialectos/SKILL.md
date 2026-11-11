@@ -13,7 +13,7 @@ Use when the user wants Spanish for a specific audience (Mexico, Argentina, Spai
 2. **Pick formality.** `formal: true` → usted; `false` → tú (or vos for voseo dialects like es-AR). Say which you chose.
 3. **Detect** existing Spanish with `dialectos_detect` before rewriting it.
 4. **Translate** with `dialectos_translate` (≤ 8000 source chars per call; split long docs by section). Select an explicit `llm`, `deepl`, `libre`, or `mymemory` provider in settings or the call; missing selection and `auto` are refused, with no automatic fallback. This sends text to that provider — don't send secrets or private data unless the user agreed.
-5. **QA gate:** always run `dialectos_validate` with both `translated` **and** `source` (the original text). Empty source always fails v0.3.1 semantic QA. Fix blocking issues and re-validate before presenting.
+5. **QA gate:** always run `dialectos_validate` with both `translated` **and** `source` (the original text). Empty source always fails v0.3.1 semantic QA. Fix blocking issues and re-validate before presenting. A pass is not proof of meaning: v0.3.1 checks can pass a flipped negation or a wrong word sense, so compare the meaning against the source yourself before presenting.
 6. Present: translation, dialect + formality, and the validate verdict.
 
 ## Limits

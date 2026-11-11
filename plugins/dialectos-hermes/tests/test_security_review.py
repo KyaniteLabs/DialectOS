@@ -25,3 +25,15 @@ def test_missing_session_module_fails_closed(plugin, monkeypatch, surface, sourc
         monkeypatch.setenv("HERMES_SESSION_SOURCE", source)
     monkeypatch.setattr(builtins, "__import__", missing)
     assert plugin._on_gateway() is expected
+
+
+@pytest.mark.parametrize("platform,source,env", [
+    ("", "", None), ("telegram", "telegram", None), ("", "cli", None),
+    ("", "desktop", None), ("unknown", "", None), ("", "", "discord"), ("", "", "cli"),
+])
+def test_runtime_identity_matches_core(plugin, runtime, monkeypatch, platform, source, env):
+    """With the runtime present, the public get_session_env path decides exactly as core does."""
+    if env is not None:
+        monkeypatch.setenv("HERMES_PLATFORM", env)
+    runtime.set_session_vars(platform=platform, source=source)
+    assert plugin._on_gateway() is runtime.session_is_messaging_surface()
