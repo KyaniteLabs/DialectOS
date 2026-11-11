@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Hermes plugin 0.2.2 ships the Chakra Petch font license** (`desktop/OFL.txt`) for the font its desktop page embeds. Its README says the page's Translate button answers anyone who can reach the dashboard, and that DialectOS is not endorsed by Nous Research.
+
 ### Fixed
 
 - **The Hermes plugin no longer downloads DialectOS on every call.** The old default ran `npx --package=<release URL>`, which fetched the 6 MB tarball on each call and failed after about 70 seconds without a network, so "detect, list and validate run offline" was not true. The plugin now downloads the v0.3.2 tarball once, refuses it unless it matches a pinned sha256, unpacks it under `plugin-data/dialectos/cli/` and runs it with `node`. A tarball placed in the data folder installs it without internet. A saved copy of the old `npx` default is read as the new default. The docs now say Node 22.13, which the CLI needs.
