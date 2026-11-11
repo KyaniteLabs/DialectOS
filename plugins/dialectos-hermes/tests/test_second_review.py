@@ -13,6 +13,8 @@ def test_root_report_with_nested_arrays(plugin, fake_cli, valid):
     fake_cli(f"print(json.dumps({report!r})); sys.exit({0 if valid else 1})")
     result = plugin.validate("Hola", "es-MX", "Hello")
     assert result["ok"] is True
+    guards = result["data"].pop("pluginGuards")
+    assert guards["passed"] is True and guards["issues"] == []
     assert result["data"] == report
 
 

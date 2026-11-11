@@ -78,13 +78,15 @@ def _issues(data: Any) -> list[Dict[str, Any]]:
 
 @router.get("/status")
 def status():
-    command = str(core._cfg("dialectos_command"))
-    first = (shlex.split(command) or [""])[0]
+    managed = core._managed()
+    command = str(core._cfg("dialectos_command") or "")
+    first = "node" if managed else (shlex.split(command) or [""])[0]
     provider = str(core._cfg("provider") or "").strip().lower()
     ledger = core._load_json(core._ledger_path(), [])
     return {
-        "cli": "release" if command == core.DEFAULTS["dialectos_command"] else "custom",
-        "cli_version": "0.3.2" if command == core.DEFAULTS["dialectos_command"] else None,
+        "cli": "release" if managed else "custom",
+        "cli_version": core.RELEASE_VERSION if managed else None,
+        "cli_installed": core.release_installed() if managed else None,
         "runner_found": bool(first and shutil.which(first)),
         "provider": provider if provider in core.PROVIDERS else "",
         "default_dialect": str(core._cfg("default_dialect")),
