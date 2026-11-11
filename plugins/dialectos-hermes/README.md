@@ -30,6 +30,7 @@ You need Node 22.13 or later, with `node` on your PATH.
 - **Translate is the only network call.** Detect, list and validate run offline. Translate sends text only to the provider you name in settings or in the tool call: `llm`, `deepl`, `libre` or `mymemory`. If you name none, or name `auto`, it refuses before starting anything, and it never falls back to another provider. The slash command and the page's Translate button use the provider from settings, and the page sends text only when you press Translate.
 - **Keys stay scoped.** The plugin reads provider keys and endpoints only through Hermes's secret scope and passes them only to the DialectOS process. These are `LLM_API_KEY`, `LLM_API_URL`, `LLM_ENDPOINT`, `LLM_MODEL`, `LLM_API_FORMAT`, `DEEPL_AUTH_KEY`, `DEEPL_API_URL`, `LIBRETRANSLATE_URL` and `LIBRETRANSLATE_API_KEY`, plus the switches `ENABLE_MYMEMORY`, `LLM_ALLOW_LOCAL` and `LM_STUDIO_URL`. That process gets a cleaned environment: PATH, HOME, locale, proxy and npm cache settings, plus those keys. It never sees the rest of your environment. MyMemory is used only when `ENABLE_MYMEMORY=1`. A local endpoint such as Ollama needs `LLM_ALLOW_LOCAL=1`, and LM Studio also needs `LM_STUDIO_URL`.
 - **Data stays in one folder.** The CLI copy, the cache, the corpus and `qa_ledger.json` live in `<HERMES_HOME>/plugin-data/dialectos/`, one per profile. Checks run from the page add the same verdict-only rows, marked `via: page`. Corpus recording is off, and nothing else is written.
+- **The page answers anyone who can reach your dashboard.** Its Translate button sends text with your provider keys. Keep the Hermes dashboard on localhost unless you trust everyone who can reach it.
 - **Nothing runs in the background.** There is no telemetry and there are no background jobs. The plugin acts only when its hook matches a message or when you call a tool or the slash command.
 
 ## Settings
@@ -57,4 +58,6 @@ Set these under `plugins.entries.dialectos.settings`.
 - **Older Hermes.** On Hermes versions before 0.23.0, the hook, tools, slash command and skill load, but the page and dashboard tab don't.
 - **Platforms.** Tested on Linux only. macOS and Windows are unverified.
 
-License: Apache-2.0, the same as DialectOS.
+License: Apache-2.0, the same as DialectOS. DialectOS is an independent project by KyaniteLabs and is not endorsed by Nous Research.
+
+The desktop page embeds a subset of the Chakra Petch font, Copyright 2018 The Chakra Petch Project Authors, under the SIL Open Font License 1.1. See [desktop/OFL.txt](desktop/OFL.txt).
