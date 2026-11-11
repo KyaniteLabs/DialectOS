@@ -12596,6 +12596,113 @@
     }
   },
   {
+    "infinitive": "escuchar",
+    "meaning": "to listen",
+    "category": "conjugation-pattern",
+    "forms": {
+      "es-ES": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-AD": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-MX": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-PE": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-CU": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-DO": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-PR": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-PA": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-US": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-PH": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-BZ": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-GQ": {
+        "present_2s": "escuchas",
+        "imperative_2s": "escucha"
+      },
+      "es-AR": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-UY": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-PY": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-GT": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-HN": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-SV": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-NI": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-BO": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-EC": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-CR": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-CO": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-VE": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      },
+      "es-CL": {
+        "present_2s": "escuchás",
+        "imperative_2s": "escuchá"
+      }
+    }
+  },
+  {
     "infinitive": "olvidar",
     "meaning": "to forget",
     "category": "conjugation-pattern",

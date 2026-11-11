@@ -23,6 +23,8 @@ export interface Variant {
    *  be used as an avoid-term for lexical substitution. Prevents false
    *  positives like "botón" (button) being swapped to "tomba" (cop slang). */
   ambiguous?: boolean;
+  /** Other words native speakers of this variant also use for the concept ("nevera" in es-ES). Not flagged. */
+  alsoAccepted?: string[];
 }
 
 export interface DictionaryEntry {
@@ -30,6 +32,8 @@ export interface DictionaryEntry {
   concept: string;
   englishGloss: string;
   panHispanic?: string;
+  /** Everyday English words for the concept beyond its name ("fridge" for refrigerator), so the source check finds it. */
+  englishTerms?: string[];
   variants?: Partial<Record<SpanishDialect, Variant>>;
 }
 
