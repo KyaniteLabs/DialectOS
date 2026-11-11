@@ -368,6 +368,14 @@ def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: 
     err = (err_s or "").strip()
     if proc.returncode != 0 and not out:
         return {"ok": False, "exit": proc.returncode, "error": err[-800:] or f"exit {proc.returncode}"}
+    # One output limit for every mode. JSON replies used to skip it, so the page's detect route
+    # could return an unbounded payload while prose replies were refused.
+    if len(out) > MAX_OUT:
+        return {
+            "ok": False,
+            "error": f"dialectos output exceeds {MAX_OUT} chars ({len(out)}); use the DialectOS CLI for documents",
+            "truncated": True,
+        }
     res: Dict[str, Any] = {"ok": proc.returncode == 0, "exit": proc.returncode}
     if expect_json:
         # Decode only the root at offset zero. The CLI appends a human status
@@ -385,12 +393,6 @@ def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: 
                 res["error"] = "expected JSON from dialectos"
     else:
         # Translation / non-JSON stdout is prose — never fish JSON fragments out of it.
-        if len(out) > MAX_OUT:
-            return {
-                "ok": False,
-                "error": f"dialectos output exceeds {MAX_OUT} chars ({len(out)}); use the DialectOS CLI for documents",
-                "truncated": True,
-            }
         res["text"] = out
     if err:
         res["stderr"] = err[-400:]
@@ -540,6 +542,10 @@ def _on_post_tool(tool_name: str = "", args: Optional[Dict[str, Any]] = None, re
         dialect = (args or {}).get("dialect")
         if not dialect:
             dialect = _cfg("default_dialect")
+        # The ledger is verdict-only: store a dialect code, never a raw rejected argument
+        # (a caller can put any text in that field before validation refuses it).
+        if not (isinstance(dialect, str) and DIALECT_RE.match(dialect)):
+            dialect = "invalid"
         entry: Dict[str, Any] = {
             "ts": int(time.time()),
             "tool": tool_name,

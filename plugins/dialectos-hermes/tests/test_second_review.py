@@ -117,3 +117,22 @@ def test_configured_auto_cannot_spawn(plugin, fake_cli):
     fake_cli("raise AssertionError('must not spawn')", provider="auto")
     with pytest.raises(ValueError, match="explicit"):
         plugin.translate("Hello")
+
+
+# --- plugin roast (Sol, 2026-11-11) ------------------------------------------
+
+def test_json_output_obeys_max_out(plugin, fake_cli):
+    """JSON replies used to skip the MAX_OUT guard that prose replies get."""
+    fake_cli(f"print(json.dumps({{'detail': 'x' * {plugin.MAX_OUT + 1}}}))")
+    res = plugin.detect("hola")
+    assert res["ok"] is False and res.get("truncated") is True and "data" not in res
+
+
+def test_ledger_never_stores_raw_rejected_dialect(plugin):
+    marker = "PRIVATE-MARKER do not persist"
+    plugin._on_post_tool("dialectos_translate", {"dialect": marker}, json.dumps({"ok": False}))
+    entry = json.loads(plugin._ledger_path().read_text())[-1]
+    assert entry["dialect"] == "invalid"
+    assert marker not in plugin._ledger_path().read_text()
+    plugin._on_post_tool("dialectos_translate", {"dialect": "es-AR"}, json.dumps({"ok": True}))
+    assert json.loads(plugin._ledger_path().read_text())[-1]["dialect"] == "es-AR"
