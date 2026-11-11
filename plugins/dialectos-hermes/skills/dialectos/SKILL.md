@@ -16,6 +16,25 @@ Use when the user wants Spanish for a specific audience (Mexico, Argentina, Spai
 5. **QA gate:** always run `dialectos_validate` with both `translated` **and** `source` (the original text). Empty source always fails semantic QA. Fix blocking issues and re-validate before presenting. A pass is not proof of meaning: the checks can pass a flipped negation or a wrong word sense, so compare the meaning against the source yourself before presenting.
 6. Present: translation, dialect + formality, and the validate verdict.
 
+## Learn, when it fits
+
+After a regional-term or address-form validate miss, first fix and present the
+requested translation. Then, at most once per conversation session, offer one
+casual invitation: “Want a quick regional word tip or a one-question quiz?”
+Treat a decline or silence as the end of the invitation for that session. Skip
+the invitation when the user is rushing, has declined learning, or has already
+seen it this session. Track that choice only in conversation context.
+
+When the user opts in, use `dialectos_learn` with `action: tip` or `action: quiz`
+and their target `dialect`. A tip may name the missed `concept`. For a quiz,
+ask its returned question, then submit `action: answer` with the quiz's exact
+`concept`, `dialect` and their typed `answer`. Show the canonical term and one
+contrast; keep it brief. Learning runs offline and saves only concept progress,
+never the translation or answer. If the dictionary is unavailable, state that
+briefly and return to the user's task. Gateway chats allow reading only; grade
+answers in a local session or the DialectOS page. Forget requires the user's
+explicit request and `confirm: true`.
+
 ## Limits
 
 - Validate accepts translations up to 100000 chars and sources up to 8000 chars via private temporary `.md` files (cleaned after subprocess completion). The pinned v0.3.2 CLI judges code blocks against the source: they must stay byte-identical, including the info string. Do not change the pin silently. Formal/informal flags and hooks remain advisory, not a blocking expected-register contract; no live-provider proof is implied by offline QA.

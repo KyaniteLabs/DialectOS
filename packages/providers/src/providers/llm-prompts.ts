@@ -18,7 +18,7 @@ import { sanitizeForPrompt } from "./llm-response.js";
 
 /**
  * Detect models too small for full semantic-context prompts.
- * Models ≤ 8B params (or specified in MB) get a compact prompt that
+ * Models ≤ 8B active/effective params get a compact prompt that
  * skips the heavy dialect context — they echo it instead of translating.
  */
 export function isCompactModel(model: string | undefined): boolean {
@@ -29,14 +29,18 @@ export function isCompactModel(model: string | undefined): boolean {
   const lower = model.toLowerCase();
   // MiniMax M-series models are weak/compact
   if (lower.includes("minimax")) return true;
+  // MoE names (including Liquid LFM) specify active parameters as "A1B".
+  const activeMatch = lower.match(/(?:^|[-_/:])a(\d*\.?\d+)b\b/);
+  if (activeMatch) return parseFloat(activeMatch[1]) <= 8;
   // Effective-param markers (e.g. "e2b" = effective 2B)
   const effMatch = lower.match(/e(\d*\.?\d+)b/);
   if (effMatch && parseFloat(effMatch[1]) <= 8) return true;
   // Total-param markers (e.g. "0.6b", "1.2b", "8b")
   const paramMatch = lower.match(/(\d*\.?\d+)b/);
   if (paramMatch && parseFloat(paramMatch[1]) <= 8) return true;
-  // Models specified in MB (e.g. "461M") are always compact
-  if (/\d+m\b/.test(lower)) return true;
+  // Million-parameter counts must use the same threshold as billion counts.
+  const millionMatch = lower.match(/(\d*\.?\d+)m\b/);
+  if (millionMatch) return parseFloat(millionMatch[1]) <= 8000;
   return false;
 }
 
@@ -50,7 +54,20 @@ export function detectModelTier(model: string | undefined): "tiny" | "small" | "
 
   const lower = model.toLowerCase();
   if (lower.includes("minimax")) return "small";
-  if (/\d+m\b/.test(lower)) return "tiny";
+  const activeMatch = lower.match(/(?:^|[-_/:])a(\d*\.?\d+)b\b/);
+  if (activeMatch) {
+    const params = parseFloat(activeMatch[1]);
+    if (params <= 1) return "tiny";
+    if (params <= 8) return "small";
+    return "medium";
+  }
+  const millionMatch = lower.match(/(\d*\.?\d+)m\b/);
+  if (millionMatch) {
+    const params = parseFloat(millionMatch[1]) / 1000;
+    if (params <= 1) return "tiny";
+    if (params <= 8) return "small";
+    return "medium";
+  }
 
   const effMatch = lower.match(/e(\d*\.?\d+)b/);
   if (effMatch) {
@@ -302,6 +319,7 @@ export function buildUserPrompt(
 ): string {
   const sanitized = sanitizeForPrompt(text);
   const compact = model ? isCompactModel(model) : false;
+  // Keep controls family-specific; do not assume LFM supports Qwen's /no_think.
   const isQwen = model?.toLowerCase().includes("qwen") ?? false;
   const dialect = options.dialect || targetLang;
 

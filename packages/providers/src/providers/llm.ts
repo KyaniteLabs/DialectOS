@@ -331,7 +331,8 @@ export class LLMProvider implements TranslationProvider {
   private async _callLLM(
     systemPrompt: string,
     userPrompt: string,
-    signal: AbortSignal
+    signal: AbortSignal,
+    sourceText: string
   ): Promise<string> {
     const headers = this.buildHeaders();
     if (this.apiFormat === "lmstudio" && this.lmStudioJitLoad) {
@@ -377,7 +378,7 @@ export class LLMProvider implements TranslationProvider {
     }
 
     const rawText = extractResponseText(this.apiFormat, data);
-    const translatedText = stripPreamble(rawText || "");
+    const translatedText = stripPreamble(rawText || "", sourceText);
     if (!translatedText) {
       throw new Error("LLM response did not include translated content");
     }
@@ -403,7 +404,7 @@ export class LLMProvider implements TranslationProvider {
 
     try {
       const userPrompt = buildUserPrompt(strippedText, sourceLang, targetLang, options, this.model);
-      const translatedText = await this._callLLM(systemPrompt, userPrompt, controller.signal);
+      const translatedText = await this._callLLM(systemPrompt, userPrompt, controller.signal, strippedText);
       clearTimeout(timeoutId);
 
       return {
@@ -437,7 +438,7 @@ export class LLMProvider implements TranslationProvider {
     try {
       const generalSystemPrompt = buildGeneralGrammarSystemPrompt();
       const generalUserPrompt = strippedText;
-      const call1Output = await this._callLLM(generalSystemPrompt, generalUserPrompt, controller.signal);
+      const call1Output = await this._callLLM(generalSystemPrompt, generalUserPrompt, controller.signal, strippedText);
 
       const dialect = options?.dialect || targetLang;
       const spanishHint = buildSpanishVocabHint(call1Output, dialect);
@@ -455,7 +456,7 @@ export class LLMProvider implements TranslationProvider {
             spanishHint,
           ].filter(Boolean).join("\n");
 
-      const call2Output = await this._callLLM(dialectSystemPrompt, dialectUserPrompt, controller.signal);
+      const call2Output = await this._callLLM(dialectSystemPrompt, dialectUserPrompt, controller.signal, call1Output);
       clearTimeout(timeoutId);
 
       return {

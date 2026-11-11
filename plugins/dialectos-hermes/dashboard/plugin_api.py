@@ -16,10 +16,10 @@ import threading
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Literal, Optional
 
 from fastapi import APIRouter, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StrictBool
 
 
 def _load_core():
@@ -146,6 +146,34 @@ class TranslateIn(BaseModel):
     dialect: Optional[str] = Field(None, max_length=5)
     formal: Optional[bool] = None
     check: bool = True
+
+
+class LearnIn(BaseModel):
+    action: Literal["answer", "forget"]
+    dialect: Optional[str] = Field(None, max_length=5)
+    concept: Optional[str] = Field(None, max_length=100)
+    answer: Optional[str] = Field(None, max_length=500)
+    confirm: StrictBool = False
+
+
+@router.get("/learn")
+def learning(action: Literal["tip", "quiz", "stats", "cards"] = "tip",
+             dialect: Optional[str] = None, concept: Optional[str] = None,
+             offset: int = Query(0, ge=0)):
+    try:
+        return core.learn(action, dialect, concept, offset=offset)
+    except Exception as exc:
+        return _err(exc)
+
+
+@router.post("/learn")
+def learning_update(body: LearnIn):
+    try:
+        # The dashboard is a trusted owner surface, as with its Translate route.
+        # Chat tools cannot pass this private keyword through the tool schema.
+        return core.learn(body.action, body.dialect, body.concept, body.answer, body.confirm, _page=True)
+    except Exception as exc:
+        return _err(exc)
 
 
 @router.post("/detect")
