@@ -146,7 +146,7 @@ function TryIt({ ctx, status, dialects, target, setTarget, refresh }) {
     !provider ? jsx('p', { className: 'dos-why', children: 'Translate is off until you name a provider (llm, deepl, libre or mymemory) in the plugin settings. Detect and checks work without one.' }) : null,
     jsxs('div', { role: 'status', 'aria-live': 'polite', style: { display: 'grid', gap: 10 }, children: [
     stale ? jsx('p', { className: 'dos-stale', children: 'Your text or variant changed after this result. Run it again to update it.' }) : null,
-    r && !r.ok ? jsx('p', { className: 'dos-err', role: 'alert', children: r.error || 'Something went wrong.' }) : null,
+    r && !r.ok ? jsx('p', { className: 'dos-err', role: 'alert', children: r.error || 'DialectOS returned no error message. Try again.' }) : null,
     out?.kind === 'translate' && r?.ok ? jsxs('div', { className: 'dos-out', children: [
       jsxs('div', { className: 'dos-row', style: { justifyContent: 'space-between' }, children: [
         jsx('span', { className: 'dos-why', children: `${r.dialect} via ${PROVIDER_NAMES[provider] || provider}` }),

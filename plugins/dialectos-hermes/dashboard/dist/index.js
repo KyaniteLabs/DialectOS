@@ -70,7 +70,7 @@
         !provider ? h("p", { className: "text-sm text-muted-foreground" }, "Translate is off until you name a provider in the plugin settings. Detect and checks work without one.") : null,
         h("div", { role: "status", "aria-live": "polite", className: "space-y-3" },
         stale ? h("p", { className: "text-sm text-muted-foreground" }, "Your text or variant changed after this result. Run it again to update it.") : null,
-        r && !r.ok ? h("p", { role: "alert", className: "text-sm" }, r.error || "Something went wrong.") : null,
+        r && !r.ok ? h("p", { role: "alert", className: "text-sm" }, r.error || "DialectOS returned no error message. Try again.") : null,
         out && out.kind === "translate" && r && r.ok ? h("div", { className: "space-y-2 rounded-md border border-border p-3" },
           h("p", { className: "text-xs text-muted-foreground" }, r.dialect + " via " + (PROVIDERS[provider] || provider)),
           h("p", { lang: r.dialect, className: "whitespace-pre-wrap text-sm" }, r.text),
