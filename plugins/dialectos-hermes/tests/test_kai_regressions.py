@@ -153,7 +153,7 @@ def test_validate_retains_cli_fence_failure(plugin, fake_cli):
 
 def test_validate_description_discloses_released_pin_limit(plugin):
     desc = plugin.VALIDATE_SCHEMA["description"].lower()
-    assert "v0.3.1" in desc and "fence" in desc
+    assert "v0.3.2" in desc and "fence" in desc
 
 
 # --- P2 (6): no silent truncation of successful translations ------------------

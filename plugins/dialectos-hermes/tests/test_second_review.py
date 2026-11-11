@@ -82,7 +82,7 @@ def test_brief_cannot_override_non_spanish_target(plugin, message):
 def test_fence_transport_does_not_promise_release_bypass(plugin, fake_cli):
     fake_cli("print(json.dumps({'valid': False})); sys.exit(1)")
     assert plugin.validate("```hola```", "es-MX", "Hello")['data']['valid'] is False
-    assert "v0.3.1" in plugin.VALIDATE_SCHEMA["description"]
+    assert "v0.3.2" in plugin.VALIDATE_SCHEMA["description"]
 
 
 @pytest.mark.parametrize("provider", [None, "auto", ""])

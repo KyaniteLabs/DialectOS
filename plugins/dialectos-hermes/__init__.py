@@ -12,8 +12,8 @@ Child processes get a scrubbed env; cache, corpus and the QA ledger live under
 ctx.* APIs; runtime seams also include gateway.session_context and agent.secret_scope.
 Those imports are compatibility-sensitive, not a public-API-only guarantee.
 
-Validate uses private bounded temporary .md files for structural QA. The default
-v0.3.1 CLI still false-fails fences; reviewed source must be explicitly configured.
+Validate uses private bounded temporary .md files for structural QA. The pinned
+v0.3.2 CLI checks code fences against the source (fixed after v0.3.1).
 Pass a real source for semantic QA; register controls remain advisory.
 """
 
@@ -36,7 +36,7 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 PLUGIN_NAME = "dialectos"
-RELEASE_TGZ = "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-cli-0.3.1.tgz"
+RELEASE_TGZ = "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-cli-0.3.2.tgz"
 DEFAULTS: Dict[str, Any] = {
     "dialectos_command": f"npx -y --package={RELEASE_TGZ} dialectos",
     "default_dialect": "es-MX",
@@ -230,7 +230,7 @@ _SECRET_NAMES = (
     "LLM_API_KEY", "LLM_API_URL", "LLM_ENDPOINT", "LLM_MODEL", "LLM_API_FORMAT",
     "DEEPL_AUTH_KEY", "DEEPL_API_URL", "LIBRETRANSLATE_URL", "LIBRETRANSLATE_API_KEY",
     # Provider activation / local endpoint opt-ins (not credentials, but required for
-    # the advertised mymemory / localhost LLM configurations to reach v0.3.1).
+    # the advertised mymemory / localhost LLM configurations to reach the CLI).
     "ENABLE_MYMEMORY", "LLM_ALLOW_LOCAL", "LM_STUDIO_URL",
 )
 
@@ -370,7 +370,7 @@ def run_dialectos(args: List[str], stdin: Optional[str] = None, *, expect_json: 
         return {"ok": False, "exit": proc.returncode, "error": err[-800:] or f"exit {proc.returncode}"}
     res: Dict[str, Any] = {"ok": proc.returncode == 0, "exit": proc.returncode}
     if expect_json:
-        # Decode only the root at offset zero. v0.3.1 appends a human status
+        # Decode only the root at offset zero. The CLI appends a human status
         # line to failed validation reports; never search nested JSON openers.
         try:
             data, end = json.JSONDecoder().raw_decode(out)
@@ -452,7 +452,7 @@ def translate(text: str, dialect: Optional[str] = None, formal: Optional[bool] =
 def validate(translated: str, dialect: Optional[str] = None, source: Optional[str] = None) -> Dict[str, Any]:
     if not (source and str(source).strip()):
         raise ValueError(
-            "source is required for dialectos_validate (empty source always fails v0.3.1 semantic QA). "
+            "source is required for dialectos_validate (empty source always fails DialectOS semantic QA). "
             "Pass the original English/source text, or use the DialectOS CLI for dialect-only workflows."
         )
     _text(translated, "translated", MAX_OUT)
@@ -464,7 +464,7 @@ def validate(translated: str, dialect: Optional[str] = None, source: Optional[st
     args = ["validate", "--dialect", _dialect(dialect), "--format", "json"]
     # All inline documents go through private bounded files: enables CLI markdown
     # structure checks without exposing a user-facing path API or argv-size limits.
-    # Released v0.3.1 still false-fails fences; only reviewed source fixes that judge.
+    # v0.3.2+ judges fences against the source; a failing CLI verdict is never overridden.
     with tempfile.TemporaryDirectory(prefix="qa-", dir=str(_data_dir())) as temp:
         src = Path(temp) / "source.md"
         dst = Path(temp) / "translated.md"
@@ -490,7 +490,7 @@ _BRIEF = (
     "pick the target regional variant (es-MX, es-AR, es-ES, es-CO, … — `dialectos_list_dialects`), "
     "use `dialectos_detect` on any source Spanish, select an explicit provider (no auto fallback), translate with `dialectos_translate`, and run "
     "`dialectos_validate` on the result with the original source text before presenting it. "
-    "Fenced QA needs explicitly configured reviewed CLI source; the default v0.3.1 still false-fails fences. "
+    "Code blocks must match the source byte for byte. "
     "Register is advisory; state the dialect and formality (tú/vos/usted) you used."
 )
 
@@ -505,7 +505,7 @@ def _on_pre_llm(user_message: str = "", **_: Any) -> Optional[Dict[str, str]]:
 
 
 def _issue_counts(report: Dict[str, Any]) -> tuple[int, int]:
-    """Normalize v0.3.1 report fields into (all_issues, blocking_issues)."""
+    """Normalize CLI report fields into (all_issues, blocking_issues)."""
     judge = report.get("outputJudge") if isinstance(report.get("outputJudge"), dict) else {}
     judge_issues = judge.get("issues") if isinstance(judge.get("issues"), list) else []
     judge_blocking = judge.get("blockingIssues") if isinstance(judge.get("blockingIssues"), list) else []
@@ -582,7 +582,7 @@ DETECT_SCHEMA = {
 }
 VALIDATE_SCHEMA = {
     "name": "dialectos_validate",
-    "description": "Offline Spanish QA against a dialect with original source required. Bounded inline documents use private temporary .md files for structure checks. The default v0.3.1 CLI still false-fails code fences: repaired reviewed source must be explicitly configured for fenced QA. Register controls are advisory, not a blocking expected-register contract. Returns issues and a pass/fail verdict.",
+    "description": "Offline Spanish QA against a dialect with original source required. Bounded inline documents use private temporary .md files for structure checks. The pinned v0.3.2 CLI requires code fences to match the source byte for byte. Register controls are advisory, not a blocking expected-register contract. Returns issues and a pass/fail verdict.",
     "parameters": {
         "type": "object",
         "properties": {
@@ -637,7 +637,7 @@ _HELP = (
     "  /dialectos translate <es-XX> <english text>              Translate (network provider; CLI/TUI only by default)\n"
     "  /dialectos validate <es-XX> <source> :: <spanish text>   Offline plain-text QA (source required)\n"
     "  /dialectos status                                        Last QA ledger entries\n"
-    "No file paths, serve, corpus export or benchmark from slash. Fenced QA needs reviewed CLI source; default v0.3.1 still false-fails fences. Register is advisory."
+    "No file paths, serve, corpus export or benchmark from slash. Code blocks must match the source. Register is advisory."
 )
 
 

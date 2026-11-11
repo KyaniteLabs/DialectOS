@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Hermes plugin 0.2.1 runs the v0.3.2 CLI.** The plugin now downloads the v0.3.2 release tarball instead of v0.3.1, so translations that contain code blocks pass the check when the blocks match the source. Its README, tool descriptions and bundled skill drop the "fix not yet released" notes.
+
 ## [0.3.2] - 2026-11-11
 
 ### Fixed

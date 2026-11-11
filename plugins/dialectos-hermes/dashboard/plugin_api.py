@@ -58,7 +58,7 @@ def _record(tool: str, dialect: str, res: Dict[str, Any]) -> None:
 
 
 def _issues(data: Any) -> list[Dict[str, Any]]:
-    """Flatten a v0.3.1 report into [{message, blocking}] for display (deduplicated)."""
+    """Flatten a CLI report into [{message, blocking}] for display (deduplicated)."""
     if not isinstance(data, dict):
         return []
     judge = data.get("outputJudge") if isinstance(data.get("outputJudge"), dict) else {}
@@ -84,7 +84,7 @@ def status():
     ledger = core._load_json(core._ledger_path(), [])
     return {
         "cli": "release" if command == core.DEFAULTS["dialectos_command"] else "custom",
-        "cli_version": "0.3.1" if command == core.DEFAULTS["dialectos_command"] else None,
+        "cli_version": "0.3.2" if command == core.DEFAULTS["dialectos_command"] else None,
         "runner_found": bool(first and shutil.which(first)),
         "provider": provider if provider in core.PROVIDERS else "",
         "default_dialect": str(core._cfg("default_dialect")),
