@@ -75,22 +75,42 @@ _KILL_GRACE = 0.5
 
 # Spanish-specific intent only. Bare localize/i18n/localization alone must NOT match
 # (German/Japanese localization requests are not Spanish workflows).
+_VARIANTS = (
+    r"(?:español|espanol|castellano|mexicano|argentino|chileno|colombiano|peruano|venezolano|"
+    r"cubano|uruguayo|rioplatense|caribeño|neutro)"
+)
+_SPANISH_WORD = r"(?:spanish|castilian|español|espanol|castellano)"
+# A Spanish *target* only. A bare mention ("Spanish flu", "a Spanish restaurant",
+# "LATAM sales") must not pull the brief in, and neither must a refusal
+# ("do not answer in Spanish").
 _SPANISH_RE = re.compile(
     r"(?:"
-    r"\b(?:spanish|español|espanol|castellano|latam|latin american)\b|"
-    r"\btranslate\b(?:\s+\w+){0,4}\s+(?:into|to)\s+spanish\b|"
-    r"\blocali[sz](?:e|ation|ing)\b(?:\s+\w+){0,6}\s+(?:into|to|for)\s+"
-    r"(?:spanish|español|espanol|mexico|mexican|argentina|spain|colombia|latam)\b|"
+    r"\b(?:in|into|to)\s+(?:[\w-]+\s+){0,2}" + _SPANISH_WORD + r"\b|"
+    r"\b(?:spanish|castilian)\s+(?:version|translation|copy|reply|response|localization|localisation|subtitles?)\b|"
+    r"\b(?:en|al)\s+" + _VARIANTS + r"\b|"
+    r"\b(?:translat\w*|locali[sz]\w*|writ\w*|answer|reply|respond)\b(?:\s+[\w-]+){0,6}\s+(?:into|to|for|in)\s+"
+    r"(?:(?:the|our|your|their|a)\s+)?(?:spanish|español|espanol|mexico|mexican|argentina|argentine|spain|colombia|latam|latin american)\b|"
     r"\bes-(?:MX|AR|CO|ES|PR|CL|PE|VE|US|CU|UY|EC|GT|HN|SV|NI|CR|PA|DO|BO|PY|GQ|PH|BZ|AD)\b"
     r")",
     re.IGNORECASE,
 )
+_NEGATED_RE = re.compile(
+    r"\b(?:not|never|don't|dont|no|without)\s+(?:[\w-]+\s+){0,4}(?:in|into|to)\s+(?:[\w-]+\s+){0,2}"
+    + _SPANISH_WORD + r"\b",
+    re.IGNORECASE,
+)
 
-# Mirrors gateway.session_context.NON_MESSAGING_SESSION_SURFACES (Hermes v0.21.6).
-_NON_MESSAGING = frozenset({
-    "", "api_server", "cli", "codex", "desktop", "gateway", "kanban", "local",
-    "msgraph_webhook", "tool", "tui", "webhook",
-})
+
+def _wants_spanish(message: str) -> bool:
+    """True when the message asks for Spanish output and does not refuse it."""
+    return bool(_SPANISH_RE.search(message)) and not _NEGATED_RE.search(message)
+
+
+# Surfaces where the owner sits at their own machine. Everything else (chat platforms,
+# webhooks, the API server, kanban workers, cron, unknown names) counts as remote and
+# needs allow_translate_slash_on_gateway. Hermes's NON_MESSAGING_SESSION_SURFACES is
+# wider on purpose: it answers "is this a chat?", not "is the owner at the keyboard?".
+_LOCAL_SURFACES = frozenset({"cli", "tui", "desktop", "local", "acp"})
 
 _ctx = None
 _THREAD_LOCK = threading.Lock()
@@ -211,31 +231,41 @@ def _append_ledger(entry: Dict[str, Any]) -> None:
         _atomic_write_json(path, ledger[-LEDGER_MAX:])
 
 
-def _on_gateway() -> bool:
-    """True when this turn arrives over a human messaging surface.
-
-    Hermes v0.21.6 binds platform/source in task-local ContextVars; read them via
-    the public ``get_session_env`` and apply the same rule as core's
-    ``session_is_messaging_surface``. Missing runtime context fails closed unless the
-    environment explicitly identifies a known non-messaging surface; an absent
-    identity is not permission.
-    """
+def _session_identity() -> tuple:
+    """(platform, source, gateway-process) for this turn, each lower-cased."""
     try:
         from gateway.session_context import get_session_env
     except ImportError:
-        idents = (
-            os.environ.get("HERMES_PLATFORM") or os.environ.get("HERMES_SESSION_PLATFORM") or "",
-            os.environ.get("HERMES_SESSION_SOURCE") or "",
-        )
-        explicit = [str(v).strip().lower() for v in idents if str(v).strip()]
-        return not explicit or any(v not in _NON_MESSAGING for v in explicit)
+        platform = os.environ.get("HERMES_PLATFORM") or os.environ.get("HERMES_SESSION_PLATFORM") or ""
+        source = os.environ.get("HERMES_SESSION_SOURCE") or ""
+        engaged = True  # no runtime seam: an unnamed surface cannot be shown to be local
+    else:
+        from gateway import session_context as _sc
+
+        platform = get_session_env("HERMES_SESSION_PLATFORM", "") or os.environ.get("HERMES_PLATFORM", "")
+        source = get_session_env("HERMES_SESSION_SOURCE", "")
+        engaged = bool(getattr(_sc, "session_context_engaged", lambda: False)())
+    return str(platform or "").strip().lower(), str(source or "").strip().lower(), engaged
+
+
+def _on_gateway() -> bool:
+    """True unless this turn comes from a local surface (cli, tui, desktop, local, acp).
+
+    Chat platforms, webhooks, the API server, kanban workers, cron and unknown names
+    all count as remote. A turn that names no surface is local only in a process that
+    has never bound a gateway session (the classic CLI). Fails closed otherwise.
+    """
     try:
-        platform = os.environ.get("HERMES_PLATFORM") or get_session_env("HERMES_SESSION_PLATFORM", "")
-        idents = (str(v or "").strip().lower() for v in (platform, get_session_env("HERMES_SESSION_SOURCE", "")))
-        return any(v and v not in _NON_MESSAGING for v in idents)
+        platform, source, engaged = _session_identity()
     except Exception:
         logger.debug("dialectos: session identity lookup failed; failing closed", exc_info=True)
         return True
+    named = [v for v in (platform, source) if v]
+    if named:
+        return any(v not in _LOCAL_SURFACES for v in named)
+    if engaged:
+        return True
+    return (os.environ.get("HERMES_GATEWAY_SESSION") or "").strip().lower() in ("1", "true", "yes", "on")
 
 
 # --- child process ----------------------------------------------------------
@@ -718,7 +748,10 @@ def list_dialects() -> Dict[str, Any]:
 
 def translate(text: str, dialect: Optional[str] = None, formal: Optional[bool] = None,
               provider: Optional[str] = None) -> Dict[str, Any]:
-    prov = str(_cfg("provider") if provider is None else provider).strip().lower()
+    # The user's setting wins: the model may only choose when no provider is configured,
+    # so a prompt cannot reroute text to a provider the user did not pick.
+    configured = str(_cfg("provider") or "").strip().lower()
+    prov = configured or str(provider or "").strip().lower()
     if prov not in PROVIDERS:
         raise ValueError(f"select an explicit provider in settings or this call: {sorted(PROVIDERS)}; auto fallback is disabled")
     args = ["translate", "--dialect", _dialect(dialect), "--provider", prov]
@@ -778,7 +811,7 @@ _BRIEF = (
 
 def _on_pre_llm(user_message: str = "", **_: Any) -> Optional[Dict[str, str]]:
     try:
-        if _cfg("inject_on_spanish") and user_message and _SPANISH_RE.search(user_message):
+        if _cfg("inject_on_spanish") and user_message and _wants_spanish(user_message):
             return {"context": _BRIEF}
     except Exception:
         logger.debug("dialectos: pre_llm_call failed", exc_info=True)
@@ -855,7 +888,8 @@ TRANSLATE_SCHEMA = {
             "text": {"type": "string", "description": "Source text (<= 8000 chars)."},
             "dialect": {"type": "string", "description": "Target dialect code, e.g. es-MX, es-AR, es-ES."},
             "formal": {"type": "boolean", "description": "true = usted, false = tú/vos; omit for provider default."},
-            "provider": {"type": "string", "enum": sorted(PROVIDERS)},
+            "provider": {"type": "string", "enum": sorted(PROVIDERS),
+                         "description": "Used only when the user has not set a provider in settings; the setting always wins."},
         },
         "required": ["text"],
     },
@@ -964,7 +998,8 @@ def _slash(raw_args: str) -> str:
                 )})
             return _fmt(res)
         if cmd == "status":
-            return json.dumps(_load_json(_ledger_path(), [])[-10:], indent=2)
+            ledger = _load_json(_ledger_path(), [])
+            return json.dumps(ledger[-10:] if isinstance(ledger, list) else [], indent=2)
         if cmd == "detect":
             return _fmt(detect(rest))
         dialect, _, text = rest.partition(" ")
@@ -974,8 +1009,14 @@ def _slash(raw_args: str) -> str:
                     "validate requires the original source text: "
                     "`/dialectos validate <es-XX> <source> :: <translated>`.\n\n" + _HELP
                 )
-            source, _, translated = text.partition(" :: ")
-            return _fmt(validate(translated.strip(), dialect, source.strip()))
+            # Code such as `a :: b` usually survives translation, so the source and the
+            # translation hold the same number of separators: split at the middle one.
+            parts = text.split(" :: ")
+            mid = len(parts) // 2
+            source, translated = " :: ".join(parts[:mid]), " :: ".join(parts[mid:])
+            res = validate(translated.strip(), dialect, source.strip())
+            _on_post_tool("dialectos_validate", {"dialect": dialect}, res)  # same ledger as the tool
+            return _fmt(res)
         if cmd == "translate":
             if _on_gateway() and not _cfg("allow_translate_slash_on_gateway"):
                 return ("/dialectos translate is disabled on gateway platforms (sends text to a network "
