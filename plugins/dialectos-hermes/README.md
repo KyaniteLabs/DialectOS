@@ -57,4 +57,4 @@ Set these under `plugins.entries.dialectos.settings`.
 - **Older Hermes.** On Hermes versions before 0.23.0, the hook, tools, slash command and skill load, but the page and dashboard tab don't.
 - **Platforms.** Tested on Linux only. macOS and Windows are unverified.
 
-License: Apache-2.0, the same as DialectOS.
+License: Apache-2.0, the same as DialectOS. DialectOS is an independent project by KyaniteLabs and is not endorsed by Nous Research.
