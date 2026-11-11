@@ -3,8 +3,8 @@
 Surfaces:
   pre_llm_call   -> when the user asks for Spanish, inject a dialect + QA brief
   post_tool_call -> record dialectos_* results (dialect, QA verdict) in a profile-local ledger
-  /dialectos     -> detect | list | translate | validate | status | help (no file paths, no serve)
-  tools          -> dialectos_translate, dialectos_detect, dialectos_validate, dialectos_list_dialects
+  /dialectos     -> detect | list | translate | validate | status | learn | quiz | tip | answer | help
+  tools          -> dialectos_translate, dialectos_detect, dialectos_validate, dialectos_list_dialects, dialectos_learn
   skill          -> skills/dialectos/SKILL.md
 
 Child processes get a scrubbed env; cache, corpus and the QA ledger live under
@@ -95,7 +95,8 @@ _SPANISH_RE = re.compile(
     re.IGNORECASE,
 )
 _NEGATED_RE = re.compile(
-    r"\b(?:not|never|don't|dont|no|without)\s+(?:[\w-]+\s+){0,4}(?:in|into|to)\s+(?:[\w-]+\s+){0,2}"
+    r"\b(?:not|never|don't(?!\s+(?:forget|hesitate)\b)|dont(?!\s+(?:forget|hesitate)\b)|no|without)"
+    r"\s+(?:[\w-]+\s+){0,4}(?:in|into|to)\s+(?:[\w-]+\s+){0,2}"
     + _SPANISH_WORD + r"\b",
     re.IGNORECASE,
 )
@@ -191,11 +192,11 @@ def _save_json(path: Path, payload: Any) -> None:
 
 
 @contextmanager
-def _locked(path: Path):
+def _locked(path: Path, *, thread_lock=None):
     """Exclusive cross-thread + cross-process lock for a read-modify-write of *path*."""
     lock_path = path.with_name(path.name + ".lock")
     lock_path.parent.mkdir(parents=True, exist_ok=True)
-    with _THREAD_LOCK, open(lock_path, "a+b") as fh:
+    with (thread_lock or _THREAD_LOCK), open(lock_path, "a+b") as fh:
         if os.name == "nt":
             import msvcrt
 
@@ -442,7 +443,7 @@ def _ensure_release(timeout: float) -> Path:
     """
     if release_installed():
         return _release_entry()
-    with _INSTALL_LOCK, _locked(_data_dir() / "cli" / "install"):
+    with _locked(_data_dir() / "cli" / "install", thread_lock=_INSTALL_LOCK):
         if release_installed():
             return _release_entry()
         parent = _data_dir() / "cli"
@@ -633,8 +634,10 @@ GUARD_SCOPE = (
 _FENCE_RE = re.compile(r"(?ms)^\s*(```|~~~).*?^\s*\1[^\n]*$")
 _INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 _URL_RE = re.compile(r"https?://\S+")
-_NUM_RE = re.compile(r"(?<![\w.,])\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?![\w])")
+_NUM_RE = re.compile(r"(?<![\w.,+-])[+-]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?![\w])")
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
+_TIME_12H_RE = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?m\.?(?!\w)", re.I)
+_TIME_24H_RE = re.compile(r"(?<!\d)([01]?\d|2[0-3]):([0-5]\d)(?!\d)")
 _ES_WORDS = frozenset(
     "el la los las de del y en que es un una por para con se no su sus al lo como más pero "
     "le les ya o este esta estos estas ese esa eso porque entre cuando muy sin sobre también "
@@ -642,6 +645,7 @@ _ES_WORDS = frozenset(
     "algunos qué otro otra otros otras él tanto mucho nada cual poco ella estar algo nosotros "
     "tu tú usted ustedes vos son está están fue ser tiene puede hacer después aquí así".split()
 )
+_SPANISH_HOMOGRAPHS = frozenset("ha solo che come di entro dos da das pelo mas".split())
 # Words that are common in each language and are not Spanish words.
 _OTHER_WORDS: Dict[str, frozenset] = {
     "English": frozenset(
@@ -652,16 +656,23 @@ _OTHER_WORDS: Dict[str, frozenset] = {
         "nous je les une ou mais cette ces être avoir fait leur très".split()) - _ES_WORDS,
     "Portuguese": frozenset(
         "o os as da do das dos não em uma ao na no você mais mas é são pelo pela isso também "
-        "muito seu sua foi tem".split()) - _ES_WORDS,
+        "muito seu sua foi tem".split()) - _ES_WORDS - _SPANISH_HOMOGRAPHS,
     "Italian": frozenset(
         "il gli della di che è per non sono del alla dei delle questo anche più ma come nel "
-        "una lo ha i entro dopo nella degli sul questa essere ogni solo".split()) - _ES_WORDS,
+        "una lo ha i entro dopo nella degli sul questa essere ogni solo".split()) - _ES_WORDS - _SPANISH_HOMOGRAPHS,
 }
 # Small numbers a translator may spell out ("3 to 5" -> "de tres a cinco").
 _ES_SPELLED = {
     "0": ("cero",), "1": ("uno", "una", "un", "primer", "primero", "primera"), "2": ("dos",),
     "3": ("tres",), "4": ("cuatro",), "5": ("cinco",), "6": ("seis",), "7": ("siete",),
     "8": ("ocho",), "9": ("nueve",), "10": ("diez",), "11": ("once",), "12": ("doce",),
+    "13": ("trece",), "14": ("catorce",), "15": ("quince",), "16": ("dieciséis", "dieciseis"),
+    "17": ("diecisiete",), "18": ("dieciocho",), "19": ("diecinueve",), "20": ("veinte",),
+    "21": ("veintiuno", "veintiún", "veintiun", "veintiuna"), "22": ("veintidós", "veintidos"),
+    "23": ("veintitrés", "veintitres"), "24": ("veinticuatro",), "25": ("veinticinco",),
+    "26": ("veintiséis", "veintiseis"), "27": ("veintisiete",), "28": ("veintiocho",),
+    "29": ("veintinueve",), "30": ("treinta",), "40": ("cuarenta",), "50": ("cincuenta",),
+    "60": ("sesenta",), "70": ("setenta",), "80": ("ochenta",), "90": ("noventa",),
 }
 _MIN_WORDS_FOR_LANG = 6
 _MIN_CHARS_FOR_LENGTH = 80
@@ -674,7 +685,69 @@ def _prose(text: str) -> str:
 
 def _numbers(text: str) -> List[str]:
     """Digits of each number, ignoring thousands/decimal separator style (1,000.5 == 1.000,5)."""
-    return [re.sub(r"\D", "", m.group(0)) for m in _NUM_RE.finditer(_URL_RE.sub(" ", text))]
+    numbers = []
+    for match in _NUM_RE.finditer(_URL_RE.sub(" ", text)):
+        raw = match.group(0).replace(" ", "").replace(" ", "").replace(" ", "")
+        sign = "-" if raw.startswith("-") else ""
+        raw = raw.lstrip("+-")
+        separators = [i for i, char in enumerate(raw) if char in ",."]
+        if "," in raw and "." in raw:
+            decimal_at = max(i for i, char in enumerate(raw) if char in ",.")
+        elif len(separators) == 1 and len(raw) - separators[0] - 1 != 3:
+            decimal_at = separators[0]
+        else:
+            decimal_at = None
+        if decimal_at is None:
+            integer, fraction = re.sub(r"[,.]", "", raw), ""
+        else:
+            integer = re.sub(r"[,.]", "", raw[:decimal_at])
+            fraction = raw[decimal_at + 1:].rstrip("0")
+        integer = integer.lstrip("0") or "0"
+        numbers.append(sign + integer + ("." + fraction if fraction else ""))
+    return numbers
+
+
+def _time_matches(text: str):
+    """Return explicit 12-hour and 24-hour times as (canonical minutes, span)."""
+    matches = []
+    occupied = []
+    for match in _TIME_12H_RE.finditer(text):
+        hour = int(match.group(1)) % 12
+        if match.group(3).lower() == "p":
+            hour += 12
+        minute = int(match.group(2) or "0")
+        matches.append((hour * 60 + minute, match.span()))
+        occupied.append(match.span())
+    for match in _TIME_24H_RE.finditer(text):
+        span = match.span()
+        if any(span[0] < end and start < span[1] for start, end in occupied):
+            continue
+        matches.append((int(match.group(1)) * 60 + int(match.group(2)), span))
+    return matches
+
+
+def _without_equivalent_times(source: str, translated: str):
+    """Remove only time expressions present in both texts with the same local time."""
+    src_times = _time_matches(source)
+    dst_times = _time_matches(translated)
+    src_counts: Dict[int, int] = {}
+    dst_counts: Dict[int, int] = {}
+    for minute, _ in src_times:
+        src_counts[minute] = src_counts.get(minute, 0) + 1
+    for minute, _ in dst_times:
+        dst_counts[minute] = dst_counts.get(minute, 0) + 1
+    equivalent = {minute: min(count, dst_counts.get(minute, 0)) for minute, count in src_counts.items()}
+
+    def strip(text, times):
+        chars = list(text)
+        remaining = dict(equivalent)
+        for minute, (start, end) in times:
+            if remaining.get(minute, 0):
+                chars[start:end] = " " * (end - start)
+                remaining[minute] -= 1
+        return "".join(chars)
+
+    return strip(source, src_times), strip(translated, dst_times)
 
 
 def _language_guess(text: str) -> Optional[str]:
@@ -690,8 +763,9 @@ def _language_guess(text: str) -> Optional[str]:
 def _guard_issues(source: str, translated: str) -> List[str]:
     src, dst = _prose(source), _prose(translated)
     issues: List[str] = []
-    missing = list(_numbers(src))
-    for n in _numbers(dst):
+    src_numbers, dst_numbers = _without_equivalent_times(src, dst)
+    missing = list(_numbers(src_numbers))
+    for n in _numbers(dst_numbers):
         if n in missing:
             missing.remove(n)
     if missing:
@@ -788,11 +862,68 @@ def validate(translated: str, dialect: Optional[str] = None, source: Optional[st
     if isinstance(res.get("data"), dict) and type(res["data"].get("valid")) is bool:
         res["ok"] = True
         _apply_guards(res["data"], source_text, translated_text)
+        _capture_learning(res["data"], _dialect(dialect))
     elif "data" in res:
         res.pop("data")
         res["ok"] = False
         res["error"] = "expected validation report object with a boolean valid verdict"
     return res
+
+
+def _learning_store():
+    from .learning import LearningStore
+
+    def dictionary_path():
+        suffix = "node_modules/@dialectos/types/dist/dialectal-dictionary.json"
+        root = _release_dir()
+        paths = (root / suffix, root / "package" / suffix)
+        return next((p for p in paths if p.is_file()), paths[0])
+
+    return LearningStore(_data_dir, _atomic_write_json, _locked, dictionary_path)
+
+
+def _capture_learning(report: Dict[str, Any], dialect: str) -> None:
+    # Learning must never change a verdict or interrupt the ledger, even if its
+    # dictionary is absent or the private folder is temporarily unwritable.
+    try:
+        _learning_store().capture(report, dialect)
+    except Exception:
+        logger.debug("dialectos: learning capture unavailable")
+
+
+def learn(action: str, dialect: Optional[str] = None, concept: Optional[str] = None,
+          answer: Optional[str] = None, confirm: bool = False, offset: int = 0,
+          *, _page: bool = False) -> Dict[str, Any]:
+    """Offline learning; remote chats can read but cannot change private progress.
+
+    The dashboard has its existing trusted-dashboard boundary (as for Translate).
+    Only its Python route can set _page; this is not an agent tool parameter.
+    """
+    if action not in {"tip", "quiz", "answer", "stats", "cards", "forget"}:
+        raise ValueError("Learn action must be tip, quiz, answer, stats, cards or forget.")
+    if action in {"answer", "forget"} and not _page and _on_gateway():
+        raise ValueError("Learning changes are disabled on gateway platforms; use a local session or the DialectOS page.")
+    d = _dialect(dialect)
+    store = _learning_store()
+    if action == "tip":
+        data = store.compare(concept, d) if concept else store.tip(d)
+    elif action == "quiz":
+        data = store.quiz(d)
+    elif action == "stats":
+        data = store.stats(d)
+    elif action == "cards":
+        if type(offset) is not int or offset < 0:
+            raise ValueError("offset must be a nonnegative integer")
+        cards = store.cards(d)
+        data = {"cards": cards[offset:offset + 20], "total": len(cards), "offset": offset,
+                "next_offset": offset + 20 if offset + 20 < len(cards) else None}
+    elif action == "answer":
+        if not isinstance(concept, str) or not concept:
+            raise ValueError("answer requires the quiz concept and dialect")
+        data = store.answer(concept, d, _text(answer, "answer", 500))
+    else:
+        data = {"forgotten": store.forget(d, confirm=confirm)}
+    return {"ok": True, "data": data}
 
 
 # --- hooks ------------------------------------------------------------------
@@ -871,6 +1002,7 @@ def _on_post_tool(tool_name: str = "", args: Optional[Dict[str, Any]] = None, re
                 all_n, block_n = _issue_counts(d)
                 entry["issue_count"] = all_n
                 entry["blocking_issue_count"] = block_n
+                _capture_learning(d, dialect)
         _append_ledger(entry)
     except Exception:
         logger.debug("dialectos: post_tool_call failed", exc_info=True)
@@ -917,6 +1049,23 @@ LIST_SCHEMA = {
     "description": "List the 25 Spanish dialect variants DialectOS supports.",
     "parameters": {"type": "object", "properties": {}},
 }
+LEARN_SCHEMA = {
+    "name": "dialectos_learn",
+    "description": "Offline regional Spanish learning: daily comparisons, a casual quiz, private Leitner progress. Never stores your text or answers. Read-only actions work on gateway platforms; answer/forget need a local session. Forget requires confirm=true.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "action": {"type": "string", "enum": ["tip", "quiz", "answer", "stats", "cards", "forget"]},
+            "dialect": {"type": "string", "description": "Target variant; defaults to your configured dialect."},
+            "concept": {"type": "string", "description": "Quiz concept id for answer; optional specific comparison for tip."},
+            "answer": {"type": "string", "maxLength": 500, "description": "Typed quiz answer, never saved."},
+            "confirm": {"type": "boolean", "description": "Explicit confirmation required to forget this variant's cards."},
+            "offset": {"type": "integer", "minimum": 0, "description": "Cards page offset (20 per page)."},
+        },
+        "required": ["action"],
+        "additionalProperties": False,
+    },
+}
 
 
 def _wrap(fn):
@@ -944,11 +1093,13 @@ _tool_translate = _wrap(lambda a: translate(a.get("text"), a.get("dialect"), a.g
 _tool_detect = _wrap(lambda a: detect(a.get("text")))
 _tool_validate = _wrap(lambda a: validate(a.get("translated"), a.get("dialect"), a.get("source")))
 _tool_list = _wrap(lambda a: list_dialects())
+_tool_learn = _wrap(lambda a: learn(a.get("action"), a.get("dialect"), a.get("concept"),
+                                   a.get("answer"), a.get("confirm", False), a.get("offset", 0)))
 
 
 # --- slash ------------------------------------------------------------------
 
-_SAFE_SLASH = {"detect", "list", "translate", "validate", "status", "help"}
+_SAFE_SLASH = {"detect", "list", "translate", "validate", "status", "help", "learn", "quiz", "tip", "answer"}
 _HELP = (
     "Usage:\n"
     "  /dialectos detect <spanish text>                         Which dialect is this?\n"
@@ -956,6 +1107,11 @@ _HELP = (
     "  /dialectos translate <es-XX> <english text>              Translate (network provider; CLI/TUI only by default)\n"
     "  /dialectos validate <es-XX> <source> :: <spanish text>   Offline plain-text QA (source required)\n"
     "  /dialectos status                                        Last QA ledger entries\n"
+    "  /dialectos learn [tip|quiz|stats|cards] [es-XX]          Learn offline, at your pace\n"
+    "  /dialectos tip [es-XX] [concept]                       Compare regional terms\n"
+    "  /dialectos quiz [es-XX]                                One question\n"
+    "  /dialectos answer <es-XX> <concept> <typed answer>      Review a quiz card\n"
+    "  /dialectos learn forget <es-XX> --confirm              Delete that variant's cards (local only)\n"
     "No file paths, serve, corpus export or benchmark from slash. Code blocks must match the source. Register is advisory."
 )
 
@@ -990,6 +1146,30 @@ def _slash(raw_args: str) -> str:
     if cmd not in _SAFE_SLASH:
         return f"Unknown or blocked subcommand `{cmd}`. Allowed: {', '.join(sorted(_SAFE_SLASH))}."
     try:
+        if cmd in {"learn", "quiz", "tip", "answer"}:
+            parts = rest.split()
+            action = cmd
+            if cmd == "learn":
+                action = parts.pop(0) if parts and not parts[0].startswith("es-") else "tip"
+            d = parts.pop(0) if parts and parts[0].startswith("es-") else None
+            concept = None
+            typed = None
+            confirm = False
+            if action == "answer":
+                if not d or len(parts) < 2:
+                    raise ValueError("Usage: /dialectos answer <es-XX> <concept> <typed answer>")
+                concept, typed = parts[0], " ".join(parts[1:])
+            elif action == "tip":
+                if len(parts) > 1:
+                    raise ValueError("Usage: /dialectos tip [es-XX] [concept]")
+                concept = parts[0] if parts else None
+            elif action == "forget":
+                if parts not in ([], ["--confirm"]):
+                    raise ValueError("forget accepts only an explicit --confirm flag")
+                confirm = parts == ["--confirm"]
+            elif parts:
+                raise ValueError("Unexpected Learn arguments; see /dialectos help.")
+            return _fmt(learn(action, d, concept, typed, confirm))
         if cmd == "list":
             res = list_dialects()
             if res.get("ok") and isinstance(res.get("data"), list):
@@ -1037,14 +1217,15 @@ def register(ctx) -> None:
     ctx.register_command(
         "dialectos",
         handler=_slash,
-        description="DialectOS regional Spanish (detect/list/translate/validate/status).",
-        args_hint="detect <text> | list | translate <es-XX> <text> | validate <es-XX> <source> :: <text> | status",
+        description="DialectOS regional Spanish and offline Learn (tip/quiz/answer).",
+        args_hint="detect <text> | list | translate <es-XX> <text> | validate <es-XX> <source> :: <text> | learn | quiz | tip | answer",
     )
     for schema, handler, emoji in (
         (TRANSLATE_SCHEMA, _tool_translate, "🌎"),
         (DETECT_SCHEMA, _tool_detect, "🔎"),
         (VALIDATE_SCHEMA, _tool_validate, "✅"),
         (LIST_SCHEMA, _tool_list, "📋"),
+        (LEARN_SCHEMA, _tool_learn, "📖"),
     ):
         ctx.register_tool(
             name=schema["name"],

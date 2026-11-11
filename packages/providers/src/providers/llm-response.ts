@@ -8,6 +8,9 @@
 
 // Tags stripped from LLM output before preamble removal.
 const REASONING_TAGS = ["thinking", "think", "tiz"];
+// Liquid and other local-model templates expose control tokens in this form.
+const CONTROL_TOKEN_PATTERN = /<\|[^<>|\r\n]+\|>/g;
+const ASSISTANT_HEADER_PATTERN = /<\|im_start\|>[ \t]*assistant\b[ \t]*(?:\r?\n)?/gi;
 
 // Common conversational preambles small models emit before the actual translation.
 const PREAMBLE_PATTERNS: Array<[RegExp, string]> = [
@@ -21,7 +24,7 @@ const PREAMBLE_PATTERNS: Array<[RegExp, string]> = [
   [/^\s*<<<\s*\n/m, ""],
   [/\n\s*>>>\s*$/m, ""],
   // Spanish conversational preambles (weak models)
-  [/^\s*¡?Bienvenido!?\s*\n*/i, ""],
+  [/^\s*¡?Bienvenido!?[ \t]*\r?\n+/i, ""],
   [/^\s*Entiendo\.?\s*Estoy listo[^\n]*\n+/i, ""],
   [/^\s*Claro,?\s*(puedo|te puedo)[^\n]*\n+/i, ""],
 ];
@@ -29,6 +32,7 @@ const PREAMBLE_PATTERNS: Array<[RegExp, string]> = [
 // Chat template format markers that can be abused for prompt injection.
 const FORMAT_INJECTION_PATTERNS: Array<[RegExp, string]> = [
   [/<\|im_start\|>\s*(system|assistant|user)\b[^<]*<\|im_end\|>/gi, ""],
+  [ASSISTANT_HEADER_PATTERN, ""],
   [/<\|im_start\|>/gi, ""],
   [/<\|im_end\|>/gi, ""],
   [/\[INST\][\s\S]*?\[\/INST\]/gi, ""],
@@ -44,6 +48,7 @@ const FORMAT_INJECTION_PATTERNS: Array<[RegExp, string]> = [
   [/<\|user\|>/gi, ""],
   [/<\|system\|>/gi, ""],
   [/^\s*(SYSTEM|ASSISTANT|USER|INSTRUCTION)\s*:\s*/gm, ""],
+  [CONTROL_TOKEN_PATTERN, ""],
 ];
 
 const SANITIZE_MAP: Array<[RegExp, string]> = [
@@ -66,30 +71,40 @@ export function extractChatCompletionText(data: unknown): string | null {
   if (!data || typeof data !== "object") return null;
   const choices = (data as { choices?: unknown }).choices;
   if (!Array.isArray(choices) || choices.length === 0) return null;
-  const first = choices[0] as { message?: { content?: unknown }; text?: unknown } | undefined;
+  const first = choices[0] as {
+    message?: { content?: unknown; refusal?: unknown }; text?: unknown;
+  } | undefined;
+  if (first?.message?.refusal) return null;
   const content = first?.message?.content ?? first?.text;
   // Modern OpenAI responses may return content as an array of parts
   if (Array.isArray(content)) {
+    if (content.some((part) => part && typeof part === "object" && part.type === "refusal")) {
+      return null;
+    }
     const text = content
       .map((part) => {
         if (!part || typeof part !== "object") return "";
         const typed = part as { type?: unknown; text?: unknown };
-        if (typed.type === "text" && typeof typed.text === "string") {
-          return typed.text;
-        }
-        const maybeText = typed.text;
-        return typeof maybeText === "string" ? maybeText : "";
+        return extractTextPart(typed);
       })
       .join("")
       .trim();
-    return text.length > 0 ? text : null;
+    return text.length > 0 ? stripReasoningTags(text) : null;
   }
   if (typeof content !== "string" || content.trim().length === 0) return null;
   return stripReasoningTags(content.trim());
 }
 
+function extractTextPart(part: { type?: unknown; text?: unknown }): string {
+  // Retain untyped gateway parts, but never treat reasoning/tool metadata as text.
+  if (part.type !== undefined && part.type !== "text" && part.type !== "output_text") return "";
+  return typeof part.text === "string" ? part.text : "";
+}
+
 function stripReasoningTags(text: string): string {
-  return stripTaggedBlocks(text, REASONING_TAGS).trim();
+  // Remove the header first: deleting adjacent reasoning can join the role
+  // name to the answer, hiding the boundary needed to recognize the header.
+  return stripTaggedBlocks(text.replace(ASSISTANT_HEADER_PATTERN, ""), REASONING_TAGS).trim();
 }
 
 function stripTaggedBlocks(text: string, tagNames: string[]): string {
@@ -101,78 +116,25 @@ function stripTaggedBlocks(text: string, tagNames: string[]): string {
 }
 
 function stripTagBlock(text: string, tagName: string): string {
-  const lowerTag = tagName.toLowerCase();
-  const lowerText = text.toLowerCase();
+  // Match against the original text so Unicode case folding cannot shift offsets.
+  const pattern = new RegExp(`<(/?)${tagName}(?=[\\s/>]|$)[^>]*(?:>|$)`, "gi");
   let result = "";
   let cursor = 0;
+  let depth = 0;
 
-  while (cursor < text.length) {
-    const open = findOpeningTag(lowerText, lowerTag, cursor);
-    if (open === -1) {
-      result += text.slice(cursor);
-      break;
+  for (const match of text.matchAll(pattern)) {
+    if (match[1] === "/") {
+      if (depth > 0) depth--;
+      // An orphan close terminates reasoning prefilled by the chat template.
+      if (depth === 0) cursor = match.index + match[0].length;
+    } else {
+      if (depth === 0) result += text.slice(cursor, match.index);
+      depth++;
     }
-
-    const openEnd = lowerText.indexOf(">", open);
-    if (openEnd === -1) {
-      result += text.slice(cursor);
-      break;
-    }
-
-    const closeStart = findClosingTag(lowerText, lowerTag, openEnd + 1);
-    if (closeStart === -1) {
-      result += text.slice(cursor);
-      break;
-    }
-
-    const closeEnd = lowerText.indexOf(">", closeStart);
-    if (closeEnd === -1) {
-      result += text.slice(cursor);
-      break;
-    }
-
-    result += text.slice(cursor, open);
-    cursor = closeEnd + 1;
   }
 
-  return result;
-}
-
-function findOpeningTag(lowerText: string, lowerTag: string, start: number): number {
-  let cursor = start;
-  while (cursor < lowerText.length) {
-    const open = lowerText.indexOf(`<${lowerTag}`, cursor);
-    if (open === -1) return -1;
-    const next = lowerText.charCodeAt(open + lowerTag.length + 1);
-    if (isTagNameTerminator(next)) return open;
-    cursor = open + 1;
-  }
-  return -1;
-}
-
-function findClosingTag(lowerText: string, lowerTag: string, start: number): number {
-  let cursor = start;
-  while (cursor < lowerText.length) {
-    const close = lowerText.indexOf(`</${lowerTag}`, cursor);
-    if (close === -1) return -1;
-    const next = lowerText.charCodeAt(close + lowerTag.length + 2);
-    if (isTagNameTerminator(next)) return close;
-    cursor = close + 1;
-  }
-  return -1;
-}
-
-function isTagNameTerminator(charCode: number): boolean {
-  return (
-    Number.isNaN(charCode) ||
-    charCode === 47 ||
-    charCode === 62 ||
-    charCode === 9 ||
-    charCode === 10 ||
-    charCode === 12 ||
-    charCode === 13 ||
-    charCode === 32
-  );
+  // Unclosed outer blocks remain private even after an inner block closes.
+  return depth === 0 ? result + text.slice(cursor) : result;
 }
 
 /**
@@ -186,8 +148,7 @@ export function extractAnthropicText(data: unknown): string | null {
   const text = content
     .map((part) => {
       if (!part || typeof part !== "object") return "";
-      const maybeText = (part as { text?: unknown }).text;
-      return typeof maybeText === "string" ? maybeText : "";
+      return extractTextPart(part as { type?: unknown; text?: unknown });
     })
     .join("")
     .trim();
@@ -236,13 +197,20 @@ export function extractResponseText(format: string, data: unknown): string | und
  * Remove common preamble patterns that small models emit before the
  * actual translation output.
  */
-export function stripPreamble(text: string): string {
+export function stripPreamble(text: string, sourceText?: string): string {
   // Strip reasoning/thinking tags first (qwen3, etc.)
-  let result = stripReasoningTags(text);
+  let result = stripReasoningTags(text).replace(CONTROL_TOKEN_PATTERN, "");
   for (const [pattern, replacement] of PREAMBLE_PATTERNS) {
     result = result.replace(pattern, replacement);
   }
-  return result.trim();
+  result = result.trim();
+  // Only unwrap model-added fences when the source has no fenced blocks.
+  // Without source context, Markdown/code fences are legitimate content.
+  if (sourceText !== undefined && !/^[ \t]*(?:`{3,}|~{3,})/m.test(sourceText)) {
+    const fence = result.match(/^(`{3,}|~{3,})(?:json|text|plaintext|markdown|md)?[ \t]*\r?\n([\s\S]*?)\r?\n\1[ \t]*$/i);
+    if (fence) result = fence[2].trim();
+  }
+  return result;
 }
 
 /**

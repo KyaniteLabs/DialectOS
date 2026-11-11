@@ -19,6 +19,7 @@ Use DialectOS when an agent needs regional Spanish localization that preserves s
 - MCP: best when an agent host needs tools such as `translate_markdown`, `translate_text`, `detect_missing_keys`, `check_formality`, `search_glossary`, or `list_dialects`.
 - CLI: best for local docs, README translation, locale JSON validation, benchmark runs, certification, and report generation.
 - Demo/server workflows: use only when the user explicitly wants the browser demo or local provider testing.
+- Hermes: when `dialectos_learn` is available, use the [bundled Learn workflow](../../plugins/dialectos-hermes/skills/dialectos/SKILL.md#learn-when-it-fits) for optional offline tips and quizzes after a regional-term or address-form validate miss. Offer it casually at most once per session, after completing the requested translation; wait for the user's interest before starting practice.
 
 ## Default path (do this first)
 

@@ -8,6 +8,7 @@ import json
 import shutil
 import sys
 import tarfile
+import threading
 import urllib.error
 
 import pytest
@@ -160,6 +161,84 @@ def test_a_good_translation_still_passes(plugin, passing_cli):
 def test_spelled_out_small_numbers_pass(plugin, passing_cli):
     data = _verdict(plugin, GOOD.replace("de 3 a 5", "de tres a cinco").replace("los 2 años", "los dos años"))
     assert data["valid"] is True
+
+
+@pytest.mark.parametrize("translated", [
+    "Che, solo ha sido un día largo.",
+    "Os enviamos dos correos con vuestra factura.",
+])
+def test_valid_regional_spanish_is_not_flagged_as_italian_or_portuguese(plugin, passing_cli, translated):
+    data = _verdict(plugin, translated, "Please review this short message.")
+    assert data["valid"] is True
+    assert data["pluginGuards"]["passed"] is True
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("You have 15 days to return the item.", "Tienes quince días para devolverlo."),
+    ("The meeting starts at 3:30 PM today.", "La reunión empieza a las 15:30."),
+])
+def test_guards_accept_spelled_numbers_and_localized_24_hour_times(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True
+    assert data["pluginGuards"]["passed"] is True
+
+
+def test_dont_forget_spanish_request_is_not_treated_as_a_refusal(plugin):
+    assert plugin._wants_spanish("Don't forget to reply in Spanish") is True
+
+
+def test_release_install_does_not_hold_up_ledger_writes(plugin, monkeypatch):
+    download_started = threading.Event()
+    allow_download_to_finish = threading.Event()
+    ledger_written = threading.Event()
+    install_errors = []
+
+    def slow_download(_dest, _timeout):
+        download_started.set()
+        assert allow_download_to_finish.wait(2)
+        raise plugin.CliUnavailable("stop after lock probe")
+
+    def install():
+        try:
+            plugin._ensure_release(1)
+        except plugin.CliUnavailable as exc:
+            install_errors.append(str(exc))
+
+    def write_ledger():
+        plugin._append_ledger({"probe": True})
+        ledger_written.set()
+
+    monkeypatch.setattr(plugin, "_download_release", slow_download)
+    install_thread = threading.Thread(target=install)
+    ledger_thread = threading.Thread(target=write_ledger)
+    install_thread.start()
+    assert download_started.wait(1)
+    ledger_thread.start()
+    try:
+        assert ledger_written.wait(0.5), "ledger write waited for the release download"
+    finally:
+        allow_download_to_finish.set()
+        install_thread.join(2)
+        ledger_thread.join(2)
+    assert not install_thread.is_alive() and not ledger_thread.is_alive()
+    assert install_errors == ["stop after lock probe"]
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("El total es 1.5 euros.", "El total es 15 euros."),
+    ("El total es 12 euros.", "El total es -12 euros."),
+])
+def test_guards_block_changed_decimal_magnitude_and_sign(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is False
+    assert data["pluginGuards"]["passed"] is False
+    assert any("Numbers from the source" in issue for issue in data["blockingIssues"])
+
+
+def test_guards_accept_equivalent_grouping_and_decimal_styles(plugin, passing_cli):
+    data = _verdict(plugin, "El total es 1.000,5 euros.", "El total es 1,000.5 euros.")
+    assert data["valid"] is True
+    assert data["pluginGuards"]["passed"] is True
 
 
 @pytest.mark.parametrize("translated, expect", [

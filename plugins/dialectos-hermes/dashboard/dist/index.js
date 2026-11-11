@@ -106,6 +106,64 @@
           : h(Verdict, { check: res })) : null)));
   }
 
+  function Learn(props) {
+    var ds = useState(null), data = ds[0], setData = ds[1];
+    var as = useState(""), answer = as[0], setAnswer = as[1];
+    var fs = useState(null), feedback = fs[0], setFeedback = fs[1];
+    var bs = useState(false), busy = bs[0], setBusy = bs[1];
+    var es = useState(""), error = es[0], setError = es[1];
+    function load() {
+      return Promise.all(["tip", "stats", "quiz"].map(function (action) {
+        return SDK.fetchJSON(API + "/learn?action=" + action + "&dialect=" + encodeURIComponent(props.target));
+      })).then(function (r) {
+        var failed = r.find(function (x) { return !x.ok; });
+        if (failed) throw new Error(failed.error || "Learning is unavailable.");
+        return { tip: r[0].data, stats: r[1].data, quiz: r[2].data };
+      });
+    }
+    useEffect(function () {
+      var active = true;
+      load().then(function (r) { if (active) { setData(r); setError(""); } }, function (e) { if (active) setError(e.message || "Could not load Learn."); });
+      return function () { active = false; };
+    }, [props.target, props.revision]);
+    function submit(e) {
+      e.preventDefault();
+      if (busy || !answer.trim() || !data || !data.quiz.concept) return;
+      setBusy(true); setError("");
+      return post("/learn", { action: "answer", dialect: props.target, concept: data.quiz.concept, answer: answer })
+        .then(function (r) {
+          if (!r.ok) throw new Error(r.error || "Could not check that answer.");
+          setFeedback(r.data); setAnswer(""); return load();
+        }).then(setData).catch(function (e) { setError(e.message || "Could not load Learn."); })
+        .finally(function () { setBusy(false); });
+    }
+    // Solid blue-apatite colours come from DESIGN-PREFLIGHT; the native form has
+    // visible keyboard focus and introduces no animation (including reduced motion).
+    var inputStyle = { width: "100%", border: "1px solid #6b8993", borderRadius: 6, padding: "8px 10px", background: "#fbfdfd", color: "#12303a", font: "inherit" };
+    var buttonStyle = { background: "#135668", color: "#f3fafb", padding: "8px 12px", border: "1px solid #135668", borderRadius: 6, minHeight: 44 };
+    return h("section", { "aria-label": "Learn", style: { background: "#f4f8f9", color: "#12303a", border: "1px solid #76929b", borderRadius: 12, padding: 16 }, className: "dos-learn space-y-3" },
+      h("style", null, ".dos-learn input:focus-visible,.dos-learn button:focus-visible{outline:2px solid #135668;outline-offset:2px}@media(prefers-reduced-motion:reduce){.dos-learn *{transition:none!important;animation:none!important}}"),
+      h("h2", { className: "text-base font-semibold" }, "Learn"),
+      h("p", { className: "text-sm" }, "One regional word at a time. Offline, private, whenever you feel like it."),
+      error ? h("p", { role: "alert" }, error) : null,
+      !data && !error ? h("p", null, "Loading Learn…") : null,
+      data ? h("div", { className: "grid gap-4 lg:grid-cols-2" },
+        h("div", null, h("h3", { className: "font-semibold" }, "Tip of the day"),
+          h("p", null, data.tip.englishGloss + " · " + data.tip.concept),
+          h("p", null, props.target + ": ", h("strong", { lang: props.target }, data.tip.term)),
+          data.tip.notes || data.tip.register && data.tip.register !== "universal" ? h("p", null, [data.tip.register, data.tip.notes].filter(Boolean).join(" · ")) : null,
+          h("ul", { className: "list-disc pl-5" }, (data.tip.contrasts || []).map(function (r) {
+            return h("li", { key: r.variant }, r.variant + ": ", h("span", { lang: r.variant }, r.term));
+          }))),
+        h("div", { className: "space-y-3" }, h("p", null, data.stats.due + " due · " + (data.quiz.practice ? "Just for practice" : "One quick question")),
+          data.quiz.concept ? h("form", { onSubmit: submit, className: "space-y-2" },
+            h("label", { className: "block" }, data.quiz.question,
+              h("input", { style: inputStyle, "aria-label": data.quiz.question, maxLength: 500, value: answer, disabled: busy, autoComplete: "off", onChange: function (e) { setAnswer(e.target.value); } })),
+            h("button", { style: buttonStyle, type: "submit", disabled: busy || !answer.trim() }, busy ? "Checking…" : "Check answer"))
+            : h("p", null, "All caught up. Come back when you feel like it."),
+          h("p", { role: "status", "aria-live": "polite" }, feedback ? (feedback.correct ? "Correct" : "Good try") + " · " + (feedback.comparison ? feedback.comparison.term : feedback.term) + ". Due " + (feedback.card ? feedback.card.due : feedback.due) + "." : ""))) : null);
+  }
+
   function DialectosPage() {
     var st = useState(null), status = st[0], setStatus = st[1];
     var dl = useState([]), dialects = dl[0], setDialects = dl[1];
@@ -141,6 +199,7 @@
       h("div", { role: "note", className: "rounded-md border border-border p-3 text-sm" },
         h("strong", null, "Checks are advisory. "), "A translation can pass with its meaning changed, such as a flipped negation or the wrong sense of a word. Read it before you use it."),
       h("div", { className: "grid gap-4 lg:grid-cols-2" }, h(TryIt, shared), h(CheckPair, shared)),
+      h(Learn, { key: target, target: target, revision: ledger }),
       h("div", { className: "grid gap-4 lg:grid-cols-2" },
         h(Card, null,
           h(CardHeader, { className: "pb-3" }, h(CardTitle, { className: "text-base" }, "Checks by dialect")),

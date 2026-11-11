@@ -7,7 +7,7 @@ import {
   Button, CopyButton, EmptyState, ErrorState, PALETTE_AREA, ROUTES_AREA, SIDEBAR_NAV_AREA,
   Skeleton, host, relativeTime, useQuery, useQueryClient
 } from '@hermes/plugin-sdk'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 
 const ID = 'dialectos'
@@ -49,12 +49,12 @@ ${Object.entries(FONTS).map(([w, b]) => `@font-face{font-family:'${FACE}';font-s
 .dos-card{background:var(--ui-bg-card);border:1px solid var(--ui-stroke-tertiary);border-radius:12px;padding:16px;display:grid;gap:12px;min-width:0;align-content:start}
 .dos-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
 .dos-field{display:grid;gap:5px;font-size:13px;font-weight:500;color:var(--ui-text-secondary)}
-.dos textarea,.dos select{font:inherit;font-size:14px;color:var(--ui-text-primary);background:var(--ui-bg-input);border:1px solid #6b8993;border-radius:6px;padding:8px 10px;width:100%;transition:border-color .12s}
+.dos textarea,.dos select,.dos input{font:inherit;font-size:14px;color:var(--ui-text-primary);background:var(--ui-bg-input);border:1px solid #6b8993;border-radius:6px;padding:8px 10px;width:100%;transition:border-color .12s}
 .dos textarea::placeholder{color:#5d7780}
 .dos textarea:hover,.dos select:hover{border-color:#4f6e78}
 .dos textarea{min-height:88px;resize:vertical;line-height:1.5}
 .dos select{height:32px;padding:0 8px;width:auto;min-width:220px}
-.dos textarea:focus-visible,.dos select:focus-visible,.dos button:focus-visible{outline:2px solid var(--dos-id);outline-offset:1px}
+.dos textarea:focus-visible,.dos select:focus-visible,.dos input:focus-visible,.dos button:focus-visible{outline:2px solid var(--dos-id);outline-offset:1px}
 .dos-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .dos-why{font-size:13px;color:var(--ui-text-tertiary)}
 .dos-out{border:1px solid var(--ui-stroke-tertiary);border-radius:8px;background:var(--ui-bg-input);padding:12px 14px;display:grid;gap:10px;box-shadow:inset 3px 0 0 var(--dos-id)}
@@ -244,6 +244,60 @@ function Dialects({ dialects, target, setTarget, defaultDialect, failed, retry }
 
 const fact = (k, v, off) => jsxs('div', { className: 'dos-fact', 'data-off': off ? '' : undefined, children: [jsx('dt', { children: k }), jsx('dd', { children: v })] }, k)
 
+function Learn({ ctx, target, revision }) {
+  const [data, setData] = useState(null)
+  const [answer, setAnswer] = useState('')
+  const [feedback, setFeedback] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const load = async () => {
+    const results = await Promise.all(['tip', 'stats', 'quiz'].map(action => ctx.rest(`/learn?action=${action}&dialect=${encodeURIComponent(target)}`)))
+    const failed = results.find(r => !r.ok)
+    if (failed) throw new Error(failed.error || 'Learning is unavailable.')
+    return { tip: results[0].data, stats: results[1].data, quiz: results[2].data }
+  }
+  useEffect(() => {
+    let active = true
+    load().then(r => { if (active) { setData(r); setError('') } }, e => { if (active) setError(e.message || 'Could not load Learn.') })
+    return () => { active = false }
+  }, [ctx, target, revision])
+  const submit = async e => {
+    e.preventDefault()
+    if (busy || !answer.trim() || !data?.quiz?.concept) return
+    setBusy(true); setError('')
+    try {
+      const res = await post(ctx, '/learn', { action: 'answer', dialect: target, concept: data.quiz.concept, answer })
+      if (!res.ok) throw new Error(res.error || 'Could not check that answer.')
+      setFeedback(res.data); setAnswer('')
+      setData(await load())
+    } catch (err) { setError(err.message || 'Could not load Learn.') }
+    finally { setBusy(false) }
+  }
+  return jsxs('section', { className: 'dos-card', 'aria-label': 'Learn', children: [
+    jsx('h2', { className: 'dos-label', children: 'Learn' }),
+    jsx('p', { className: 'dos-why', children: 'One regional word at a time. Offline, private, whenever you feel like it.' }),
+    error ? jsx('p', { className: 'dos-err', role: 'alert', children: error }) : null,
+    !data && !error ? jsx('p', { children: 'Loading Learn…' }) : null,
+    data ? jsxs('div', { className: 'dos-cols', children: [
+      jsxs('div', { children: [jsx('h3', { children: 'Tip of the day' }),
+        jsx('p', { children: `${data.tip.englishGloss} · ${data.tip.concept}` }),
+        jsxs('p', { children: [target, ': ', jsx('strong', { lang: target, children: data.tip.term })] }),
+        data.tip.notes || data.tip.register && data.tip.register !== 'universal'
+          ? jsx('p', { className: 'dos-why', children: [data.tip.register, data.tip.notes].filter(Boolean).join(' · ') }) : null,
+        jsx('ul', { className: 'dos-issues', children: (data.tip.contrasts || []).map(r => jsxs('li', { children: [r.variant, ': ', jsx('span', { lang: r.variant, children: r.term })] }, r.variant)) })] }),
+      jsxs('div', { children: [jsx('p', { children: `${data.stats.due} due · ${data.quiz.practice ? 'Just for practice' : 'One quick question'}` }),
+        data.quiz.concept ? jsxs('form', { onSubmit: submit, children: [
+          jsx('label', { className: 'dos-field', children: [data.quiz.question,
+            jsx('input', { 'aria-label': data.quiz.question, value: answer, maxLength: 500, autoComplete: 'off', disabled: busy,
+              onChange: e => setAnswer(e.target.value) })] }),
+          jsx(Button, { type: 'submit', disabled: busy || !answer.trim(), children: busy ? 'Checking…' : 'Check answer' })] })
+          : jsx('p', { children: 'All caught up. Come back when you feel like it.' }),
+        jsx('p', { role: 'status', 'aria-live': 'polite', children: feedback
+          ? `${feedback.correct ? 'Correct' : 'Good try'} · ${feedback.comparison?.term || feedback.term}. Due ${feedback.card?.due || feedback.due}.` : '' })] })
+    ] }) : null
+  ] })
+}
+
 function DialectosPage({ ctx }) {
   const qc = useQueryClient()
   const status = useQuery({ queryKey: [ID, 'status'], queryFn: () => ctx.rest('/status') })
@@ -276,6 +330,7 @@ function DialectosPage({ ctx }) {
     status.isError ? jsx(ErrorState, { title: 'DialectOS backend unavailable', description: 'Turn on the DialectOS plugin, then reopen this page.' }) : null,
     jsxs('p', { className: 'dos-note', children: [jsx('b', { children: 'Checks are advisory.' }), ' A translation can pass with its meaning changed, such as a flipped negation or the wrong sense of a word. Read it before you use it.'] }),
     jsxs('div', { className: 'dos-cols', children: [jsx(TryIt, shared), jsx(CheckPair, shared)] }),
+    jsx(Learn, { ctx, target, revision: ledger.dataUpdatedAt }, target),
     jsx(Dialects, { dialects, target, setTarget, defaultDialect: s?.default_dialect, failed: list.isError ? true : list.data && !list.data.ok ? list.data.error : null, retry: () => list.refetch?.() }),
     jsxs('div', { className: 'dos-cols', children: [jsx(ByDialect, { ledger: ledgerOk, names, failed: ledgerFailed, retry: () => ledger.refetch?.() }), jsx(Recent, { ledger: ledgerOk, failed: ledgerFailed, retry: () => ledger.refetch?.() })] })
   ] }) })
