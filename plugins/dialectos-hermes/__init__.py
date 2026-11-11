@@ -537,8 +537,10 @@ def _on_post_tool(tool_name: str = "", args: Optional[Dict[str, Any]] = None, re
                 payload = json.loads(result)
             except Exception:
                 payload = {"raw": result[:200]}
+        # Only a well-formed variant code reaches the ledger, so tool arguments can
+        # never smuggle text into the verdict-only history.
         dialect = (args or {}).get("dialect")
-        if not dialect:
+        if not (isinstance(dialect, str) and DIALECT_RE.match(dialect)):
             dialect = _cfg("default_dialect")
         entry: Dict[str, Any] = {
             "ts": int(time.time()),

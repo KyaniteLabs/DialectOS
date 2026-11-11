@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Hermes plugin 0.2.2: the check history could hold text from a tool call.** The ledger copied the `dialect` argument as given, so a call that put text there stored it. It now keeps only a well-formed variant code and falls back to the default.
+
+### Added
+
+- **Hermes plugin 0.2.2 ships the Chakra Petch font license** (`desktop/OFL.txt`) for the font its desktop page embeds, and its README says the npx tarball is not hash-checked and that the page's Translate button answers anyone who can reach the dashboard.
+
 ### Changed
 
 - **Hermes plugin 0.2.1 runs the v0.3.2 CLI.** The plugin now downloads the v0.3.2 release tarball instead of v0.3.1, so translations that contain code blocks pass the check when the blocks match the source. Its README, tool descriptions and bundled skill drop the "fix not yet released" notes.
