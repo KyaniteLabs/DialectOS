@@ -471,3 +471,29 @@ describe("BulkTranslationEngine", () => {
     expect(result.successes[1].result.translatedText).toBe("translated:Hello");
   });
 });
+
+describe("buildBulkCheckpoint (single checkpoint serializer)", () => {
+  it("keeps the v2 on-disk shape byte-compatible", async () => {
+    const { buildBulkCheckpoint } = await import("../engine.js");
+    const item = { id: "1", sourceText: "Hi", sourceLang: "en", targetLang: "es" };
+    const failed = { id: "2", sourceText: "Bye", sourceLang: "en", targetLang: "es" };
+    const checkpoint = buildBulkCheckpoint(
+      [{ item, result: { translatedText: "Hola" }, latencyMs: 5, cacheHit: false, retryCount: 0 }],
+      [{ item: failed, error: "boom", retryCount: 2, failedAt: "2026-01-01T00:00:00.000Z" }],
+      2,
+      new Date("2026-01-02T00:00:00.000Z")
+    );
+    expect(JSON.stringify(checkpoint)).toBe(
+      JSON.stringify({
+        version: 2,
+        createdAt: "2026-01-02T00:00:00.000Z",
+        completedIds: ["1"],
+        completedResults: [{ id: "1", result: { translatedText: "Hola" } }],
+        failedItems: [
+          { item: failed, error: "boom", retryCount: 2, failedAt: "2026-01-01T00:00:00.000Z" },
+        ],
+        totalItems: 2,
+      })
+    );
+  });
+});

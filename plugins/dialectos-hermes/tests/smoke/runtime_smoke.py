@@ -12,7 +12,7 @@ import sys
 runtime, home = map(lambda p: Path(p).resolve(), sys.argv[1:3])
 os.environ['HERMES_HOME'] = str(home)
 sys.path.insert(0, str(runtime))
-shutil.copytree(Path(__file__).parent, home / 'plugins/dialectos',
+shutil.copytree(Path(__file__).resolve().parents[2], home / 'plugins/dialectos',
                 dirs_exist_ok=True,
                 ignore=shutil.ignore_patterns('__pycache__', '.pytest_cache', 'tests'))
 # This file belongs to the disposable home, never an active gateway profile.

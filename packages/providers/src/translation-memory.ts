@@ -31,6 +31,38 @@ export interface TranslationMemoryOptions {
   defaultTtlMs?: number;
 }
 
+/**
+ * Disk-persistence lifecycle (in-process only; nothing about it is stored).
+ *
+ *   idle          --set()-->              writing        (starts the persist loop)
+ *   writing       --set()-->              writing-dirty  (coalesce: one more pass needed)
+ *   writing-dirty --set()-->              writing-dirty
+ *   writing-dirty --loop starts a pass--> writing
+ *   writing       --pass done / failed--> idle
+ *   writing-dirty --pass failed-->        idle           (dirty data retried on next set())
+ *
+ * Replaces the old `persistPromise` + `pendingPersist` flag pair, where
+ * `pendingPersist === true` with no loop running was representable.
+ */
+export const PERSIST_STATES = ["idle", "writing", "writing-dirty"] as const;
+export type PersistState = (typeof PERSIST_STATES)[number];
+
+export const PERSIST_TRANSITIONS: Readonly<Record<PersistState, readonly PersistState[]>> = {
+  idle: ["writing"],
+  writing: ["writing-dirty", "idle"],
+  "writing-dirty": ["writing-dirty", "writing", "idle"],
+};
+
+export class IllegalPersistTransitionError extends Error {
+  constructor(
+    readonly from: PersistState,
+    readonly to: PersistState
+  ) {
+    super(`Illegal translation-memory persist transition: ${from} -> ${to}`);
+    this.name = "IllegalPersistTransitionError";
+  }
+}
+
 const CACHE_VERSION = 1;
 const DEFAULT_MAX_SIZE = 10_000;
 const DEFAULT_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -49,8 +81,9 @@ export class TranslationMemory {
   private readonly maxSize: number;
   private readonly defaultTtlMs: number;
   private readonly data = new Map<string, CacheEntry>();
+  private persistState: PersistState = "idle";
+  /** The running persist loop; non-null exactly when persistState !== "idle". */
   private persistPromise: Promise<void> | null = null;
-  private pendingPersist = false;
   private persistGeneration = 0;
 
   constructor(options: TranslationMemoryOptions = {}) {
@@ -231,12 +264,33 @@ export class TranslationMemory {
     await this.enqueuePersist();
   }
 
+  /** The single writer of `persistState`; refuses illegal moves. */
+  private movePersistState(to: PersistState): void {
+    if (!PERSIST_TRANSITIONS[this.persistState].includes(to)) {
+      throw new IllegalPersistTransitionError(this.persistState, to);
+    }
+    this.persistState = to;
+  }
+
+  /** Current disk-persistence state (for diagnostics/tests). */
+  getPersistState(): PersistState {
+    return this.persistState;
+  }
+
+  /**
+   * Request a persist. Resolves once a disk write that includes the caller's
+   * change has completed (or failed and been swallowed).
+   */
   private async enqueuePersist(): Promise<void> {
-    if (this.persistPromise) {
-      this.pendingPersist = true;
+    if (this.persistState !== "idle" && this.persistPromise) {
+      // Coalesce into the running loop; it will make one more pass that
+      // includes this change before it resolves.
+      this.movePersistState("writing-dirty");
+      await this.persistPromise;
       return;
     }
 
+    this.movePersistState("writing");
     this.persistPromise = this.runPersistLoop();
     await this.persistPromise;
   }
@@ -244,15 +298,15 @@ export class TranslationMemory {
   private async runPersistLoop(): Promise<void> {
     try {
       await this.doPersist();
-      while (this.pendingPersist) {
-        this.pendingPersist = false;
+      while (this.persistState === "writing-dirty") {
+        this.movePersistState("writing");
         await this.doPersist();
       }
     } catch {
       // Persist failure should not deadlock future writes.
       // In-memory cache continues to work; disk will retry on next write.
     } finally {
-      this.pendingPersist = false;
+      this.movePersistState("idle");
       this.persistPromise = null;
     }
   }

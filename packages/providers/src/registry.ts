@@ -8,9 +8,23 @@ import { CircuitBreaker } from "./circuit-breaker.js";
 import { TranslationMemory } from "./translation-memory.js";
 import { CachedProvider } from "./cached-provider.js";
 
+/**
+ * Who drives a provider's circuit breaker.
+ *
+ * - "provider": the provider exposes `getCircuitBreaker()` and already calls
+ *   `canExecute()` / `recordSuccess()` / `recordFailure()` inside `translate()`.
+ *   The registry must only PEEK (`wouldAllow()`) and must not record outcomes
+ *   again, or every call is counted twice and the half-open probe slot is
+ *   stolen by the availability check before the real request can use it.
+ * - "registry": a plain provider; the registry is the only gatekeeper and
+ *   records outcomes itself.
+ */
+export type BreakerOwner = "provider" | "registry";
+
 interface ProviderEntry {
   provider: TranslationProvider;
   breaker: CircuitBreaker;
+  breakerOwner: BreakerOwner;
 }
 
 export interface CapabilityValidationError {
@@ -59,11 +73,27 @@ export class ProviderRegistry {
     // Use the provider's own circuit breaker if available to avoid
     // the double-breaker anti-pattern where registry and provider
     // maintain separate, desynchronized breakers.
-    const breaker =
-      (wrappedProvider as unknown as { getCircuitBreaker?(): CircuitBreaker }).getCircuitBreaker?.() ??
-      new CircuitBreaker(this.failureThreshold, this.resetTimeoutMs);
+    const ownBreaker = (
+      wrappedProvider as unknown as { getCircuitBreaker?(): CircuitBreaker | undefined }
+    ).getCircuitBreaker?.();
+    const entry: ProviderEntry = ownBreaker
+      ? { provider: wrappedProvider, breaker: ownBreaker, breakerOwner: "provider" }
+      : {
+          provider: wrappedProvider,
+          breaker: new CircuitBreaker(this.failureThreshold, this.resetTimeoutMs),
+          breakerOwner: "registry",
+        };
 
-    this.providers.set(provider.name, { provider: wrappedProvider, breaker });
+    this.providers.set(provider.name, entry);
+  }
+
+  /**
+   * Gate check for an entry. Registry-owned breakers are claimed here (the
+   * registry is the only gatekeeper); provider-owned breakers are only peeked
+   * so the provider's own `canExecute()` inside `translate()` gets the probe.
+   */
+  private admits(entry: ProviderEntry): boolean {
+    return entry.breakerOwner === "provider" ? entry.breaker.wouldAllow() : entry.breaker.canExecute();
   }
 
   /**
@@ -102,7 +132,7 @@ export class ProviderRegistry {
     for (const rank of sortedRanks) {
       const group = rankGroups.get(rank)!;
       const available = group.filter((entry) => {
-        if (!entry.breaker.canExecute()) return false;
+        if (!this.admits(entry)) return false;
         if (targetLang) {
           const caps = entry.provider.getCapabilities?.();
           const baseLang = targetLang.split("-")[0];
@@ -172,7 +202,7 @@ export class ProviderRegistry {
    */
   isAvailable(name: string): boolean {
     const entry = this.providers.get(this.canonicalName(name));
-    return entry ? entry.breaker.canExecute() : false;
+    return entry ? this.admits(entry) : false;
   }
 
   /**
@@ -326,7 +356,8 @@ export class ProviderRegistry {
    */
   recordSuccess(name: string): void {
     const entry = this.providers.get(this.canonicalName(name));
-    if (entry) {
+    // Provider-owned breakers already recorded this inside translate().
+    if (entry && entry.breakerOwner === "registry") {
       entry.breaker.recordSuccess();
     }
   }
@@ -336,7 +367,8 @@ export class ProviderRegistry {
    */
   recordFailure(name: string): void {
     const entry = this.providers.get(this.canonicalName(name));
-    if (entry) {
+    // Provider-owned breakers already recorded this inside translate().
+    if (entry && entry.breakerOwner === "registry") {
       entry.breaker.recordFailure();
     }
   }

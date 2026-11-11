@@ -4,6 +4,7 @@
 
 import type { TranslationProvider, TranslationResult, ProviderCapability, TranslateOptions } from "./types.js";
 import type { TranslationMemory } from "./translation-memory.js";
+import type { CircuitBreaker } from "./circuit-breaker.js";
 
 export class CachedProvider implements TranslationProvider {
   readonly name: string;
@@ -52,6 +53,16 @@ export class CachedProvider implements TranslationProvider {
         dialectHandling: "none",
       }
     );
+  }
+
+  /**
+   * Expose the wrapped provider's own circuit breaker (if any) so the registry
+   * shares it instead of creating a second, desynchronized breaker.
+   */
+  getCircuitBreaker(): CircuitBreaker | undefined {
+    return (
+      this.provider as unknown as { getCircuitBreaker?(): CircuitBreaker | undefined }
+    ).getCircuitBreaker?.();
   }
 
   /**

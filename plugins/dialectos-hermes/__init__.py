@@ -79,9 +79,22 @@ _THREAD_LOCK = threading.Lock()
 
 # --- config / storage -------------------------------------------------------
 
+def _settings_from_config() -> Dict[str, Any]:
+    """plugins.entries.dialectos.settings from config.yaml, for the dashboard/desktop
+    backend, which runs without the agent's PluginContext."""
+    try:
+        from hermes_cli.config import load_config
+
+        entry = ((load_config() or {}).get("plugins") or {}).get("entries") or {}
+        settings = (entry.get(PLUGIN_NAME) or {}).get("settings") or {}
+        return settings if isinstance(settings, dict) else {}
+    except Exception:
+        return {}
+
+
 def _cfg(key: str) -> Any:
     try:
-        val = _ctx.get_config(key, None) if _ctx is not None else None
+        val = _ctx.get_config(key, None) if _ctx is not None else _settings_from_config().get(key)
     except Exception:
         val = None
     return DEFAULTS[key] if val is None else val
@@ -182,12 +195,14 @@ def _append_ledger(entry: Dict[str, Any]) -> None:
 def _on_gateway() -> bool:
     """True when this turn arrives over a human messaging surface.
 
-    Hermes v0.21.6 binds platform/source in task-local ContextVars, so ask the
-    runtime. Missing runtime context fails closed unless the environment explicitly
-    identifies a known non-messaging surface; an absent identity is not permission.
+    Hermes v0.21.6 binds platform/source in task-local ContextVars; read them via
+    the public ``get_session_env`` and apply the same rule as core's
+    ``session_is_messaging_surface``. Missing runtime context fails closed unless the
+    environment explicitly identifies a known non-messaging surface; an absent
+    identity is not permission.
     """
     try:
-        from gateway.session_context import session_is_messaging_surface
+        from gateway.session_context import get_session_env
     except ImportError:
         idents = (
             os.environ.get("HERMES_PLATFORM") or os.environ.get("HERMES_SESSION_PLATFORM") or "",
@@ -196,9 +211,11 @@ def _on_gateway() -> bool:
         explicit = [str(v).strip().lower() for v in idents if str(v).strip()]
         return not explicit or any(v not in _NON_MESSAGING for v in explicit)
     try:
-        return bool(session_is_messaging_surface())
+        platform = os.environ.get("HERMES_PLATFORM") or get_session_env("HERMES_SESSION_PLATFORM", "")
+        idents = (str(v or "").strip().lower() for v in (platform, get_session_env("HERMES_SESSION_SOURCE", "")))
+        return any(v and v not in _NON_MESSAGING for v in idents)
     except Exception:
-        logger.debug("dialectos: session_is_messaging_surface failed; failing closed", exc_info=True)
+        logger.debug("dialectos: session identity lookup failed; failing closed", exc_info=True)
         return True
 
 
