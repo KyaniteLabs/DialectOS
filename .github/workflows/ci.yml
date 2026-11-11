@@ -137,5 +137,5 @@ jobs:
           HERMES_HOME: ${{ runner.temp }}/dialectos-disposable-profile
           PYTHONPATH: ${{ github.workspace }}/.hermes-test-runtime
         run: |
-          "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" plugins/dialectos-hermes/runtime_smoke.py "$PYTHONPATH" "$HERMES_HOME"
+          "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" plugins/dialectos-hermes/tests/smoke/runtime_smoke.py "$PYTHONPATH" "$HERMES_HOME"
           "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" -c "from hermes_cli.plugins_cmd_catalog import cmd_validate; cmd_validate('plugins/dialectos-hermes', as_json=True)"

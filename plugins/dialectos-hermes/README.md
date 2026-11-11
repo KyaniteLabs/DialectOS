@@ -16,7 +16,7 @@ Regional Spanish localization across **25 dialect variants** with QA gates — i
 ## Install
 
 ```bash
-hermes plugins install KyaniteLabs/DialectOS --subdir plugins/dialectos-hermes
+hermes plugins install KyaniteLabs/DialectOS/plugins/dialectos-hermes
 hermes plugins enable dialectos
 ```
 
@@ -46,7 +46,7 @@ Requires **Node ≥ 20** and `npx` on PATH.
 - First call is slow (tarball download); offline machines need a pre-installed `dialectos`.
 - Free providers (MyMemory/Libre) only take base `es`; dialect shaping is then post-processing — configure an LLM provider for best dialect fidelity.
 - Source/detection input is capped at 8000 chars; validation accepts translated text up to 100000 chars (`MAX_OUT`). Successful translations are not silently truncated; oversized tool/slash results return an explicit size error.
-- Validation writes bounded inline documents to private temporary `.md` files under profile-local plugin data, enabling existing structure checks; files are removed on success or failure. The default v0.3.1 output judge still false-fails code fences. This PR repairs the CLI source judge (byte-identical source-aware fences); explicitly configure `dialectos_command` to that reviewed build to exercise the repair. The released default pin is unchanged; do not claim repaired-source results describe that release. Register flags and hooks are advisory, not an expected-register blocking contract.
+- Validation writes bounded inline documents to private temporary `.md` files under profile-local plugin data, enabling existing structure checks; files are removed on success or failure. The default v0.3.1 output judge still false-fails code fences. The repaired judge (byte-identical source-aware fences) is in the CLI source on `main` but not yet in a release; point `dialectos_command` at a build of that source to use it. Results from that build don't describe the v0.3.1 release. Register flags and hooks are advisory, not an expected-register blocking contract.
 - `/dialectos list` renders all 25 code/name pairs; the agent list tool retains full metadata.
 - Validation uses private temporary files rather than large text argv; no user-facing file-path API is exposed. Files are plaintext while the subprocess runs (owner-only directory), removed afterwards; a hard host/process crash can leave residue under plugin data for owner cleanup.
 - No Desktop pane or banner/screenshots yet.

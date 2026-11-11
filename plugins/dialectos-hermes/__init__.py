@@ -182,12 +182,14 @@ def _append_ledger(entry: Dict[str, Any]) -> None:
 def _on_gateway() -> bool:
     """True when this turn arrives over a human messaging surface.
 
-    Hermes v0.21.6 binds platform/source in task-local ContextVars, so ask the
-    runtime. Missing runtime context fails closed unless the environment explicitly
-    identifies a known non-messaging surface; an absent identity is not permission.
+    Hermes v0.21.6 binds platform/source in task-local ContextVars; read them via
+    the public ``get_session_env`` and apply the same rule as core's
+    ``session_is_messaging_surface``. Missing runtime context fails closed unless the
+    environment explicitly identifies a known non-messaging surface; an absent
+    identity is not permission.
     """
     try:
-        from gateway.session_context import session_is_messaging_surface
+        from gateway.session_context import get_session_env
     except ImportError:
         idents = (
             os.environ.get("HERMES_PLATFORM") or os.environ.get("HERMES_SESSION_PLATFORM") or "",
@@ -196,9 +198,11 @@ def _on_gateway() -> bool:
         explicit = [str(v).strip().lower() for v in idents if str(v).strip()]
         return not explicit or any(v not in _NON_MESSAGING for v in explicit)
     try:
-        return bool(session_is_messaging_surface())
+        platform = os.environ.get("HERMES_PLATFORM") or get_session_env("HERMES_SESSION_PLATFORM", "")
+        idents = (str(v or "").strip().lower() for v in (platform, get_session_env("HERMES_SESSION_SOURCE", "")))
+        return any(v and v not in _NON_MESSAGING for v in idents)
     except Exception:
-        logger.debug("dialectos: session_is_messaging_surface failed; failing closed", exc_info=True)
+        logger.debug("dialectos: session identity lookup failed; failing closed", exc_info=True)
         return True
 
 
