@@ -1,6 +1,6 @@
 {
   "name": "dialectos",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "description": "Spanish dialect localization MCP server and CLI for 25 regional variants, glossary enforcement, structure preservation, and QA gates.",
   "type": "module",
@@ -53,7 +53,7 @@
   ],
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.13.0"
   },
   "packageManager": "pnpm@11.1.1",
   "repository": {
@@ -65,6 +65,7 @@
   },
   "homepage": "https://kyanitelabs.github.io/DialectOS/",
   "devDependencies": {
-    "@vitest/coverage-v8": "4.1.11"
+    "@vitest/coverage-v8": "4.1.12",
+    "esbuild": "0.28.1"
   }
 }

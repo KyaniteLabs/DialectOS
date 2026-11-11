@@ -51,6 +51,17 @@ describe("semantic similarity", () => {
     expect(result.wordOverlap).toBeGreaterThan(0.3);
   });
 
+  it("does not penalize a short UI string for capitalising its first word", () => {
+    const result = calculateSemanticSimilarity("Welcome", "Bienvenido");
+    expect(result.entityPreservation).toBe(1);
+    expect(meetsSemanticThreshold(result.score)).toBe(true);
+  });
+
+  it("still penalizes a short source whose mid-sentence name disappears", () => {
+    const result = calculateSemanticSimilarity("Email Maria at Kyanite Labs about the release", "Escribe");
+    expect(meetsSemanticThreshold(result.score)).toBe(false);
+  });
+
   it("should penalize very short translations", () => {
     const result = calculateSemanticSimilarity(
       "This is a long paragraph with many words about translation quality",

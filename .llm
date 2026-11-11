@@ -51,7 +51,7 @@ translation, glossary enforcement, adversarial quality gates, and standalone val
 | Feature | Google Translate | DeepL | DialectOS |
 |---------|----------------|-------|-----------|
 | Spanish dialects | 1 (generic) | ~5 | 25 |
-| MCP integration | No | No | Yes (17 tools) |
+| MCP integration | No | No | Yes (18 tools) |
 | Markdown preservation | No | No | Yes |
 | i18n locale support | No | No | Yes |
 | Gender-neutral output | No | No | Yes |

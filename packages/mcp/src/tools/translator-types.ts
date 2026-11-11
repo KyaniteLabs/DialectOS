@@ -33,6 +33,13 @@ export interface SearchGlossaryParams {
 
 export interface ListDialectsParams {}
 
+export interface ValidateTranslationParams {
+  source: string;
+  translated: string;
+  dialect: SpanishDialect;
+  markdown?: boolean;
+}
+
 export interface ResearchRegionalTermParams {
   concept: string;
   dialects: string;

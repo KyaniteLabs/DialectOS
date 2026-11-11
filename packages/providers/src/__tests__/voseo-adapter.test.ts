@@ -74,3 +74,23 @@ describe("applyVoseo", () => {
     expect(applyVoseo(input, "" as any, "informal")).toBe(input);
   });
 });
+
+describe("applyVoseo pronouns and quotes", () => {
+  it("moves the pronoun with the verb instead of leaving 'tú tenés'", () => {
+    expect(applyVoseo("Tú tienes razón y lo sabes.", "es-AR", "informal")).toBe("Vos tenés razón y lo sabés.");
+  });
+
+  it("swaps prepositional ti and contigo, but not the acronym TI or possessive tu", () => {
+    expect(applyVoseo("Esto es para ti y voy contigo.", "es-AR", "informal")).toBe("Esto es para vos y voy con vos.");
+    expect(applyVoseo("Habla con el equipo de TI sobre tu cuenta.", "es-AR", "informal")).toBe(
+      "Habla con el equipo de TI sobre tu cuenta."
+    );
+  });
+
+  it("leaves quoted speech exactly as written", () => {
+    expect(applyVoseo('Dijo "tú tienes razón" y tienes que creerle.', "es-AR", "informal")).toBe(
+      'Dijo "tú tienes razón" y tenés que creerle.'
+    );
+    expect(applyVoseo("Leí «tú puedes» en la pared.", "es-AR", "informal")).toBe("Leí «tú puedes» en la pared.");
+  });
+});

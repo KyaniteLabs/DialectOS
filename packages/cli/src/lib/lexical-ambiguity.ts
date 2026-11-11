@@ -101,7 +101,7 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
   {
     id: "baby-guagua",
     dialects: "all",
-    sourcePattern: /\b(baby|infant|newborn|beb[eé]|guagua)\b/i,
+    sourcePattern: /(?<![\p{L}\p{N}_])(baby|infant|newborn|beb[eé]|guagua)(?![\p{L}\p{N}_])/iu,
     guidance: "For the baby/infant semantic field, guagua is natural in Chilean and some Andean varieties, but in Puerto Rican, Dominican, and Cuban Spanish guagua strongly points to bus in transit contexts. Use bebé/niño/infante for babies in Caribbean Spanish; do not use guagua there unless the source is about a bus.",
     expectations: (dialect) => ({
       requiredOutputGroups: [

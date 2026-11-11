@@ -301,7 +301,7 @@ describe("combinedSemanticCheck", () => {
     });
 
     it("fails when score < 0.4 and no backstop needed", () => {
-      const result = combinedSemanticCheck("Hello world", "Hola");
+      const result = combinedSemanticCheck("Email Maria at Kyanite Labs about the release", "Escribe");
       expect(result.negationDropped).toBe(false);
       expect(result.backstop).toBeUndefined();
       expect(result.primaryScore).toBeLessThan(0.4);

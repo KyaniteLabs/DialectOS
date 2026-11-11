@@ -117,7 +117,7 @@ export class BulkTranslationEngine {
     // O(1) item lookup for the entire pipeline
     const itemMap = new Map(items.map((i) => [i.id, i]));
 
-    // Deduplicate: map source text → list of item IDs
+    // Deduplicate: map (source text + languages + options) → list of item IDs
     const dedupMap = this.buildDedupMap(items);
     const uniqueTexts = Array.from(dedupMap.keys());
 
@@ -183,8 +183,8 @@ export class BulkTranslationEngine {
       });
     };
 
-    for (const sourceText of pendingTexts) {
-      const itemIds = dedupMap.get(sourceText)!;
+    for (const dedupKey of pendingTexts) {
+      const itemIds = dedupMap.get(dedupKey)!;
       const pendingIds = itemIds.filter((id) => !resumedIds.has(id));
       if (pendingIds.length === 0) continue;
 
@@ -267,7 +267,13 @@ export class BulkTranslationEngine {
     // Check cache
     let cacheKey: string | undefined;
     if (this.useCache) {
-      cacheKey = this.cache.computeKey(sourceText, sourceLang, targetLang, options);
+      cacheKey = this.cache.computeKey(
+        sourceText,
+        sourceLang,
+        targetLang,
+        options,
+        provider.cacheIdentity?.() ?? provider.name
+      );
       const cached = await this.cache.get(cacheKey);
       if (cached) {
         const successes: BulkTranslationSuccess[] = [];
@@ -342,12 +348,21 @@ export class BulkTranslationEngine {
   private buildDedupMap(items: BulkTranslationItem[]): Map<string, string[]> {
     const map = new Map<string, string[]>();
     for (const item of items) {
-      const normalized = item.sourceText.trim().replace(/\s+/g, " ");
-      const existing = map.get(normalized);
+      // Only items that would produce the same request share one call: the
+      // same text to a different target or dialect is a different translation.
+      const key = JSON.stringify([
+        item.sourceText.trim().replace(/\s+/g, " "),
+        (item.sourceLang ?? "").toLowerCase(),
+        (item.targetLang ?? "").toLowerCase(),
+        item.options?.dialect ?? null,
+        item.options?.formality ?? null,
+        item.options?.context ?? null,
+      ]);
+      const existing = map.get(key);
       if (existing) {
         existing.push(item.id);
       } else {
-        map.set(normalized, [item.id]);
+        map.set(key, [item.id]);
       }
     }
     return map;

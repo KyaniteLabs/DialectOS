@@ -40,8 +40,10 @@ import {
 import {
   ProviderRegistry,
   applyLexicalSubstitution,
+  adaptSecondPersonPlural,
 } from "@dialectos/providers";
 import { ToolResult } from "../lib/types.js";
+import { assertGate } from "../lib/translation-gate.js";
 import { createProviderRegistry } from "@dialectos/providers";
 import type { TranslateOptions } from "@dialectos/types";
 import { registerScoredTool } from "./metadata.js";
@@ -123,25 +125,39 @@ function reportPath(resolvedPath: string): string {
 // ============================================================================
 
 /**
+ * Match whole Spanish words. `\b` cannot be used: JavaScript treats
+ * accented letters as non-word characters, so `\btú\b` never matches "tú".
+ */
+function spanishWords(words: string): RegExp {
+  return new RegExp(`(?<![\\p{L}\\p{N}_])(?:${words})(?![\\p{L}\\p{N}_])`, "giu");
+}
+
+/**
  * Informal pronouns and verb forms
  */
 const INFORMAL_PATTERNS = [
-  /\b(tú|vos|vosotros)\b/gi,
-  /\b(estás|vais|tenéis|sois|vais)\b/gi,
-  /\b(eres|tienes|vienes|sales|haces|dices|ves|oyes)\b/gi,
+  spanishWords("tú|vos|vosotros|vosotras"),
+  spanishWords("estás|vais|tenéis|sois"),
+  spanishWords("eres|tienes|vienes|sales|haces|dices|ves|oyes"),
 ];
 
 /**
- * Formal pronouns and verb forms
+ * Formal pronouns. Third-person verbs ("está", "son", "tienen") are not
+ * listed: they serve él, ella and ellos as much as usted, so they say
+ * nothing about register.
  */
-const FORMAL_PATTERNS = [
-  /\b(usted|ustedes)\b/gi,
-  /\b(está|van|tienen|son|están)\b/gi,
-];
+const FORMAL_PATTERNS = [spanishWords("usted|ustedes")];
 
 // ============================================================================
 // Gender Neutral Transformations
 // ============================================================================
+
+/** Give `target` the casing of `source` (all caps, capitalised, or as is). */
+function matchCase(source: string, target: string): string {
+  if (source.length > 1 && source === source.toUpperCase()) return target.toUpperCase();
+  if (source[0] === source[0].toUpperCase()) return target[0].toUpperCase() + target.slice(1);
+  return target;
+}
 
 /**
  * Gender-neutral transformation patterns by strategy
@@ -322,6 +338,7 @@ async function handleTranslateMissingKeys(
     // Translate missing keys
     let translatedCount = 0;
     const errors: string[] = [];
+    const warnings = new Set<string>();
     const updatedTargetEntries = [...targetEntries];
 
     for (const key of missingKeys) {
@@ -342,6 +359,9 @@ async function handleTranslateMissingKeys(
           prepared.targetLang,
           prepared.options
         );
+        prepared.warnings.forEach((w) => warnings.add(w));
+        // A rejected key stays missing rather than writing a bad string.
+        assertGate({ source: baseEntry.value, translated: result.translatedText, dialect: params.dialect || "es-ES" });
 
         updatedTargetEntries.push({
           key,
@@ -366,6 +386,7 @@ async function handleTranslateMissingKeys(
             missingKeys,
             errors,
             skippedCount: errors.length,
+            warnings: [...warnings],
           }),
         },
       ],
@@ -434,6 +455,7 @@ async function handleBatchTranslateLocales(
 
     let totalTranslated = 0;
     const errors: string[] = [];
+    const warnings = new Set<string>();
     const targets: string[] = [];
 
     // Translate to each target dialect
@@ -469,6 +491,8 @@ async function handleBatchTranslateLocales(
               prepared.targetLang,
               prepared.options
             );
+            prepared.warnings.forEach((w) => warnings.add(w));
+            assertGate({ source: entry.value, translated: result.translatedText, dialect: targetDialect });
 
             targetEntries.push({
               key: entry.key,
@@ -499,6 +523,7 @@ async function handleBatchTranslateLocales(
             totalTranslated,
             targets,
             errors,
+            warnings: [...warnings],
           }),
         },
       ],
@@ -525,7 +550,8 @@ async function handleBatchTranslateLocales(
  *
  * Applies the shared deterministic lexical substitution engine
  * (dialect vocabulary + article gender agreement, e.g. "el ordenador" ->
- * "la computadora", never "el computadora").
+ * "la computadora", never "el computadora"), then swaps vosotros forms for
+ * ustedes forms, as the CLI does.
  *
  * Output handling (data-loss protection): the source file is rewritten only
  * when the caller explicitly sets overwrite to true. By default the adapted
@@ -569,7 +595,10 @@ async function handleManageDialectVariants(
     const changes: string[] = [];
     const adaptedEntries = sourceEntries.map((entry) => {
       const original = String(entry.value);
-      const adapted = applyLexicalSubstitution(original, params.variant);
+      const adapted = adaptSecondPersonPlural(
+        applyLexicalSubstitution(original, params.variant),
+        params.variant,
+      );
       if (adapted !== original) {
         changes.push(`${entry.key}: ${original} -> ${adapted}`);
       }
@@ -733,18 +762,27 @@ async function handleApplyGenderNeutral(
       );
     }
 
-    // Apply transformations
+    // Apply transformations in one pass, longest phrase first, so a
+    // replacement is never matched again ("todos" -> "todas y todos" must
+    // not then turn its own "todas" into "todas y todos").
+    // Already-paired phrases ("todas y todos") map to themselves, so a second
+    // run leaves them alone instead of pairing them again.
+    const table: Record<string, string> = { ...transforms };
+    for (const target of Object.values(transforms)) {
+      if (target.includes(" ") && !(target in table)) table[target] = target;
+    }
+    const sources = Object.keys(table).sort((a, b) => b.length - a.length);
+    const regex = spanishWords(
+      sources.map((src) => src.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"),
+    );
     const changes: string[] = [];
     const adaptedEntries = entries.map((entry) => {
-      let newValue = entry.value;
-      for (const [source, target] of Object.entries(transforms)) {
-        const escaped = source.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        const regex = new RegExp(`\\b${escaped}\\b`, "gi");
-        if (regex.test(newValue)) {
-          newValue = newValue.replace(regex, target);
-          changes.push(`${entry.key}: ${source} -> ${target}`);
-        }
-      }
+      const newValue = entry.value.replace(regex, (match: string) => {
+        const target = table[match.toLowerCase()];
+        if (target === undefined || target === match.toLowerCase()) return match;
+        changes.push(`${entry.key}: ${match} -> ${target}`);
+        return matchCase(match, target);
+      });
       return { ...entry, value: newValue };
     });
 

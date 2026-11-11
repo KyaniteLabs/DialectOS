@@ -90,7 +90,7 @@ Each produces:
 ## Numbers
 
 - **automated tests** across 7 packages
-- **18 CVEs** resolved
+- Known dependency advisories patched with pinned overrides
 - **4 quality gates** with semantic backstop
 - **6 adversarial trap categories**
 - **0** silent static fallback paths

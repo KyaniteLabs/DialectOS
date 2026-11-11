@@ -179,11 +179,14 @@ export class DeepLProvider implements TranslationProvider {
       needsApiKey: true,
       supportsFormality: true,
       supportsContext: true,
-      supportsDialect: true,
+      // translate() sends the base code ("ES"), so a Spanish variant such as
+      // es-MX comes back as generic Spanish. Say so, so the registry warns
+      // and prefers a provider that can actually honour the dialect.
+      supportsDialect: false,
       supportedSourceLangs: [...DEEPL_SUPPORTED_LANGS, "auto"],
       supportedTargetLangs: DEEPL_SUPPORTED_LANGS,
       maxPayloadChars: 50000,
-      dialectHandling: "native",
+      dialectHandling: "none",
       rateLimitHints: { maxRequests: 60, windowMs: 60000 },
     };
   }

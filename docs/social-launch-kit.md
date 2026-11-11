@@ -17,7 +17,7 @@ Most translation tools treat Spanish as a monolith. If you ship es-ES to Mexico,
 DialectOS is a Model Context Protocol server that understands 25 Spanish regional variants. It preserves markdown structure, enforces glossaries, and has quality gates that catch semantic drift.
 
 **What it does:**
-- 17 MCP tools for AI assistants (Claude, Cursor, etc.)
+- 18 MCP tools for AI assistants (Claude, Cursor, etc.)
 - Translate to es-MX, es-AR, es-CO, es-ES, and 21 more
 - Structure-preserving markdown translation (tables, code blocks, links)
 - i18n operations: detect missing keys, batch translate, check formality
@@ -38,7 +38,7 @@ Most translation APIs treat Spanish as one language.
 
 It's not. Mexico, Argentina, Colombia, Spain — all different.
 
-I built DialectOS: the first MCP server for Spanish dialects.
+I built DialectOS: an MCP server for Spanish dialects.
 
 25 variants. Structure preservation. Quality gates.
 
@@ -52,7 +52,7 @@ The problem: ship es-ES to Mexico and users think you're being rude.
 DialectOS knows the difference and translates accordingly.
 
 **Tweet 3:**
-17 MCP tools means Claude, Cursor, and any MCP client can translate natively.
+18 MCP tools means Claude, Cursor, and any MCP client can translate natively.
 
 No wrappers. No glue code. Just works.
 
@@ -64,7 +64,7 @@ Security matters when you're piping content through translation APIs.
 - SSRF protection on all endpoints
 - Circuit breakers + rate limiting
 - Semantic drift detection
-- 18 CVEs resolved, zero current vulnerabilities
+- Known dependency advisories patched with pinned overrides
 
 **Tweet 5:**
 automated tests. 7 packages. pnpm monorepo. TypeScript.
@@ -125,14 +125,14 @@ https://github.com/KyaniteLabs/DialectOS
 
 ## Product Hunt
 
-**Tagline:** The first MCP server built for Spanish dialects
+**Tagline:** An MCP server built for Spanish dialects
 
 **Description:**
 DialectOS translates content across 25 Spanish regional variants while preserving markdown structure, code comments, and locale file formatting. It runs as a Model Context Protocol server, so Claude, Cursor, and other MCP clients can translate natively.
 
 **Key features:**
 - 25 Spanish dialects (es-MX, es-AR, es-CO, es-ES, etc.)
-- 17 MCP tools for AI assistants
+- 18 MCP tools for AI assistants
 - Structure-preserving markdown translation
 - i18n operations (missing key detection, batch translation, formality checking)
 - LLM-first provider routing plus fallback utilities

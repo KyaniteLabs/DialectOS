@@ -86,6 +86,14 @@ export interface TranslationProvider {
   readonly name: string;
 
   /**
+   * Optional identity for caching: providers whose output depends on more
+   * than their name (e.g. an LLM's model or endpoint) return it here so a
+   * cached result from one configuration is never served for another.
+   * Defaults to `name` when absent.
+   */
+  cacheIdentity?(): string;
+
+  /**
    * Translate text from source language to target language
    * @param text - Text to translate
    * @param sourceLang - Source language code (e.g., "en", "es", "auto" for auto-detect)
@@ -417,6 +425,7 @@ export * from "./certification.js";
 
 // --- Dialect vocabulary and grammar data ---
 export * from "./dialectal-vocabulary.js";
+export * from "./negation.js";
 export * from "./dialectal-dictionary.js";
 export * from "./glossary-data.js";
 export * from "./verb-conjugations.js";

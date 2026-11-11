@@ -38,7 +38,7 @@ export { CachedProvider } from "./cached-provider.js";
 export { DeepLProvider } from "./providers/deepl.js";
 export { LibreTranslateProvider } from "./providers/libre-translate.js";
 export { MyMemoryProvider } from "./providers/my-memory.js";
-export { LLMProvider } from "./providers/llm.js";
+export { LLMProvider, QualityGateError } from "./providers/llm.js";
 export { extractResponseText } from "./providers/llm-response.js";
 
 // Translation corpus
@@ -68,6 +68,7 @@ export type { FalseFriendWarning } from "./false-friends.js";
 
 // Lexical substitution and voseo adapter
 export { applyLexicalSubstitution } from "./lexical-substitution.js";
+export { adaptSecondPersonPlural } from "./second-person-plural.js";
 export { applyVoseo } from "./voseo-adapter.js";
 
 // Bulk translation engine
@@ -92,7 +93,7 @@ export {
 export type { ProviderFactoryEnv } from "./factory.js";
 
 // Quality gates
-export { runQualityGates, lengthSanityCheck, dialectComplianceCheck, personConsistencyCheck, haberTenerCheck } from "./quality-gates.js";
+export { runQualityGates, lengthSanityCheck, dialectComplianceCheck, personConsistencyCheck, haberTenerCheck, garbagePatternCheck, negationPreservationCheck } from "./quality-gates.js";
 export type { QualityGateResult, QualityGateContext, ModelTier } from "./quality-gates.js";
 
 // Dialect output pipeline

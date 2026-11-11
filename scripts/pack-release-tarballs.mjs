@@ -57,7 +57,13 @@ function stage(pkg, stageRoot) {
   const deps = { ...(pj.dependencies || {}) };
   const bundled = [];
 
-  for (const lib of LIBS) {
+  // The five shared libs, plus any other workspace package this target
+  // declares (mcp depends on @dialectos/cli for the shared validator).
+  const extraLibs = Object.keys(deps)
+    .filter((name) => name.startsWith("@dialectos/"))
+    .map((name) => name.slice("@dialectos/".length))
+    .filter((lib) => !LIBS.includes(lib));
+  for (const lib of [...LIBS, ...extraLibs]) {
     ensurePackageBuilt(lib);
     const libSrc = join(ROOT, "packages", lib);
     const libPj = readPkg(lib);
@@ -90,6 +96,34 @@ function stage(pkg, stageRoot) {
 }
 
 /**
+ * Read the `overrides:` block of pnpm-workspace.yaml as a flat map. The block
+ * is simple `'selector': 'version'` pairs, which npm accepts as-is in its own
+ * `overrides` field (range-keyed selectors included).
+ */
+let cachedOverrides;
+function workspaceOverrides() {
+  if (cachedOverrides) return cachedOverrides;
+  const yaml = readFileSync(join(ROOT, "pnpm-workspace.yaml"), "utf8");
+  const out = {};
+  let inBlock = false;
+  for (const line of yaml.split("\n")) {
+    if (/^overrides:\s*$/.test(line)) {
+      inBlock = true;
+      continue;
+    }
+    if (!inBlock) continue;
+    if (/^\S/.test(line)) break; // next top-level key
+    const m = line.match(/^\s+(?:'([^']+)'|([^\s:#'][^:]*?)):\s*'([^']+)'\s*$/);
+    if (m) out[m[1] ?? m[2]] = m[3];
+  }
+  if (Object.keys(out).length === 0) {
+    throw new Error("pnpm-workspace.yaml has no parsable overrides block");
+  }
+  cachedOverrides = out;
+  return out;
+}
+
+/**
  * Resolve `deps` (name -> range) into a real installed tree, then move that
  * tree into <stageRoot>/<pkg>/node_modules/. Returns the list of top-level
  * package names that were vendored. The @dialectos/* workspace packages are
@@ -99,13 +133,34 @@ function vendorClosure(pkg, deps, stageRoot) {
   const publicDeps = Object.fromEntries(
     Object.entries(deps).filter(([name]) => !name.startsWith("@dialectos/")),
   );
+  // npm >= 11 rejects an override that targets a direct dependency
+  // (EOVERRIDE), so for those raise the direct spec to the patched version
+  // and only pass the remaining overrides through.
+  const overrides = {};
+  for (const [selector, version] of Object.entries(workspaceOverrides())) {
+    const name = selector.replace(/^(@?[^@]+)@.*$/, "$1");
+    if (name in publicDeps) publicDeps[name] = version;
+    else overrides[selector] = version;
+  }
   const vendorRoot = join(stageRoot, `${pkg}-vendor`);
   const cacheDir = join(stageRoot, "npm-cache");
   rmSync(vendorRoot, { recursive: true, force: true });
   mkdirSync(vendorRoot, { recursive: true });
   writeFileSync(
     join(vendorRoot, "package.json"),
-    `${JSON.stringify({ name: "dialectos-vendor", private: true, dependencies: publicDeps }, null, 2)}\n`,
+    `${JSON.stringify(
+      {
+        name: "dialectos-vendor",
+        private: true,
+        dependencies: publicDeps,
+        // npm ignores pnpm-lock.yaml, so carry the workspace's security
+        // overrides across; otherwise the vendored closure can resolve
+        // versions the lockfile deliberately patched out.
+        overrides,
+      },
+      null,
+      2,
+    )}\n`,
   );
 
   console.log(`vendoring closure for ${pkg}: ${Object.keys(publicDeps).length} direct deps`);

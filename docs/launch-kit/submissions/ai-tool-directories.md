@@ -56,7 +56,7 @@ open-source Spanish dialect translation with MCP support. 25 regional variants, 
 **Name:** DialectOS
 **Description:**
 
-The first MCP server for Spanish dialects. Translate to 25 regional variants with quality gates, glossary enforcement, and markdown preservation. CLI and MCP server included.
+An MCP server for Spanish dialects. Translate to 25 regional variants with quality gates, glossary enforcement, and markdown preservation. CLI and MCP server included.
 
 **Category:** Developer Tools / Translation
 **Website:** https://github.com/KyaniteLabs/DialectOS
@@ -86,7 +86,7 @@ Once you're listed in awesome-mcp-servers, Glama will auto-sync. But you can als
 **Name:** DialectOS
 **Description:**
 
-MCP server for Spanish dialect translation. 25 variants, 17 tools, quality gates.
+MCP server for Spanish dialect translation. 25 variants, 18 tools, quality gates.
 
 **Website:** https://github.com/KyaniteLabs/DialectOS
 

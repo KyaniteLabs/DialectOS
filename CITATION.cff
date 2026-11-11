@@ -2,14 +2,14 @@ cff-version: 1.2.0
 message: "If you use DialectOS in your research, please cite it as below."
 type: software
 title: "DialectOS"
-abstract: "The first Model Context Protocol server built specifically for Spanish dialects. Translate across 25 regional variants while preserving markdown structure, code comments, and locale file formatting."
+abstract: "A Model Context Protocol server built for Spanish dialects. Translate across 25 regional variants while preserving markdown structure, code comments, and locale file formatting."
 authors:
   - family-names: "Gonzalez"
     given-names: "Simon"
 repository-code: "https://github.com/KyaniteLabs/DialectOS"
-license: BSL-1.1
-version: 0.3.1
-date-released: 2026-04-27
+license: Apache-2.0
+version: 0.3.2
+date-released: 2026-11-11
 keywords:
   - spanish
   - translation

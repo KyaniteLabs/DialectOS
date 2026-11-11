@@ -1061,7 +1061,7 @@ describe("Provider capabilities", () => {
 
     expect(vi.mocked(global.fetch).mock.calls[0][0]).toBe("http://127.0.0.1:1234/api/v1/models");
   });
-  it("DeepL should report native dialect support", () => {
+  it("DeepL reports no dialect support (it only sends base ES)", () => {
     const provider = new DeepLProvider("test-key", undefined, {
       timeout: 5000,
       failureThreshold: 3,
@@ -1072,8 +1072,8 @@ describe("Provider capabilities", () => {
     const caps = provider.getCapabilities!();
     expect(caps.name).toBe("deepl");
     expect(caps.supportsFormality).toBe(true);
-    expect(caps.supportsDialect).toBe(true);
-    expect(caps.dialectHandling).toBe("native");
+    expect(caps.supportsDialect).toBe(false);
+    expect(caps.dialectHandling).toBe("none");
     expect(caps.needsApiKey).toBe(true);
     expect(caps.maxPayloadChars).toBe(50000);
     expect(caps.supportedTargetLangs).toContain("es");

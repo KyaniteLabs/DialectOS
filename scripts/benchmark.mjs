@@ -56,7 +56,7 @@ const {
 
 const translate = live
   ? await createLiveTranslate(providerName)
-  : async (source, dialect, _sample) => mockTranslate(source, dialect);
+  : async (sample, dialect) => mockTranslate(sample.source, dialect);
 
 // Benchmark-specific evaluation (uses unified validation pipeline)
 async function evaluateSample(sample, dialect) {
@@ -65,7 +65,9 @@ async function evaluateSample(sample, dialect) {
   const warnings = [];
 
   try {
-    output = await translate(sample.source, dialect, sample);
+    // createLiveTranslate takes the whole sample (it reads source, register
+    // and documentKind), so both paths share that shape.
+    output = await translate(sample, dialect);
   } catch (error) {
     failures.push(
       `Provider error: ${error instanceof Error ? error.message : String(error)}`

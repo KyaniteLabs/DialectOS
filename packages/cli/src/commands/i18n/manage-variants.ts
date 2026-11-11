@@ -11,6 +11,7 @@ import type { SpanishDialect, I18nEntry, VariantResult } from "@dialectos/types"
 import { ALL_SPANISH_DIALECTS } from "@dialectos/types";
 import { readLocaleFile, writeLocaleFile } from "@dialectos/locale-utils";
 import { validateFilePath } from "@dialectos/security";
+import { applyLexicalSubstitution } from "@dialectos/providers";
 
 /**
  * Options for the manage-variants command
@@ -30,8 +31,9 @@ export interface ManageVariantsOptions {
 
 /** 2nd person plural: Spain uses vosotros; Americas use ustedes */
 const VOSOTROS_ADAPTATION = [
-  { from: /\bvosotros\b/gi, to: "ustedes", description: "2nd person plural pronoun" },
-  { from: /\bvuestro(a|s)?\b/gi, to: "su$1", description: "2nd person plural possessive" },
+  { from: /\bvosotr[oa]s\b/gi, to: "ustedes", description: "2nd person plural pronoun" },
+  { from: /\bvuestr[oa]s\b/gi, to: "sus", description: "2nd person plural possessive" },
+  { from: /\bvuestr[oa]\b/gi, to: "su", description: "2nd person plural possessive" },
 ];
 
 /** Technology & devices */
@@ -429,7 +431,12 @@ export async function executeManageVariants(
 
   for (const entry of entries) {
     const originalValue = entry.value;
-    const adaptedValue = applyAdaptations(originalValue, variant);
+    // The shared engine swaps vocabulary with article and plural agreement
+    // ("el ordenador" -> "la computadora"); the table then handles what the
+    // engine does not cover, such as vosotros -> ustedes.
+    const adaptedValue = variant === "es-ES"
+      ? originalValue
+      : applyAdaptations(applyLexicalSubstitution(originalValue, variant), variant);
 
     if (adaptedValue !== originalValue) {
       changes.push(`${entry.key}: "${originalValue}" → "${adaptedValue}"`);

@@ -107,15 +107,51 @@ export function applyVoseo(text: string, dialect: SpanishDialect, formality?: st
   // Sort by tuForm length descending for priority matching
   const sorted = [...swaps].sort((a, b) => b.tuForm.length - a.tuForm.length);
 
-  let result = text;
-  for (const swap of sorted) {
-    const regex = wordRegex(swap.tuForm);
-    result = result.replace(regex, (match, before, after) => {
-      const matched = match.slice(before.length, match.length - after.length);
-      const replacement = applyCase(matched, swap.vosForm);
-      return `${before}${replacement}${after}`;
-    });
-  }
+  // Quoted text is someone's exact words and stays as written.
+  return mapOutsideQuotes(text, (segment) => {
+    let result = segment;
+    for (const swap of sorted) {
+      const regex = wordRegex(swap.tuForm);
+      result = result.replace(regex, (match, before, after) => {
+        const matched = match.slice(before.length, match.length - after.length);
+        const replacement = applyCase(matched, swap.vosForm);
+        return `${before}${replacement}${after}`;
+      });
+    }
+    // The pronoun moves with its verb: "tú tienes" becomes "vos tenés",
+    // never the hybrid "tú tenés".
+    for (const [tuForm, vosForm] of PRONOUN_SWAPS) {
+      result = result.replace(wordRegex(tuForm), (match, before, after) => {
+        const matched = match.slice(before.length, match.length - after.length);
+        return `${before}${applyCase(matched, vosForm)}${after}`;
+      });
+    }
+    result = result.replace(PREPOSITIONAL_TI, (match, prep: string) =>
+      match.endsWith("ti") ? `${prep}vos` : match
+    );
+    return result;
+  });
+}
 
-  return result;
+/** Second-person pronouns that change with voseo. Possessive "tu" and clitic "te" do not. */
+const PRONOUN_SWAPS: ReadonlyArray<[string, string]> = [
+  ["contigo", "con vos"],
+  ["tú", "vos"],
+];
+
+/** "ti" only after a preposition, lowercase, so "el equipo de TI" (IT) is left alone. */
+const PREPOSITIONAL_TI =
+  /(?<![\p{L}\p{N}])((?:a|ante|con|contra|de|desde|en|entre|hacia|hasta|para|por|según|sin|sobre|tras)\s+)ti(?![\p{L}\p{N}])/giu;
+
+const QUOTED = /"[^"\n]*"|“[^”]*”|«[^»]*»/g;
+
+/** Apply `fn` to the parts of `text` that are not inside quotation marks. */
+function mapOutsideQuotes(text: string, fn: (segment: string) => string): string {
+  let out = "";
+  let last = 0;
+  for (const m of text.matchAll(QUOTED)) {
+    out += fn(text.slice(last, m.index)) + m[0];
+    last = m.index + m[0].length;
+  }
+  return out + fn(text.slice(last));
 }

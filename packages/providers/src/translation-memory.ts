@@ -177,14 +177,17 @@ export class TranslationMemory {
 
   /**
    * Compute a SHA-256 cache key from request parameters.
-   * Includes text, sourceLang, targetLang, dialect, formality, and context.
+   * Includes text, sourceLang, targetLang, dialect, formality, context and
+   * the provider identity (name, plus model/endpoint where it matters), so
+   * one provider's result is never served for another.
    * Text is normalized (trimmed, whitespace collapsed) before hashing.
    */
   computeKey(
     text: string,
     sourceLang: string,
     targetLang: string,
-    options?: TranslateOptions
+    options?: TranslateOptions,
+    providerIdentity?: string
   ): string {
     const normalizedText = (text ?? "").trim().replace(/\s+/g, " ");
     const payload = JSON.stringify({
@@ -194,6 +197,7 @@ export class TranslationMemory {
       dialect: options?.dialect,
       formality: options?.formality,
       context: options?.context,
+      provider: providerIdentity ?? null,
     });
     return crypto.createHash("sha256").update(payload).digest("hex");
   }

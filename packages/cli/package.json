@@ -1,6 +1,6 @@
 {
   "name": "@dialectos/cli",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Spanish translation CLI — translate text, docs, i18n files with dialect awareness",
   "type": "module",
   "main": "dist/index.js",
@@ -12,6 +12,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./validate": {
+      "types": "./dist/lib/validate-translation.d.ts",
+      "import": "./dist/lib/validate-translation.js"
     }
   },
   "scripts": {
@@ -51,7 +55,7 @@
     "url": "https://github.com/KyaniteLabs/DialectOS/issues"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.13.0"
   },
   "publishConfig": {
     "access": "public"

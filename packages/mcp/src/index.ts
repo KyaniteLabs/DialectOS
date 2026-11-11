@@ -22,7 +22,7 @@ import { setupGlobalHandlers } from "./lib/error-handler.js";
 import { createNullParamsGuard } from "./lib/null-params-guard.js";
 import { loadConfig, getConfigPath, type MCPConfig } from "./lib/config.js";
 import { createProviderRegistry } from "@dialectos/providers";
-import { RateLimiter } from "@dialectos/security";
+import { RateLimiter, configureSecurity } from "@dialectos/security";
 
 const packageJson = JSON.parse(
   readFileSync(new URL("../package.json", import.meta.url), "utf-8")
@@ -46,13 +46,22 @@ function createServer(config: MCPConfig = loadConfig()): McpServer {
     }
   );
 
+  // The config file and env (ALLOWED_LOCALE_DIRS, ESPANOL_MAX_FILE_SIZE,
+  // ESPANOL_MAX_CONTENT_LENGTH) set these; every file and text tool enforces them.
+  configureSecurity({
+    allowedDirs: config.security.allowedDirs,
+    maxFileSize: config.security.maxFileSize,
+    maxContentLength: config.security.maxContentLength,
+    allowHomeAsWorkingDir: false,
+  });
+
   const registry = createProviderRegistry();
   const rateLimiter = new RateLimiter(
     config.rateLimit.maxRequests,
     config.rateLimit.windowMs
   );
 
-  // Register all tool categories (17 tools total)
+  // Register all tool categories (18 tools total)
   registerDocsTools(server, { registry, rateLimiter });
   registerI18nTools(server, { registry, rateLimiter });
   registerTranslatorTools(server, { registry, rateLimiter });

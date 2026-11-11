@@ -129,7 +129,21 @@ const VOSOTROS_FALSE_POSITIVES = new Set([
   "red",
   "lid",
   "mid",
+  "pared",
+  "sed",
+  "usted",
+  "huésped",
+  "césped",
+  "madrid",
+  "david",
+  "vid",
+  "ardid",
 ]);
+
+/** Nouns ending in -dad/-tad (verdad, ciudad, libertad) look like vosotros imperatives. */
+function isAbstractNoun(word: string): boolean {
+  return /(?:dad|tad)$/.test(word);
+}
 
 /** Split text into Spanish words (handles accented characters). */
 function getWords(text: string): string[] {
@@ -182,12 +196,17 @@ export function detectGrammarSignals(text: string): GrammarSignals {
 
   // Vosotros imperative: -ad, -ed, -id
   const vosotrosImperativeMatches = words.filter(
-    (w) => /^[a-záéíóúñ]+(?:ad|ed|id)$/.test(w) && !VOSOTROS_FALSE_POSITIVES.has(w)
+    (w) =>
+      /^[a-záéíóúñ]+(?:ad|ed|id)$/.test(w) &&
+      !VOSOTROS_FALSE_POSITIVES.has(w) &&
+      !isAbstractNoun(w)
   );
 
-  // Leísmo: le/les + direct-object perception/encounter verb
+  // Leísmo: le/les as the direct object of a verb that takes one. Verbs
+  // whose "le" is an indirect object (decir, dar, preguntar: "le dije la
+  // verdad") are correct Spanish everywhere and are not listed.
   const leismoPattern =
-    /\b(le|les)\s+(?:vi|viste|vio|veo|ves|ve|dije|dijiste|dio|di|doy|das|da|conozco|conoces|conoce|quiero|quieres|quiere|encontré|encontraste|encontró|llamé|llamaste|llamó|tomé|tomaste|tomó|busqué|buscaste|buscó|pregunté|preguntaste|preguntó|saludé|saludaste|saludó)\b/g;
+    /(?<![\p{L}\p{N}_])(le|les)\s+(?:vi|viste|vio|veo|ves|ve|conozco|conoces|conoce|quiero|quieres|quiere|encontré|encontraste|encontró|llamé|llamaste|llamó|busqué|buscaste|buscó|saludé|saludaste|saludó)(?![\p{L}\p{N}_])/gu;
   const leismoMatches = (lower.match(leismoPattern) || []).length;
 
   // Diminutives

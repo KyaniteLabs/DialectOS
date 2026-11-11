@@ -8,7 +8,7 @@
  */
 
 import type { SpanishDialect } from "@dialectos/types";
-import { validateDialectCompliance } from "@dialectos/types";
+import { validateDialectCompliance, negationDropped } from "@dialectos/types";
 import { GARBAGE_PATTERNS, COMMON_ENGLISH_WORDS } from "./data/garbage-patterns.js";
 
 export type ModelTier = "tiny" | "small" | "medium" | "large";
@@ -102,6 +102,17 @@ export function dialectComplianceCheck(context: QualityGateContext): QualityGate
 
 
 /**
+ * Short strings with no English function words ("Total", "Hotel", "Email",
+ * "Chat") are often spelled the same in Spanish; returning them unchanged is
+ * a correct translation, not garbage.
+ */
+function isLikelyCognate(source: string): boolean {
+  const wordCount = source.split(/\s+/).filter(Boolean).length;
+  if (wordCount === 0 || wordCount > 3) return false;
+  return (source.match(COMMON_ENGLISH_WORDS) || []).length === 0;
+}
+
+/**
  * Garbage pattern check: detect empty output, unchanged source, garbage patterns,
  * mostly-English output, and wild length deviations.
  */
@@ -114,7 +125,7 @@ export function garbagePatternCheck(context: QualityGateContext): QualityGateRes
     return { name: "garbagePattern", passed: false, details: "Empty output" };
   }
 
-  if (trimmed.toLowerCase() === source.toLowerCase()) {
+  if (trimmed.toLowerCase() === source.toLowerCase() && !isLikelyCognate(source)) {
     return { name: "garbagePattern", passed: false, details: "Output unchanged from source" };
   }
 
@@ -212,6 +223,21 @@ export function haberTenerCheck(context: QualityGateContext): QualityGateResult 
   return { name: "haberTener", passed: true };
 }
 
+/**
+ * Negation preservation: "You must not delete the file" -> "Debes eliminar el
+ * archivo" inverts the instruction. Runs on every tier.
+ */
+export function negationPreservationCheck(context: QualityGateContext): QualityGateResult {
+  if (negationDropped(context.sourceText, context.translatedText)) {
+    return {
+      name: "negationPreservation",
+      passed: false,
+      details: "Source negates but the translation has no Spanish negator (no, nunca, sin, ...)",
+    };
+  }
+  return { name: "negationPreservation", passed: true };
+}
+
 // ============================================================================
 // Gate registry
 // ============================================================================
@@ -225,6 +251,7 @@ const GATE_REGISTRY: GateConfig[] = [
   { gate: garbagePatternCheck, tiers: ["tiny", "small", "medium", "large"] },
   { gate: lengthSanityCheck, tiers: ["tiny", "small", "medium", "large"] },
   { gate: dialectComplianceCheck, tiers: ["tiny", "small", "medium", "large"] },
+  { gate: negationPreservationCheck, tiers: ["tiny", "small", "medium", "large"] },
   { gate: personConsistencyCheck, tiers: ["tiny", "small"] },
   { gate: haberTenerCheck, tiers: ["tiny", "small"] },
 ];
@@ -248,7 +275,7 @@ export async function runQualityGates(
     } catch (error) {
       results.push({
         name: config.gate.name,
-        passed: true, // Gate errors should not block translation
+        passed: false, // A gate that cannot run cannot vouch for the output: fail closed
         details: `Gate error: ${error instanceof Error ? error.message : String(error)}`,
       });
     }

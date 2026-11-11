@@ -179,7 +179,7 @@ describe("MCP Translator Tools", () => {
   });
 
   describe("Tool Registration", () => {
-    it("should register all 7 translator tools", async () => {
+    it("should register all 8 translator tools", async () => {
       const { registerTranslatorTools } = await import("../tools/translator.js");
       const mockServer = {
         tool: vi.fn(),
@@ -187,8 +187,9 @@ describe("MCP Translator Tools", () => {
 
       registerTranslatorTools(mockServer as any, { registry: mockRegistry });
 
-      expect(mockServer.tool).toHaveBeenCalledTimes(7);
+      expect(mockServer.tool).toHaveBeenCalledTimes(8);
       const toolNames = vi.mocked(mockServer.tool).mock.calls.map((call) => call[0]);
+      expect(toolNames).toContain("validate_translation");
       expect(toolNames).toContain("translate_text");
       expect(toolNames).toContain("detect_dialect");
       expect(toolNames).toContain("translate_code_comment");

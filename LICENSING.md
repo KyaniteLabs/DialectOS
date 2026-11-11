@@ -1,6 +1,6 @@
 # Licensing
 
-Current grant: Apache License 2.0. See [LICENSE](./LICENSE). HEAD, GitHub release `v0.3.0`, and GitHub release `v0.3.1` are Apache-2.0. This file records history; it does not change any grant.
+Current grant: Apache License 2.0. See [LICENSE](./LICENSE). HEAD and GitHub releases `v0.3.0`, `v0.3.1` and `v0.3.2` are Apache-2.0. This file records history; it does not change any grant.
 
 ## Timeline
 
@@ -12,12 +12,13 @@ Current grant: Apache License 2.0. See [LICENSE](./LICENSE). HEAD, GitHub releas
 | 2026-06-03 01:39 | `cd2f417d8` (PR #159) | Relicensed BSL-1.1 → Apache-2.0. |
 | 2026-06-03 03:16 | GitHub Release **v0.3.0** | Apache-2.0 launch release. |
 | 2026-10-27 | GitHub Release **v0.3.1** | Apache-2.0; operator-path fixes. |
+| 2026-11-11 | GitHub Release **v0.3.2** | Apache-2.0; roast fixes. |
 
 ## What this means for consumers
 
 - Copies of **v0.2.0** (the tag and GitHub's source archives for that tag) shipped under BSL-1.1 as published. Relicensing later commits to Apache-2.0 does not rewrite that artifact.
 - An MIT → BSL → Apache sequence does not automatically reach previously published MIT-licensed copies. Copies obtained under MIT remain under MIT.
-- Current HEAD / v0.3.0 / v0.3.1 are Apache-2.0.
+- Current HEAD / v0.3.0 / v0.3.1 / v0.3.2 are Apache-2.0.
 
 ## Proposed notice on the v0.2.0 GitHub Release (wording; applied after this file lands)
 

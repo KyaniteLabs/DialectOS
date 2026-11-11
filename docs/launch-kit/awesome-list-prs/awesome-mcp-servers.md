@@ -54,7 +54,7 @@ Adds [DialectOS](https://github.com/KyaniteLabs/DialectOS) to the Translation se
 
 DialectOS is an open-source MCP server for Spanish regional dialect translation:
 - 25 Spanish dialects (es-MX, es-AR, es-CO, es-PR, etc.)
-- 17 MCP tools for translation, i18n, glossary, and research workflows
+- 18 MCP tools for translation, i18n, glossary, and research workflows
 - Structure-preserving markdown translation (tables, code blocks, links)
 - Adversarial quality gates (semantic drift, negation preservation, structure validation)
 - automated tests across 7 packages

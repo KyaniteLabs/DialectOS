@@ -59,6 +59,20 @@ function extractEntities(text: string): string[] {
   return Array.from(entities);
 }
 
+/**
+ * True when a capitalised word appears somewhere other than the start of a
+ * sentence. A short UI string like "Welcome" or "Save changes" is capitalised
+ * only because it starts a sentence; it names nothing, so it must not be
+ * penalised for "losing" entities it never had.
+ */
+function hasMidSentenceCapital(text: string): boolean {
+  for (const m of text.matchAll(/\b[A-Z][a-zA-Z0-9]{2,}\b/g)) {
+    const before = text.slice(0, m.index).trimEnd();
+    if (before.length > 0 && !/[.!?]$/.test(before)) return true;
+  }
+  return false;
+}
+
 function jaccardSimilarity(a: string[], b: string[]): number {
   if (a.length === 0 && b.length === 0) return 1;
   if (a.length === 0 || b.length === 0) return 0;
@@ -181,10 +195,9 @@ export function calculateSemanticSimilarity(
   const sourceEntities = extractEntities(safeSource);
   const translatedEntities = extractEntities(safeTranslated);
   const sourceWordCount = tokenize(safeSource).length;
-  const sourceHadCapitalizedWords = /\b[A-Z][a-zA-Z0-9]{2,}\b/.test(safeSource);
   const entityPreservation =
     sourceEntities.length === 0
-      ? (sourceHadCapitalizedWords && sourceWordCount <= 5 ? 0.15 : 1)
+      ? (hasMidSentenceCapital(safeSource) && sourceWordCount <= 5 ? 0.15 : 1)
       : jaccardSimilarity(sourceEntities, translatedEntities);
 
   const score =

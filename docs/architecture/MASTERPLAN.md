@@ -30,7 +30,7 @@ DialectOS is a **Spanish dialect-aware translation system** with four user surfa
 │  │  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌────────────┐    │   │
 │  │  │    CLI     │  │   MCP      │  │  HTTP API  │  │  GitHub    │    │   │
 │  │  │  (Node)    │  │  Server    │  │  (Demo)    │  │   Action   │    │   │
-│  │  │ 19 cmds    │  │ 17 tools   │  │ 2 routes   │  │ 1 composite│    │   │
+│  │  │ 19 cmds    │  │ 18 tools   │  │ 2 routes   │  │ 1 composite│    │   │
 │  │  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘  └─────┬──────┘    │   │
 │  │        │               │               │               │            │   │
 │  │        └───────────────┴───────────────┴───────────────┘            │   │
@@ -146,7 +146,7 @@ DialectOS is a **Spanish dialect-aware translation system** with four user surfa
 ```
                     ┌─────────────────┐
                     │ @dialectos/cli  │  (CLI entry, 19 commands)
-                    │ @dialectos/mcp  │  (MCP server, 17 tools)
+                    │ @dialectos/mcp  │  (MCP server, 18 tools)
                     └────────┬────────┘
                              │ depends on
          ┌───────────────────┼───────────────────┐
@@ -193,7 +193,7 @@ DialectOS is a **Spanish dialect-aware translation system** with four user surfa
 | **`@dialectos/markdown-parser`** | Safe markdown parsing: `marked` lexer (no ReDoS), URL validation, HTML sanitization, frontmatter extraction, parse→reconstruct for translation workflows | `marked`, `isomorphic-dompurify`, `zod` | ~400 |
 | **`@dialectos/providers`** | Translation engine: 4 providers (LLM, DeepL, LibreTranslate, MyMemory), circuit breaker, retry policy, translation memory, corpus, chaos testing, sentinel extraction, agreement validation, false friends, voseo adapter, lexical substitution, typography normalization | `zod` | ~3.5K |
 | **`@dialectos/cli`** | User interface layer: 19 CLI commands, shared libraries (resilient translation, telemetry, checkpointing, token protection, quality scoring, glossary enforcement, semantic context, validation, output judge) | `commander` | ~4K |
-| **`@dialectos/mcp`** | MCP adapter: 17 tools exposing translation, i18n, docs, glossary, and research capabilities via `@modelcontextprotocol/sdk` | `@modelcontextprotocol/sdk`, `zod` | ~800 |
+| **`@dialectos/mcp`** | MCP adapter: 18 tools exposing translation, i18n, docs, glossary, and research capabilities via `@modelcontextprotocol/sdk` | `@modelcontextprotocol/sdk`, `zod` | ~800 |
 
 ### 3.3 Build & Test Architecture
 
@@ -828,7 +828,7 @@ Browser → POST /api/translate { text, dialect }
 
 ### User Surfaces
 - [x] CLI with 19 commands
-- [x] MCP server with 17 tools
+- [x] MCP server with 18 tools
 - [x] HTTP demo server with 2 routes
 - [x] GitHub Action for CI validation
 

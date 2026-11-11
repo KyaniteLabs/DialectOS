@@ -179,19 +179,44 @@ export function buildConjugationPrompt(dialect: SpanishDialect): string {
 
 // --- Validation ---
 
-const CONCEPT_PATTERNS: Array<{ concept: string; patterns: RegExp[] }> = (() => {
-  const map: Array<{ concept: string; patterns: RegExp[] }> = [];
+/** Concept-key parts that are joiners, not headwords ("to_watch", "brother_in_law"). */
+const CONCEPT_JOINERS = new Set(["to", "in", "of", "on", "the", "and", "for", "a", "an"]);
+
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Trigger patterns come from the English headword in the concept key
+ * ("computer", "file_computer", "gas_station", "to_watch"), not from the
+ * descriptive gloss: "electronic computing device" never contains "computer",
+ * so gloss-based triggers left the flagship concepts unchecked.
+ * Simple inflections (files, watched, watching) also trigger.
+ */
+const CONCEPT_PATTERNS: Map<string, RegExp[]> = (() => {
+  const map = new Map<string, RegExp[]>();
   for (const entry of DICTIONARY) {
-    const words = entry.englishGloss
-      .split(/[\s,;.()\/]+/)
-      .filter(w => w.length >= 4)
-      .map(w => w.toLowerCase());
-    if (words.length === 0) continue;
-    const patterns = words.map(w => new RegExp(`\\b${w}\\b`, "i"));
-    map.push({ concept: entry.concept, patterns });
+    const parts = entry.concept.toLowerCase().split("_").filter(Boolean);
+    const heads = new Set<string>();
+    const phrase = parts.filter((p, i) => !(i === 0 && p === "to")).join(" ");
+    if (phrase.includes(" ")) heads.add(phrase);
+    for (const part of parts) {
+      if (part.length >= 3 && !CONCEPT_JOINERS.has(part)) heads.add(part);
+    }
+    if (heads.size === 0) continue;
+    const patterns = [...heads].map(
+      (h) => new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegExp(h)}(?:s|es|ed|d|ing)?(?![\\p{L}\\p{N}])`, "iu")
+    );
+    map.set(entry.concept, patterns);
   }
   return map;
 })();
+
+/** Whole-word (Unicode-aware) match, allowing a Spanish plural: "auto" must not match "automático". */
+function containsTerm(text: string, term: string): boolean {
+  const re = new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegExp(term.toLowerCase())}(?:s|es)?(?![\\p{L}\\p{N}])`, "iu");
+  return re.test(text);
+}
 
 export function validateDialectCompliance(
   source: string,
@@ -204,9 +229,9 @@ export function validateDialectCompliance(
   const lowerTranslated = translated.toLowerCase();
 
   for (const entry of DICTIONARY) {
-    const cp = CONCEPT_PATTERNS.find(c => c.concept === entry.concept);
-    if (!cp) continue;
-    const matched = cp.patterns.some(p => p.test(lowerSource));
+    const patterns = CONCEPT_PATTERNS.get(entry.concept);
+    if (!patterns) continue;
+    const matched = patterns.some(p => p.test(lowerSource));
     if (!matched) continue;
     checkedCount++;
 
@@ -217,13 +242,16 @@ export function validateDialectCompliance(
     const allTerms = getAllTerms(entry);
 
     // Check if expected term is present
-    const hasExpected = lowerTranslated.includes(expectedLower);
+    const hasExpected = containsTerm(lowerTranslated, expectedLower);
 
     // Check if a wrong-dialect term is present instead
     for (const term of allTerms) {
-      if (term === expectedLower) continue;
-      if (lowerTranslated.includes(term.toLowerCase())) {
-        if (!hasExpected) {
+      if (term.toLowerCase() === expectedLower) continue;
+      if (containsTerm(lowerTranslated, term)) {
+        const duplicate = violations.some(
+          (v) => v.foundTerm === term && v.expectedTerm === expected.term
+        );
+        if (!hasExpected && !duplicate) {
           const severity: "error" | "warning" = expected.notes?.includes("vulgar") ? "error" : "warning";
           violations.push({
             concept: entry.concept,
@@ -295,7 +323,7 @@ export const SYNTACTIC_RULES: SyntacticRule[] = [
   {
     id: "leismo-spain",
     dialects: ["es-ES", "es-AD"],
-    rule: "Leísmo is accepted: use le for male direct object (a Juan le vi). Use lo for female and inanimate direct objects.",
+    rule: "Leísmo is accepted for a male person as direct object (a Juan le vi). Use la for a female direct object and lo for a masculine thing.",
     enforcement: "prompt-only",
   },
   {

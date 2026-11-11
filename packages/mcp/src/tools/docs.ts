@@ -30,6 +30,7 @@ import {
 } from "@dialectos/security";
 import type { ProviderRegistry } from "@dialectos/providers";
 import { ToolResult } from "../lib/types.js";
+import { assertGate } from "../lib/translation-gate.js";
 import type { BaseToolOptions } from "../lib/types.js";
 import { createProviderRegistry } from "@dialectos/providers";
 import { registerScoredTool } from "./metadata.js";
@@ -111,6 +112,7 @@ async function handleTranslateMarkdown(
     // Translate translatable sections
     const translatedSections: MarkdownSection[] = [];
     const errors: string[] = [];
+    const warnings = new Set<string>();
     let sectionsTranslated = 0;
 
     for (const section of parsed.sections) {
@@ -133,6 +135,13 @@ async function handleTranslateMarkdown(
             prepared.targetLang,
             prepared.options
           );
+          prepared.warnings.forEach((w) => warnings.add(w));
+          assertGate({
+            source: section.content,
+            translated: result.translatedText,
+            dialect: params.dialect || "es-ES",
+            isMarkdown: true,
+          });
 
           translatedSections.push({
             ...section,
@@ -160,6 +169,7 @@ async function handleTranslateMarkdown(
             sectionsProcessed: parsed.translatableSections,
             sectionsTranslated,
             errors,
+            warnings: [...warnings],
             codeBlocksPreserved: parsed.codeBlockCount,
             linksPreserved: parsed.linkCount,
           }),
@@ -283,6 +293,7 @@ async function handleTranslateApiDocs(
     // Translate translatable sections
     const translatedSections: MarkdownSection[] = [];
     const errors: string[] = [];
+    const warnings = new Set<string>();
     let sectionsTranslated = 0;
 
     for (const section of parsed.sections) {
@@ -307,6 +318,13 @@ async function handleTranslateApiDocs(
             prepared.targetLang,
             prepared.options
           );
+          prepared.warnings.forEach((w) => warnings.add(w));
+          assertGate({
+            source: section.content,
+            translated: result.translatedText,
+            dialect: params.dialect || "es-ES",
+            isMarkdown: true,
+          });
 
           translatedSections.push({
             ...section,
@@ -333,6 +351,7 @@ async function handleTranslateApiDocs(
             sectionsProcessed: parsed.translatableSections,
             sectionsTranslated,
             errors,
+            warnings: [...warnings],
           }),
         },
       ],
@@ -390,6 +409,7 @@ async function handleCreateBilingualDoc(
     // Build bilingual document
     const bilingualParts: string[] = [];
     const errors: string[] = [];
+    const warnings = new Set<string>();
     let sectionsTranslated = 0;
 
     for (const section of parsed.sections) {
@@ -412,6 +432,13 @@ async function handleCreateBilingualDoc(
             prepared.targetLang,
             prepared.options
           );
+          prepared.warnings.forEach((w) => warnings.add(w));
+          assertGate({
+            source: section.content,
+            translated: result.translatedText,
+            dialect: params.dialect || "es-ES",
+            isMarkdown: true,
+          });
 
           // Add side-by-side sections
           bilingualParts.push("## Original");
@@ -447,6 +474,7 @@ async function handleCreateBilingualDoc(
             sectionsProcessed: parsed.translatableSections,
             sectionsTranslated,
             errors,
+            warnings: [...warnings],
           }),
         },
       ],

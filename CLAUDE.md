@@ -1,7 +1,7 @@
 # KyaniteLabs Engineering Rules
 
 **Repository**: DialectOS
-**Description**: The first MCP server built for Spanish dialects. Translate across 25 regional variants with structure preservation, register differentiation, and quality gates.
+**Description**: An MCP server built for Spanish dialects. Translate across 25 regional variants with structure preservation, register differentiation, and quality gates.
 **Tech Stack**: TypeScript/Node
 
 This file is loaded automatically by Claude Code when working in any KyaniteLabs repository. It supplements the global rules in `~/.claude/CLAUDE.md`.
@@ -10,7 +10,7 @@ See KyaniteLabs/.github for org-wide rules. Project-specific rules below:
 
 ## Project-Specific Context
 
-This is the **DialectOS** repository. It is The first MCP server built for Spanish dialects. Translate across 25 regional variants with structure preservation, register differentiation, and quality gates..
+This is the **DialectOS** repository. It is an MCP server built for Spanish dialects. Translate across 25 regional variants with structure preservation, register differentiation, and quality gates..
 
 # KyaniteLabs Engineering Rules
 

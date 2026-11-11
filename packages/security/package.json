@@ -1,6 +1,6 @@
 {
   "name": "@dialectos/security",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Unified security module for DialectOS — path validation, sanitization, rate limiting",
   "type": "module",
   "main": "dist/index.js",
@@ -43,7 +43,7 @@
     "url": "https://github.com/KyaniteLabs/DialectOS/issues"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.13.0"
   },
   "publishConfig": {
     "access": "public"

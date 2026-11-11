@@ -476,6 +476,27 @@ describe("MCP i18n Tools", () => {
       }
     });
 
+    it("swaps vosotros for ustedes outside Spain, like the CLI", async () => {
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "greeting", value: "Gracias a vosotros y a vuestra familia." },
+        { key: "agree", value: "El ordenador está listo." },
+      ]);
+
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = { tool: vi.fn() };
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+      const handler = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "manage_dialect_variants"
+      )![3];
+
+      vi.mocked(writeLocaleFile).mockClear();
+      await handler({ sourcePath: "/test/es.json", variant: "es-MX", outputPath: "/test/out-es-MX.json" } as any);
+      const writtenEntries = vi.mocked(writeLocaleFile).mock.calls[0][1];
+      const byKey = Object.fromEntries(writtenEntries.map((e: any) => [e.key, e.value]));
+      expect(byKey.greeting).toBe("Gracias a ustedes y a su familia.");
+      expect(byKey.agree).toBe("La computadora está lista.");
+    });
+
     it("regression: does not overwrite sourcePath by default (adversarial finding 3)", async () => {
       vi.mocked(readLocaleFile).mockReturnValue([
         { key: "computer", value: "Guarda tus archivos en el ordenador." },
@@ -790,4 +811,47 @@ describe("MCP i18n Tools", () => {
     });
   });
 
+
+  describe("register and gender-neutral regressions (roast item 10)", () => {
+    async function handlerFor(name: string) {
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = { tool: vi.fn() };
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+      return vi.mocked(mockServer.tool).mock.calls.find((call) => call[0] === name)![3];
+    }
+
+    it("flags accented informal words like tú and estás in a formal register", async () => {
+      const handler = await handlerFor("check_formality");
+      vi.mocked(readLocaleFile).mockReturnValue([{ key: "q", value: "¿Tú estás listo?" }]);
+      const parsed = JSON.parse((await handler({ localePath: "/test/es.json", register: "formal" } as any)).content[0].text);
+      expect(parsed.issues.map((i: any) => i.suggestion).join(" ")).toMatch(/"Tú"/);
+    });
+
+    it("does not flag son, van, tienen or está as formal in an informal register", async () => {
+      const handler = await handlerFor("check_formality");
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "a", value: "Ellos son amigos y van juntos." },
+        { key: "b", value: "Tienen tiempo; la casa está cerca." },
+      ]);
+      const parsed = JSON.parse((await handler({ localePath: "/test/es.json", register: "informal" } as any)).content[0].text);
+      expect(parsed.issues).toEqual([]);
+    });
+
+    it("pairs 'todos' once, keeps its casing, and is stable on a second run", async () => {
+      const handler = await handlerFor("apply_gender_neutral");
+      vi.mocked(writeLocaleFile).mockClear();
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "hi", value: "Hola a todos" },
+        { key: "title", value: "Todos los usuarios" },
+        { key: "done", value: "Hola a todas y todos" },
+      ]);
+      await handler({ localePath: "/test/es.json", strategy: "descriptive" } as any);
+      const written = vi.mocked(writeLocaleFile).mock.calls.at(-1)![1] as Array<{ key: string; value: string }>;
+      expect(written.map((e) => e.value)).toEqual([
+        "Hola a todas y todos",
+        "Todas y todos los usuarios y usuarias",
+        "Hola a todas y todos",
+      ]);
+    });
+  });
 });

@@ -135,7 +135,7 @@ describe("validateDialectCompliance", () => {
 
   it("detects wrong dialect term for car trunk in es-MX", () => {
     const result = validateDialectCompliance(
-      "Put the luggage in the rear storage compartment",
+      "Put the luggage in the trunk of the car",
       "Pon el equipaje en el maletero del carro",
       "es-MX",
     );
@@ -148,7 +148,7 @@ describe("validateDialectCompliance", () => {
 
   it("passes when correct term is used", () => {
     const result = validateDialectCompliance(
-      "Put the luggage in the rear storage compartment",
+      "Put the luggage in the trunk of the car",
       "Pon el equipaje en la cajuela del carro",
       "es-MX",
     );

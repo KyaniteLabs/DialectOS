@@ -641,12 +641,12 @@ describe("MCP Security Tests", () => {
       ]);
     });
 
-    it("should register exactly 6 translator tools", async () => {
+    it("should register exactly 8 translator tools", async () => {
       const { registerTranslatorTools } = await import("../tools/translator.js");
       const mockServer = { tool: vi.fn() };
       registerTranslatorTools(mockServer as any, { registry: mockRegistry });
 
-      expect(mockServer.tool).toHaveBeenCalledTimes(7);
+      expect(mockServer.tool).toHaveBeenCalledTimes(8);
       const toolNames = vi.mocked(mockServer.tool).mock.calls.map(
         (call) => call[0]
       );
@@ -658,10 +658,11 @@ describe("MCP Security Tests", () => {
         "search_glossary",
         "research_regional_term",
         "list_dialects",
+        "validate_translation",
       ]);
     });
 
-    it("should register all 17 tools total", async () => {
+    it("should register all 18 tools total", async () => {
       const { registerDocsTools } = await import("../tools/docs.js");
       const { registerI18nTools } = await import("../tools/i18n.js");
       const { registerTranslatorTools } = await import(
@@ -674,7 +675,7 @@ describe("MCP Security Tests", () => {
       registerI18nTools(mockServer as any, { registry: mockRegistry });
       registerTranslatorTools(mockServer as any, { registry: mockRegistry });
 
-      expect(mockServer.tool).toHaveBeenCalledTimes(17);
+      expect(mockServer.tool).toHaveBeenCalledTimes(18);
     });
   });
 

@@ -20,6 +20,21 @@ import { VERB_CONJUGATIONS } from "../verb-conjugations.js";
 // ============================================================================
 
 describe("DICTIONARY", () => {
+  it("keeps Spanish accents and ñ in terms", () => {
+    const stripped = new Set([
+      "bano", "aplicacion", "camara", "credito", "sofa", "contrasenas",
+      "cunada", "ensenar", "termometro", "radiografia", "cedula", "cinturon",
+    ]);
+    const found: string[] = [];
+    for (const entry of DICTIONARY) {
+      for (const [dialect, v] of Object.entries(entry.variants ?? {})) {
+        if (stripped.has(v.term)) found.push(`${entry.concept}/${dialect}: ${v.term}`);
+      }
+      if (entry.panHispanic && stripped.has(entry.panHispanic)) found.push(`${entry.concept}: ${entry.panHispanic}`);
+    }
+    expect(found).toEqual([]);
+  });
+
   it("has at least 95 entries", () => {
     expect(DICTIONARY.length).toBeGreaterThanOrEqual(95);
   });
@@ -268,7 +283,7 @@ describe("getForbiddenTerms", () => {
 describe("validateDialectCompliance", () => {
   it("passes when output uses correct dialect terms", () => {
     const result = validateDialectCompliance(
-      "I drove my motor vehicle",
+      "I drove my car",
       "Manejé mi carro",
       "es-MX",
     );
@@ -278,7 +293,7 @@ describe("validateDialectCompliance", () => {
 
   it("catches es-MX output using coche instead of carro", () => {
     const result = validateDialectCompliance(
-      "I drove my motor vehicle to the gas station",
+      "I drove my car to the gas station",
       "Manejé mi coche a la gasolinera",
       "es-MX",
     );
@@ -291,7 +306,7 @@ describe("validateDialectCompliance", () => {
 
   it("catches es-AR output using autobús instead of colectivo", () => {
     const result = validateDialectCompliance(
-      "Take the public transit vehicle to downtown",
+      "Take the bus downtown",
       "Tomá el autobús al centro",
       "es-AR",
     );
@@ -301,9 +316,41 @@ describe("validateDialectCompliance", () => {
     expect(busViolation!.expectedTerm).toBe("colectivo");
   });
 
+  it("triggers on the English headword, not the gloss (README flagship example)", () => {
+    const result = validateDialectCompliance(
+      "Save the file on the computer.",
+      "Guarda el fichero en el ordenador.",
+      "es-MX",
+    );
+    expect(result.passed).toBe(false);
+    const found = result.violations.map((v) => v.foundTerm);
+    expect(found).toContain("ordenador");
+    expect(found).toContain("fichero");
+  });
+
+  it("flags plural wrong-dialect terms and accepts plural expected terms", () => {
+    expect(
+      validateDialectCompliance("The computers are slow.", "Los ordenadores son lentos.", "es-MX").passed,
+    ).toBe(false);
+    expect(
+      validateDialectCompliance("The computers are slow.", "Las computadoras son lentas.", "es-MX").passed,
+    ).toBe(true);
+  });
+
+  it("matches whole words only: auto does not match automática", () => {
+    const result = validateDialectCompliance("I drove my car to the automatic car wash", "Manejé mi carro al autolavado automático", "es-MX");
+    expect(result.violations.filter((v) => v.foundTerm === "auto")).toHaveLength(0);
+  });
+
+  it("reports one violation per wrong term even when several concepts share it", () => {
+    const result = validateDialectCompliance("I drove my car.", "Manejé mi coche.", "es-MX");
+    const coche = result.violations.filter((v) => v.foundTerm === "coche");
+    expect(coche).toHaveLength(1);
+  });
+
   it("es-ES allows coche", () => {
     const result = validateDialectCompliance(
-      "I drove my motor vehicle",
+      "I drove my car",
       "Conduje mi coche",
       "es-ES",
     );
@@ -312,7 +359,7 @@ describe("validateDialectCompliance", () => {
 
   it("es-CL requires palta for avocado (tropical fruit)", () => {
     const result = validateDialectCompliance(
-      "The green tropical fruit is ripe",
+      "The avocado is ripe",
       "El aguacate está maduro",
       "es-CL",
     );
