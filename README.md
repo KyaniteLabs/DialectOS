@@ -306,6 +306,8 @@ pnpm test        # 1,500+ tests passing
 
 > Package versions above match the latest GitHub release, **v0.3.1**.
 
+> Package versions above are the **source** tree (0.3.1, unreleased). The **latest release is v0.3.0** — install paths elsewhere in this README point at v0.3.0 artifacts.
+
 ---
 
 ## 🛡️ Security & Quality
