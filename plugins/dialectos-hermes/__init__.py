@@ -4,7 +4,7 @@ Surfaces:
   pre_llm_call   -> when the user asks for Spanish, inject a dialect + QA brief
   post_tool_call -> record dialectos_* results (dialect, QA verdict) in a profile-local ledger
   /dialectos     -> detect | list | translate | validate | status | learn | quiz | tip | answer | help
-  tools          -> dialectos_translate, dialectos_detect, dialectos_validate, dialectos_list_dialects, dialectos_learn
+  tools          -> dialectos_translate, dialectos_detect, dialectos_validate, dialectos_list_dialects, dialectos_learn, dialectos_show
   skill          -> skills/dialectos/SKILL.md
 
 Child processes get a scrubbed env; cache, corpus and the QA ledger live under
@@ -71,6 +71,11 @@ MAX_OUT = 100_000
 SLASH_DISPLAY = 3500
 TOOL_JSON_MAX = 20000
 LEDGER_MAX = 200
+PANE_VIEWS = ("translate", "check", "dialects", "by_dialect", "recent")
+PANE_GUIDANCE = (
+    "Check that DialectOS appears in the Desktop sidebar or command palette; "
+    "a person enables the pane in Capabilities -> Plugins, then leaves the page open."
+)
 _KILL_GRACE = 0.5
 
 # Spanish-specific intent only. Bare localize/i18n/localization alone must NOT match
@@ -230,6 +235,52 @@ def _append_ledger(entry: Dict[str, Any]) -> None:
             ledger = []
         ledger.append(entry)
         _atomic_write_json(path, ledger[-LEDGER_MAX:])
+        count = min(len(ledger), LEDGER_MAX)
+    _broadcast_pane_event("ledger.updated", {"count": count})
+
+
+# --- Desktop events ---------------------------------------------------------
+
+def _view_payload(args: Any) -> Dict[str, str]:
+    if not isinstance(args, dict) or set(args) - {"view", "item_id"}:
+        raise ValueError("expected view and optional item_id arguments")
+    view = args.get("view")
+    if not isinstance(view, str) or view not in PANE_VIEWS:
+        raise ValueError(f"view must be one of: {', '.join(PANE_VIEWS)}")
+    payload = {"view": view}
+    if "item_id" in args:
+        item = args["item_id"]
+        if not isinstance(item, str) or len(item) != 5 or not DIALECT_RE.fullmatch(item):
+            raise ValueError("item_id must be a dialect code (5 chars, e.g. es-AR)")
+        payload["item_id"] = item
+    return payload
+
+
+def _broadcast_pane_event(event: str, payload: Dict[str, Any]) -> None:
+    """Only bounded visual metadata crosses the optional local Desktop bridge."""
+    if event == "view.set":
+        payload = _view_payload(payload)
+    elif event == "ledger.updated" and isinstance(payload, dict) and set(payload) == {"count"}:
+        if type(payload["count"]) is not int or not 0 <= payload["count"] <= LEDGER_MAX:
+            raise ValueError("ledger count is out of range")
+    else:
+        raise ValueError("unknown Desktop event or invalid payload")
+    try:
+        from hermes_cli.plugin_events import broadcast_plugin_event
+    except ImportError:
+        logger.debug("dialectos: Hermes Desktop event bridge unavailable")
+        return
+    try:
+        broadcast_plugin_event(PLUGIN_NAME, event, payload)
+    except Exception:
+        logger.debug("dialectos: Desktop event was not delivered", exc_info=True)
+
+
+def show(args: Any) -> Dict[str, Any]:
+    payload = _view_payload(args)
+    _broadcast_pane_event("view.set", payload)
+    item = f" for {payload['item_id']}" if "item_id" in payload else ""
+    return {"ok": True, "text": f"Asked the open DialectOS Desktop page to show {payload['view']}{item}; the page must be enabled."}
 
 
 def _session_identity() -> tuple:
@@ -634,10 +685,14 @@ GUARD_SCOPE = (
 _FENCE_RE = re.compile(r"(?ms)^\s*(```|~~~).*?^\s*\1[^\n]*$")
 _INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 _URL_RE = re.compile(r"https?://\S+")
-_NUM_RE = re.compile(r"(?<![\w.,+-])[+-]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?![\w])")
+_NUM_RE = re.compile(r"(?<![\w.,])[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?![\w])")
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 _TIME_12H_RE = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?m\.?(?!\w)", re.I)
-_TIME_24H_RE = re.compile(r"(?<!\d)([01]?\d|2[0-3]):([0-5]\d)(?!\d)")
+_TIME_24H_RE = re.compile(r"(?<!\d)([01]?\d|2[0-3])(?::([0-5]\d)|\s*h(?:oras?)?)(?!\w)", re.I)
+# Spanish day periods: "4 de la tarde" is 16:00, "12 de la noche" is midnight.
+_TIME_ES_PERIOD_RE = re.compile(
+    r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s+(?:de\s+la\s+(mañana|madrugada|tarde|noche)|del\s+(mediod[ií]a))(?!\w)",
+    re.I)
 _ES_WORDS = frozenset(
     "el la los las de del y en que es un una por para con se no su sus al lo como más pero "
     "le les ya o este esta estos estas ese esa eso porque entre cuando muy sin sobre también "
@@ -671,8 +726,11 @@ _ES_SPELLED = {
     "21": ("veintiuno", "veintiún", "veintiun", "veintiuna"), "22": ("veintidós", "veintidos"),
     "23": ("veintitrés", "veintitres"), "24": ("veinticuatro",), "25": ("veinticinco",),
     "26": ("veintiséis", "veintiseis"), "27": ("veintisiete",), "28": ("veintiocho",),
-    "29": ("veintinueve",), "30": ("treinta",), "40": ("cuarenta",), "50": ("cincuenta",),
+    "29": ("veintinueve",), "30": ("treinta",),
+    "31": ("treinta y uno", "treinta y una", "treinta y un"),
+    "40": ("cuarenta",), "50": ("cincuenta",),
     "60": ("sesenta",), "70": ("setenta",), "80": ("ochenta",), "90": ("noventa",),
+    "100": ("cien", "ciento"), "1000": ("mil",),
 }
 _MIN_WORDS_FOR_LANG = 6
 _MIN_CHARS_FOR_LENGTH = 80
@@ -688,21 +746,21 @@ def _numbers(text: str) -> List[str]:
     numbers = []
     for match in _NUM_RE.finditer(_URL_RE.sub(" ", text)):
         raw = match.group(0).replace(" ", "").replace(" ", "").replace(" ", "")
-        sign = "-" if raw.startswith("-") else ""
-        raw = raw.lstrip("+-")
+        sign = "-" if raw.startswith(("-", "−")) else ""
+        raw = raw.lstrip("+-−")
         separators = [i for i, char in enumerate(raw) if char in ",."]
         if "," in raw and "." in raw:
             decimal_at = max(i for i, char in enumerate(raw) if char in ",.")
-        elif len(separators) == 1 and len(raw) - separators[0] - 1 != 3:
-            decimal_at = separators[0]
+        elif len(separators) == 1:
+            right_digits = len(raw) - separators[0] - 1
+            decimal_at = separators[0] if right_digits != 3 or raw[:separators[0]] == "0" else None
         else:
             decimal_at = None
         if decimal_at is None:
             integer, fraction = re.sub(r"[,.]", "", raw), ""
         else:
             integer = re.sub(r"[,.]", "", raw[:decimal_at])
-            fraction = raw[decimal_at + 1:].rstrip("0")
-        integer = integer.lstrip("0") or "0"
+            fraction = raw[decimal_at + 1:]
         numbers.append(sign + integer + ("." + fraction if fraction else ""))
     return numbers
 
@@ -718,33 +776,32 @@ def _time_matches(text: str):
         minute = int(match.group(2) or "0")
         matches.append((hour * 60 + minute, match.span()))
         occupied.append(match.span())
+    for match in _TIME_ES_PERIOD_RE.finditer(text):
+        hour = int(match.group(1)) % 12
+        period = (match.group(3) or "mediodía").lower()
+        # "de la noche" after 4 is evening; "12" and "1 de la noche" are past midnight.
+        if period in ("tarde", "mediodía", "mediodia") or (period == "noche" and hour > 4):
+            hour += 12
+        minute = int(match.group(2) or "0")
+        matches.append((hour * 60 + minute, match.span()))
+        occupied.append(match.span())
     for match in _TIME_24H_RE.finditer(text):
         span = match.span()
         if any(span[0] < end and start < span[1] for start, end in occupied):
             continue
-        matches.append((int(match.group(1)) * 60 + int(match.group(2)), span))
+        matches.append((int(match.group(1)) * 60 + int(match.group(2) or "0"), span))
     return matches
 
 
-def _without_equivalent_times(source: str, translated: str):
-    """Remove only time expressions present in both texts with the same local time."""
+def _without_times(source: str, translated: str):
+    """Remove explicit times so the caller can compare their canonical values."""
     src_times = _time_matches(source)
     dst_times = _time_matches(translated)
-    src_counts: Dict[int, int] = {}
-    dst_counts: Dict[int, int] = {}
-    for minute, _ in src_times:
-        src_counts[minute] = src_counts.get(minute, 0) + 1
-    for minute, _ in dst_times:
-        dst_counts[minute] = dst_counts.get(minute, 0) + 1
-    equivalent = {minute: min(count, dst_counts.get(minute, 0)) for minute, count in src_counts.items()}
 
     def strip(text, times):
         chars = list(text)
-        remaining = dict(equivalent)
-        for minute, (start, end) in times:
-            if remaining.get(minute, 0):
-                chars[start:end] = " " * (end - start)
-                remaining[minute] -= 1
+        for _, (start, end) in times:
+            chars[start:end] = " " * (end - start)
         return "".join(chars)
 
     return strip(source, src_times), strip(translated, dst_times)
@@ -763,18 +820,29 @@ def _language_guess(text: str) -> Optional[str]:
 def _guard_issues(source: str, translated: str) -> List[str]:
     src, dst = _prose(source), _prose(translated)
     issues: List[str] = []
-    src_numbers, dst_numbers = _without_equivalent_times(src, dst)
+    src_times = sorted(minute for minute, _ in _time_matches(src))
+    dst_times = sorted(minute for minute, _ in _time_matches(dst))
+    if src_times != dst_times and (src_times or dst_times):
+        issues.append("Times from the source are missing or changed.")
+    src_numbers, dst_numbers = _without_times(src, dst)
     missing = list(_numbers(src_numbers))
     for n in _numbers(dst_numbers):
         if n in missing:
             missing.remove(n)
+    for cold in re.finditer(r"(?<!\w)(\d+(?:[.,]\d+)?)\s*(?:grados?|°)\s+bajo\s+cero\b", dst, re.I):
+        for magnitude in _numbers(cold.group(1)):
+            signed = "-" + magnitude
+            if signed in missing:
+                missing.remove(signed)
     if missing:
-        words = [w.lower() for w in _WORD_RE.findall(dst)]
+        normalized_dst = " " + re.sub(r"[^\w]+", " ", dst.casefold()) + " "
         for n in list(missing):
-            spelled = next((w for w in words if w in _ES_SPELLED.get(n, ())), None)
-            if spelled:
+            spelled = next((form for form in _ES_SPELLED.get(n, ())
+                            if " " + re.sub(r"[^\w]+", " ", form.casefold()).strip() + " " in normalized_dst), None)
+            if spelled is not None:
                 missing.remove(n)
-                words.remove(spelled)
+                normalized_form = " " + re.sub(r"[^\w]+", " ", spelled.casefold()).strip() + " "
+                normalized_dst = normalized_dst.replace(normalized_form, " ", 1)
     if missing:
         issues.append("Numbers from the source are missing or changed: " + ", ".join(sorted(set(missing))[:8]))
     lang = _language_guess(dst)
@@ -974,7 +1042,7 @@ def _on_post_tool(tool_name: str = "", args: Optional[Dict[str, Any]] = None, re
                   **_: Any) -> None:
     """QA ledger: remember dialect + validate verdicts (no source text stored)."""
     try:
-        if not str(tool_name or "").startswith("dialectos_"):
+        if tool_name not in {"dialectos_translate", "dialectos_detect", "dialectos_validate", "dialectos_list_dialects"}:
             return None
         payload = result
         if isinstance(result, str):
@@ -1066,6 +1134,21 @@ LEARN_SCHEMA = {
         "additionalProperties": False,
     },
 }
+SHOW_SCHEMA = {
+    "name": "dialectos_show",
+    "description": "Ask the open Desktop page to show a section and optionally focus a dialect. The page must be enabled.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "view": {"type": "string", "enum": list(PANE_VIEWS), "maxLength": 10,
+                     "description": "translate = Translate or detect; check = Check a translation; dialects = Variants; by_dialect = Checks by dialect; recent = Recent."},
+            "item_id": {"type": "string", "minLength": 5, "maxLength": 5, "pattern": "^es-[A-Z]{2}$",
+                        "description": "Optional dialect code to select or focus, e.g. es-AR."},
+        },
+        "required": ["view"],
+        "additionalProperties": False,
+    },
+}
 
 
 def _wrap(fn):
@@ -1095,6 +1178,7 @@ _tool_validate = _wrap(lambda a: validate(a.get("translated"), a.get("dialect"),
 _tool_list = _wrap(lambda a: list_dialects())
 _tool_learn = _wrap(lambda a: learn(a.get("action"), a.get("dialect"), a.get("concept"),
                                    a.get("answer"), a.get("confirm", False), a.get("offset", 0)))
+_tool_show = _wrap(show)
 
 
 # --- slash ------------------------------------------------------------------
@@ -1112,7 +1196,8 @@ _HELP = (
     "  /dialectos quiz [es-XX]                                One question\n"
     "  /dialectos answer <es-XX> <concept> <typed answer>      Review a quiz card\n"
     "  /dialectos learn forget <es-XX> --confirm              Delete that variant's cards (local only)\n"
-    "No file paths, serve, corpus export or benchmark from slash. Code blocks must match the source. Register is advisory."
+    "No file paths, serve, corpus export or benchmark from slash. Code blocks must match the source. Register is advisory.\n"
+    + PANE_GUIDANCE
 )
 
 
@@ -1179,7 +1264,7 @@ def _slash(raw_args: str) -> str:
             return _fmt(res)
         if cmd == "status":
             ledger = _load_json(_ledger_path(), [])
-            return json.dumps(ledger[-10:] if isinstance(ledger, list) else [], indent=2)
+            return json.dumps({"recent": ledger[-10:] if isinstance(ledger, list) else [], "desktop": PANE_GUIDANCE}, indent=2)
         if cmd == "detect":
             return _fmt(detect(rest))
         dialect, _, text = rest.partition(" ")
@@ -1226,6 +1311,7 @@ def register(ctx) -> None:
         (VALIDATE_SCHEMA, _tool_validate, "✅"),
         (LIST_SCHEMA, _tool_list, "📋"),
         (LEARN_SCHEMA, _tool_learn, "📖"),
+        (SHOW_SCHEMA, _tool_show, "🧭"),
     ):
         ctx.register_tool(
             name=schema["name"],

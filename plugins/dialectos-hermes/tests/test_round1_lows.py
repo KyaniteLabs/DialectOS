@@ -76,7 +76,9 @@ def test_spanish_targets_inject(plugin, message):
 def test_status_survives_a_ledger_that_is_not_a_list(plugin):
     plugin._ledger_path().parent.mkdir(parents=True, exist_ok=True)
     plugin._ledger_path().write_text(json.dumps({"broken": True}))
-    assert json.loads(plugin._slash("status")) == []
+    status = json.loads(plugin._slash("status"))
+    assert status["recent"] == []
+    assert "Capabilities -> Plugins" in status["desktop"]
 
 
 def test_slash_validate_splits_at_the_middle_separator(plugin, monkeypatch):

@@ -11,9 +11,10 @@ Spanish is not one language to its readers. "Coger el autobús" is ordinary in M
   - `dialectos_validate` checks a translation against its source, offline. It needs the source.
   - `dialectos_list_dialects` lists the 25 variants.
   - `dialectos_learn` offers offline comparisons, a daily tip and a casual quiz with private progress.
+  - `dialectos_show` asks an open, enabled Desktop page to show `translate` (Translate or detect), `check`, `dialects`, `by_dialect` or `recent`; an optional `item_id` dialect code such as `es-AR` selects the variant or focuses its row.
 - **A slash command.** `/dialectos detect | list | translate | validate | status | learn | quiz | tip | answer | help` does the same from chat. For `validate`, write `<source> :: <translation>`; when the text itself contains ` :: `, the middle separator splits the two. Slash checks go into the same history as the tool. It takes text only: no file paths, no server mode, and no corpus or benchmark commands.
 - **A skill.** The bundled `dialectos:dialectos` skill walks the agent through pick, translate and check.
-- **A check history.** After each DialectOS tool call, a ledger records the verdict. It keeps the tool, the variant, and the pass and issue counts, never the text. This is the `post_tool_call` hook.
+- **A check history.** After each translate, detect, validate or list tool call, a ledger records the verdict. It keeps the tool, the variant, and the pass and issue counts, never the text. This is the `post_tool_call` hook.
 - **A DialectOS page.** It lives in the Hermes desktop app (sidebar and ⌘K) and as a tab in the web dashboard. You can detect a variant, translate with an automatic check, check any source and translation pair, browse the variants, and see the check history per variant. It needs Hermes 0.23.0 or later.
 
 ## Learn
@@ -81,6 +82,8 @@ If the dictionary disappears, forgetting still works when the selected variant
 owns every card. Restore the dictionary before forgetting one of several
 variants so the remaining terms can be checked before they are rewritten.
 
+The open Desktop page reacts to agent tool calls via local Desktop events: recorded calls refresh its verdict-only history, and `dialectos_show` points to a section or dialect without changing the current route; an older REST response cannot overwrite a live update. The palette command opens the page. Events carry only counts, section names and dialect codes, never source text or translations. With no Desktop client, events are a logged no-op; older Hermes builds without the event bridge still run the tools, but cannot drive the page.
+
 ## Install
 
 ```bash
@@ -89,6 +92,8 @@ hermes plugins enable dialectos
 ```
 
 You need Node 22.13 or later, with `node` on your PATH.
+
+Check that DialectOS appears in the Desktop sidebar or command palette; a person enables the pane in Capabilities -> Plugins, then leaves the page open.
 
 ## What it does on your machine
 

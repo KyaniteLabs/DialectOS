@@ -50,11 +50,11 @@ def test_missing_dictionary_preserves_existing_cards(plugin):
     assert not list(store.path.parent.glob('learning.json.corrupt-*'))
 
 
-def test_prose_plural_address_miss_creates_plural_card(plugin):
+def test_unstructured_plural_address_prose_does_not_create_card(plugin):
     store = make_store(plugin)
     store.capture({'addressForms': {'passed': False, 'violations': [
         'Use ustedes instead of vosotros for this region.']}}, 'es-MX')
-    assert [c['concept'] for c in store.cards('es-MX')] == ['address_plural']
+    assert store.cards('es-MX') == []
 
 
 def test_direct_address_miss_shape_is_captured(plugin):

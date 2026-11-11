@@ -235,6 +235,48 @@ def test_guards_block_changed_decimal_magnitude_and_sign(plugin, passing_cli, so
     assert any("Numbers from the source" in issue for issue in data["blockingIssues"])
 
 
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Open 9-5", "Open 9-6"),
+    ("Call 555-1234 now.", "Call 555-9999 now."),
+    ("Range 10-20", "Range 10-99"),
+    ("The date is 2020-2024.", "The date is 2020-2031."),
+    ("Take 1-2 tablets every 4-6 hours.", "Take 1-8 tablets every 4-12 hours."),
+    ("The date is 2026-11-11.", "The date is 2026-12-25."),
+    ("Use code B-12.", "Use code B-13."),
+    ("The rate is 0.125 euros.", "The rate is 125 euros."),
+    ("Meet at 5 PM.", "Meet at 5 AM."),
+    ("Meet at 3:30 PM.", "Meet at 3:30 AM."),
+    ("Meet at 3:30 PM.", "Meet at 03:30."),
+    ("Use release 2.10.", "Usa la versión 2.1."),
+    ("Enter code 0042.", "Ingresa el código 42."),
+    ("Meet at 4 pm.", "Nos vemos a las 4 de la mañana."),
+    ("Meet at 9 pm.", "Nos vemos a las 9 de la tarde y 9 de la noche."),
+])
+def test_adversarial_numbers_and_times_are_not_lost(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is False
+    assert data["pluginGuards"]["passed"] is False
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("It is -5 degrees.", "Hace 5 grados bajo cero."),
+    ("It is -5 degrees.", "Hace −5 grados."),
+    ("There are 31 pages.", "Hay treinta y una páginas."),
+    ("There are 100 pages.", "Hay cien páginas."),
+    ("There are 1,000 pages.", "Hay mil páginas."),
+    ("Call me at 5 pm.", "Llámame a las 17 h."),
+    ("Come between 3 and 4 pm.", "Ven entre las 3 y las 4 de la tarde."),
+    ("Lunch is at 12 pm.", "El almuerzo es a las 12 del mediodía."),
+    ("Dinner at 9:30 pm.", "Cena a las 9:30 de la noche."),
+    ("The shift ends at 12 am.", "El turno termina a las 12 de la noche."),
+    ("Leave at 6 am.", "Sal a las 6 de la mañana."),
+])
+def test_equivalent_signed_and_spelled_numbers_pass(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True
+    assert data["pluginGuards"]["passed"] is True
+
+
 def test_guards_accept_equivalent_grouping_and_decimal_styles(plugin, passing_cli):
     data = _verdict(plugin, "El total es 1.000,5 euros.", "El total es 1,000.5 euros.")
     assert data["valid"] is True

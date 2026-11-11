@@ -63,7 +63,7 @@ def test_store_never_contains_user_text_fuzz(store, plugin):
 
 
 @pytest.mark.parametrize('broken', ['{oops', '[]', '{"cards": "bad"}',
-    '{"cards": [{"concept": "bus", "variant": "es-AR", "term": "private text", "box": 1, "due": "2026-11-11"}]}'])
+    '{"cards": [{"concept": "bus", "variant": "es-AR", "term": 5, "box": 1, "due": "2026-11-11"}]}'])
 def test_corrupt_store_is_backed_up_and_recovers(store, plugin, broken):
     path = plugin._data_dir() / 'learning.json'
     path.write_text(broken)
@@ -74,6 +74,31 @@ def test_corrupt_store_is_backed_up_and_recovers(store, plugin, broken):
     assert backups[0].stat().st_mode & 0o777 == 0o600
     assert json.loads(path.read_text()) == {'cards': []}
     assert path.stat().st_mode & 0o777 == 0o600
+
+
+def test_dictionary_term_change_refreshes_only_affected_learning_card(store, plugin):
+    assert store.capture(miss(), 'es-AR') == 1
+    store.answer('bus', 'es-AR', 'colectivo')
+    assert store.capture(miss('father', 'padre', 'papá'), 'es-MX') == 1
+    before = store.cards()
+    path = store._dictionary_path()
+    data = json.loads(path.read_text(encoding='utf-8'))
+    for entry in data:
+        if entry['concept'] == 'bus':
+            entry['variants']['es-AR']['term'] = 'bondi'
+    path.write_text(json.dumps(data), encoding='utf-8')
+
+    after = store.cards()
+    assert {(c['concept'], c['variant'], c['box'], c['due']) for c in after} == {
+        (c['concept'], c['variant'], c['box'], c['due']) for c in before
+    }
+    assert next(c for c in after if c['concept'] == 'bus')['term'] == 'bondi'
+    assert not list(plugin._data_dir().glob('learning.json.corrupt-*'))
+
+    data = [entry for entry in data if entry['concept'] != 'bus']
+    path.write_text(json.dumps(data), encoding='utf-8')
+    assert [(c['concept'], c['variant']) for c in store.cards()] == [('father', 'es-MX')]
+    assert not list(plugin._data_dir().glob('learning.json.corrupt-*'))
 
 
 def test_concurrent_capture_does_not_lose_updates(store):

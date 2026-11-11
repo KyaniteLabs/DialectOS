@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Hermes plugin 0.3.0 lets the agent drive the Desktop page.** Recorded tool calls refresh the verdict-only history through local Desktop events, and `dialectos_show` opens a section and optionally focuses a dialect code. Live events take precedence over an older REST response. Events carry counts, section names and dialect codes only; tools still work on Hermes builds without the event bridge. The skill and slash status explain that a person enables the pane in Capabilities -> Plugins.
 - **Hermes plugin 0.2.2 ships the Chakra Petch font license** (`desktop/OFL.txt`) for the font its desktop page embeds. Its README says the page's Translate button answers anyone who can reach the dashboard, and that DialectOS is not endorsed by Nous Research.
 
 ### Fixed

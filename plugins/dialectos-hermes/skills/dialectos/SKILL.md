@@ -35,6 +35,12 @@ briefly and return to the user's task. Gateway chats allow reading only; grade
 answers in a local session or the DialectOS page. Forget requires the user's
 explicit request and `confirm: true`.
 
+Use `dialectos_show` to change the section in an open Desktop page: `translate` (Translate or detect), `check`, `dialects`, `by_dialect` or `recent`; optionally pass `item_id: "es-AR"` (a 5-character dialect code) to select the variant or focus its row, including the most recent matching call in Recent. Use the Desktop palette command to open the page.
+
+Check that DialectOS appears in the Desktop sidebar or command palette; a person enables the pane in Capabilities -> Plugins, then opens the page and leaves it open when using `dialectos_show`.
+
+Tool calls refresh the open page's verdict-only history through local events; `dialectos_show` asks it to change section without confirming delivery, and Hermes builds without the event bridge keep the tools working without page control.
+
 ## Limits
 
 - Validate accepts translations up to 100000 chars and sources up to 8000 chars via private temporary `.md` files (cleaned after subprocess completion). The pinned v0.3.2 CLI judges code blocks against the source: they must stay byte-identical, including the info string. Do not change the pin silently. Formal/informal flags and hooks remain advisory, not a blocking expected-register contract; no live-provider proof is implied by offline QA.
