@@ -46,6 +46,11 @@ export interface ValidationReport {
       message: string;
     }>;
   };
+  /** Second-person address forms: tú/vos agreement and vosotros outside Spain. */
+  addressForms?: {
+    passed: boolean;
+    violations: Array<{ kind: string; found: string; expected?: string; message: string }>;
+  };
   idiomCheck: {
     passed: boolean;
     literalTraps: string[];

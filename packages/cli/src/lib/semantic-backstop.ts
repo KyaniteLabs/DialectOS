@@ -11,6 +11,8 @@
  * 3. Structural parity — sentence count ratio, paragraph count ratio
  */
 
+import { countNegators } from "@dialectos/types";
+
 import { calculateSemanticSimilarity } from "./semantic-similarity.js";
 
 export interface BackstopResult {
@@ -25,18 +27,6 @@ export interface BackstopResult {
     structuralParity: number;
   };
 }
-
-const NEGATION_WORDS_EN = new Set([
-  "not", "no", "never", "nothing", "nobody", "nowhere", "neither", "nor",
-  "none", "without", "lack", "absent", "refuse", "deny", "decline",
-  "reject", "prevent", "avoid", "stop", "cease", "cannot",
-]);
-
-const NEGATION_WORDS_ES = new Set([
-  "no", "nunca", "jamás", "nada", "nadie", "ninguno", "ninguna", "ningún",
-  "ni", "sin", "falta", "ausente", "rechazar", "negar", "rehusar",
-  "evitar", "impedir", "detener", "parar", "carecer",
-]);
 
 /** English stop words to filter out from keyword extraction */
 const STOP_WORDS_EN = new Set([
@@ -83,11 +73,6 @@ function normalizeText(text: string): string {
   return (text ?? "").normalize("NFC");
 }
 
-function isNegationWord(word: string, lang: "en" | "es"): boolean {
-  const set = lang === "en" ? NEGATION_WORDS_EN : NEGATION_WORDS_ES;
-  return set.has(word.toLowerCase());
-}
-
 function extractContentWords(text: string, lang: "en" | "es"): string[] {
   const stopWords = lang === "en" ? STOP_WORDS_EN : STOP_WORDS_ES;
   return normalizeText(text)
@@ -95,42 +80,6 @@ function extractContentWords(text: string, lang: "en" | "es"): string[] {
     .replace(/[^\p{L}\p{N}\s]/gu, " ")
     .split(/\s+/)
     .filter((w) => w.length >= 3 && !stopWords.has(w));
-}
-
-function expandContractions(text: string): string {
-  // Expand common English negation contractions BEFORE stripping punctuation
-  return text
-    .replace(/\bcan't\b/gi, "can not")
-    .replace(/\bwon't\b/gi, "will not")
-    .replace(/\bdon't\b/gi, "do not")
-    .replace(/\bdoesn't\b/gi, "does not")
-    .replace(/\bdidn't\b/gi, "did not")
-    .replace(/\bisn't\b/gi, "is not")
-    .replace(/\baren't\b/gi, "are not")
-    .replace(/\bwasn't\b/gi, "was not")
-    .replace(/\bweren't\b/gi, "were not")
-    .replace(/\bhaven't\b/gi, "have not")
-    .replace(/\bhasn't\b/gi, "has not")
-    .replace(/\bhadn't\b/gi, "had not")
-    .replace(/\bwouldn't\b/gi, "would not")
-    .replace(/\bcouldn't\b/gi, "could not")
-    .replace(/\bshouldn't\b/gi, "should not")
-    .replace(/\bmightn't\b/gi, "might not")
-    .replace(/\bmustn't\b/gi, "must not")
-    .replace(/\bshan't\b/gi, "shall not")
-    .replace(/\bneedn't\b/gi, "need not");
-}
-
-function countNegations(text: string, lang: "en" | "es"): number {
-  let processed = normalizeText(text).toLowerCase();
-  if (lang === "en") {
-    processed = expandContractions(processed);
-  }
-  const words = processed
-    .replace(/[^\p{L}\p{N}\s]/gu, " ")
-    .split(/\s+/)
-    .filter((w) => w.length > 0);
-  return words.filter((w) => isNegationWord(w, lang)).length;
 }
 
 function computeKeywordOverlap(sourceWords: string[], translatedWords: string[]): number {
@@ -235,8 +184,8 @@ export function runSemanticBackstop(
   const safeTranslated = translated ?? "";
 
   // Negation preservation: compare negation counts
-  const sourceNegations = countNegations(safeSource, "en");
-  const translatedNegations = countNegations(safeTranslated, "es");
+  const sourceNegations = countNegators(safeSource, "en");
+  const translatedNegations = countNegators(safeTranslated, "es");
   // If source has negations, translated should too. Allow for some variation.
   let negationPreservation: number;
   if (sourceNegations === 0 && translatedNegations === 0) {
@@ -327,8 +276,8 @@ export function combinedSemanticCheck(
   }
 
   // Mandatory negation check: source has negation but translation doesn't = fail
-  const sourceNegations = countNegations(safeSource, "en");
-  const translatedNegations = countNegations(safeTranslated, "es");
+  const sourceNegations = countNegators(safeSource, "en");
+  const translatedNegations = countNegators(safeTranslated, "es");
   const negationDropped = sourceNegations > 0 && translatedNegations === 0;
 
   if (negationDropped) {

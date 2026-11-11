@@ -1,4 +1,5 @@
 import type { SpanishDialect } from "@dialectos/types";
+import { hasTerm } from "./term-match.js";
 
 export type OutputJudgeCategory =
   | "accuracy"
@@ -107,8 +108,7 @@ function extractUrls(text: string): string[] {
 }
 
 function containsWholeTerm(text: string, term: string): boolean {
-  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`, "iu").test(text);
+  return hasTerm(text, term);
 }
 
 function isBlocking(issue: OutputJudgeIssue): boolean {
