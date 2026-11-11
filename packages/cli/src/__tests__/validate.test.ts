@@ -200,14 +200,26 @@ describe("validateTranslation", () => {
     const structureBlockers = report.structureValidation && !report.structureValidation.valid
       ? report.structureValidation.violations
       : [];
-    const lexicalBlockers = !report.lexicalCompliance.passed
-      ? report.lexicalCompliance.violations
-      : [];
+    // Lexical expectations are reported through the output judge, not twice.
     const judgeBlockers = report.outputJudge.blockingIssues.map((i) => i.message);
 
-    const expectedTotal = structureBlockers.length + lexicalBlockers.length + judgeBlockers.length;
+    const expectedTotal = structureBlockers.length + judgeBlockers.length;
     // May also include semantic blockers
     expect(report.blockingIssues.length).toBeGreaterThanOrEqual(expectedTotal);
+  });
+
+  it("lists each lexical problem once, not once per checker", () => {
+    const report = validateTranslation({
+      source: "I need to catch the bus.",
+      translated: "Necesito coger el autobús.",
+      dialect: "es-MX",
+    });
+
+    expect(report.lexicalCompliance.passed).toBe(false);
+    const lexicalMentions = report.blockingIssues.filter((m) => /coger|required/i.test(m));
+    expect(lexicalMentions.length).toBeGreaterThan(0);
+    expect(report.blockingIssues.filter((m) => /Forbidden term detected|Missing required term:/.test(m))).toEqual([]);
+    expect(new Set(report.blockingIssues).size).toBe(report.blockingIssues.length);
   });
 
   it("handles empty source and translated text", () => {

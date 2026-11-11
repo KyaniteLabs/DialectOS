@@ -61,9 +61,10 @@ export function validateTranslation(options: ValidateTranslationOptions): Valida
     blockingIssues.push(...structureValidation.violations);
   }
 
-  if (!lexicalCompliance.passed) {
-    blockingIssues.push(...lexicalCompliance.violations);
-  }
+  // Lexical violations are not pushed here: the output judge below receives
+  // the same expectations, matches them with the same whole-word rule, and
+  // reports each one as a critical (blocking) issue. Pushing both listed every
+  // missing or forbidden term twice. lexicalCompliance stays in the result.
 
   for (const violation of dialectCompliance.violations) {
     if (violation.severity === "error") {
