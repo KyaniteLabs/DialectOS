@@ -139,15 +139,17 @@ def test_ledger_summary_newest_first(api):
     rows = [
         {"ts": 1, "tool": "dialectos_validate", "dialect": "es-MX", "passed": True},
         {"ts": 2, "tool": "dialectos_validate", "dialect": "es-MX", "passed": False},
-        {"ts": 3, "tool": "dialectos_translate", "dialect": "es-AR", "ok": True},
+        {"ts": 3, "tool": "dialectos_validate", "dialect": "es-MX", "passed": False, "blocking_issue_count": 0},
+        {"ts": 4, "tool": "dialectos_translate", "dialect": "es-AR", "ok": True},
         "junk",
     ]
     plugin._ledger_path().write_text(json.dumps(rows))
     r = client.get("/api/plugins/dialectos/ledger?limit=2").json()
-    assert r["total"] == 3
-    assert [x["ts"] for x in r["rows"]] == [3, 2]
+    assert r["total"] == 4
+    assert [x["ts"] for x in r["rows"]] == [4, 3]
     mx = next(x for x in r["by_dialect"] if x["dialect"] == "es-MX")
-    assert mx == {"dialect": "es-MX", "checked": 2, "passed": 1, "blocked": 1, "calls": 2}
+    # an unreadable count stays blocked; zero blocking issues reads as advisory
+    assert mx == {"dialect": "es-MX", "checked": 3, "passed": 1, "blocked": 1, "advisory": 1, "calls": 3}
     assert r["by_dialect"][0]["dialect"] == "es-MX"
 
 

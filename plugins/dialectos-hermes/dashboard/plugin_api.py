@@ -113,13 +113,18 @@ def dialects():
 def ledger(limit: int = Query(40, ge=1, le=200)):
     rows = core._load_json(core._ledger_path(), [])
     rows = [r for r in rows if isinstance(r, dict)] if isinstance(rows, list) else []
-    by: Dict[str, Dict[str, int]] = defaultdict(lambda: {"checked": 0, "passed": 0, "blocked": 0, "calls": 0})
+    by: Dict[str, Dict[str, int]] = defaultdict(lambda: {"checked": 0, "passed": 0, "blocked": 0, "advisory": 0, "calls": 0})
     for r in rows:
         d = by[str(r.get("dialect") or "?")]
         d["calls"] += 1
         if r.get("tool") == "dialectos_validate" and r.get("passed") is not None:
             d["checked"] += 1
-            d["passed" if r.get("passed") is True else "blocked"] += 1
+            if r.get("passed") is True:
+                d["passed"] += 1
+            elif r.get("blocking_issue_count") == 0:
+                d["advisory"] += 1  # did not pass, but nothing blocking
+            else:
+                d["blocked"] += 1  # blocking issues, or a count we cannot read
     summary = sorted(({"dialect": k, **v} for k, v in by.items()), key=lambda x: (-x["checked"], -x["calls"], x["dialect"]))
     return {"ok": True, "total": len(rows), "rows": list(reversed(rows))[:limit], "by_dialect": summary}
 
