@@ -5,7 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DialectOS — Spanish dialect translation with receipts</title>
   <meta name="description" content="A full-stack Spanish dialect translation demo with provider-backed inference, regional semantic prompts, and visible quality receipts.">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0b'/%3E%3Cpath d='M16 43V20h14c11 0 18 6 18 15s-7 8-18 8H16z' fill='none' stroke='%23d89b2b' stroke-width='5' stroke-linejoin='round'/%3E%3Ccircle cx='31' cy='32' r='4' fill='%23fafafa'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="assets/favicon-64.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&display=swap">
   <link rel="canonical" href="https://kyanitelabs.github.io/DialectOS/">
   <meta property="og:title" content="DialectOS — Spanish Dialect Translation Server (MCP + CLI)">
   <meta property="og:description" content="Translate across 25 Spanish regional variants with structure preservation, quality gates, and MCP native integration. 17 MCP tools.">
@@ -24,7 +28,7 @@
     "description": "The first Model Context Protocol server built specifically for Spanish dialects. Translate across 25 regional variants with structure preservation and quality gates.",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Any",
-    "softwareVersion": "0.3.0",
+    "softwareVersion": "0.3.1",
     "license": "https://github.com/KyaniteLabs/DialectOS/blob/main/LICENSE",
     "codeRepository": "https://github.com/KyaniteLabs/DialectOS",
     "programmingLanguage": ["TypeScript", "JavaScript"],
@@ -56,7 +60,7 @@
       --surface-4: #232328;
       --text-1: #fafafa;
       --text-2: #a1a1aa;
-      --text-3: #71717a;
+      --text-3: #8b8b94;
       --gold: #d89b2b;
       --gold-light: #f0c873;
       --gold-dim: rgba(216,155,43,0.12);
@@ -70,6 +74,7 @@
       --border-strong: rgba(255,255,255,0.14);
       --elevation: 0 16px 48px rgba(0,0,0,0.4);
       --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --display: 'Chakra Petch', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
       --mono: 'SF Mono', 'Cascadia Code', ui-monospace, Menlo, monospace;
       font-family: var(--sans);
     }
@@ -128,24 +133,31 @@
       border-bottom: 1px solid var(--border-subtle);
     }
     .brand { display: flex; align-items: center; gap: 14px; text-decoration: none; color: var(--text-1); font-weight: 760; letter-spacing: -.035em; }
-    .brand-lockup { display: block; }
+    .brand-lockup { display: block; font-family: var(--display); font-weight: 700; letter-spacing: .01em; }
+    .brand-lockup small { font-family: var(--sans); }
     .brand-logo {
-      width: clamp(160px, 18vw, 220px);
-      height: auto;
+      width: 32px;
+      height: 40px;
+      box-sizing: content-box;
+      padding: 4px 6px;
+      background: #F4EFE6;
+      border-radius: 6px;
+      flex: none;
       display: block;
     }
     .brand small { display: block; color: var(--text-3); font-weight: 620; letter-spacing: .01em; margin-top: 4px; }
     .navlinks { display: flex; align-items: center; gap: 6px; color: var(--text-2); font-size: 14px; font-weight: 650; }
-    .navlinks a { text-decoration: none; color: var(--text-2); padding: 8px 12px; border-radius: 999px; transition: color .2s ease, background .2s ease; }
-    .navlinks a:hover { color: var(--text-1); background: var(--surface-2); }
-    .nav-cta { color: var(--base) !important; background: var(--gold) !important; font-weight: 700 !important; }
+    .navlinks a { text-decoration: none; color: var(--text-2); padding: 10px 12px; border-radius: 6px; text-underline-offset: 6px; transition: color .2s ease; }
+    .navlinks a:hover { color: var(--text-1); text-decoration: underline; text-decoration-color: var(--gold); }
+    .nav-cta { color: var(--base) !important; background: var(--gold) !important; font-weight: 700 !important; margin-left: 8px; }
+    .nav-cta:hover { text-decoration: none !important; }
     .nav-cta:hover { background: var(--gold-light) !important; }
 
     /* Hero */
     .hero { padding: 64px 0 40px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(300px, .74fr); gap: 42px; align-items: end; }
     .kicker { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; color: var(--text-3); font-size: 13px; font-weight: 760; text-transform: uppercase; letter-spacing: .12em; }
     .live-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--green); box-shadow: 0 0 0 6px rgba(34,197,94,0.15); }
-    h1 { margin: 18px 0 20px; max-width: 900px; font-size: clamp(48px, 8vw, 96px); line-height: .89; letter-spacing: -.07em; font-weight: 820; background: linear-gradient(135deg, var(--text-1) 50%, var(--gold-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    h1 { margin: 18px 0 20px; max-width: 900px; font-size: clamp(48px, 8vw, 96px); line-height: .92; letter-spacing: -.02em; font-weight: 700; font-family: var(--display); background: linear-gradient(135deg, var(--text-1) 50%, var(--gold-light) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .lede { margin: 0; max-width: 760px; color: var(--text-2); font-size: clamp(16px, 2vw, 20px); line-height: 1.56; letter-spacing: -.015em; }
     .lede em { color: var(--gold-light); font-style: italic; }
     .subproof { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
@@ -170,13 +182,6 @@
     .receipt-value { text-align: right; font-weight: 760; }
     .ok { color: #4ade80; } .warn { color: var(--gold-light); } .bad { color: #f87171; }
 
-    /* Metrics */
-    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--border-subtle); background: var(--surface-1); border-radius: 24px; overflow: hidden; box-shadow: var(--elevation); }
-    .metric { padding: 22px; border-right: 1px solid var(--border-subtle); min-height: 128px; }
-    .metric:last-child { border-right: 0; }
-    .metric strong { display: block; font-size: 36px; letter-spacing: -.055em; line-height: 1; color: var(--gold-light); }
-    .metric span { display: block; margin-top: 10px; color: var(--text-3); font-size: 13px; line-height: 1.35; font-weight: 650; }
-
     /* Main content */
     main { padding: 38px 0 76px; }
     .panel {
@@ -196,7 +201,7 @@
       background: var(--surface-2);
     }
     .section-label { color: var(--gold); font-family: var(--mono); font-size: 12px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }
-    .demo-head h2, .section-title h2 { margin: 8px 0 8px; font-size: clamp(28px, 4vw, 44px); line-height: .98; letter-spacing: -.05em; }
+    .demo-head h2, .section-title h2 { margin: 8px 0 8px; font-size: clamp(28px, 4vw, 44px); line-height: 1; letter-spacing: -.01em; font-family: var(--display); font-weight: 700; }
     .demo-head p, .section-title p { margin: 0; max-width: 720px; color: var(--text-2); font-size: 15px; line-height: 1.55; }
     .status {
       min-width: 260px;
@@ -209,6 +214,7 @@
       line-height: 1.45;
     }
     .status.ready { background: var(--green-dim); border-color: rgba(34,197,94,0.2); color: var(--text-2); }
+    .status.client { background: var(--gold-dim); border-color: rgba(216,155,43,0.22); color: var(--text-2); }
     .status.error { background: var(--red-dim); border-color: rgba(239,68,68,0.2); color: var(--text-2); }
     .status strong { display: block; margin-bottom: 5px; color: var(--text-1); }
 
@@ -282,12 +288,11 @@
     .section { margin-top: 56px; }
     .section-title { display: flex; justify-content: space-between; gap: 30px; align-items: end; margin-bottom: 18px; }
     .section-title p { max-width: 560px; }
-    .matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .trap-card { background: var(--surface-1); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 22px; transition: border-color .2s ease, transform .2s ease; }
-    .trap-card:hover { border-color: var(--border-medium); transform: translateY(-2px); }
-    .trap-card h3 { margin: 0 0 10px; font-size: 20px; letter-spacing: -.03em; }
+    .matrix { border-top: 1px solid var(--border-medium); }
+    .trap-card { display: grid; grid-template-columns: minmax(160px, 1fr) 2fr; gap: 8px 32px; padding: 20px 0; border-bottom: 1px solid var(--border-subtle); }
+    .trap-card h3 { grid-row: 1 / span 2; margin: 0; font-size: 20px; letter-spacing: -.03em; }
     .trap-card p { margin: 0; color: var(--text-2); line-height: 1.55; font-size: 14px; }
-    .trap-card .example { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle); font-family: var(--mono); font-size: 13px; color: var(--blue); }
+    .trap-card .example { font-family: var(--mono); font-size: 13px; color: var(--blue); }
 
     .dialect-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
     .dialect-card {
@@ -304,9 +309,9 @@
     .dialect-card strong { display: block; font-family: var(--mono); font-size: 13px; }
     .dialect-card small { color: var(--text-3); display: block; margin-top: 4px; }
 
-    .audit-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .audit-item { background: var(--surface-1); color: var(--text-1); border-radius: 20px; padding: 22px; border: 1px solid var(--border-subtle); }
-    .audit-item strong { display: block; color: var(--gold-light); margin-bottom: 10px; }
+    .audit-strip { border-top: 1px solid var(--border-medium); }
+    .audit-item { display: grid; grid-template-columns: minmax(160px, 1fr) 2fr; gap: 8px 32px; padding: 18px 0; border-bottom: 1px solid var(--border-subtle); color: var(--text-1); }
+    .audit-item strong { display: block; color: var(--gold-light); }
     .audit-item span { color: var(--text-2); line-height: 1.52; font-size: 14px; }
 
     footer { padding: 46px 0 70px; color: var(--text-3); border-top: 1px solid var(--border-subtle); }
@@ -316,7 +321,6 @@
 
     @media (max-width: 980px) {
       .hero { grid-template-columns: 1fr; padding-top: 44px; }
-      .metrics, .matrix, .audit-strip { grid-template-columns: 1fr 1fr; }
       .demo-head, .demo-body, .translator-grid { grid-template-columns: 1fr; }
       .preset-rail { border-right: 0; border-bottom: 1px solid var(--border-subtle); }
       .dialect-grid { grid-template-columns: repeat(3, 1fr); }
@@ -327,9 +331,9 @@
       .navlinks { flex-wrap: wrap; justify-content: flex-end; gap: 4px; font-size: 12px; }
       .navlinks a { padding: 6px 8px; }
       h1 { font-size: clamp(40px, 14vw, 60px); }
-      .metrics, .matrix, .audit-strip, .dialect-grid { grid-template-columns: 1fr; }
-      .metric { border-right: 0; border-bottom: 1px solid var(--border-subtle); }
-      .metric:last-child { border-bottom: 0; }
+      .dialect-grid { grid-template-columns: 1fr; }
+      .trap-card, .audit-item { grid-template-columns: 1fr; }
+      .trap-card h3 { grid-row: auto; }
       .section-title, .footer-inner { display: block; }
       .demo-head, .translator { padding: 18px; }
       .preset-rail { padding: 16px; }
@@ -346,7 +350,7 @@
 
   <nav class="shell nav" aria-label="Primary navigation">
     <a class="brand" href="#top" aria-label="DialectOS home">
-      <img class="brand-logo" src="assets/dialectos-logo.svg" alt="DialectOS logo">
+      <img class="brand-logo" src="assets/dialectos-mark.png" width="32" height="40" alt="">
       <span class="brand-lockup">DialectOS<small>regional Spanish translation</small></span>
     </a>
     <div class="navlinks">
@@ -359,7 +363,7 @@
 
   <header id="top" class="shell hero">
     <div>
-      <div class="kicker"><span class="live-dot"></span><span>1034 tests</span><span>·</span><span>provider-backed</span><span>·</span><span>no static fallback</span></div>
+      <div class="kicker"><span class="live-dot"></span><span>1,500+ tests</span><span>·</span><span>25 dialects</span><span>·</span><span>17 MCP tools</span><span>·</span><span>explicit client mode</span></div>
       <h1>Spanish that can defend where it came from.</h1>
       <p class="lede">DialectOS is a full-stack dialect translation surface for Spanish regional meaning: Puerto Rican <em>jugo de china</em>, Caribbean <em>guagua</em>, voseo, taboo verbs, and semantic traps that generic translation demos flatten.</p>
       <div class="subproof" aria-label="Product proof points">
@@ -370,26 +374,19 @@
     </div>
     <aside class="hero-receipt" aria-label="Runtime receipt">
       <div class="receipt-top">
-        <div class="receipt-title"><span>Runtime receipt</span><br>not a mock translation widget</div>
-        <div class="receipt-stamp">LIVE</div>
+        <div class="receipt-title"><span>Runtime receipt</span><br>what actually ran, per mode</div>
+        <div id="receiptStamp" class="receipt-stamp">CHECKING</div>
       </div>
       <div class="receipt-grid">
-        <div class="receipt-row"><span class="receipt-label">Inference</span><span class="receipt-value">Model provider stack</span></div>
-        <div class="receipt-row"><span class="receipt-label">Quality</span><span class="receipt-value ok">judge + backstop + negation gate</span></div>
-        <div class="receipt-row"><span class="receipt-label">Grammar</span><span class="receipt-value ok">voseo / leísmo / laísmo detection</span></div>
-        <div class="receipt-row"><span class="receipt-label">Cache</span><span class="receipt-value">translation memory (SHA-256 + TTL)</span></div>
-        <div class="receipt-row"><span class="receipt-label">Fallback</span><span class="receipt-value">none to static rules</span></div>
+        <div class="receipt-row"><span class="receipt-label">Inference</span><span id="rInference" class="receipt-value">vocabulary engine in this browser</span></div>
+        <div class="receipt-row"><span class="receipt-label">Quality</span><span id="rQuality" class="receipt-value warn">judge + backstop + negation gate: backend only</span></div>
+        <div class="receipt-row"><span class="receipt-label">Grammar</span><span id="rGrammar" class="receipt-value warn">voseo / leísmo / laísmo detection: backend only</span></div>
+        <div class="receipt-row"><span class="receipt-label">Cache</span><span id="rCache" class="receipt-value warn">translation memory (SHA-256 + TTL): backend only</span></div>
+        <div class="receipt-row"><span class="receipt-label">Fallback</span><span class="receipt-value">client engine, labelled in this receipt</span></div>
         <div class="receipt-row"><span class="receipt-label">Status</span><span id="heroStatus" class="receipt-value warn">checking…</span></div>
       </div>
     </aside>
   </header>
-
-  <section class="shell metrics" aria-label="Project metrics">
-    <div class="metric"><strong>25</strong><span>Spanish regional variants covered by the app surface</span></div>
-    <div class="metric"><strong>662</strong><span>tests across runtime, docs, dialect fixtures, and safety checks</span></div>
-    <div class="metric"><strong>17</strong><span>MCP tools for translation, glossary, and research workflows</span></div>
-    <div class="metric"><strong>0</strong><span>hidden fallbacks — client mode is receipt-visible</span></div>
-  </section>
 
   <main class="shell">
     <section id="translate" class="panel" aria-label="Full-app translator demo">
@@ -462,7 +459,7 @@
         <article class="trap-card"><h3>Grammar detection</h3><p>Automatic detection of voseo, leísmo, laísmo, and loísmo flags translations that mismatch their claimed dialect.</p><div class="example">ES: le vi → leísmo flagged in non-Spain target</div></article>
         <article class="trap-card"><h3>Semantic backstop</h3><p>Heuristic scores in the borderline zone trigger a second gate: negation preservation, keyword overlap, and structural parity.</p><div class="example">"Do not click" → "Haz clic" = negation dropped, auto-rejected</div></article>
         <article class="trap-card"><h3>Translation memory</h3><p>Provider calls are cached by SHA-256 key of (text, dialect, register) with TTL eviction and max-entry caps.</p><div class="example">cache hit → no provider call, instant return</div></article>
-        <article class="trap-card"><h3>Receipts</h3><p>Every public demo response shows provider, target, fallback count, quality status, and backstop verdict.</p><div class="example">provider: llm · quality: not reported · backstop: ok</div></article>
+        <article class="trap-card"><h3>Receipts</h3><p>Every demo response shows its mode and target; live responses add provider, fallback count and quality status.</p><div class="example">mode: live · provider: llm · fallbacks: 0</div></article>
       </div>
     </section>
 
@@ -496,7 +493,7 @@
   <footer class="shell">
     <div class="footer-inner">
       <p><a href="https://github.com/KyaniteLabs/DialectOS">DialectOS</a> — Apache-2.0</p>
-      <p class="mono">1034 tests · 17 MCP tools · 25 dialects</p>
+      <p class="mono">1,500+ tests · 17 MCP tools · 25 dialects</p>
     </div>
   </footer>
 
@@ -530,7 +527,15 @@
       backendAvailable = ready;
       $('heroStatus').textContent = ready ? 'live · LLM-powered' : 'client mode · vocabulary engine';
       $('heroStatus').className = 'receipt-value ' + (ready ? 'ok' : 'warn');
-      $('backendStatus').className = 'status ' + (ready ? 'ready' : 'error');
+      $('receiptStamp').textContent = ready ? 'LIVE' : 'CLIENT';
+      $('rInference').textContent = ready ? 'model provider stack' : 'vocabulary engine in this browser';
+      $('rQuality').textContent = 'judge + backstop + negation gate' + (ready ? '' : ': backend only');
+      $('rQuality').className = 'receipt-value ' + (ready ? 'ok' : 'warn');
+      $('rGrammar').textContent = 'voseo / leísmo / laísmo detection' + (ready ? '' : ': backend only');
+      $('rGrammar').className = 'receipt-value ' + (ready ? 'ok' : 'warn');
+      $('rCache').textContent = 'translation memory (SHA-256 + TTL)' + (ready ? '' : ': backend only');
+      $('rCache').className = 'receipt-value' + (ready ? '' : ' warn');
+      $('backendStatus').className = 'status ' + (ready ? 'ready' : 'client');
       if (ready) {
         $('backendStatus').innerHTML = '<strong>Live mode</strong> ' + escapeHtml(status.message || 'unknown') +
           '<br><span style="color:var(--text-3)">Providers: ' + escapeHtml((status.providers || []).join(', ') || 'none') + '</span>';
@@ -597,6 +602,7 @@
       $('changesPanel').classList.remove('show');
 
       let usedBackend = false;
+      let backendError = '';
       try {
         if (backendAvailable) {
           usedBackend = true;
@@ -610,13 +616,15 @@
           if (!response.ok || result.ok === false) throw new Error(result.error || `backend returned ${response.status}`);
           $('outputBox').innerHTML = escapeHtml(result.translatedText || '');
           $('copyButton').style.display = result.translatedText ? 'inline-flex' : 'none';
-          const qualityText = result.qualityScore != null ? String(result.qualityScore) : (result.warnings?.length ? 'warnings' : 'not reported');
+          const warnings = Array.isArray(result.qualityWarnings) ? result.qualityWarnings : null;
+          const qualityText = warnings ? (warnings.length ? warnings.length + ' warning' + (warnings.length === 1 ? '' : 's') : 'no warnings') : 'not reported';
           $('changesList').innerHTML = [
             ['mode', 'live · LLM-powered'],
             ['provider', result.providerUsed || 'unknown'],
             ['target', dialect],
             ['fallbacks', String(result.fallbackCount || 0)],
-            ['quality', qualityText]
+            ['quality', qualityText],
+            ['cache', result.cacheHit === true ? 'hit' : result.cacheHit === false ? 'miss' : 'not reported']
           ].map(([k,v]) => `<span class="pill">${escapeHtml(k)}: ${escapeHtml(v)}</span>`).join('');
           $('changesPanel').classList.add('show');
           renderDetection(result.sourceDetection);
@@ -625,6 +633,7 @@
         }
       } catch (error) {
         backendAvailable = false;
+        backendError = error.message || 'unknown error';
         setStatus({ ready: false, providers: [], message: 'backend lost, falling back to client engine' });
         if (requestId === translateRequestId) {
           $('outputBox').innerHTML = '<span class="placeholder">Backend error: ' + escapeHtml(error.message) + '. Falling back to client engine…</span>';
@@ -644,6 +653,7 @@
       $('outputBox').innerHTML = escapeHtml(adapted);
       $('copyButton').style.display = adapted ? 'inline-flex' : 'none';
       const pills = [['mode', 'client · vocabulary engine'], ['target', dialect]];
+      if (backendError) pills.unshift(['backend error', backendError + ' · fell back to client engine']);
       if (detection.isReliable) {
         pills.push(['detected', `${FLAGS[detection.dialect] || '🌐'} ${detection.dialect} (${Math.round(detection.confidence * 100)}%)`]);
       }
