@@ -1,6 +1,6 @@
 # DialectOS for Hermes
 
-Spanish is not one language to its readers. "Coger el autobús" is ordinary in Madrid and rude in Mexico City. This plugin lets Hermes translate into the variant you mean, from 25 regional variants, and check the result before you send it. It wraps the DialectOS v0.3.1 command-line tool.
+Spanish is not one language to its readers. "Coger el autobús" is ordinary in Madrid and rude in Mexico City. This plugin lets Hermes translate into the variant you mean, from 25 regional variants, and check the result before you send it. It wraps the DialectOS v0.3.2 command-line tool.
 
 ## What it adds
 
@@ -26,7 +26,7 @@ You need Node 20 or later, with `npx` on your PATH.
 
 ## What it does on your machine
 
-- **It downloads code.** The first call runs `npx -y --package=https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-cli-0.3.1.tgz dialectos`. DialectOS ships as GitHub Release tarballs, not on npm. To use an installed copy instead, set `dialectos_command`, for example to `dialectos` after `pnpm add -g <tarball>`.
+- **It downloads code.** The first call runs `npx -y --package=https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-cli-0.3.2.tgz dialectos`. DialectOS ships as GitHub Release tarballs, not on npm. To use an installed copy instead, set `dialectos_command`, for example to `dialectos` after `pnpm add -g <tarball>`.
 - **Translate is the only network call.** Detect, list and validate run offline. Translate sends text only to the provider you name in settings or in the tool call: `llm`, `deepl`, `libre` or `mymemory`. If you name none, or name `auto`, it refuses before starting anything, and it never falls back to another provider. The slash command and the page's Translate button use the provider from settings, and the page sends text only when you press Translate.
 - **Keys stay scoped.** The plugin reads provider keys and endpoints only through Hermes's secret scope and passes them only to the DialectOS process. These are `LLM_API_KEY`, `LLM_API_URL`, `LLM_ENDPOINT`, `LLM_MODEL`, `LLM_API_FORMAT`, `DEEPL_AUTH_KEY`, `DEEPL_API_URL`, `LIBRETRANSLATE_URL` and `LIBRETRANSLATE_API_KEY`, plus the switches `ENABLE_MYMEMORY`, `LLM_ALLOW_LOCAL` and `LM_STUDIO_URL`. That process gets a cleaned environment: PATH, HOME, locale, proxy and npm cache settings, plus those keys. It never sees the rest of your environment. MyMemory is used only when `ENABLE_MYMEMORY=1`. A local endpoint such as Ollama needs `LLM_ALLOW_LOCAL=1`, and LM Studio also needs `LM_STUDIO_URL`.
 - **Data stays in one folder.** The cache, the corpus and `qa_ledger.json` live in `<HERMES_HOME>/plugin-data/dialectos/`, one per profile. Checks run from the page add the same verdict-only rows, marked `via: page`. Corpus recording is off, and nothing else is written.
@@ -38,7 +38,7 @@ Set these under `plugins.entries.dialectos.settings`.
 
 | Key | Default | What it does |
 |---|---|---|
-| `dialectos_command` | the v0.3.1 `npx` command above | How to run DialectOS |
+| `dialectos_command` | the v0.3.2 `npx` command above | How to run DialectOS |
 | `default_dialect` | `es-MX` | The variant used when none is given |
 | `provider` | empty, so Translate is off | `llm`, `deepl`, `libre` or `mymemory`; `auto` is refused |
 | `inject_on_spanish` | `true` | Adds the dialect brief to Spanish requests |
@@ -47,8 +47,8 @@ Set these under `plugins.entries.dialectos.settings`.
 
 ## Known issues
 
-- **Checks are advisory.** The v0.3.1 checks look at placeholders, structure and regional terms. They can pass a translation whose meaning changed, such as a dropped "not" or the wrong sense of a word. Read the output before you use it.
-- **Code blocks fail checks.** The v0.3.1 checker wrongly fails translations that contain code blocks. The fix is in the DialectOS source on `main` but not in a release yet. To use it, point `dialectos_command` at a build of that source. Results from that build don't describe the v0.3.1 release.
+- **Checks are advisory.** The v0.3.2 checks look at placeholders, structure and regional terms. They can pass a translation whose meaning changed, such as a dropped "not" or the wrong sense of a word. Read the output before you use it.
+- **Code blocks must match exactly.** The check fails a translation whose code blocks differ from the source in any byte, including the language tag. Earlier versions (v0.3.1) failed every translation that contained a code block; v0.3.2 fixed that.
 - **Free providers are less regional.** MyMemory and LibreTranslate only take generic Spanish (`es`), so the regional wording is applied afterwards. An LLM provider gives better results.
 - **The first call is slow** while `npx` downloads DialectOS. Machines without internet need DialectOS installed and set as `dialectos_command`.
 - **Text limits.** Text to translate or detect is capped at 8,000 characters. A translation to check can be up to 100,000. A result that is too large comes back as a size error, never silently cut short.

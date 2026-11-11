@@ -48,7 +48,7 @@ REPORT_BLOCKED = {
 def test_status_defaults_without_provider(api):
     client, _ = api
     s = client.get("/api/plugins/dialectos/status").json()
-    assert s["cli"] == "release" and s["cli_version"] == "0.3.1"
+    assert s["cli"] == "release" and s["cli_version"] == "0.3.2"
     assert s["provider"] == "" and s["default_dialect"]
     assert s["ledger_entries"] == 0
     assert s["limits"] == {"text": 8000, "translated": 100_000}
