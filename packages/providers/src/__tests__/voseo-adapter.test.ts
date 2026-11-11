@@ -93,4 +93,13 @@ describe("applyVoseo pronouns and quotes", () => {
     );
     expect(applyVoseo("Leí «tú puedes» en la pared.", "es-AR", "informal")).toBe("Leí «tú puedes» en la pared.");
   });
+
+  it("stays linear on long runs of unmatched opening quotes", () => {
+    for (const opener of ["“", "«"]) {
+      const text = opener.repeat(50_000) + " tienes";
+      const start = performance.now();
+      expect(applyVoseo(text, "es-AR", "informal")).toBe(opener.repeat(50_000) + " tenés");
+      expect(performance.now() - start).toBeLessThan(1000);
+    }
+  });
 });

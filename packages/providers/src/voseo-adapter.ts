@@ -143,7 +143,9 @@ const PRONOUN_SWAPS: ReadonlyArray<[string, string]> = [
 const PREPOSITIONAL_TI =
   /(?<![\p{L}\p{N}])((?:a|ante|con|contra|de|desde|en|entre|hacia|hasta|para|por|según|sin|sobre|tras)\s+)ti(?![\p{L}\p{N}])/giu;
 
-const QUOTED = /"[^"\n]*"|“[^”]*”|«[^»]*»/g;
+// Each body also excludes its own opener, so a run of unmatched “ or « is
+// scanned once, not once per opener (quadratic on hostile input).
+const QUOTED = /"[^"\n]*"|“[^“”]*”|«[^«»]*»/g;
 
 /** Apply `fn` to the parts of `text` that are not inside quotation marks. */
 function mapOutsideQuotes(text: string, fn: (segment: string) => string): string {

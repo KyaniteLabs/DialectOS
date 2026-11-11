@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+- **Quoted-speech detection in the voseo adapter could take quadratic time:** a long run of unmatched “ or « made the pattern rescan the rest of the text from every opener (about 1.3 s for 50,000 of them). Each quote body now excludes its own opener, so the scan is linear. Found by CodeQL.
 - Patched production dependency advisories (1 critical, 7 high): `hono` 4.13.11, `@hono/node-server` 2.1.3, `undici` 7.30.1, `body-parser` 2.4.0, `qs` 6.16.1, `fast-uri` 3.1.9, `ip-address` 10.7.4, `dompurify` 3.4.17 and `zod` 4.6.6 via workspace overrides; `@dialectos/mcp` now requires `@modelcontextprotocol/sdk` ^1.32.1. Dev tooling moves to `vite` 7.3.7, `vitest` 4.1.12 and `esbuild` 0.28.1. `pnpm audit` reports no known vulnerabilities.
 - Release tarballs are vendored with `npm install`, which ignores `pnpm-lock.yaml`; the packing script now carries the workspace overrides into the vendored manifest so the bundled closure gets the same patched versions. Packages the closure depends on directly get the patched version pinned in `dependencies`, since npm 11 rejects an override that conflicts with a direct dependency (`EOVERRIDE`); transitive ones go in npm `overrides`.
 - The release workflow's dependency audit now blocks the release on any high or critical production advisory instead of only logging it.
