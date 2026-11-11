@@ -54,7 +54,7 @@ It started from a real production issue: we shipped Spain Spanish translations t
 
 **Technical highlights:**
 - TypeScript monorepo with pnpm workspaces
-- 17 MCP tools exposed over stdio JSON-RPC
+- 18 MCP tools exposed over stdio JSON-RPC
 - Provider registry with circuit breaker pattern
 - Translation memory with SHA-256 keyed caching
 - automated tests across 7 packages
@@ -73,16 +73,16 @@ Simon Gonzalez
 **Contact:** Search for submission form or editor email
 **Audience:** AI tool builders and users
 
-**Subject:** DialectOS — First MCP server for Spanish dialect translation
+**Subject:** DialectOS — an MCP server for Spanish dialect translation
 
 **Body:**
 
 Hi AI Tools Weekly team,
 
-MCP (Model Context Protocol) is exploding right now. We built what might be the first domain-specific MCP server — for Spanish dialect translation.
+MCP (Model Context Protocol) is exploding right now. We built a domain-specific MCP server for Spanish dialect translation.
 
 **What it does:**
-- 17 MCP tools for translation, i18n, glossary, and research
+- 18 MCP tools for translation, i18n, glossary, and research
 - 25 Spanish regional variants (not just generic "Spanish")
 - Adversarial quality gates that catch bad AI translations
 - Works with any LLM provider (OpenAI, Anthropic, local)
@@ -147,7 +147,7 @@ Hi Pointer team,
 
 We're building DialectOS — an open-source translation engine for Spanish regional dialects.
 
-It exposes 17 MCP tools, supports 25 dialects, and applies adversarial quality gates to catch semantic drift in AI translations.
+It exposes 18 MCP tools, supports 25 dialects, and applies adversarial quality gates to catch semantic drift in AI translations.
 
 **Repo:** https://github.com/KyaniteLabs/DialectOS
 

@@ -21,7 +21,7 @@ DialectOS is an open-source Spanish dialect translation server built on the Mode
 **Additional Details:**
 
 - 25 Spanish dialects supported (es-MX, es-AR, es-CO, es-PR, es-CL, etc.)
-- MCP server with 17 tools for Claude Desktop, Cursor, and MCP clients
+- MCP server with 18 tools for Claude Desktop, Cursor, and MCP clients
 - Structure-preserving markdown translation (tables, code blocks, links)
 - i18n locale file diff/merge
 - Gender-neutral language support (elles, latine, -e/-x)
@@ -38,4 +38,4 @@ DialectOS is an open-source Spanish dialect translation server built on the Mode
 - MCP-native translation workflows
 
 **Differentiation:**
-DialectOS is the first MCP server specifically built for Spanish dialects. Unlike generic translation APIs that treat Spanish as one language, DialectOS understands 25 regional variants with different vocabulary, grammar, and formality levels.
+DialectOS is an MCP server specifically built for Spanish dialects. Unlike generic translation APIs that treat Spanish as one language, DialectOS understands 25 regional variants with different vocabulary, grammar, and formality levels.

@@ -36,3 +36,10 @@ test('hostinger docker-compose references an existing Dockerfile', () => {
   const dockerfilePath = dockerfileMatch[1].trim();
   assert.ok(existsSync(dockerfilePath), `hostinger docker-compose references missing ${dockerfilePath}`);
 });
+
+test('root Dockerfile builds the MCP server from this checkout', () => {
+  const dockerfile = readFileSync('Dockerfile', 'utf8');
+  assert.doesNotMatch(dockerfile, /npm install -g/, 'root Dockerfile must not install a package from the npm registry');
+  assert.match(dockerfile, /pnpm install --frozen-lockfile/, 'root Dockerfile must install from the lockfile');
+  assert.match(dockerfile, /ENTRYPOINT \["node", "\/app\/packages\/mcp\/dist\/index\.js"\]/, 'root Dockerfile must start the built MCP server');
+});

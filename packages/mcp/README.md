@@ -1,8 +1,8 @@
 # @dialectos/mcp
 
-Model Context Protocol server providing 17 tools for Spanish dialect translation across 25 regional variants.
+Model Context Protocol server providing 18 tools for Spanish dialect translation across 25 regional variants.
 
-> v0.3.1 is distributed as GitHub Release tarballs. `GET https://registry.npmjs.org/@kyanitelabs/dialectos` and `GET https://registry.npmjs.org/dialectos` both return 404 — there is no npm package. The tarball bundles the unpublished `@dialectos/*` workspace packages.
+> v0.3.2 is distributed as GitHub Release tarballs. `GET https://registry.npmjs.org/@kyanitelabs/dialectos` and `GET https://registry.npmjs.org/dialectos` both return 404 — there is no npm package. The tarball bundles the unpublished `@dialectos/*` workspace packages.
 
 ## Usage
 
@@ -15,7 +15,7 @@ Add to your MCP client configuration:
       "command": "pnpm",
       "args": [
         "dlx",
-        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-mcp-0.3.2.tgz"
       ],
       "env": {
         "DEEPL_AUTH_KEY": "your-key",
@@ -25,6 +25,11 @@ Add to your MCP client configuration:
   }
 }
 ```
+
+`ALLOWED_LOCALE_DIRS` is a comma-separated list of the only directories the
+server may read or write; when set, it replaces the working directory. Without
+it the server falls back to its working directory, but never to `/` or your
+home directory, so set it when your client starts servers from either.
 
 ## Available Tools
 
@@ -50,6 +55,7 @@ Add to your MCP client configuration:
 - `search_glossary` — Search 300+ source-attributed glossary terms
 - `list_dialects` — List all 25 supported dialects
 - `research_regional_term` — Research source-backed regional lexeme proposals without mutating runtime data
+- `validate_translation` — Check an existing translation with the same validator as the CLI and GitHub Action
 
 ## Security
 

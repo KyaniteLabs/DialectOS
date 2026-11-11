@@ -55,18 +55,5 @@ jobs:
 
       - name: Smoke deployed Pages site
         run: |
-          URL="${{ steps.deployment.outputs.page_url }}"
-          if node scripts/smoke-pages.mjs "$URL"; then
-            exit 0
-          fi
-          # Fallback: if custom domain DNS is misconfigured, verify GitHub Pages
-          # itself is serving the redirect (301/308 proves deployment succeeded).
-          GH_IO_URL="https://kyanitelabs.github.io/DialectOS/"
-          STATUS=$(curl -sI --no-location -o /dev/null -w "%{http_code}" "$GH_IO_URL")
-          if [ "$STATUS" = "301" ] || [ "$STATUS" = "308" ]; then
-            echo "⚠️ Custom domain DNS misconfigured (kyanitelabs.tech → 404),"
-            echo "   but GitHub Pages deployment verified (HTTP $STATUS from $GH_IO_URL)"
-            exit 0
-          fi
-          echo "GitHub Pages fallback check failed: $GH_IO_URL returned HTTP $STATUS"
-          exit 1
+          # No fallback: a redirect or a different site is a failed deploy.
+          node scripts/smoke-pages.mjs "${{ steps.deployment.outputs.page_url }}"

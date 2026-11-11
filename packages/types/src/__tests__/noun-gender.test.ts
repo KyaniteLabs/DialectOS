@@ -116,3 +116,20 @@ describe("articleMatchesNoun", () => {
     expect(articleMatchesNoun("el", "guagua")).toBe(false);
   });
 });
+
+describe("resolveNounGender: irregular and accent-sensitive nouns", () => {
+  it("treats día as masculine", () => {
+    expect(resolveNounGender("día")).toBe("m");
+    expect(resolveNounGender("días")).toBe("m");
+  });
+
+  it("tells papá (father) from papa (potato)", () => {
+    expect(resolveNounGender("papá")).toBe("m");
+    expect(resolveNounGender("papás")).toBe("m");
+    expect(resolveNounGender("papa")).toBe("f");
+  });
+
+  it("treats mamá as feminine", () => {
+    expect(resolveNounGender("mamá")).toBe("f");
+  });
+});

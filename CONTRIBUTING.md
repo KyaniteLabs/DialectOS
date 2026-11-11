@@ -6,8 +6,8 @@ Thank you for your interest in contributing! DialectOS is a community-driven pro
 
 ### Prerequisites
 
-- **Node.js** ≥ 20.0.0
-- **pnpm** 9.15.0 (managed via corepack)
+- **Node.js** ≥ 22.13.0
+- **pnpm** 11.1.1 (pinned by `packageManager`; `corepack enable` picks it up)
 
 ### Setup
 

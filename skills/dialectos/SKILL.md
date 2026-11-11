@@ -11,7 +11,7 @@ Use DialectOS when an agent needs regional Spanish localization that preserves s
 
 - Read `../../README.md` for quick start, provider setup, supported workflows, and certification commands.
 - Read `../../packages/cli/README.md` for CLI commands.
-- Read `../../packages/mcp/README.md` for the 17 MCP tools and client configuration.
+- Read `../../packages/mcp/README.md` for the 18 MCP tools and client configuration.
 - Use `../../llms.txt` for a compact public summary when another agent needs project context.
 
 ## Choose A Surface
@@ -57,7 +57,7 @@ dialectos dialects list
       "command": "pnpm",
       "args": [
         "dlx",
-        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-mcp-0.3.2.tgz"
       ],
       "env": {
         "ALLOWED_LOCALE_DIRS": "/path/to/locales"

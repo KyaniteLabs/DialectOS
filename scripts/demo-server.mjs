@@ -53,7 +53,6 @@ const PUBLIC_STATIC_FILES = new Map([
   ["/assets/dialectos-mark.png", "docs/assets/dialectos-mark.png"],
   ["/assets/favicon-64.png", "docs/assets/favicon-64.png"],
   ["/assets/apple-touch-icon.png", "docs/assets/apple-touch-icon.png"],
-  ["/CNAME", "docs/CNAME"],
   ["/robots.txt", "docs/robots.txt"],
   ["/sitemap.xml", "docs/sitemap.xml"],
   ["/llms.txt", "llms.txt"],

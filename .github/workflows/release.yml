@@ -38,9 +38,9 @@ jobs:
 
       - run: pnpm test:coverage
 
-      - name: Run npm audit
-        run: pnpm audit --audit-level=moderate
-        continue-on-error: true
+      - name: Audit production dependencies
+        # Blocking: a release must not ship a known high/critical advisory.
+        run: pnpm audit --prod --audit-level=high
 
       - name: Verify packages install from tarballs
         run: |

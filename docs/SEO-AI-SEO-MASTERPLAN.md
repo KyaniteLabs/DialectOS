@@ -81,7 +81,7 @@ topics_to_add = [
 
 # 5. Create custom social preview image (1200×630px)
 # Use: Canva, Figma, or OG Image Generator
-# Must include: DialectOS logo, tagline, key metrics (25 dialects, 17 MCP tools)
+# Must include: DialectOS logo, tagline, key metrics (25 dialects, 18 MCP tools)
 # Upload: Repo Settings → General → Social preview
 
 # 6. Keep release notes current for v0.3.0
@@ -95,7 +95,7 @@ Add to `docs/index.html` `<head>`:
 ```html
 <!-- Open Graph -->
 <meta property="og:title" content="DialectOS — Spanish Dialect Translation Server (MCP + CLI)">
-<meta property="og:description" content="Translate across 25 Spanish regional variants with structure preservation, quality gates, and MCP native integration. automated tests. 17 MCP tools.">
+<meta property="og:description" content="Translate across 25 Spanish regional variants with structure preservation, quality gates, and MCP native integration. automated tests. 18 MCP tools.">
 <meta property="og:image" content="https://kyanitelabs.github.io/DialectOS/assets/og-image.png">
 <meta property="og:url" content="https://kyanitelabs.github.io/DialectOS">
 <meta property="og:type" content="website">
@@ -115,7 +115,7 @@ Add to `docs/index.html` `<head>`:
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   "name": "DialectOS",
-  "description": "The first Model Context Protocol server built specifically for Spanish dialects. Translate across 25 regional variants with structure preservation and quality gates.",
+  "description": "A Model Context Protocol server built specifically for Spanish dialects. Translate across 25 regional variants with structure preservation and quality gates.",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Any",
   "softwareVersion": "0.3.0",
@@ -124,7 +124,7 @@ Add to `docs/index.html` `<head>`:
   "programmingLanguage": ["TypeScript", "JavaScript"],
   "featureList": [
     "25 Spanish regional dialects",
-    "17 MCP tools for translation workflows",
+    "18 MCP tools for translation workflows",
     "Markdown structure preservation",
     "i18n locale file support",
     "Gender-neutral language support",
@@ -253,7 +253,7 @@ DialectOS exposes 17 translation tools through MCP.
 
 5. **Product Hunt launch**:
    - Create stunning gallery images (features, demo GIF, architecture diagram)
-   - Write compelling tagline: "The first MCP server for Spanish dialects"
+   - Write compelling tagline: "The MCP server for Spanish dialects"
    - Prepare maker comment with personal story
    - Launch on Tuesday 12:01 AM PT (best time)
    - Share on Twitter, LinkedIn, relevant subreddits
@@ -414,7 +414,7 @@ The Puerto Rican "orange juice → jugo de china" example is *perfect* for viral
 - Dev.to article opener
 
 ### Secret Weapon #2: The MCP Angle
-MCP is THE hottest topic in AI tooling right now (April 2026). Being "the first MCP server for Spanish dialects" is a massive differentiator. Lean into it HARD:
+MCP is THE hottest topic in AI tooling right now (April 2026). Being an MCP server built specifically for Spanish dialects is a real differentiator; do not claim to be the first. Lean into it:
 - All headlines should mention MCP
 - Compare against non-MCP translation tools
 - Target MCP-specific communities (r/mcp, MCP Discord, etc.)

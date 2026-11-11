@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&display=swap">
   <link rel="canonical" href="https://kyanitelabs.github.io/DialectOS/">
   <meta property="og:title" content="DialectOS — Spanish Dialect Translation Server (MCP + CLI)">
-  <meta property="og:description" content="Translate across 25 Spanish regional variants with structure preservation, quality gates, and MCP native integration. 17 MCP tools.">
+  <meta property="og:description" content="Translate across 25 Spanish regional variants with structure preservation, quality gates, and MCP native integration. 18 MCP tools.">
   <meta property="og:image" content="https://kyanitelabs.github.io/DialectOS/assets/og-image.png">
   <meta property="og:url" content="https://kyanitelabs.github.io/DialectOS">
   <meta property="og:type" content="website">
@@ -25,16 +25,16 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "DialectOS",
-    "description": "The first Model Context Protocol server built specifically for Spanish dialects. Translate across 25 regional variants with structure preservation and quality gates.",
+    "description": "A Model Context Protocol server built specifically for Spanish dialects. Translate across 25 regional variants with structure preservation and quality gates.",
     "applicationCategory": "DeveloperApplication",
     "operatingSystem": "Any",
-    "softwareVersion": "0.3.1",
+    "softwareVersion": "0.3.2",
     "license": "https://github.com/KyaniteLabs/DialectOS/blob/main/LICENSE",
     "codeRepository": "https://github.com/KyaniteLabs/DialectOS",
     "programmingLanguage": ["TypeScript", "JavaScript"],
     "featureList": [
       "25 Spanish regional dialects",
-      "17 MCP tools for translation workflows",
+      "18 MCP tools for translation workflows",
       "Markdown structure preservation",
       "i18n locale file support",
       "Gender-neutral language support",
@@ -363,7 +363,7 @@
 
   <header id="top" class="shell hero">
     <div>
-      <div class="kicker"><span class="live-dot"></span><span>1,500+ tests</span><span>·</span><span>25 dialects</span><span>·</span><span>17 MCP tools</span><span>·</span><span>explicit client mode</span></div>
+      <div class="kicker"><span class="live-dot"></span><span>1,500+ tests</span><span>·</span><span>25 dialects</span><span>·</span><span>18 MCP tools</span><span>·</span><span>explicit client mode</span></div>
       <h1>Spanish that can defend where it came from.</h1>
       <p class="lede">DialectOS is a full-stack dialect translation surface for Spanish regional meaning: Puerto Rican <em>jugo de china</em>, Caribbean <em>guagua</em>, voseo, taboo verbs, and semantic traps that generic translation demos flatten.</p>
       <div class="subproof" aria-label="Product proof points">
@@ -377,10 +377,10 @@
         <div class="receipt-title"><span>Runtime receipt</span><br>what actually ran, per mode</div>
         <div id="receiptStamp" class="receipt-stamp">CHECKING</div>
       </div>
-      <div class="receipt-grid">
+      <div class="receipt-grid" role="status" aria-live="polite">
         <div class="receipt-row"><span class="receipt-label">Inference</span><span id="rInference" class="receipt-value">vocabulary engine in this browser</span></div>
-        <div class="receipt-row"><span class="receipt-label">Quality</span><span id="rQuality" class="receipt-value warn">judge + backstop + negation gate: backend only</span></div>
-        <div class="receipt-row"><span class="receipt-label">Grammar</span><span id="rGrammar" class="receipt-value warn">voseo / leísmo / laísmo detection: backend only</span></div>
+        <div class="receipt-row"><span class="receipt-label">Quality</span><span id="rQuality" class="receipt-value warn">output judge + idiom check: backend only</span></div>
+        <div class="receipt-row"><span class="receipt-label">Grammar</span><span id="rGrammar" class="receipt-value warn">voseo / leísmo / laísmo detection: CLI and MCP only, not run by this demo</span></div>
         <div class="receipt-row"><span class="receipt-label">Cache</span><span id="rCache" class="receipt-value warn">translation memory (SHA-256 + TTL): backend only</span></div>
         <div class="receipt-row"><span class="receipt-label">Fallback</span><span class="receipt-value">client engine, labelled in this receipt</span></div>
         <div class="receipt-row"><span class="receipt-label">Status</span><span id="heroStatus" class="receipt-value warn">checking…</span></div>
@@ -422,8 +422,8 @@
               <div class="actions">
                 <button id="translateButton" class="btn btn-primary">Translate with full app</button>
                 <div style="position:relative;">
-                  <div id="outputBox" class="output"><span class="placeholder">Run a provider-backed translation. The receipt below will show what happened.</span></div>
-                  <button id="copyButton" class="btn btn-secondary" style="position:absolute;top:8px;right:8px;padding:8px 12px;font-size:12px;display:none;" title="Copy output">📋</button>
+                  <div id="outputBox" class="output" role="status" aria-live="polite" aria-label="Translation output"><span class="placeholder">Run a provider-backed translation. The receipt below will show what happened.</span></div>
+                  <button id="copyButton" class="btn btn-secondary" style="position:absolute;top:8px;right:8px;padding:8px 12px;font-size:12px;display:none;" title="Copy output" aria-label="Copy output">📋</button>
                 </div>
               </div>
             </div>
@@ -493,7 +493,7 @@
   <footer class="shell">
     <div class="footer-inner">
       <p><a href="https://github.com/KyaniteLabs/DialectOS">DialectOS</a> — Apache-2.0</p>
-      <p class="mono">1,500+ tests · 17 MCP tools · 25 dialects</p>
+      <p class="mono">1,500+ tests · 18 MCP tools · 25 dialects</p>
     </div>
   </footer>
 
@@ -529,10 +529,12 @@
       $('heroStatus').className = 'receipt-value ' + (ready ? 'ok' : 'warn');
       $('receiptStamp').textContent = ready ? 'LIVE' : 'CLIENT';
       $('rInference').textContent = ready ? 'model provider stack' : 'vocabulary engine in this browser';
-      $('rQuality').textContent = 'judge + backstop + negation gate' + (ready ? '' : ': backend only');
+      $('rQuality').textContent = 'output judge + idiom check' + (ready ? '' : ': backend only');
       $('rQuality').className = 'receipt-value ' + (ready ? 'ok' : 'warn');
-      $('rGrammar').textContent = 'voseo / leísmo / laísmo detection' + (ready ? '' : ': backend only');
-      $('rGrammar').className = 'receipt-value ' + (ready ? 'ok' : 'warn');
+      // The demo backend runs the output judge and idiom check only. Semantic
+      // backstop, negation gate and grammar detection run in the CLI/MCP paths.
+      $('rGrammar').textContent = 'voseo / leísmo / laísmo detection: CLI and MCP only, not run by this demo';
+      $('rGrammar').className = 'receipt-value warn';
       $('rCache').textContent = 'translation memory (SHA-256 + TTL)' + (ready ? '' : ': backend only');
       $('rCache').className = 'receipt-value' + (ready ? '' : ' warn');
       $('backendStatus').className = 'status ' + (ready ? 'ready' : 'client');
@@ -576,16 +578,36 @@
       }
     }
 
+    // List what changed by diffing the words of the input and the output, so
+    // agreement fixes ("el" -> "la", "listo" -> "lista") show up too.
+    function wordChanges(before, after) {
+      const a = before.match(/\p{L}+/gu) || [];
+      const b = after.match(/\p{L}+/gu) || [];
+      const lcs = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+      for (let i = a.length - 1; i >= 0; i--) {
+        for (let j = b.length - 1; j >= 0; j--) {
+          lcs[i][j] = a[i] === b[j] ? lcs[i + 1][j + 1] + 1 : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+        }
+      }
+      const changes = [];
+      let i = 0, j = 0, from = [], to = [];
+      const flush = () => {
+        if (from.length || to.length) changes.push({ from: from.join(' '), to: to.join(' ') });
+        from = []; to = [];
+      };
+      while (i < a.length || j < b.length) {
+        if (i < a.length && j < b.length && a[i] === b[j]) { flush(); i++; j++; }
+        else if (j < b.length && (i >= a.length || lcs[i][j + 1] >= lcs[i + 1][j])) to.push(b[j++]);
+        else from.push(a[i++]);
+      }
+      flush();
+      return changes;
+    }
+
     function runClientTranslation(text, dialect) {
       const detection = window.detectDialect(text);
-      const adapted = window.applyAdaptations(text, dialect);
-      const adaptations = window.DIALECT_ADAPTATIONS[dialect] || [];
-      const changes = [];
-      for (const rule of adaptations) {
-        const match = text.match(rule.from);
-        if (match) changes.push({ from: match[0], to: rule.to.replace(/\$1/g, match[1] || ''), desc: rule.description });
-      }
-      return { detection, adapted, changes };
+      const adapted = window.adaptForDialect(text, dialect);
+      return { detection, adapted, changes: wordChanges(text, adapted) };
     }
 
     async function runTranslation() {

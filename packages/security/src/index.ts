@@ -71,18 +71,59 @@ export class SecurityError extends Error {
 // ============================================================================
 
 /**
- * Get allowed directories from environment and defaults
+ * Limits a host (the MCP server, the CLI) can set once at startup. Calls that
+ * pass explicit limits still win; these replace the built-in defaults.
+ */
+export interface SecurityPolicy {
+  /** Directories file tools may touch. Empty means "not configured". */
+  allowedDirs?: string[];
+  maxFileSize?: number;
+  maxContentLength?: number;
+  /**
+   * Whether the home directory may serve as the implicit working directory.
+   * The CLI keeps the default (true): a person typed the path. The MCP server
+   * sets false, because there a model chooses the paths.
+   */
+  allowHomeAsWorkingDir?: boolean;
+}
+
+let policy: SecurityPolicy = {};
+
+/** Set the process-wide security policy. Pass `{}` to restore the defaults. */
+export function configureSecurity(next: SecurityPolicy): void {
+  policy = { ...next };
+}
+
+/** The directory the sandbox would fall back to, or null when that is unsafe. */
+function implicitWorkingDir(): string | null {
+  const cwd = path.resolve(process.cwd());
+  // A process started at "/" (as some MCP hosts do) would otherwise open the
+  // whole disk to file tools; the home directory would open every dotfile.
+  if (cwd === path.parse(cwd).root) return null;
+  const home = process.env.HOME || process.env.USERPROFILE;
+  if (policy.allowHomeAsWorkingDir === false && home && cwd === path.resolve(home)) return null;
+  return cwd;
+}
+
+/**
+ * Get allowed directories: the configured list, else ALLOWED_LOCALE_DIRS,
+ * else the working directory (never the filesystem root).
  */
 function getAllowedDirs(): string[] {
-  const allowed = new Set<string>([process.cwd()]);
+  const allowed = new Set<string>();
 
-  // Add ALLOWED_LOCALE_DIRS from environment
-  const envDirs = process.env.ALLOWED_LOCALE_DIRS;
-  if (envDirs) {
-    envDirs.split(",").forEach((dir) => {
-      const resolved = path.resolve(dir.trim());
-      allowed.add(resolved);
-    });
+  const configured = policy.allowedDirs?.filter(Boolean) ?? [];
+  const envDirs = (process.env.ALLOWED_LOCALE_DIRS ?? "")
+    .split(",")
+    .map((dir) => dir.trim())
+    .filter(Boolean);
+  const explicit = configured.length > 0 ? configured : envDirs;
+
+  if (explicit.length > 0) {
+    explicit.forEach((dir) => allowed.add(path.resolve(dir)));
+  } else {
+    const cwd = implicitWorkingDir();
+    if (cwd) allowed.add(cwd);
   }
 
   // In test mode, also allow /tmp and /test
@@ -206,7 +247,11 @@ export function validateFilePath(
     }
     const relativePath = path.relative(resolvedAllowedDir, realPath);
 
-    if (!relativePath.startsWith("..")) {
+    if (
+      relativePath !== ".." &&
+      !relativePath.startsWith(`..${path.sep}`) &&
+      !path.isAbsolute(relativePath)
+    ) {
       isAllowed = true;
       break;
     }
@@ -214,7 +259,9 @@ export function validateFilePath(
 
   if (!isAllowed) {
     throw new SecurityError(
-      "Path is outside allowed directories",
+      dirs.length === 0
+        ? "No allowed directories: set ALLOWED_LOCALE_DIRS (or security.allowedDirs) to the folders file tools may use"
+        : "Path is outside allowed directories",
       ErrorCode.PATH_TRAVERSAL
     );
   }
@@ -301,7 +348,7 @@ export function validateJsonPath(
  */
 export function checkFileSize(
   filePath: string,
-  maxSize: number = MAX_FILE_SIZE
+  maxSize: number = policy.maxFileSize ?? MAX_FILE_SIZE
 ): void {
   try {
     const stats = fs.statSync(filePath);
@@ -328,7 +375,7 @@ export function checkFileSize(
  */
 export function validateContentLength(
   content: string,
-  maxLength: number = MAX_CONTENT_LENGTH
+  maxLength: number = policy.maxContentLength ?? MAX_CONTENT_LENGTH
 ): void {
   if (content.length > maxLength) {
     throw new SecurityError(

@@ -8,7 +8,7 @@
 
 Hey r/javascript — wanted to share a project we've been working on.
 
-**DialectOS** is a Spanish dialect translation engine built as a TypeScript monorepo. It exposes 17 MCP tools and a CLI.
+**DialectOS** is a Spanish dialect translation engine built as a TypeScript monorepo. It exposes 18 MCP tools and a CLI.
 
 **Why TypeScript?**
 
@@ -18,7 +18,7 @@ Because the target users are JavaScript developers who need to localize apps for
 
 ```
 packages/
-  @dialectos/mcp          — 17 tools, stdio JSON-RPC server
+  @dialectos/mcp          — 18 tools, stdio JSON-RPC server
   @dialectos/cli          — CLI commands + quality gates
   @dialectos/providers    — LLM/DeepL/LibreTranslate with circuit breaker
   @dialectos/security     — Rate limiting, SSRF protection

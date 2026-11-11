@@ -1,8 +1,9 @@
 /**
  * MCP Tools for Translation
  *
- * Provides 7 MCP tools:
+ * Provides 8 MCP tools:
  * - translate_text: Translate text to Spanish dialect
+ * - validate_translation: Check an existing translation with the CLI/Action validator
  * - detect_dialect: Detect Spanish dialect from text
  * - translate_code_comment: Translate code comments (basic, text extraction)
  * - translate_readme: Translate a README markdown file
@@ -25,6 +26,7 @@ import {
   handleSearchGlossary,
   handleResearchRegionalTerm,
   handleListDialects,
+  handleValidateTranslation,
 } from "./translator-handlers.js";
 import { registerScoredTool } from "./metadata.js";
 import type {
@@ -35,6 +37,7 @@ import type {
   SearchGlossaryParams,
   ListDialectsParams,
   ResearchRegionalTermParams,
+  ValidateTranslationParams,
 } from "./translator-types.js";
 
 export type {
@@ -48,6 +51,7 @@ export type {
   McpRegionalResearchSource,
   McpResearchConfidence,
   McpRegionalLexemeProposal,
+  ValidateTranslationParams as ValidateTranslationToolParams,
 } from "./translator-types.js";
 
 export { DIALECT_METADATA } from "./translator-data.js";
@@ -221,5 +225,29 @@ export function registerTranslatorTools(
       },
     },
     async (params) => handleListDialects(params as ListDialectsParams, registry, rateLimiter)
+  );
+
+  registerScoredTool(
+    server,
+    "validate_translation",
+    {
+      title: "Validate a Spanish translation",
+      description:
+        "Check an existing English-to-Spanish translation against a target dialect with the same validator the DialectOS CLI and GitHub Action use: placeholder and token preservation, Markdown structure, dialect vocabulary, dropped negation, and output-judge checks (prompt leakage, untranslated English). Returns a report with valid, a quality score, and blocking issues. It reads no files and calls no translation provider.",
+      inputSchema: {
+        source: z.string().min(1).describe("Original English text."),
+        translated: z.string().min(1).describe("Spanish translation to check."),
+        dialect: dialectSchema.describe("Target Spanish dialect code the translation is meant for, e.g. es-MX."),
+        markdown: z.boolean().optional().describe("Set true when source and translation are Markdown, to also check structure."),
+      },
+      annotations: {
+        title: "Validate a Spanish translation",
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    async (params) => handleValidateTranslation(params as ValidateTranslationParams, registry, rateLimiter)
   );
 }

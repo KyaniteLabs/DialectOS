@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { ProviderRegistry } from "@dialectos/providers";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { ProviderRegistry, TranslationMemory } from "@dialectos/providers";
 import type { ProviderCapability, TranslationProvider } from "@dialectos/types";
 import {
   getWebDemoProviderStatus,
@@ -115,6 +118,36 @@ describe("web demo service", () => {
       dialect: "es-MX",
     }, registry)).rejects.toThrow(/All semantic demo providers failed/);
     expect(generic.translate).not.toHaveBeenCalled();
+  });
+
+  it("reports a cache hit only when the cache actually served the request", async () => {
+    const cacheDir = mkdtempSync(path.join(tmpdir(), "dialectos-demo-cache-"));
+    try {
+      const registry = new ProviderRegistry(undefined, undefined, true, new TranslationMemory({ cacheDir }));
+      const provider = makeProvider("llm");
+      registry.register(provider);
+      const request = { text: "Pick up the file before you park the car.", dialect: "es-MX" as const };
+
+      const first = await translateForWebDemo(request, registry);
+      const second = await translateForWebDemo(request, registry);
+
+      expect(first.cacheHit).toBe(false);
+      expect(second.cacheHit).toBe(true);
+      expect(provider.translate).toHaveBeenCalledTimes(1);
+    } finally {
+      rmSync(cacheDir, { recursive: true, force: true });
+    }
+  });
+
+  it("never reports a cache hit when no cache is configured", async () => {
+    const registry = new ProviderRegistry();
+    registry.register(makeProvider("llm"));
+    const request = { text: "Pick up the file before you park the car.", dialect: "es-MX" as const };
+
+    await translateForWebDemo(request, registry);
+    const second = await translateForWebDemo(request, registry);
+
+    expect(second.cacheHit).toBe(false);
   });
 
   it("returns quality warnings for non-critical judge issues instead of rejecting", async () => {

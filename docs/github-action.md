@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: KyaniteLabs/DialectOS@v0.3.1
+      - uses: KyaniteLabs/DialectOS@v0.3.2
         with:
           dialect: es-MX
           fail-on-blocking: true
@@ -60,7 +60,7 @@ jobs:
         dialect: [es-ES, es-MX, es-AR, es-CO]
     steps:
       - uses: actions/checkout@v4
-      - uses: KyaniteLabs/DialectOS@v0.3.1
+      - uses: KyaniteLabs/DialectOS@v0.3.2
         with:
           dialect: ${{ matrix.dialect }}
 ```

@@ -1,5 +1,5 @@
 import type { ProviderRegistry } from "@dialectos/providers";
-import type { FormalityLevel, SpanishDialect } from "@dialectos/types";
+import type { FormalityLevel, SpanishDialect, TranslationProvider } from "@dialectos/types";
 import { ALL_SPANISH_DIALECTS } from "@dialectos/types";
 import { stripHtmlTags, validateContentLength } from "@dialectos/security";
 import { detectDialect } from "./dialect-info.js";
@@ -194,21 +194,21 @@ async function translateWithSemanticDemoProviders(
     try {
       const provider = registry.get(name);
       const prepared = registry.prepareRequest(name, text, sourceLang, targetLang, options);
-      const preSize = getCacheSize(registry, name);
+      const hitsBefore = getCacheHits(provider);
       const result = await provider.translate(
         text,
         prepared.sourceLang,
         prepared.targetLang,
         prepared.options
       );
-      const postSize = getCacheSize(registry, name);
+      const hitsAfter = getCacheHits(provider);
       registry.recordSuccess(name);
       return {
         translatedText: result.translatedText,
         providerUsed: provider.name,
         fallbackCount: attemptIndex,
         retryCount: 0,
-        cacheHit: preSize === postSize && postSize > 0,
+        cacheHit: hitsBefore !== undefined && hitsAfter !== undefined && hitsAfter > hitsBefore,
       };
     } catch (error) {
       registry.recordFailure(name);
@@ -219,14 +219,11 @@ async function translateWithSemanticDemoProviders(
   throw new Error(`All semantic demo providers failed (${providers.join(" -> ")}): ${errors.join(" | ")}`);
 }
 
-function getCacheSize(registry: ProviderRegistry, _providerName: string): number {
-  try {
-    const entry = (registry as unknown as { providers?: Map<string, { provider: { getCacheStats?: () => { size: number } } }> }).providers;
-    if (!entry) return 0;
-    for (const [, val] of entry) {
-      const stats = val.provider?.getCacheStats?.();
-      if (stats) return stats.size;
-    }
-  } catch { /* cache not available */ }
-  return 0;
+/**
+ * Read the hit counter of a CachedProvider wrapper. A hit is only reported
+ * when this exact call moved the counter, not guessed from cache size.
+ */
+function getCacheHits(provider: TranslationProvider): number | undefined {
+  const stats = (provider as { getCacheStats?: () => { hits: number } }).getCacheStats?.();
+  return stats?.hits;
 }

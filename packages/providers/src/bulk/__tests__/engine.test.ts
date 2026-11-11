@@ -453,7 +453,7 @@ describe("BulkTranslationEngine", () => {
     expect(callCount).toBe(1);
   });
 
-  it("deduplicates items with same text even if languages differ (uses representative)", async () => {
+  it("does not deduplicate the same text sent to different target languages", async () => {
     const engine = new BulkTranslationEngine({ cache: createFreshCache() });
     const provider = createMockProvider(new Map());
     const items: BulkTranslationItem[] = [
@@ -463,12 +463,9 @@ describe("BulkTranslationEngine", () => {
 
     const result = await engine.translate(items, provider);
 
-    // Both items succeed but only one API call due to sourceText dedup
+    // A different target is a different translation: one call each.
     expect(result.successes).toHaveLength(2);
-    expect(result.apiCalls).toBe(1);
-    // The representative item (first pending) drives the translation call
-    expect(result.successes[0].result.translatedText).toBe("translated:Hello");
-    expect(result.successes[1].result.translatedText).toBe("translated:Hello");
+    expect(result.apiCalls).toBe(2);
   });
 });
 

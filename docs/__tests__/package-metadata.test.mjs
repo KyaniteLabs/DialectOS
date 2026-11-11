@@ -49,7 +49,8 @@ for (const path of packages) {
     assert.equal(pkg.license, 'Apache-2.0', `${path} license must be Apache-2.0`);
   });
 
-  test(`${pkg.name} engines.node is >=20.0.0`, () => {
-    assert.equal(pkg.engines?.node, '>=20.0.0', `${path} engines.node must be '>=20.0.0'`);
+  // commander 15 needs >=22.12.0 and jsdom (via isomorphic-dompurify) ^22.13.0.
+  test(`${pkg.name} engines.node is >=22.13.0`, () => {
+    assert.equal(pkg.engines?.node, '>=22.13.0', `${path} engines.node must be '>=22.13.0'`);
   });
 }

@@ -132,7 +132,7 @@ Run your translations by speakers from each target region. Ask:
 We built DialectOS to solve this systematically:
 
 **25 dialects** with regional vocabulary databases
-**17 MCP tools** for AI assistant integration
+**18 MCP tools** for AI assistant integration
 **4 quality gates** with semantic backstop
 **Markdown preservation** for technical docs
 **i18n tools** for locale file management

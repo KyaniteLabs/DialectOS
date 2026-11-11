@@ -24,12 +24,18 @@ async function readFileContent(path: string): Promise<string> {
   return fs.readFile(validatedPath, "utf-8");
 }
 
-function formatTextReport(report: ValidationReport): string {
+export function formatTextReport(report: ValidationReport): string {
   const lines: string[] = [];
   const status = report.valid ? "PASS" : "FAIL";
 
   lines.push(`Validation: ${status} (dialect: ${report.dialect})`);
-  lines.push(`Quality score: ${report.qualityScore.score}/100`);
+  // The quality score averages five component checks; the output judge, idiom
+  // and dialect checks can fail a translation the score still rates highly.
+  // Never print a bare high score next to a FAIL.
+  const scoreNote = report.valid
+    ? ""
+    : ` (component average only; failed on ${report.blockingIssues.length} blocking issue(s) below)`;
+  lines.push(`Quality score: ${report.qualityScore.score}/100${scoreNote}`);
   lines.push(`  Token integrity: ${(report.qualityScore.tokenIntegrity * 100).toFixed(0)}%`);
   lines.push(`  Glossary fidelity: ${(report.qualityScore.glossaryFidelity * 100).toFixed(0)}%`);
   lines.push(`  Structure integrity: ${report.qualityScore.structureIntegrity === 1 ? "pass" : "fail"}`);

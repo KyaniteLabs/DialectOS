@@ -76,6 +76,40 @@ describe("i18n manage-variants command", () => {
       expect(writtenEntries[0].value).not.toContain("ordenador");
     });
 
+    it("keeps the article in agreement when the noun changes gender", async () => {
+      mockReadLocaleFile.mockReturnValue([
+        { key: "a", value: "El ordenador está encendido" },
+        { key: "b", value: "Los ordenadores están encendidos" },
+      ]);
+      mockWriteLocaleFile.mockImplementation(() => {});
+
+      await executeManageVariants({
+        source: "/path/to/es-ES.json",
+        variant: "es-MX",
+        output: "/path/to/es-MX.json",
+      });
+
+      const writtenEntries = mockWriteLocaleFile.mock.calls[0][1] as I18nEntry[];
+      expect(writtenEntries[0].value).toBe("La computadora está encendida");
+      expect(writtenEntries[1].value).toBe("Las computadoras están encendidas");
+    });
+
+    it("swaps vosotras and feminine possessives too", async () => {
+      mockReadLocaleFile.mockReturnValue([
+        { key: "a", value: "Gracias a vosotras y a vuestra familia, y a vuestras amigas." },
+      ]);
+      mockWriteLocaleFile.mockImplementation(() => {});
+
+      await executeManageVariants({
+        source: "/path/to/es-ES.json",
+        variant: "es-MX",
+        output: "/path/to/es-MX.json",
+      });
+
+      const writtenEntries = mockWriteLocaleFile.mock.calls[0][1] as I18nEntry[];
+      expect(writtenEntries[0].value).toBe("Gracias a ustedes y a su familia, y a sus amigas.");
+    });
+
     it("should apply coche → carro for es-MX", async () => {
       const sourceEntries: I18nEntry[] = [
         { key: "vehicle.car", value: "Mi coche es rojo" },

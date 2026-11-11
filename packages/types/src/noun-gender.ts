@@ -26,6 +26,7 @@ const MASC_A_ENDINGS: ReadonlySet<string> = new Set([
   "guru", "huracan", "lingua", "monarca", "paraguas", "piloto",
   "sofa", "taxista", "testigo", "tranvia", "turista", "atleta",
   "artista", "optimista", "periodista", "pianista", "ventilador",
+  "dia",
   // NOTE: "papa" (potato) is intentionally NOT here — it is feminine in the
   // food sense ("la papa"); only the Pope is "el Papa".
 ]);
@@ -85,6 +86,14 @@ function singularize(word: string): string {
   return word;
 }
 
+// Accented words whose unaccented twin is a different noun with another
+// gender: "el papá" (father) vs "la papa" (potato). Checked before accents
+// are stripped.
+const ACCENTED_GENDER: ReadonlyMap<string, NounGender> = new Map([
+  ["papá", "m"],
+  ["mamá", "f"],
+]);
+
 const ACCENT_MAP: Record<string, string> = {
   á: "a", é: "e", í: "i", ó: "o", ú: "u", ü: "u",
 };
@@ -101,6 +110,9 @@ const ACCENT_MAP: Record<string, string> = {
  */
 export function resolveNounGender(noun: string): NounGender | undefined {
   const lower = noun.toLowerCase();
+  const accented =
+    ACCENTED_GENDER.get(lower) ?? (lower.endsWith("s") ? ACCENTED_GENDER.get(lower.slice(0, -1)) : undefined);
+  if (accented) return accented;
   // Unaccented twin: override keys and exception lists are stored without
   // accents ("autobus"), so lookups must normalize "autobús" -> "autobus".
   // Morphological suffix checks below keep the accented form (ción, ón).

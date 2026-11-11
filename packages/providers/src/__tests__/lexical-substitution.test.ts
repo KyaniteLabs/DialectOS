@@ -96,3 +96,49 @@ describe("applyLexicalSubstitution", () => {
     expect(result).not.toContain("paco");
   });
 });
+
+describe("applyLexicalSubstitution: meaning guards", () => {
+  it("does not turn 'padre' into the potato word", () => {
+    const result = applyLexicalSubstitution("El padre de Juan llegó.", "es-MX");
+    expect(result).not.toMatch(/\bpapa\b/i);
+    expect(result).not.toContain("La papa");
+  });
+
+  it("does not swap toward informal-only terms ('hermano' stays a brother)", () => {
+    const result = applyLexicalSubstitution("Tengo un hermano.", "es-VE");
+    expect(result).toBe("Tengo un hermano.");
+  });
+
+  it("skips a word whose senses map to different terms in the dialect", () => {
+    const result = applyLexicalSubstitution("Tomamos la guagua.", "es-MX");
+    expect(result).toBe("Tomamos la guagua.");
+  });
+});
+
+describe("applyLexicalSubstitution: predicate adjective agreement", () => {
+  it("flips the adjective after a linking verb when the noun changes gender", () => {
+    expect(applyLexicalSubstitution("El ordenador está listo.", "es-MX")).toBe("La computadora está lista.");
+    expect(applyLexicalSubstitution("La computadora está lista.", "es-ES")).toBe("El ordenador está listo.");
+  });
+
+  it("handles plurals, negation and a degree word", () => {
+    expect(applyLexicalSubstitution("Los ordenadores no son muy caros.", "es-MX")).toBe(
+      "Las computadoras no son muy caras.",
+    );
+  });
+
+  it("leaves non-agreeing words and invariant adjectives alone", () => {
+    expect(applyLexicalSubstitution("El ordenador es como nuevo.", "es-MX")).toBe("La computadora es como nuevo.");
+    expect(applyLexicalSubstitution("El ordenador es rosa.", "es-MX")).toBe("La computadora es rosa.");
+  });
+
+  it("does not touch a verb right after the noun", () => {
+    expect(applyLexicalSubstitution("La computadora trabaja bien.", "es-ES")).toBe("El ordenador trabaja bien.");
+  });
+});
+
+describe("applyLexicalSubstitution: invariant -ista adjectives", () => {
+  it("keeps an -ista adjective unchanged", () => {
+    expect(applyLexicalSubstitution("El ordenador es minimalista.", "es-MX")).toBe("La computadora es minimalista.");
+  });
+});

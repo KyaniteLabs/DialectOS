@@ -63,7 +63,7 @@ function runSmoke(url) {
 
 test('smoke-pages passes against a valid site', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'dialectos-smoke-'));
-  writeFileSync(join(dir, 'index.html'), '<html>hello</html>');
+  writeFileSync(join(dir, 'index.html'), '<html><title>DialectOS</title>hello</html>');
   writeFileSync(join(dir, 'robots.txt'), 'User-agent: *\nAllow: /\n');
   writeFileSync(join(dir, 'sitemap.xml'), '<?xml version="1.0"?><urlset></urlset>');
   writeFileSync(join(dir, 'llms.txt'), '# DialectOS');
@@ -75,6 +75,26 @@ test('smoke-pages passes against a valid site', async () => {
     const res = await runSmoke(`http://127.0.0.1:${port}`);
     assert.equal(res.code, 0, `smoke should pass: ${res.stderr}`);
     assert.match(res.stdout, /Pages smoke passed/);
+  } finally {
+    server.closeAllConnections?.();
+    server.close();
+  }
+});
+
+test('smoke-pages fails when the root page is not DialectOS', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dialectos-smoke-'));
+  writeFileSync(join(dir, 'index.html'), '<html>Org landing page</html>');
+  writeFileSync(join(dir, 'robots.txt'), 'User-agent: *\nAllow: /\n');
+  writeFileSync(join(dir, 'sitemap.xml'), '<?xml version="1.0"?><urlset></urlset>');
+  writeFileSync(join(dir, 'llms.txt'), '# DialectOS');
+
+  const server = await startServer(dir, 0);
+  const port = server.address().port;
+
+  try {
+    const res = await runSmoke(`http://127.0.0.1:${port}`);
+    assert.notEqual(res.code, 0, 'smoke should fail on a foreign root page');
+    assert.match(res.stderr, /not the DialectOS page/);
   } finally {
     server.closeAllConnections?.();
     server.close();

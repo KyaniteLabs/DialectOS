@@ -5,10 +5,6 @@
 const fs = require('fs');
 const path = require('path');
 
-function getLines(file, start, end) {
-  return fs.readFileSync(file, 'utf8').split('\n').slice(start - 1, end).join('\n');
-}
-
 function extractBalanced(source, startIndex, openChar, closeChar) {
   const openIndex = source.indexOf(openChar, startIndex);
   if (openIndex === -1) throw new Error(`Could not find ${openChar}`);
@@ -49,6 +45,17 @@ function extractConstArray(file, name) {
   return `${source.slice(start, assignment)}= ${array};`;
 }
 
+function extractConst(file, name) {
+  const source = fs.readFileSync(file, 'utf8');
+  const start = source.indexOf(`const ${name}`);
+  if (start === -1) throw new Error(`Could not find ${name}`);
+  const assignment = source.indexOf('=', start);
+  const open = source.slice(assignment + 1).search(/[[{]/) + assignment + 1;
+  const [openChar, closeChar] = source[open] === '[' ? ['[', ']'] : ['{', '}'];
+  const end = findBalancedEnd(source, open, openChar, closeChar);
+  return source.slice(start, source[end] === ';' ? end + 1 : end);
+}
+
 function extractFunction(file, name) {
   const source = fs.readFileSync(file, 'utf8');
   const exportStart = source.indexOf(`export function ${name}`);
@@ -66,10 +73,10 @@ const blocks = [
   extractConstArray(d, 'DIALECT_METADATA'),
   extractFunction(d, 'getWordBoundaries'),
   extractFunction(d, 'detectDialect'),
-  getLines(m, 32, 35),     // VOSOTROS_ADAPTATION
-  getLines(m, 38, 348),    // TECH_ADAPTATIONS
-  getLines(m, 354, 383),   // DIALECT_ADAPTATIONS
-  getLines(m, 400, 411),   // applyAdaptations
+  extractConst(m, 'VOSOTROS_ADAPTATION'),
+  extractConst(m, 'TECH_ADAPTATIONS'),
+  extractConst(m, 'DIALECT_ADAPTATIONS'),
+  extractFunction(m, 'applyAdaptations'),
 ];
 
 function stripTS(code) {
@@ -103,17 +110,99 @@ function stripTS(code) {
     .replace(/^import type .* from .*;\n?/gm, '');
 }
 
-const output = `// AUTO-GENERATED from packages/cli/src/lib/dialect-info.ts
-// and packages/cli/src/commands/i18n/manage-variants.ts
+// Bundle the shared lexical substitution engine for the browser. The engine
+// reads its data files with node:fs at load time, so those reads are served
+// from inlined JSON. Fields the engine never reads (notes, glosses) are
+// dropped to keep the bundle small.
+function compactDictionary() {
+  const file = path.join(__dirname, '../packages/types/src/dialectal-dictionary.json');
+  const entries = JSON.parse(fs.readFileSync(file, 'utf8'));
+  return entries.map((e) => {
+    const out = { concept: e.concept };
+    if (e.panHispanic) out.panHispanic = e.panHispanic;
+    if (e.variants) {
+      out.variants = {};
+      for (const [code, v] of Object.entries(e.variants)) {
+        const kept = { term: v.term, frequency: v.frequency, register: v.register };
+        if (v.ambiguous) kept.ambiguous = true;
+        out.variants[code] = kept;
+      }
+    }
+    return out;
+  });
+}
+
+async function bundleLexicalEngine() {
+  const esbuild = require('esbuild');
+  const typesDir = path.join(__dirname, '../packages/types/src');
+  const dataFiles = {
+    'dialectal-dictionary.json': JSON.stringify(compactDictionary()),
+    'gender-overrides.json': fs.readFileSync(path.join(typesDir, 'gender-overrides.json'), 'utf8'),
+    // Verb tables are not used by vocabulary swaps.
+    'verb-conjugations.json': '[]',
+  };
+  const nodeShim = `
+    const DATA = ${JSON.stringify(dataFiles)};
+    export function readFileSync(p) {
+      const name = String(p).split('/').pop();
+      if (!(name in DATA)) throw new Error('demo bundle has no data file ' + name);
+      return DATA[name];
+    }
+    export function fileURLToPath(u) { return String(u).slice('file://'.length); }
+    export function dirname(p) { return p.slice(0, p.lastIndexOf('/')); }
+    export function join(...parts) { return parts.join('/'); }
+  `;
+  const result = await esbuild.build({
+    entryPoints: [path.join(__dirname, 'demo-engine/entry.ts')],
+    bundle: true,
+    write: false,
+    format: 'iife',
+    globalName: 'DialectOSLexical',
+    platform: 'browser',
+    target: 'es2020',
+    minify: true,
+    charset: 'utf8',
+    legalComments: 'none',
+    define: { 'import.meta.url': '"file:///demo/engine.js"' },
+    logLevel: 'silent',
+    plugins: [{
+      name: 'demo-shims',
+      setup(build) {
+        build.onResolve({ filter: /^@dialectos\/types$/ }, () => ({
+          path: path.join(__dirname, 'demo-engine/types-shim.ts'),
+        }));
+        build.onResolve({ filter: /^node:(fs|url|path)$/ }, (args) => ({ path: args.path, namespace: 'demo-node' }));
+        build.onLoad({ filter: /.*/, namespace: 'demo-node' }, () => ({ contents: nodeShim, loader: 'js' }));
+      },
+    }],
+  });
+  return result.outputFiles[0].text;
+}
+
+async function main() {
+const lexicalBundle = await bundleLexicalEngine();
+
+const output = `// AUTO-GENERATED from packages/cli/src/lib/dialect-info.ts,
+// packages/cli/src/commands/i18n/manage-variants.ts
+// and packages/providers/src/lexical-substitution.ts (bundled with esbuild)
 // Do not edit manually. Run: node scripts/build-demo.cjs
 
+${lexicalBundle}
 ${blocks.map(stripTS).join('\n\n')}
+
+// Same pipeline as the CLI's manage-variants: the shared engine swaps
+// vocabulary with article and adjective agreement, then the table covers
+// what the engine does not (vosotros -> ustedes, a few verbs).
+function adaptForDialect(value, variant) {
+  if (variant === 'es-ES') return value;
+  return applyAdaptations(DialectOSLexical.applyLexicalSubstitution(value, variant), variant);
+}
 
 // Browser exports
 if (typeof window !== 'undefined') {
   window.DIALECT_METADATA = DIALECT_METADATA;
   window.detectDialect = detectDialect;
-  window.applyAdaptations = applyAdaptations;
+  window.adaptForDialect = adaptForDialect;
   window.DIALECT_ADAPTATIONS = DIALECT_ADAPTATIONS;
 }
 `;
@@ -138,3 +227,9 @@ try {
   console.error('Syntax check failed:', e.stdout?.toString() || e.message);
   process.exit(1);
 }
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

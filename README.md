@@ -8,7 +8,7 @@
 
 **TL;DR:** DialectOS — open-source MCP server and CLI for translating and QA-checking content across 25 regional Spanish variants. Best for AI agents, documentation teams, and app developers localizing into Spanish.
 
-**The first Model Context Protocol server built specifically for Spanish dialects.**
+**A Model Context Protocol server built specifically for Spanish dialects.**
 
 DialectOS is an open-source Spanish dialect translation server that runs as an MCP
 (Model Context Protocol) tool and CLI. It translates English and other languages into
@@ -21,8 +21,8 @@ Translate, detect, and adapt content across **25 regional Spanish variants** whi
 [![CI](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml/badge.svg)](https://github.com/KyaniteLabs/DialectOS/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/KyaniteLabs/DialectOS/actions)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
-[![pnpm](https://img.shields.io/badge/pnpm-11.12.0-orange)](package.json)
+[![Node](https://img.shields.io/badge/node-%3E%3D22.13.0-brightgreen)](package.json)
+[![pnpm](https://img.shields.io/badge/pnpm-11.1.1-orange)](package.json)
 [![MCP](https://img.shields.io/badge/MCP-compatible-purple)](https://modelcontextprotocol.io)
 [![Security](https://img.shields.io/badge/security-hardened-success)](https://github.com/KyaniteLabs/DialectOS/security)
 
@@ -66,8 +66,8 @@ DialectOS is available as a paid Spanish localization launch audit. We certify y
 
 | Feature | Google Translate | DeepL API | **DialectOS** |
 |---------|-----------------|-----------|---------------|
-| Spanish dialect awareness | ❌ Generic "Spanish" | ⚠️ Limited variants | ✅ **25 regional variants** |
-| MCP native integration | ❌ | ❌ | ✅ **17 MCP tools** |
+| Spanish dialect awareness | ❌ Generic "Spanish" | ⚠️ Limited variants | ✅ **25 regional variants** (5 experimental, see below) |
+| MCP native integration | ❌ | ⚠️ Official DeepL MCP server, generic Spanish | ✅ **18 MCP tools** |
 | Markdown structure preservation | ❌ | ❌ | ✅ **Tables, code blocks, links intact** |
 | i18n locale file support | ❌ | ❌ | ✅ **JSON locale diff & merge** |
 | Gender-neutral language | ❌ | ❌ | ✅ **elles / latine / -x** |
@@ -78,6 +78,10 @@ DialectOS is available as a paid Spanish localization launch audit. We certify y
 | GitHub CI integration | ❌ | ❌ | ✅ **Composite action for PR validation** |
 | Auto-glossary from corrections | ❌ | ❌ | ✅ **Learns from user feedback** |
 | Public benchmark suite | ❌ | ❌ | ✅ **205 adversarial samples across 25 dialects** |
+
+> **Coverage is not equal across the 25 variants.** es-AD, es-BZ, es-PH, es-GQ and es-US are **experimental**: their profiles lean on contact-language markers (Catalan, Kriol, Tagalog, English) and have thinner vocabulary and test data than the major variants.
+>
+> **Dialect detection is a keyword heuristic.** Its last recorded top-1 accuracy was 54.8% on the bundled detection corpus, and that corpus was written from the detector's own keyword lists, so the figure is **not an independent measure**. Treat `detect_dialect` output as a hint, not a verdict.
 
 ---
 
@@ -98,7 +102,7 @@ Spanish is not one language — it's **25 regional variants** with different voc
 
 ## 🚀 Quick Start
 
-> **Install note:** DialectOS v0.3.1 is distributed as GitHub Release tarballs. `GET https://registry.npmjs.org/@kyanitelabs/dialectos` and `GET https://registry.npmjs.org/dialectos` both return **404** — there is no npm package. The CLI and MCP tarballs bundle the unpublished `@dialectos/*` workspace packages, so a single `pnpm add -g` / `pnpm dlx` of the tarball URL works. Clone the repo only for local development or the browser demo.
+> **Install note:** DialectOS v0.3.2 is distributed as GitHub Release tarballs. `GET https://registry.npmjs.org/@kyanitelabs/dialectos` and `GET https://registry.npmjs.org/dialectos` both return **404** — there is no npm package. The CLI and MCP tarballs bundle the unpublished `@dialectos/*` workspace packages, so a single `pnpm add -g` / `pnpm dlx` of the tarball URL works. Clone the repo only for local development or the browser demo.
 
 ### MCP setup
 
@@ -111,7 +115,7 @@ Add the released MCP server to Claude Desktop, Cursor, or any MCP client:
       "command": "pnpm",
       "args": [
         "dlx",
-        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-mcp-0.3.2.tgz"
       ],
       "env": {
         "LLM_API_URL": "https://your-llm-gateway/v1/chat/completions",
@@ -124,6 +128,11 @@ Add the released MCP server to Claude Desktop, Cursor, or any MCP client:
   }
 }
 ```
+
+`ALLOWED_LOCALE_DIRS` is a comma-separated list of the only directories the
+server may read or write; when set, it replaces the working directory. Without
+it the server falls back to its working directory, but never to `/` or your
+home directory, so set it when your client starts servers from either.
 
 For local development from a source checkout, run `pnpm build` and point your MCP client at `packages/mcp/dist/index.js`.
 
@@ -207,8 +216,8 @@ pnpm dialect:report -- --input=audits/release-candidate-2026-04-22/model-matrix.
 ### CLI install
 
 ```bash
-# Install the v0.3.1 CLI tarball from the GitHub Release
-pnpm add -g https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-cli-0.3.1.tgz
+# Install the v0.3.2 CLI tarball from the GitHub Release
+pnpm add -g https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-cli-0.3.2.tgz
 
 # Or use a local source checkout
 pnpm install --frozen-lockfile
@@ -281,12 +290,13 @@ pnpm test        # 1,500+ tests passing
 | Tool | Description |
 |------|-------------|
 | `translate_text` | Translate with semantic context, grammar profiles, and quality contracts |
-| `detect_dialect` | Detect dialect from sample text |
+| `detect_dialect` | Detect dialect from sample text (heuristic; see accuracy note below) |
 | `translate_code_comment` | Translate comments, preserve code |
 | `translate_readme` | Full README translation pipeline |
 | `search_glossary` | Search 300+ source-attributed glossary terms |
 | `list_dialects` | List all 25 supported dialects |
 | `research_regional_term` | Research source-backed regional lexeme proposals without mutating runtime data |
+| `validate_translation` | Check an existing translation with the same validator as the CLI and GitHub Action |
 
 ---
 
@@ -294,19 +304,18 @@ pnpm test        # 1,500+ tests passing
 
 | Package | Version (source) | Description | Tests |
 |---------|---------|-------------|-------|
-| [`@dialectos/mcp`](packages/mcp) | `0.3.1` | 17 MCP tools (stdio server) | 93 |
-| [`@dialectos/cli`](packages/cli) | `0.3.1` | CLI: translate, validate, corpus, benchmark, glossary | 569 |
-| [`@dialectos/providers`](packages/providers) | `0.3.1` | LLM, DeepL, LibreTranslate, MyMemory with circuit breaker + corpus | 152 |
-| [`@dialectos/security`](packages/security) | `0.3.1` | Rate limiting, SSRF protection, sanitization | 68 |
-| [`@dialectos/types`](packages/types) | `0.3.1` | Shared TypeScript types + glossary, profile, certification, and quality data | 54 |
-| [`@dialectos/locale-utils`](packages/locale-utils) | `0.3.1` | Locale file diff/merge utilities | 55 |
-| [`@dialectos/markdown-parser`](packages/markdown-parser) | `0.3.1` | Structure-preserving markdown parser | 74 |
+| [`@dialectos/mcp`](packages/mcp) | `0.3.2` | 18 MCP tools (stdio server) | 93 |
+| [`@dialectos/cli`](packages/cli) | `0.3.2` | CLI: translate, validate, corpus, benchmark, glossary | 569 |
+| [`@dialectos/providers`](packages/providers) | `0.3.2` | LLM, DeepL, LibreTranslate, MyMemory with circuit breaker + corpus | 152 |
+| [`@dialectos/security`](packages/security) | `0.3.2` | Rate limiting, SSRF protection, sanitization | 68 |
+| [`@dialectos/types`](packages/types) | `0.3.2` | Shared TypeScript types + glossary, profile, certification, and quality data | 54 |
+| [`@dialectos/locale-utils`](packages/locale-utils) | `0.3.2` | Locale file diff/merge utilities | 55 |
+| [`@dialectos/markdown-parser`](packages/markdown-parser) | `0.3.2` | Structure-preserving markdown parser | 74 |
 
 **1,500+ tests across 7 packages plus docs contracts, demo-server contracts, and static-hardening checks**
 
-> Package versions above match the latest GitHub release, **v0.3.1**.
+> Package versions above match the latest GitHub release, **v0.3.2**.
 
-> Package versions above are the **source** tree (0.3.1, unreleased). The **latest release is v0.3.0** — install paths elsewhere in this README point at v0.3.0 artifacts.
 
 ---
 
@@ -314,7 +323,7 @@ pnpm test        # 1,500+ tests passing
 
 DialectOS has undergone adversarial security hardening:
 
-- **18 CVEs resolved** via dependency overrides
+- **Known dependency advisories patched** with pinned overrides (see CHANGELOG)
 - **SSRF protection** on all provider endpoints
 - **Circuit breaker** with half-open probe locks
 - **Atomic checkpoint writes** with schema versioning
@@ -359,7 +368,7 @@ See [`SECURITY.md`](SECURITY.md) for details.
                        │ stdio
 ┌──────────────────────▼──────────────────────────────────────┐
 │                   @dialectos/mcp                               │
-│              17 tools • JSON-RPC over stdio                  │
+│              18 tools • JSON-RPC over stdio                  │
 └──────────────────────┬──────────────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────────────┐
@@ -422,7 +431,7 @@ Yes. DialectOS is an MCP server, so Claude Desktop, Cursor, Windsurf, and other 
 clients can use its 17 translation tools natively.
 
 **Is DialectOS free?**
-Yes. DialectOS v0.3.1 is released under Apache-2.0. See [LICENSE](LICENSE) for details.
+Yes. DialectOS v0.3.2 is released under Apache-2.0. See [LICENSE](LICENSE) for details.
 
 **What is MCP?**
 Model Context Protocol is an open standard that lets AI assistants use external tools.
@@ -448,7 +457,7 @@ Add this badge to your project if you use DialectOS for translation:
 Validate Spanish translations in CI on every pull request:
 
 ```yaml
-- uses: KyaniteLabs/DialectOS@v0.3.1
+- uses: KyaniteLabs/DialectOS@v0.3.2
   with:
     dialect: es-MX
     source-dir: locales/en
@@ -463,7 +472,7 @@ strategy:
   matrix:
     dialect: [es-ES, es-MX, es-AR, es-CO]
 steps:
-  - uses: KyaniteLabs/DialectOS@v0.3.1
+  - uses: KyaniteLabs/DialectOS@v0.3.2
     with:
       dialect: ${{ matrix.dialect }}
       fail-on-blocking: true

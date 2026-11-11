@@ -18,13 +18,23 @@ export class CachedProvider implements TranslationProvider {
     this.name = provider.name;
   }
 
+  cacheIdentity(): string {
+    return this.provider.cacheIdentity?.() ?? this.provider.name;
+  }
+
   async translate(
     text: string,
     sourceLang: string,
     targetLang: string,
     options?: TranslateOptions
   ): Promise<TranslationResult> {
-    const key = this.cache.computeKey(text, sourceLang, targetLang, options);
+    const key = this.cache.computeKey(
+      text,
+      sourceLang,
+      targetLang,
+      options,
+      this.provider.cacheIdentity?.() ?? this.provider.name
+    );
     const cached = await this.cache.get(key);
 
     if (cached) {

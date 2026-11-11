@@ -60,6 +60,12 @@ test("pack-release-tarballs emits cli and mcp tarballs with the full dep closure
     assert.match(listing.stdout, /package\/node_modules\/jsdom\/package\.json/, "jsdom must be vendored");
   }
 
+  // mcp imports the shared validator from @dialectos/cli/validate, so the
+  // mcp tarball must carry cli and cli's own public deps.
+  const mcpListing = spawnSync("tar", ["-tzf", mcpTar], { encoding: "utf8" });
+  assert.match(mcpListing.stdout, /package\/node_modules\/@dialectos\/cli\/dist\/lib\/validate-translation\.js/);
+  assert.match(mcpListing.stdout, /package\/node_modules\/commander\/package\.json/);
+
   const extractDir = mkdtempSync(join(tmpdir(), "dialectos-pack-extract-"));
   spawnSync("tar", ["-xzf", cliTar, "-C", extractDir], { stdio: "ignore" });
   const manifest = JSON.parse(readFileSync(join(extractDir, "package", "package.json"), "utf8"));

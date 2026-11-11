@@ -1,6 +1,6 @@
 {
   "name": "@dialectos/markdown-parser",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Safe markdown parser using marked — replaces vulnerable regex-based parser",
   "type": "module",
   "main": "dist/index.js",
@@ -46,7 +46,7 @@
     "url": "https://github.com/KyaniteLabs/DialectOS/issues"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.13.0"
   },
   "publishConfig": {
     "access": "public"

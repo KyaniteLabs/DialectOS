@@ -39,7 +39,7 @@ Google Translate gives you generic Spanish. DeepL gives you ~5 variants. Dialect
 ```
 MCP Client (Claude Desktop)
   ↓ stdio
-@dialectos/mcp (17 tools)
+@dialectos/mcp (18 tools)
   ↓
 @dialectos/cli
   ↓
@@ -49,7 +49,7 @@ MCP Client (Claude Desktop)
   └─ LibreTranslate / MyMemory
 ```
 
-## 17 MCP Tools
+## 18 MCP Tools
 
 **Markdown Translation (4):**
 - `translate_markdown` — preserve tables, code blocks, links

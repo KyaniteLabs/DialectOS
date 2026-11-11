@@ -134,8 +134,26 @@ async function checkQuality(
   return { passed: true };
 }
 
+/**
+ * The model answered, but the answer failed the content gates. This is a
+ * quality failure, not an availability failure, so it must not open the
+ * circuit breaker (five cognates in a locale file used to take the provider
+ * down for 60 s).
+ */
+export class QualityGateError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "QualityGateError";
+  }
+}
+
 export class LLMProvider implements TranslationProvider {
   readonly name = "llm";
+
+  /** Different models/endpoints give different output: keep their caches apart. */
+  cacheIdentity(): string {
+    return `llm|${this.apiFormat}|${this.endpoint}|${this.model}`;
+  }
   private endpoint: string;
   private model: string;
   private apiFormat: LLMApiFormat;
@@ -273,6 +291,10 @@ export class LLMProvider implements TranslationProvider {
       let result: TranslationResult;
       if (this.twoCallMode) {
         result = await this._doTwoCallTranslate(strippedText, sourceLang, targetLang, options, sentinels);
+        const quality = await checkQuality(text, result.translatedText, options?.dialect || targetLang, this.model);
+        if (!quality.passed) {
+          throw new QualityGateError(`LLM failed quality gates: ${quality.details}`);
+        }
       } else {
         const dialect = options?.dialect || targetLang;
         const sysPrompt = isCompactModel(this.model)
@@ -286,7 +308,7 @@ export class LLMProvider implements TranslationProvider {
           result = await this._doSingleCallTranslate(strippedText, sourceLang, targetLang, options, retryPrompt, sentinels);
           const retryQuality = await checkQuality(text, result.translatedText, dialect, this.model);
           if (!retryQuality.passed) {
-            throw new Error(`LLM failed quality gates after retry: ${retryQuality.details}`);
+            throw new QualityGateError(`LLM failed quality gates after retry: ${retryQuality.details}`);
           }
         }
       }
@@ -294,7 +316,12 @@ export class LLMProvider implements TranslationProvider {
       this.breaker.recordSuccess();
       return result;
     } catch (error) {
-      this.breaker.recordFailure();
+      if (error instanceof QualityGateError) {
+        // Transport worked; only the content was rejected.
+        this.breaker.recordSuccess();
+      } else {
+        this.breaker.recordFailure();
+      }
       throw error;
     } finally {
       this.releaseSlot();

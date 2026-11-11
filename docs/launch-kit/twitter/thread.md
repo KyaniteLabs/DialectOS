@@ -47,14 +47,14 @@ It runs as:
 - A CLI tool
 - A Node.js library
 
-25 dialects. 17 MCP tools. automated tests.
+25 dialects. 18 MCP tools. automated tests.
 
 ---
 
 ## Tweet 5 (MCP Angle)
 MCP (Model Context Protocol) is the hottest thing in AI tooling right now.
 
-DialectOS is the first MCP server built specifically for Spanish dialects.
+DialectOS is an MCP server built specifically for Spanish dialects.
 
 Your AI assistant can now translate to Mexican Spanish, Argentinian voseo, or Puerto Rican Spanish — natively.
 

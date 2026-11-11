@@ -12,7 +12,7 @@
     "packages/mcp/.ci-results/tests.xml"
   ],
   "steps": [
-    {"name": "Install declared pnpm and frozen workspace", "phase": "install", "argv": ["bash", "-euo", "pipefail", "-c", "npm install --global pnpm@11.12.0 && pnpm install --frozen-lockfile"], "timeout_seconds": 600},
+    {"name": "Install declared pnpm and frozen workspace", "phase": "install", "argv": ["bash", "-euo", "pipefail", "-c", "npm install --global pnpm@11.1.1 && pnpm install --frozen-lockfile"], "timeout_seconds": 600},
     {"name": "Verify generated demo", "phase": "verify", "argv": ["pnpm", "check:generated"]},
     {"name": "Build all workspace packages", "phase": "build", "argv": ["pnpm", "build"]},
     {"name": "Run static checks and all workspace tests", "phase": "test", "argv": ["pnpm", "test", "--reporter=default", "--reporter=junit", "--outputFile.junit=.ci-results/tests.xml"], "timeout_seconds": 1800},

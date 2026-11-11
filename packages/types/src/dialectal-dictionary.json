@@ -1501,12 +1501,12 @@
       "es-CU": {
         "term": "guagua",
         "frequency": 1,
-        "register": "informal"
+        "register": "universal"
       },
       "es-DO": {
         "term": "guagua",
         "frequency": 1,
-        "register": "informal"
+        "register": "universal"
       },
       "es-EC": {
         "term": "bus",
@@ -1536,7 +1536,7 @@
       "es-MX": {
         "term": "camión",
         "frequency": 1,
-        "register": "informal"
+        "register": "universal"
       },
       "es-NI": {
         "term": "bus",
@@ -1561,7 +1561,7 @@
       "es-PR": {
         "term": "guagua",
         "frequency": 1,
-        "register": "informal"
+        "register": "universal"
       },
       "es-PY": {
         "term": "bus",
@@ -3102,7 +3102,7 @@
         "register": "universal"
       },
       "es-EC": {
-        "term": "frejol",
+        "term": "fréjol",
         "frequency": 1,
         "register": "universal"
       },
@@ -3142,7 +3142,7 @@
         "register": "universal"
       },
       "es-PE": {
-        "term": "frejol",
+        "term": "fréjol",
         "frequency": 1,
         "register": "universal"
       },
@@ -16900,7 +16900,7 @@
     "field": "transport",
     "concept": "seatbelt",
     "englishGloss": "safety belt securing a vehicle occupant",
-    "panHispanic": "cinturon de seguridad"
+    "panHispanic": "cinturón de seguridad"
   },
   {
     "field": "transport",
@@ -17051,7 +17051,7 @@
         "register": "universal"
       },
       "es-AR": {
-        "term": "baden",
+        "term": "badén",
         "frequency": 1,
         "register": "universal"
       },
@@ -17066,7 +17066,7 @@
         "register": "universal"
       },
       "es-CL": {
-        "term": "baden",
+        "term": "badén",
         "frequency": 1,
         "register": "universal"
       },
@@ -17147,7 +17147,7 @@
         "register": "informal"
       },
       "es-PY": {
-        "term": "baden",
+        "term": "badén",
         "frequency": 1,
         "register": "universal"
       },
@@ -17162,7 +17162,7 @@
         "register": "universal"
       },
       "es-UY": {
-        "term": "baden",
+        "term": "badén",
         "frequency": 1,
         "register": "universal"
       },
@@ -17316,75 +17316,75 @@
     "field": "transport",
     "concept": "odometer",
     "englishGloss": "instrument measuring distance traveled",
-    "panHispanic": "cuentakilometros",
+    "panHispanic": "cuentakilómetros",
     "variants": {
       "es-AD": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-AR": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-ES": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
@@ -17394,52 +17394,52 @@
         "register": "universal"
       },
       "es-NI": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "cuentakilometros",
+        "term": "cuentakilómetros",
         "frequency": 1,
         "register": "universal"
       }
@@ -17752,12 +17752,12 @@
         "register": "universal"
       },
       "es-CU": {
-        "term": "maquina",
+        "term": "máquina",
         "frequency": 2,
         "register": "informal"
       },
       "es-DO": {
-        "term": "maquina",
+        "term": "máquina",
         "frequency": 2,
         "register": "informal"
       },
@@ -17812,7 +17812,7 @@
         "register": "universal"
       },
       "es-PR": {
-        "term": "maquina",
+        "term": "máquina",
         "frequency": 2,
         "register": "informal"
       },
@@ -17873,7 +17873,7 @@
     "englishGloss": "metal plate showing vehicle registration number",
     "variants": {
       "es-AD": {
-        "term": "matricula",
+        "term": "matrícula",
         "frequency": 1,
         "register": "universal"
       },
@@ -17923,7 +17923,7 @@
         "register": "universal"
       },
       "es-ES": {
-        "term": "matricula",
+        "term": "matrícula",
         "frequency": 1,
         "register": "universal"
       },
@@ -18674,12 +18674,12 @@
     "englishGloss": "official document certifying a vehicle is registered",
     "variants": {
       "es-AD": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-AR": {
-        "term": "cedula verde",
+        "term": "cédula verde",
         "frequency": 1,
         "register": "universal"
       },
@@ -18689,12 +18689,12 @@
         "register": "universal"
       },
       "es-BZ": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
@@ -18705,17 +18705,17 @@
         "notes": "mandatory insurance document"
       },
       "es-CR": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
@@ -18725,37 +18725,37 @@
         "register": "universal"
       },
       "es-ES": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-MX": {
-        "term": "tarjeta de circulacion",
+        "term": "tarjeta de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
@@ -18765,37 +18765,37 @@
         "register": "universal"
       },
       "es-PH": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "cedula verde",
+        "term": "cédula verde",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "permiso de circulacion",
+        "term": "permiso de circulación",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "cedula verde",
+        "term": "cédula verde",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "carta de circulacion",
+        "term": "carta de circulación",
         "frequency": 1,
         "register": "universal"
       }
@@ -18811,7 +18811,7 @@
     "field": "household",
     "concept": "bathroom",
     "englishGloss": "room containing a toilet and washing facilities",
-    "panHispanic": "bano",
+    "panHispanic": "baño",
     "variants": {
       "es-AD": {
         "term": "servicio",
@@ -18820,47 +18820,47 @@
         "notes": "polite register"
       },
       "es-AR": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
@@ -18871,72 +18871,72 @@
         "notes": "polite register"
       },
       "es-GQ": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-MX": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "bano",
+        "term": "baño",
         "frequency": 1,
         "register": "universal"
       }
@@ -19098,132 +19098,132 @@
     "field": "household",
     "concept": "sofa",
     "englishGloss": "long upholstered seat for multiple people",
-    "panHispanic": "sofa",
+    "panHispanic": "sofá",
     "variants": {
       "es-AD": {
-        "term": "sillon",
+        "term": "sillón",
         "frequency": 2,
         "register": "informal",
         "notes": "large armchair"
       },
       "es-AR": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-ES": {
-        "term": "sillon",
+        "term": "sillón",
         "frequency": 2,
         "register": "informal",
         "notes": "large armchair"
       },
       "es-GQ": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-MX": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "sofa",
+        "term": "sofá",
         "frequency": 1,
         "register": "universal"
       }
@@ -19692,30 +19692,30 @@
     "field": "household",
     "concept": "bathtub",
     "englishGloss": "container for bathing, typically with running water",
-    "panHispanic": "banera",
+    "panHispanic": "bañera",
     "variants": {
       "es-AD": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-AR": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
@@ -19730,27 +19730,27 @@
         "register": "universal"
       },
       "es-CU": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-ES": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
@@ -19780,22 +19780,22 @@
         "register": "universal"
       },
       "es-PE": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
@@ -19805,12 +19805,12 @@
         "register": "universal"
       },
       "es-US": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "banera",
+        "term": "bañera",
         "frequency": 1,
         "register": "universal"
       },
@@ -23063,7 +23063,7 @@
     "field": "social",
     "concept": "fast_quick",
     "englishGloss": "moving or done at high speed",
-    "panHispanic": "rapido"
+    "panHispanic": "rápido"
   },
   {
     "field": "medicine_health",
@@ -23075,7 +23075,7 @@
     "field": "medicine_health",
     "concept": "antibiotic",
     "englishGloss": "medicine that kills or inhibits bacteria",
-    "panHispanic": "antibiotico"
+    "panHispanic": "antibiótico"
   },
   {
     "field": "medicine_health",
@@ -23087,7 +23087,7 @@
     "field": "medicine_health",
     "concept": "thermometer",
     "englishGloss": "instrument for measuring body temperature",
-    "panHispanic": "termometro"
+    "panHispanic": "termómetro"
   },
   {
     "field": "medicine_health",
@@ -23107,127 +23107,127 @@
     "englishGloss": "force of blood against artery walls",
     "variants": {
       "es-ES": {
-        "term": "tension arterial",
+        "term": "tensión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-AD": {
-        "term": "tension arterial",
+        "term": "tensión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-MX": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-AR": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "presion arterial",
+        "term": "presión arterial",
         "frequency": 1,
         "register": "universal"
       }
@@ -23237,16 +23237,16 @@
     "field": "medicine_health",
     "concept": "surgery",
     "englishGloss": "medical operation using instruments",
-    "panHispanic": "cirugia"
+    "panHispanic": "cirugía"
   },
   {
     "field": "medicine_health",
     "concept": "x_ray",
     "englishGloss": "radiographic image of internal body structures",
-    "panHispanic": "radiografia",
+    "panHispanic": "radiografía",
     "variants": {
       "es-AD": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
@@ -23256,92 +23256,92 @@
         "register": "universal"
       },
       "es-BO": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-ES": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-MX": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
@@ -23351,12 +23351,12 @@
         "register": "universal"
       },
       "es-SV": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       },
@@ -23366,7 +23366,7 @@
         "register": "universal"
       },
       "es-VE": {
-        "term": "radiografia",
+        "term": "radiografía",
         "frequency": 1,
         "register": "universal"
       }
@@ -23530,17 +23530,17 @@
     "englishGloss": "coverage paying for medical expenses",
     "variants": {
       "es-ES": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-AD": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-MX": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
@@ -23550,107 +23550,107 @@
         "register": "universal"
       },
       "es-UY": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "seguro medico",
+        "term": "seguro médico",
         "frequency": 1,
         "register": "universal"
       }
@@ -23660,81 +23660,81 @@
     "field": "medicine_health",
     "concept": "symptom",
     "englishGloss": "physical or mental indication of a disease",
-    "panHispanic": "sintoma"
+    "panHispanic": "síntoma"
   },
   {
     "field": "medicine_health",
     "concept": "blood_test",
     "englishGloss": "laboratory analysis of a blood sample",
-    "panHispanic": "analisis de sangre",
+    "panHispanic": "análisis de sangre",
     "variants": {
       "es-AD": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-AR": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-ES": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
@@ -23744,52 +23744,52 @@
         "register": "formal"
       },
       "es-NI": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "analisis de sangre",
+        "term": "análisis de sangre",
         "frequency": 1,
         "register": "universal"
       }
@@ -23948,13 +23948,13 @@
     "field": "family_kinship",
     "concept": "aunt",
     "englishGloss": "sister of one's parent",
-    "panHispanic": "tia"
+    "panHispanic": "tía"
   },
   {
     "field": "family_kinship",
     "concept": "uncle",
     "englishGloss": "brother of one's parent",
-    "panHispanic": "tio"
+    "panHispanic": "tío"
   },
   {
     "field": "family_kinship",
@@ -24120,49 +24120,49 @@
         "notes": "mama informal affectionate"
       },
       "es-AR": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-BO": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-BZ": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-CL": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-CO": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-CR": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-CU": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-DO": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-EC": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-ES": {
         "term": "madre",
@@ -24171,75 +24171,75 @@
         "notes": "mama informal affectionate"
       },
       "es-GQ": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-GT": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-HN": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-MX": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal",
+        "register": "informal",
         "notes": "most common in daily speech"
       },
       "es-NI": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PA": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PE": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PH": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PR": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PY": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-SV": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-US": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-UY": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-VE": {
-        "term": "mama",
+        "term": "mamá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       }
     }
   },
@@ -24256,49 +24256,49 @@
         "notes": "papa informal affectionate"
       },
       "es-AR": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-BO": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-BZ": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-CL": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-CO": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-CR": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-CU": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-DO": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-EC": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-ES": {
         "term": "padre",
@@ -24307,75 +24307,75 @@
         "notes": "papa informal affectionate"
       },
       "es-GQ": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-GT": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-HN": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-MX": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal",
+        "register": "informal",
         "notes": "most common in daily speech"
       },
       "es-NI": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PA": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PE": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PH": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PR": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-PY": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-SV": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-US": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-UY": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       },
       "es-VE": {
-        "term": "papa",
+        "term": "papá",
         "frequency": 1,
-        "register": "universal"
+        "register": "informal"
       }
     }
   },
@@ -24389,7 +24389,7 @@
     "field": "family_kinship",
     "concept": "sister_in_law",
     "englishGloss": "sister of one's spouse or wife of one's brother",
-    "panHispanic": "cunada"
+    "panHispanic": "cuñada"
   },
   {
     "field": "family_kinship",
@@ -24419,7 +24419,7 @@
     "field": "finance_banking",
     "concept": "credit_card",
     "englishGloss": "plastic card for borrowing to make purchases",
-    "panHispanic": "tarjeta de credito"
+    "panHispanic": "tarjeta de crédito"
   },
   {
     "field": "finance_banking",
@@ -24866,7 +24866,7 @@
     "field": "finance_banking",
     "concept": "investment",
     "englishGloss": "money allocated with expectation of profit",
-    "panHispanic": "inversion"
+    "panHispanic": "inversión"
   },
   {
     "field": "finance_banking",
@@ -25026,127 +25026,127 @@
     "englishGloss": "percentage charged on borrowed money",
     "variants": {
       "es-ES": {
-        "term": "tipo de interes",
+        "term": "tipo de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-AD": {
-        "term": "tipo de interes",
+        "term": "tipo de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-MX": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-AR": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-PY": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "tasa de interes",
+        "term": "tasa de interés",
         "frequency": 1,
         "register": "universal"
       }
@@ -25158,12 +25158,12 @@
     "englishGloss": "portable personal computer",
     "variants": {
       "es-ES": {
-        "term": "portatil",
+        "term": "portátil",
         "frequency": 1,
         "register": "universal"
       },
       "es-AD": {
-        "term": "portatil",
+        "term": "portátil",
         "frequency": 1,
         "register": "universal"
       },
@@ -25703,7 +25703,7 @@
     "field": "technology",
     "concept": "app_application",
     "englishGloss": "software application for a mobile device or computer",
-    "panHispanic": "aplicacion"
+    "panHispanic": "aplicación"
   },
   {
     "field": "technology",
@@ -25721,7 +25721,7 @@
     "field": "technology",
     "concept": "update_software",
     "englishGloss": "new version of software with improvements or fixes",
-    "panHispanic": "actualizacion"
+    "panHispanic": "actualización"
   },
   {
     "field": "technology",
@@ -25883,12 +25883,12 @@
         "register": "universal"
       },
       "es-AR": {
-        "term": "disco rigido",
+        "term": "disco rígido",
         "frequency": 1,
         "register": "universal"
       },
       "es-UY": {
-        "term": "disco rigido",
+        "term": "disco rígido",
         "frequency": 1,
         "register": "universal"
       },
@@ -26004,7 +26004,7 @@
     "field": "technology",
     "concept": "battery",
     "englishGloss": "rechargeable power source for electronic devices",
-    "panHispanic": "bateria"
+    "panHispanic": "batería"
   },
   {
     "field": "technology",
@@ -26022,82 +26022,82 @@
         "register": "universal"
       },
       "es-MX": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-VE": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-BO": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
@@ -26112,7 +26112,7 @@
         "register": "universal"
       },
       "es-BZ": {
-        "term": "audifonos",
+        "term": "audífonos",
         "frequency": 1,
         "register": "universal"
       },
@@ -26142,13 +26142,13 @@
     "field": "technology",
     "concept": "microphone",
     "englishGloss": "device that converts sound into an electrical signal",
-    "panHispanic": "microfono"
+    "panHispanic": "micrófono"
   },
   {
     "field": "technology",
     "concept": "camera",
     "englishGloss": "device for capturing photographs or video",
-    "panHispanic": "camara"
+    "panHispanic": "cámara"
   },
   {
     "field": "technology",
@@ -26553,10 +26553,10 @@
     "field": "technology",
     "concept": "playlist",
     "englishGloss": "curated list of songs or videos for sequential playback",
-    "panHispanic": "lista de reproduccion",
+    "panHispanic": "lista de reproducción",
     "variants": {
       "es-AD": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
@@ -26566,62 +26566,62 @@
         "register": "informal"
       },
       "es-BO": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-ES": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
@@ -26631,27 +26631,27 @@
         "register": "informal"
       },
       "es-NI": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
@@ -26661,12 +26661,12 @@
         "register": "informal"
       },
       "es-SV": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       },
@@ -26676,7 +26676,7 @@
         "register": "informal"
       },
       "es-VE": {
-        "term": "lista de reproduccion",
+        "term": "lista de reproducción",
         "frequency": 1,
         "register": "universal"
       }
@@ -26686,7 +26686,7 @@
     "field": "technology",
     "concept": "password_manager",
     "englishGloss": "software that securely stores and manages passwords",
-    "panHispanic": "gestor de contrasenas"
+    "panHispanic": "gestor de contraseñas"
   },
   {
     "field": "technology",
@@ -26984,7 +26984,7 @@
     "field": "technology",
     "concept": "notification",
     "englishGloss": "alert message from an app or system",
-    "panHispanic": "notificacion"
+    "panHispanic": "notificación"
   },
   {
     "field": "technology",
@@ -27002,7 +27002,7 @@
     "field": "technology",
     "concept": "post_publish",
     "englishGloss": "content published on a social media platform",
-    "panHispanic": "publicacion",
+    "panHispanic": "publicación",
     "variants": {
       "es-AD": {
         "term": "post",
@@ -27015,42 +27015,42 @@
         "register": "informal"
       },
       "es-BO": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-CL": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-CO": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-EC": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
@@ -27060,17 +27060,17 @@
         "register": "informal"
       },
       "es-GQ": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
@@ -27080,27 +27080,27 @@
         "register": "informal"
       },
       "es-NI": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
@@ -27110,7 +27110,7 @@
         "register": "informal"
       },
       "es-SV": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       },
@@ -27125,7 +27125,7 @@
         "register": "informal"
       },
       "es-VE": {
-        "term": "publicacion",
+        "term": "publicación",
         "frequency": 1,
         "register": "universal"
       }
@@ -27463,7 +27463,7 @@
     "field": "actions",
     "concept": "to_teach",
     "englishGloss": "to impart knowledge or instruct someone",
-    "panHispanic": "ensenar"
+    "panHispanic": "enseñar"
   },
   {
     "field": "actions",
@@ -27689,7 +27689,7 @@
         "register": "universal"
       },
       "es-MX": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
@@ -27699,17 +27699,17 @@
         "register": "universal"
       },
       "es-CO": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-CU": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PE": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
@@ -27719,7 +27719,7 @@
         "register": "universal"
       },
       "es-VE": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
@@ -27739,67 +27739,67 @@
         "register": "universal"
       },
       "es-EC": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-HN": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-SV": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-NI": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-CR": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PA": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-DO": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PR": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-GQ": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-PH": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       },
       "es-BZ": {
-        "term": "calificacion",
+        "term": "calificación",
         "frequency": 1,
         "register": "universal"
       }
@@ -27815,7 +27815,7 @@
     "field": "education",
     "concept": "graduation",
     "englishGloss": "ceremony marking completion of a degree or program",
-    "panHispanic": "graduacion"
+    "panHispanic": "graduación"
   },
   {
     "field": "education",
@@ -27845,7 +27845,7 @@
         "register": "universal"
       },
       "es-MX": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
@@ -27855,7 +27855,7 @@
         "register": "universal"
       },
       "es-CO": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
@@ -27865,7 +27865,7 @@
         "register": "universal"
       },
       "es-PE": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
@@ -27875,7 +27875,7 @@
         "register": "universal"
       },
       "es-VE": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
@@ -27895,12 +27895,12 @@
         "register": "universal"
       },
       "es-EC": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
       "es-GT": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
@@ -27915,7 +27915,7 @@
         "register": "universal"
       },
       "es-NI": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
@@ -27925,7 +27925,7 @@
         "register": "universal"
       },
       "es-PA": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
@@ -27935,12 +27935,12 @@
         "register": "universal"
       },
       "es-PR": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
       "es-US": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       },
@@ -27955,7 +27955,7 @@
         "register": "universal"
       },
       "es-BZ": {
-        "term": "salon de clases",
+        "term": "salón de clases",
         "frequency": 1,
         "register": "universal"
       }
@@ -35550,7 +35550,7 @@
         "register": "universal"
       },
       "es-UY": {
-        "term": "anana",
+        "term": "ananá",
         "frequency": 1,
         "register": "universal"
       },

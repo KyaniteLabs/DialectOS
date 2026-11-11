@@ -90,6 +90,10 @@ describe("lexical ambiguity constraints", () => {
     expect(mx.forbiddenOutputTerms).toEqual(expect.arrayContaining(["china"]));
   });
 
+  it("matches the accented Spanish source word bebé", () => {
+    expect(buildLexicalAmbiguityExpectations("El bebé duerme.", "es-PR").matchedRuleIds).toContain("baby-guagua");
+  });
+
   it("models guagua as bus in Puerto Rico but baby in Chilean/Andean contexts", () => {
     const prBaby = buildLexicalAmbiguityExpectations("The baby is sleeping.", "es-PR");
     const clBaby = buildLexicalAmbiguityExpectations("The baby is sleeping.", "es-CL");

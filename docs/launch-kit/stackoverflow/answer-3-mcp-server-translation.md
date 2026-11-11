@@ -10,7 +10,7 @@
 
 If you're using Claude Desktop, Cursor, or any MCP client and want **native translation tools**, you need an MCP server that exposes translation capabilities.
 
-**[DialectOS](https://github.com/KyaniteLabs/DialectOS)** is the first MCP server built specifically for Spanish dialect translation. It exposes 17 tools:
+**[DialectOS](https://github.com/KyaniteLabs/DialectOS)** is an MCP server built specifically for Spanish dialect translation. It exposes 18 tools:
 
 ```json
 {
@@ -19,7 +19,7 @@ If you're using Claude Desktop, Cursor, or any MCP client and want **native tran
       "command": "pnpm",
       "args": [
         "dlx",
-        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.1/dialectos-mcp-0.3.1.tgz"
+        "https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-mcp-0.3.2.tgz"
       ],
       "env": {
         "LLM_API_URL": "https://api.openai.com/v1/chat/completions",

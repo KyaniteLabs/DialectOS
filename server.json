@@ -3,7 +3,7 @@
   "name": "tech.kyanitelabs/dialectos",
   "title": "DialectOS",
   "description": "Spanish dialect translation MCP server: 25 regional variants, glossary enforcement, quality gates.",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "websiteUrl": "https://github.com/KyaniteLabs/DialectOS",
   "repository": {
     "url": "https://github.com/KyaniteLabs/DialectOS",

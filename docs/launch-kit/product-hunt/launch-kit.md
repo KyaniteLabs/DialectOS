@@ -10,7 +10,7 @@
 ## Product Info
 
 **Name:** DialectOS
-**Tagline:** The first MCP server for Spanish dialects — 25 variants, quality gates, structure preservation
+**Tagline:** An MCP server for Spanish dialects — 25 variants, quality gates, structure preservation
 **Description:**
 
 DialectOS is an open-source Spanish dialect translation server that runs as an MCP (Model Context Protocol) tool and CLI. It translates English and other languages into 25 regional Spanish variants while preserving markdown structure, enforcing glossary terms, and applying adversarial quality gates that catch semantic drift before it reaches users.
@@ -36,7 +36,7 @@ Text: "Orange juice → Puerto Rico: jugo de china. Not jugo de naranja."
 **Image 3: MCP Integration**
 Title: "Works Where You Work"
 Visual: Claude Desktop / Cursor screenshots with DialectOS tools
-Text: "17 MCP tools for AI assistants. Translate natively inside Claude."
+Text: "18 MCP tools for AI assistants. Translate natively inside Claude."
 
 **Image 4: Quality Gates**
 Title: "Bad Translations Can't Hide"
@@ -46,7 +46,7 @@ Text: "4 quality gates + semantic backstop. Auto-reject negation drops."
 **Image 5: The Numbers**
 Title: "Built for Audits"
 Visual: Metrics dashboard
-Text: "automated tests · 25 dialects · 17 MCP tools · 0 silent fallbacks"
+Text: "automated tests · 25 dialects · 18 MCP tools · 0 silent fallbacks"
 
 ---
 
@@ -60,7 +60,7 @@ We built this after a real production incident: we shipped Spain Spanish to Mexi
 
 **Three things I'm most proud of:**
 
-1. **MCP-native** — DialectOS isn't a web app you copy-paste into. It's 17 tools that Claude Desktop, Cursor, and any MCP client can use natively.
+1. **MCP-native** — DialectOS isn't a web app you copy-paste into. It's 18 tools that Claude Desktop, Cursor, and any MCP client can use natively.
 
 2. **Adversarial quality gates** — We don't trust translations blindly. If "Do not click" becomes "Haz clic" (the opposite meaning), it's auto-rejected. We maintain a corpus of semantic traps and run them against every release.
 

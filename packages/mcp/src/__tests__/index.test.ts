@@ -36,6 +36,7 @@ vi.mock("@dialectos/providers", () => ({
 
 vi.mock("@dialectos/security", () => ({
   RateLimiter: vi.fn(function() { return {}; }),
+  configureSecurity: vi.fn(),
 }));
 
 describe("MCP server bootstrap", () => {
@@ -56,6 +57,22 @@ describe("MCP server bootstrap", () => {
     expect(mcpState.constructorArgs[0]?.[0]).toMatchObject({
       name: "@dialectos/mcp",
       version: packageJson.version,
+    });
+  });
+
+  it("enforces the security section of its config on every tool", async () => {
+    const security = await import("@dialectos/security");
+    const { createServer } = await import("../index.js");
+    createServer({
+      rateLimit: { maxRequests: 60, windowMs: 60000 },
+      security: { maxFileSize: 2048, maxContentLength: 1000, allowedDirs: ["/srv/locales"] },
+      logging: { level: "error" },
+    });
+    expect(security.configureSecurity).toHaveBeenLastCalledWith({
+      allowedDirs: ["/srv/locales"],
+      maxFileSize: 2048,
+      maxContentLength: 1000,
+      allowHomeAsWorkingDir: false,
     });
   });
 });
