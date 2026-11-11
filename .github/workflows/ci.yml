@@ -138,3 +138,22 @@ jobs:
         run: |
           "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" plugins/dialectos-hermes/tests/smoke/runtime_smoke.py "$PYTHONPATH" "$HERMES_HOME"
           "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" -c "from hermes_cli.plugins_cmd_catalog import cmd_validate; cmd_validate('plugins/dialectos-hermes', as_json=True)"
+
+      # The unit tests mock the CLI; this runs validate through the real built CLI.
+      - uses: pnpm/setup@c9883cc79df532ad1a7b81bf9ab944ceb090d65c # v2.0.0
+        with:
+          install: false
+          cache: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Real CLI validate matrix (offline, no provider calls)
+        env:
+          PYTHONPATH: ${{ github.workspace }}/.hermes-test-runtime
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+          "$RUNNER_TEMP/dialectos-hermes-venv/bin/python" plugins/dialectos-hermes/tests/smoke/markdown_smoke.py "$PYTHONPATH" "$RUNNER_TEMP/dialectos-markdown-profile" packages/cli/dist/cli.js

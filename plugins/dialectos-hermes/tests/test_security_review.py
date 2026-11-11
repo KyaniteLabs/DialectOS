@@ -27,13 +27,18 @@ def test_missing_session_module_fails_closed(plugin, monkeypatch, surface, sourc
     assert plugin._on_gateway() is expected
 
 
-@pytest.mark.parametrize("platform,source,env", [
-    ("", "", None), ("telegram", "telegram", None), ("", "cli", None),
-    ("", "desktop", None), ("unknown", "", None), ("", "", "discord"), ("", "", "cli"),
+@pytest.mark.parametrize("platform,source,env,expected", [
+    ("", "", None, True),            # a bound but unnamed session is not proof of a local user
+    ("telegram", "telegram", None, True), ("", "cli", None, False),
+    ("", "desktop", None, False), ("unknown", "", None, True),
+    ("", "", "discord", True), ("", "", "cli", False),
+    ("cron", "", None, True), ("", "webhook", None, True), ("", "kanban", None, True),
+    ("", "api_server", None, True),
 ])
-def test_runtime_identity_matches_core(plugin, runtime, monkeypatch, platform, source, env):
-    """With the runtime present, the public get_session_env path decides exactly as core does."""
+def test_runtime_identity_is_local_only_for_local_surfaces(plugin, runtime, monkeypatch, platform, source, env,
+                                                           expected):
+    """Only cli/tui/desktop/local/acp are local; webhooks, cron, kanban and unknown names are not."""
     if env is not None:
         monkeypatch.setenv("HERMES_PLATFORM", env)
     runtime.set_session_vars(platform=platform, source=source)
-    assert plugin._on_gateway() is runtime.session_is_messaging_surface()
+    assert plugin._on_gateway() is expected

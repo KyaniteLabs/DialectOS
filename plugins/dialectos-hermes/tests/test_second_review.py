@@ -45,7 +45,7 @@ def test_reject_unknown_json_trailer(plugin, fake_cli, suffix):
 
 
 def test_slash_real_metadata_is_complete(plugin, fake_cli):
-    payload = json.loads((Path(__file__).parent / "fixtures/dialects-v0.3.1.json").read_text())
+    payload = json.loads((Path(__file__).parent / "fixtures/dialects-list.json").read_text())
     assert len(payload) == 25
     fake_cli(f"print(json.dumps({payload!r}))")
     assert plugin.list_dialects()["data"] == payload
@@ -99,7 +99,8 @@ def test_no_implicit_or_auto_provider(plugin, monkeypatch, provider):
 def test_explicit_provider_and_configured_provider(plugin, fake_cli):
     fake_cli("print(sys.argv[sys.argv.index('--provider') + 1])", provider="deepl")
     assert plugin.translate("Hello")["text"] == "deepl"
-    assert plugin.translate("Hello", provider="llm")["text"] == "llm"
+    # The user's setting wins over the model's argument (roast D4).
+    assert plugin.translate("Hello", provider="llm")["text"] == "deepl"
     assert "auto" not in plugin.TRANSLATE_SCHEMA["parameters"]["properties"]["provider"]["enum"]
 
 

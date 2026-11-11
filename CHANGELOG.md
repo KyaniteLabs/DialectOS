@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **The Hermes plugin no longer downloads DialectOS on every call.** The old default ran `npx --package=<release URL>`, which fetched the 6 MB tarball on each call and failed after about 70 seconds without a network, so "detect, list and validate run offline" was not true. The plugin now downloads the v0.3.2 tarball once, refuses it unless it matches a pinned sha256, unpacks it under `plugin-data/dialectos/cli/` and runs it with `node`. A tarball placed in the data folder installs it without internet. A saved copy of the old `npx` default is read as the new default. The docs now say Node 22.13, which the CLI needs.
 - **`dialectos_validate` no longer passes French, changed numbers or a mostly missing translation.** The CLI passed all three. The plugin now blocks a translation that drops or changes a number from the source, reads as English, French, Portuguese or Italian, or is under half the source's length. The page says "Passed the form checks (meaning not checked)", because a reversed claim still passes.
+- **The agent could switch the Hermes plugin's translate provider.** With `llm` in settings, a `dialectos_translate` call that named `mymemory` sent the text to MyMemory. The setting now wins; the call's `provider` is used only when settings name none.
+- **`/dialectos translate` treated unnamed and scheduled sessions as local.** A gateway session that named no platform, and cron runs, could translate from the slash command. Now only the CLI, TUI, desktop app and ACP count as local; everything else needs `allow_translate_slash_on_gateway`.
+- **The dialect brief came in for "the Spanish flu".** Any mention of Spanish or LATAM added the brief, including "do not answer in Spanish", while "en argentino" and "Castilian" were missed. The brief now needs a Spanish target and skips refusals.
+- **`/dialectos status` crashed on a damaged ledger, and slash `validate` split code like `std :: move` at the wrong place.** Status now shows an empty history, validate splits at the middle ` :: `, and slash checks are recorded in the same history as the tool.
+- **CI never ran the plugin against the real CLI.** GitHub CI now builds the CLI and runs the offline validate matrix through it.
 
 ### Changed
 

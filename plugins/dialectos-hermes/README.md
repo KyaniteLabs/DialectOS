@@ -4,13 +4,13 @@ Spanish is not one language to its readers. "Coger el autobús" is ordinary in M
 
 ## What it adds
 
-- **A dialect brief.** When a message asks for Spanish or names a variant such as `es-AR`, Hermes adds a short brief: pick the variant, translate, then check. Generic words like "localize" or "i18n" don't trigger it. This is the `pre_llm_call` hook.
+- **A dialect brief.** When a message asks for Spanish or names a variant such as `es-AR`, Hermes adds a short brief: pick the variant, translate, then check. It needs a Spanish target ("into Spanish", "a Spanish version", "en argentino"), so a bare mention such as "the Spanish flu" or "LATAM sales" doesn't trigger it, and neither does "don't answer in Spanish". Generic words like "localize" or "i18n" don't trigger it either. This is the `pre_llm_call` hook.
 - **Four agent tools.**
   - `dialectos_translate` translates into a variant through the provider you choose.
   - `dialectos_detect` names the variant a Spanish text is written in. It runs offline.
   - `dialectos_validate` checks a translation against its source, offline. It needs the source.
   - `dialectos_list_dialects` lists the 25 variants.
-- **A slash command.** `/dialectos detect | list | translate | validate | status | help` does the same from chat. For `validate`, write `<source> :: <translation>`. It takes text only: no file paths, no server mode, and no corpus or benchmark commands.
+- **A slash command.** `/dialectos detect | list | translate | validate | status | help` does the same from chat. For `validate`, write `<source> :: <translation>`; when the text itself contains ` :: `, the middle separator splits the two. Slash checks go into the same history as the tool. It takes text only: no file paths, no server mode, and no corpus or benchmark commands.
 - **A skill.** The bundled `dialectos:dialectos` skill walks the agent through pick, translate and check.
 - **A check history.** After each DialectOS tool call, a ledger records the verdict. It keeps the tool, the variant, and the pass and issue counts, never the text. This is the `post_tool_call` hook.
 - **A DialectOS page.** It lives in the Hermes desktop app (sidebar and ⌘K) and as a tab in the web dashboard. You can detect a variant, translate with an automatic check, check any source and translation pair, browse the variants, and see the check history per variant. It needs Hermes 0.23.0 or later.
@@ -27,7 +27,7 @@ You need Node 22.13 or later, with `node` on your PATH.
 ## What it does on your machine
 
 - **It downloads code once.** The first call downloads `https://github.com/KyaniteLabs/DialectOS/releases/download/v0.3.2/dialectos-cli-0.3.2.tgz` (about 6 MB, all dependencies bundled). The plugin checks it against a pinned sha256, refuses it on a mismatch, unpacks it to `<HERMES_HOME>/plugin-data/dialectos/cli/0.3.2/` and runs it with `node`. Later calls use that copy and don't touch the network. On a machine without internet, put the tarball in `<HERMES_HOME>/plugin-data/dialectos/` and the plugin uses it instead (the hash is still checked). To run your own copy, set `dialectos_command`, for example to `dialectos` after `pnpm add -g <tarball>`.
-- **Translate is the only network call.** Detect, list and validate run offline. Translate sends text only to the provider you name in settings or in the tool call: `llm`, `deepl`, `libre` or `mymemory`. If you name none, or name `auto`, it refuses before starting anything, and it never falls back to another provider. The slash command and the page's Translate button use the provider from settings, and the page sends text only when you press Translate.
+- **Translate is the only network call.** Detect, list and validate run offline. Translate sends text only to the provider you name in settings, or, when settings name none, in the tool call: `llm`, `deepl`, `libre` or `mymemory`. If you name none, or name `auto`, it refuses before starting anything, and it never falls back to another provider. When settings name a provider, the agent can't switch to another one. The slash command and the page's Translate button use the provider from settings, and the page sends text only when you press Translate.
 - **Keys stay scoped.** The plugin reads provider keys and endpoints only through Hermes's secret scope and passes them only to the DialectOS process. These are `LLM_API_KEY`, `LLM_API_URL`, `LLM_ENDPOINT`, `LLM_MODEL`, `LLM_API_FORMAT`, `DEEPL_AUTH_KEY`, `DEEPL_API_URL`, `LIBRETRANSLATE_URL` and `LIBRETRANSLATE_API_KEY`, plus the switches `ENABLE_MYMEMORY`, `LLM_ALLOW_LOCAL` and `LM_STUDIO_URL`. That process gets a cleaned environment: PATH, HOME, locale, proxy and npm cache settings, plus those keys. It never sees the rest of your environment. MyMemory is used only when `ENABLE_MYMEMORY=1`. A local endpoint such as Ollama needs `LLM_ALLOW_LOCAL=1`, and LM Studio also needs `LM_STUDIO_URL`.
 - **Data stays in one folder.** The CLI copy, the cache, the corpus and `qa_ledger.json` live in `<HERMES_HOME>/plugin-data/dialectos/`, one per profile. Checks run from the page add the same verdict-only rows, marked `via: page`. Corpus recording is off, and nothing else is written.
 - **The page answers anyone who can reach your dashboard.** Its Translate button sends text with your provider keys. Keep the Hermes dashboard on localhost unless you trust everyone who can reach it.
@@ -54,7 +54,7 @@ Set these under `plugins.entries.dialectos.settings`.
 - **The first call is slower** while the plugin downloads and checks DialectOS. Machines without internet need the tarball placed in the data folder, or DialectOS installed and set as `dialectos_command`.
 - **Text limits.** Text to translate or detect is capped at 8,000 characters. A translation to check can be up to 100,000. A result that is too large comes back as a size error, never silently cut short.
 - **Temporary files.** A check writes the texts to private temporary files in the plugin's data folder and deletes them afterwards, whether the check passes or fails. While the check runs they are plain text in a folder only you can read. If the machine crashes mid-check, a file can be left behind for you to delete.
-- **Chat platforms.** `/dialectos translate` is refused on gateway platforms unless you set `allow_translate_slash_on_gateway: true`.
+- **Chat platforms.** `/dialectos translate` works only in the CLI, TUI, desktop app and ACP. Chat platforms, webhooks, the API server, kanban workers and scheduled runs need `allow_translate_slash_on_gateway: true`.
 - **Older Hermes.** On Hermes versions before 0.23.0, the hook, tools, slash command and skill load, but the page and dashboard tab don't.
 - **Platforms.** Tested on Linux only. macOS and Windows are unverified.
 
