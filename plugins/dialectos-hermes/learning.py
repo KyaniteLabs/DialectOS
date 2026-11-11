@@ -44,8 +44,9 @@ def _today():
 
 
 def _normalize(text):
-    return ''.join(c for c in unicodedata.normalize('NFD', text.strip().casefold())
-                   if not unicodedata.combining(c))
+    normalized = ''.join(c for c in unicodedata.normalize('NFD', text.strip().casefold())
+                         if not unicodedata.combining(c))
+    return re.sub(r'[\s.,;:!?¡¿]+$', '', normalized).strip()
 
 
 @lru_cache(maxsize=4)
@@ -121,19 +122,36 @@ class LearningStore:
             if not isinstance(data, dict) or set(data) != {'cards'} or not isinstance(data['cards'], list):
                 raise ValueError('Invalid store')
             seen = set()
+            refreshed = []
             for c in data['cards']:
                 if not isinstance(c, dict) or type(c.get('box')) is not int or not 1 <= c['box'] <= 5:
                     raise ValueError('Invalid card')
                 if not isinstance(c.get('concept'), str) or not isinstance(c.get('variant'), str):
                     raise ValueError('Invalid identity')
+                if c['variant'] not in VARIANTS:
+                    raise ValueError('Invalid variant')
                 due = date.fromisoformat(c['due']).isoformat()
-                if c != self._card(c['concept'], c['variant'], c['box'], due):
+                expected_fields = {'concept', 'variant', 'box', 'due'}
+                if c['concept'] not in _ADDRESS:
+                    expected_fields.add('term')
+                    if not isinstance(c.get('term'), str):
+                        raise ValueError('Invalid term')
+                if set(c) != expected_fields:
                     raise ValueError('Invalid fields')
                 key = c['concept'], c['variant']
                 if key in seen:
                     raise ValueError('Duplicate card')
                 seen.add(key)
-            return data['cards']
+                try:
+                    refreshed.append(self._card(c['concept'], c['variant'], c['box'], due))
+                except DictionaryUnavailable:
+                    raise
+                except ValueError:
+                    # A removed concept or variant term drops only its own card.
+                    continue
+            if refreshed != data['cards']:
+                self._save(refreshed)
+            return refreshed
         except DictionaryUnavailable:
             raise
         except (ValueError, TypeError, KeyError):
@@ -186,11 +204,6 @@ class LearningStore:
                         concept = _ADDRESS_TERMS[expected]
                         if self._term(concept, variant) == expected:
                             concepts.add(concept)
-                elif isinstance(v, str):
-                    words = set(re.findall(r'\w+', v.casefold()))
-                    concept = ('address_plural' if words & {'vosotros', 'ustedes'} else
-                               'address_formal' if 'usted' in words else 'address_singular')
-                    concepts.add(concept)
         fresh = []
         for concept in sorted(concepts):
             try:
@@ -283,7 +296,8 @@ class LearningStore:
                            alternates.get(variant, []) if isinstance(alternates, dict) else alternates):
                 if isinstance(source, list):
                     accepted.extend(t for t in source if isinstance(t, str) and t.strip())
-        return {_normalize(t) for t in accepted}
+        # A slash term ("guapo/guapa") is shown whole, so accept it whole as well as either half.
+        return {_normalize(form) for term in accepted for form in [term, *term.split('/')]}
 
     def answer(self, concept, variant, answer):
         self.dictionary()

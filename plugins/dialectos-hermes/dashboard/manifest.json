@@ -3,7 +3,7 @@
   "label": "DialectOS",
   "description": "Spanish for the region you mean: detect, translate and check text across 25 variants, with the verdicts the agent recorded.",
   "icon": "Languages",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "api": "plugin_api.py",
   "tab": {
     "path": "/dialectos",

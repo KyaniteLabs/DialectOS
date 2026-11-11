@@ -90,6 +90,16 @@ def test_accepts_only_explicit_dictionary_alternates(plugin):
     assert store.answer('bus', 'es-MX', 'BUS')['correct'] is True
 
 
+@pytest.mark.parametrize(('concept', 'variant', 'answer'), [
+    ('handsome_beautiful', 'es-AR', 'lindo'),
+    ('handsome_beautiful', 'es-AR', 'linda'),
+    ('email', 'es-MX', 'correo electrónico.'),
+])
+def test_answers_accept_dictionary_form_variants_and_sentence_punctuation(plugin, concept, variant, answer):
+    store = make_store(plugin)
+    assert store.answer(concept, variant, answer)['correct'] is True
+
+
 def test_unknown_concepts_and_unconfirmed_forget_leave_store_alone(plugin):
     store = make_store(plugin)
     store.capture(miss(), 'es-AR')

@@ -7,12 +7,80 @@ import {
   Button, CopyButton, EmptyState, ErrorState, PALETTE_AREA, ROUTES_AREA, SIDEBAR_NAV_AREA,
   Skeleton, host, relativeTime, useQuery, useQueryClient
 } from '@hermes/plugin-sdk'
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { jsx, jsxs } from 'react/jsx-runtime'
 
 const ID = 'dialectos'
 const PATH = '/dialectos'
 const FACE = 'DialectOS Chakra Petch'
+const VIEWS = ['translate', 'check', 'dialects', 'by_dialect', 'recent']
+const isObject = p => p !== null && typeof p === 'object' && !Array.isArray(p)
+const isDialect = s => typeof s === 'string' && s.length === 5 && /^es-[A-Z]{2}$/.test(s)
+
+function validPaneEvent(name, p) {
+  if (!isObject(p)) return false
+  if (name === 'ledger.updated') return Object.keys(p).length === 1
+    && Number.isInteger(p.count) && p.count >= 0 && p.count <= 200
+  return name === 'view.set' && VIEWS.includes(p.view)
+    && Object.keys(p).every(k => k === 'view' || k === 'item_id')
+    && (!Object.hasOwn(p, 'item_id') || isDialect(p.item_id))
+}
+
+function createPaneEvents(host, ctx) {
+  let state = { view: null, item_id: null, revision: 0, viewRevision: 0 }
+  const listeners = new Set()
+  // Register before the route mounts so section changes wait for the page to open.
+  const disposers = typeof host.onEvent !== 'function' ? [] : ['ledger.updated', 'view.set'].map(name =>
+    host.onEvent(`plugin.${ID}.${name}`, frame => {
+      const payload = frame?.payload
+      if (!validPaneEvent(name, payload)) return
+      state = { ...state, revision: state.revision + 1 }
+      if (name === 'view.set') state = { ...state, view: payload.view, item_id: payload.item_id || null, viewRevision: state.viewRevision + 1 }
+      for (const listener of listeners) listener(state)
+    }))
+  return {
+    snapshot: () => state,
+    subscribe(listener) {
+      listeners.add(listener)
+      listener(state) // covers an event between render and effect subscription
+      return () => listeners.delete(listener)
+    },
+    async read(path) {
+      // A REST request begun before a live event may contain an older ledger.
+      // Read again before publishing either its result or its error to React Query.
+      for (;;) {
+        const revision = state.revision
+        try {
+          const data = await ctx.rest(path)
+          if (revision === state.revision) return data
+        } catch (error) {
+          if (revision === state.revision) throw error
+        }
+      }
+    },
+    dispose() {
+      for (const dispose of disposers) if (typeof dispose === 'function') dispose()
+      listeners.clear()
+    }
+  }
+}
+
+function focusPaneItem(root, pane) {
+  if (!root || !VIEWS.includes(pane.view)) return
+  const section = root.querySelector(`[data-view="${pane.view}"]`)
+  const item = isDialect(pane.item_id) ? section?.querySelector(`[data-item-id="${pane.item_id}"]`) : null
+  const target = item || section
+  target?.scrollIntoView?.({ block: 'center' })
+  target?.focus?.({ preventScroll: true })
+}
+
+// Keep the requested dialect visible even when it falls outside the first ten rows.
+const visibleRows = (rows, item) => {
+  const visible = rows.slice(0, 10)
+  const focused = rows.find(r => r.dialect === item)
+  if (focused && !visible.includes(focused)) visible.push(focused)
+  return visible
+}
 
 // --- FONTS (generated) -------------------------------------------------------
 const FONTS = {
@@ -79,6 +147,7 @@ ${Object.entries(FONTS).map(([w, b]) => `@font-face{font-family:'${FACE}';font-s
 .dos-chip:hover{background:var(--ui-row-hover-background);border-color:var(--ui-stroke-primary)}
 .dos-chip[aria-pressed=true]{border-color:var(--dos-slab);background:var(--dos-slab);color:#eaf5f6}.dos-chip[aria-pressed=true] .dos-code,.dos-chip[aria-pressed=true] small{color:#eaf5f6}
 .dos-chip:focus-visible{outline:2px solid var(--dos-id);outline-offset:2px}
+.dos [data-view]:focus,.dos [data-item-id]:focus{outline:2px solid var(--dos-id);outline-offset:2px}
 .dos-chip small{margin-left:auto;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ui-text-tertiary)}
 .dos-stale{margin:0;font-size:13px;color:var(--dos-adv)}
 .dos-err-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
@@ -133,7 +202,7 @@ function TryIt({ ctx, status, dialects, target, setTarget, refresh }) {
   const r = out?.res
   const det = out?.kind === 'detect' && r?.ok ? r.data : null
   const stale = out && (out.text !== text || (out.kind === 'translate' && out.dialect !== target))
-  return jsxs('section', { className: 'dos-card', 'aria-labelledby': 'dos-try', children: [
+  return jsxs('section', { className: 'dos-card', 'data-view': 'translate', tabIndex: -1, 'aria-labelledby': 'dos-try', children: [
     jsxs('div', { children: [jsx('h2', { id: 'dos-try', className: 'dos-label', children: 'Translate or detect' }),
       jsx('p', { className: 'dos-sub', children: 'Detect runs on this machine. Translate sends the text to your provider, then checks the result against your text.' })] }),
     jsxs('label', { className: 'dos-field', children: ['Text', jsx('textarea', { value: text, maxLength: status?.limits?.text || 8000, id: 'dos-text', placeholder: 'Paste English to translate, or Spanish to detect its dialect.', onChange: e => setText(e.target.value) })] }),
@@ -175,7 +244,7 @@ function CheckPair({ ctx, dialects, target, setTarget, refresh }) {
     finally { setBusy(false); refresh() }
   }
   const stale = res && (res.sent.source !== source || res.sent.translated !== translated || res.sent.dialect !== target)
-  return jsxs('section', { className: 'dos-card', 'aria-labelledby': 'dos-check', children: [
+  return jsxs('section', { className: 'dos-card', 'data-view': 'check', tabIndex: -1, 'aria-labelledby': 'dos-check', children: [
     jsxs('div', { children: [jsx('h2', { id: 'dos-check', className: 'dos-label', children: 'Check a translation' }),
       jsx('p', { className: 'dos-sub', children: 'Runs on this machine. Checks placeholders, structure and regional terms against the source.' })] }),
     jsxs('label', { className: 'dos-field', children: ['Source', jsx('textarea', { value: source, maxLength: 8000, placeholder: 'The original text, usually English.', onChange: e => setSource(e.target.value) })] }),
@@ -192,15 +261,15 @@ function LoadError({ what, onRetry }) {
   return jsxs('div', { className: 'dos-err-row', role: 'alert', children: [jsx('p', { className: 'dos-err', children: `Could not load ${what}.` }), jsx(Button, { size: 'sm', variant: 'ghost', onClick: onRetry, children: 'Try again' })] })
 }
 
-function ByDialect({ ledger, names, failed, retry }) {
-  const rows = (ledger?.by_dialect || []).filter(r => r.dialect !== '-' && r.dialect !== '?').slice(0, 10)
-  return jsxs('section', { className: 'dos-card', 'aria-labelledby': 'dos-by', children: [
+function ByDialect({ ledger, names, failed, retry, item }) {
+  const rows = visibleRows((ledger?.by_dialect || []).filter(r => r.dialect !== '-' && r.dialect !== '?'), item)
+  return jsxs('section', { className: 'dos-card', 'data-view': 'by_dialect', tabIndex: -1, 'aria-labelledby': 'dos-by', children: [
     jsxs('div', { children: [jsx('h2', { id: 'dos-by', className: 'dos-label', children: 'Checks by dialect' }),
       jsx('p', { className: 'dos-sub', children: 'From the check history. It keeps verdicts only, never your text.' })] }),
     failed ? jsx(LoadError, { what: 'the check history', onRetry: retry })
       : !ledger ? jsx(Skeleton, { style: { height: 90, borderRadius: 6 } })
       : !rows.length ? jsx(EmptyState, { title: 'No checks yet', description: 'Checks the agent or this page runs show up here, per dialect.' })
-      : jsx('div', { children: rows.map(r => jsxs('div', { className: 'dos-sum', children: [
+      : jsx('div', { children: rows.map(r => jsxs('div', { className: 'dos-sum', 'data-item-id': r.dialect, tabIndex: -1, children: [
           jsxs('span', { children: [jsx('span', { className: 'dos-code', children: r.dialect }), names[r.dialect] ? jsx('span', { className: 'dos-why', children: ` ${names[r.dialect].replace(/ Spanish$/, '')}` }) : null] }),
           jsxs('span', { className: 'dos-bar', role: 'img', 'aria-label': `${r.passed} passed, ${r.blocked} blocked, ${r.advisory || 0} did not pass on advisory issues`, children: [
             jsx('i', { style: { width: `${r.checked ? (r.passed / r.checked) * 100 : 0}%`, background: 'var(--dos-id)' } }),
@@ -211,17 +280,17 @@ function ByDialect({ ledger, names, failed, retry }) {
   ] })
 }
 
-function Recent({ ledger, failed, retry }) {
-  const rows = (ledger?.rows || []).slice(0, 10)
+function Recent({ ledger, failed, retry, item }) {
+  const rows = visibleRows(ledger?.rows || [], item)
   const verdict = r => r.tool !== 'dialectos_validate' ? (r.ok ? 'done' : 'failed')
     : r.passed === true ? 'passed' : r.ok === false || r.passed == null ? 'failed to run' : r.blocking_issue_count ? `${r.blocking_issue_count} blocking` : 'did not pass'
-  return jsxs('section', { className: 'dos-card', 'aria-labelledby': 'dos-recent', children: [
+  return jsxs('section', { className: 'dos-card', 'data-view': 'recent', tabIndex: -1, 'aria-labelledby': 'dos-recent', children: [
     jsxs('div', { children: [jsx('h2', { id: 'dos-recent', className: 'dos-label', children: 'Recent' }),
       jsx('p', { className: 'dos-sub', children: ledger ? `${ledger.total} recorded call${ledger.total === 1 ? '' : 's'}` : ' ' })] }),
     failed ? jsx(LoadError, { what: 'recent activity', onRetry: retry })
       : !ledger ? jsx(Skeleton, { style: { height: 90, borderRadius: 6 } })
       : !rows.length ? jsx(EmptyState, { title: 'Nothing yet', description: 'Ask the agent for Spanish, or use the tools above.' })
-      : jsx('div', { children: rows.map((r, n) => jsxs('div', { className: 'dos-ev', children: [
+      : jsx('div', { children: rows.map((r, n) => jsxs('div', { className: 'dos-ev', 'data-item-id': r.dialect, tabIndex: -1, children: [
           jsx('span', { children: ago(r.ts) }),
           jsx('span', { children: `${TOOL_NAMES[r.tool] || r.tool}${r.via === 'page' ? ' · page' : ''}` }),
           jsx('span', { className: 'dos-code', children: r.dialect && r.dialect !== '-' ? r.dialect : '' }),
@@ -231,12 +300,12 @@ function Recent({ ledger, failed, retry }) {
 }
 
 function Dialects({ dialects, target, setTarget, defaultDialect, failed, retry }) {
-  return jsxs('section', { className: 'dos-card', 'aria-labelledby': 'dos-list', children: [
+  return jsxs('section', { className: 'dos-card', 'data-view': 'dialects', tabIndex: -1, 'aria-labelledby': 'dos-list', children: [
     jsxs('div', { children: [jsx('h2', { id: 'dos-list', className: 'dos-label', children: dialects.length ? `${dialects.length} variants` : 'Variants' }),
       jsx('p', { className: 'dos-sub', children: 'Choose the variant to translate into or check against.' })] }),
     failed ? jsxs('div', { style: { display: 'grid', gap: 8 }, children: [jsx(LoadError, { what: 'the variants', onRetry: retry }), typeof failed === 'string' ? jsx('p', { className: 'dos-why', children: failed }) : null] })
       : !dialects.length ? jsx(Skeleton, { style: { height: 120, borderRadius: 6 } })
-      : jsx('div', { className: 'dos-grid', children: dialects.map(d => jsxs('button', { className: 'dos-chip', 'aria-pressed': d.code === target, onClick: () => setTarget(d.code), children: [
+      : jsx('div', { className: 'dos-grid', children: dialects.map(d => jsxs('button', { className: 'dos-chip', 'data-item-id': d.code, 'aria-pressed': d.code === target, onClick: () => setTarget(d.code), children: [
           jsx('span', { className: 'dos-code', children: d.code }), jsx('span', { children: d.name.replace(/ Spanish$/, '') }),
           d.code === defaultDialect ? jsx('small', { children: 'default' }) : null] }, d.code)) })
   ] })
@@ -298,21 +367,29 @@ function Learn({ ctx, target, revision }) {
   ] })
 }
 
-function DialectosPage({ ctx }) {
+function DialectosPage({ ctx, events }) {
   const qc = useQueryClient()
-  const status = useQuery({ queryKey: [ID, 'status'], queryFn: () => ctx.rest('/status') })
-  const list = useQuery({ queryKey: [ID, 'dialects'], queryFn: () => ctx.rest('/dialects'), staleTime: Infinity })
-  const ledger = useQuery({ queryKey: [ID, 'ledger'], queryFn: () => ctx.rest('/ledger?limit=40'), refetchInterval: 30_000 })
+  const root = useRef(null)
+  const [pane, setPane] = useState(events.snapshot)
+  const status = useQuery({ queryKey: [ID, 'status'], queryFn: () => events.read('/status') })
+  const list = useQuery({ queryKey: [ID, 'dialects'], queryFn: () => events.read('/dialects'), staleTime: Infinity })
+  const ledger = useQuery({ queryKey: [ID, 'ledger'], queryFn: () => events.read('/ledger?limit=40'), refetchInterval: 30_000 })
   const s = status.data
   const ledgerFailed = ledger.isError || (ledger.data && ledger.data.ok === false)
   const ledgerOk = ledgerFailed ? null : ledger.data
   const dialects = list.data?.ok ? list.data.data : []
   const names = Object.fromEntries(dialects.map(d => [d.code, d.name]))
   const [picked, setTarget] = useState(null)
+  useEffect(() => events.subscribe(next => {
+    setPane(next)
+    qc.invalidateQueries({ queryKey: [ID] })
+  }), [events, qc])
+  useEffect(() => { if (pane.item_id) setTarget(pane.item_id) }, [pane.viewRevision])
+  useEffect(() => { focusPaneItem(root.current, pane) }, [pane.viewRevision, list.data, ledger.data])
   const target = picked || s?.default_dialect || 'es-MX'
   const refresh = () => { qc.invalidateQueries?.({ queryKey: [ID, 'ledger'] }); ledger.refetch?.() }
   const shared = { ctx, status: s, dialects, target, setTarget, refresh }
-  return jsx('div', { className: 'dos-host', children: jsxs('div', { className: 'dos', children: [
+  return jsx('div', { ref: root, className: 'dos-host', children: jsxs('div', { className: 'dos', children: [
     jsxs('header', { className: 'dos-head', children: [
       jsxs('div', { className: 'dos-id', children: [
         jsx('span', { className: 'dos-tile', children: MARK ? jsx('img', { src: `data:image/webp;base64,${MARK}`, alt: '' }) : null }),
@@ -332,7 +409,7 @@ function DialectosPage({ ctx }) {
     jsxs('div', { className: 'dos-cols', children: [jsx(TryIt, shared), jsx(CheckPair, shared)] }),
     jsx(Learn, { ctx, target, revision: ledger.dataUpdatedAt }, target),
     jsx(Dialects, { dialects, target, setTarget, defaultDialect: s?.default_dialect, failed: list.isError ? true : list.data && !list.data.ok ? list.data.error : null, retry: () => list.refetch?.() }),
-    jsxs('div', { className: 'dos-cols', children: [jsx(ByDialect, { ledger: ledgerOk, names, failed: ledgerFailed, retry: () => ledger.refetch?.() }), jsx(Recent, { ledger: ledgerOk, failed: ledgerFailed, retry: () => ledger.refetch?.() })] })
+    jsxs('div', { className: 'dos-cols', children: [jsx(ByDialect, { ledger: ledgerOk, names, item: pane.item_id, failed: ledgerFailed, retry: () => ledger.refetch?.() }), jsx(Recent, { ledger: ledgerOk, item: pane.item_id, failed: ledgerFailed, retry: () => ledger.refetch?.() })] })
   ] }) })
 }
 
@@ -340,13 +417,15 @@ export default {
   id: ID,
   name: 'DialectOS',
   register(ctx) {
+    const events = createPaneEvents(host, ctx)
+    ctx.onDispose(() => events.dispose())
     const style = document.createElement('style')
     style.dataset.plugin = ID
     style.textContent = CSS
     document.head.appendChild(style)
     ctx.onDispose(() => style.remove())
     ctx.registerMany([
-      { id: 'page', area: ROUTES_AREA, data: { path: PATH }, render: () => jsx(DialectosPage, { ctx }) },
+      { id: 'page', area: ROUTES_AREA, data: { path: PATH }, render: () => jsx(DialectosPage, { ctx, events }) },
       { id: 'nav', area: SIDEBAR_NAV_AREA, data: { path: PATH, label: 'DialectOS', codicon: 'globe' } },
       { id: 'open', area: PALETTE_AREA, data: { id: 'dialectos.open', label: 'DialectOS: open', keywords: ['spanish', 'dialect', 'translate', 'localize', 'es-MX'], run: () => host.navigate(PATH) } }
     ])

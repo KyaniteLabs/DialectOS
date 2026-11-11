@@ -1,5 +1,6 @@
 """Learning capture shares validation flows without changing their results."""
 import json
+import pytest
 
 from test_learning import make_store, miss
 
@@ -24,6 +25,18 @@ def test_address_forms_capture_only_dictionary_concepts(plugin):
     assert store.cards("es-AR")[0]["concept"] == "informal_address"
     store.capture({"addressForms": {"passed": True, "violations": [{"concept": "bus"}]}}, "es-AR")
     assert len(store.cards("es-AR")) == 1
+
+
+@pytest.mark.parametrize('issue', [
+    'Mixed formality detected in paragraph 2',
+    'plural address issue: vosotros',
+    'formal usted form mismatch',
+    {'message': 'informal address warning'},
+])
+def test_capture_ignores_unstructured_address_issue_prose(plugin, issue):
+    store = make_store(plugin)
+    assert store.capture({'addressForms': {'passed': False, 'issues': [issue]}}, 'es-AR') == 0
+    assert store.cards('es-AR') == []
 
 
 def test_capture_failure_does_not_change_validation_or_ledger(plugin, monkeypatch):
