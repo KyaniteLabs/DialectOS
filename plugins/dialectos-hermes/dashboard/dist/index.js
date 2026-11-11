@@ -28,7 +28,7 @@
     if (!c.ok && c.valid == null) return h("p", { role: "alert", className: "text-sm" }, "Check could not run: " + (c.error || "unknown error"));
     var issues = c.issues || [];
     var blocking = issues.filter(function (i) { return i.blocking; }).length;
-    var label = c.valid === true && !blocking ? "Passed the checks" : blocking ? blocking + " blocking issue" + (blocking === 1 ? "" : "s") : "Did not pass";
+    var label = c.valid === true && !blocking ? "Passed the form checks (meaning not checked)" : blocking ? blocking + " blocking issue" + (blocking === 1 ? "" : "s") : "Did not pass";
     return h("div", { className: "space-y-2" },
       h("div", { className: "flex flex-wrap items-center gap-2 text-sm" },
         h(Badge, { variant: c.valid === true && !blocking ? "default" : "outline" }, label),
@@ -137,7 +137,7 @@
         h(Badge, { variant: "outline" }, "Provider " + (status ? (status.provider ? PROVIDERS[status.provider] : "none, translate off") : "…")),
         h(Badge, { variant: "outline" }, "Default " + ((status && status.default_dialect) || "…")),
         h(Badge, { variant: "outline" }, "Chat hint " + (status ? (status.inject_on_spanish ? "on" : "off") : "…")),
-        status && !status.runner_found ? h(Badge, { variant: "destructive" }, "Node/npx not found") : null)),
+        status && !status.runner_found ? h(Badge, { variant: "destructive" }, "Node not found") : null)),
       h("div", { role: "note", className: "rounded-md border border-border p-3 text-sm" },
         h("strong", null, "Checks are advisory. "), "A translation can pass with its meaning changed, such as a flipped negation or the wrong sense of a word. Read it before you use it."),
       h("div", { className: "grid gap-4 lg:grid-cols-2" }, h(TryIt, shared), h(CheckPair, shared)),

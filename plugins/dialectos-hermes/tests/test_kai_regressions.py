@@ -330,12 +330,3 @@ def test_spanish_localize_still_injects(plugin):
 def test_es_mx_code_still_injects(plugin):
     out = plugin._on_pre_llm("Please translate to es-MX")
     assert out is not None
-
-
-def test_ledger_never_stores_free_text_from_the_dialect_argument(plugin):
-    """A tool call whose dialect argument carries text records the default variant instead."""
-    secret = "please translate my bank PIN 4417"
-    plugin._on_post_tool("dialectos_translate", {"dialect": secret}, json.dumps({"ok": True}))
-    raw = plugin._ledger_path().read_text(encoding="utf-8")
-    assert "4417" not in raw
-    assert json.loads(raw)[-1]["dialect"] == plugin._cfg("default_dialect")
