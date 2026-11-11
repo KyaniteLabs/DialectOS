@@ -4,7 +4,7 @@ Spanish is not one language to its readers. "Coger el autobús" is ordinary in M
 
 ## What it adds
 
-- **A dialect brief.** When a message asks for Spanish or names a variant such as `es-AR`, Hermes adds a short brief: pick the variant, translate, then check. Generic words like "localize" or "i18n" don't trigger it.
+- **A dialect brief.** When a message asks for Spanish or names a variant such as `es-AR`, Hermes adds a short brief: pick the variant, translate, then check. Generic words like "localize" or "i18n" don't trigger it. This is the `pre_llm_call` hook.
 - **Four agent tools.**
   - `dialectos_translate` translates into a variant through the provider you choose.
   - `dialectos_detect` names the variant a Spanish text is written in. It runs offline.
@@ -12,7 +12,7 @@ Spanish is not one language to its readers. "Coger el autobús" is ordinary in M
   - `dialectos_list_dialects` lists the 25 variants.
 - **A slash command.** `/dialectos detect | list | translate | validate | status | help` does the same from chat. For `validate`, write `<source> :: <translation>`. It takes text only: no file paths, no server mode, and no corpus or benchmark commands.
 - **A skill.** The bundled `dialectos:dialectos` skill walks the agent through pick, translate and check.
-- **A check history.** After each DialectOS tool call, a ledger records the verdict. It keeps the tool, the variant, and the pass and issue counts, never the text.
+- **A check history.** After each DialectOS tool call, a ledger records the verdict. It keeps the tool, the variant, and the pass and issue counts, never the text. This is the `post_tool_call` hook.
 - **A DialectOS page.** It lives in the Hermes desktop app (sidebar and ⌘K) and as a tab in the web dashboard. You can detect a variant, translate with an automatic check, check any source and translation pair, browse the variants, and see the check history per variant. It needs Hermes 0.23.0 or later.
 
 ## Install
