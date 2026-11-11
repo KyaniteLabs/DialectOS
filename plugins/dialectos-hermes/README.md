@@ -1,6 +1,6 @@
 # DialectOS for Hermes (native plugin)
 
-Regional Spanish localization across **25 dialect variants** with QA gates — inside Hermes. Wraps the DialectOS v0.3.1 CLI.
+Regional Spanish localization across **25 dialect variants** with advisory QA checks — inside Hermes. Wraps the DialectOS v0.3.1 CLI.
 
 | Surface | What it does |
 |---|---|
@@ -49,6 +49,7 @@ Requires **Node ≥ 20** and `npx` on PATH.
 - Validation writes bounded inline documents to private temporary `.md` files under profile-local plugin data, enabling existing structure checks; files are removed on success or failure. The default v0.3.1 output judge still false-fails code fences. The repaired judge (byte-identical source-aware fences) is in the CLI source on `main` but not yet in a release; point `dialectos_command` at a build of that source to use it. Results from that build don't describe the v0.3.1 release. Register flags and hooks are advisory, not an expected-register blocking contract.
 - `/dialectos list` renders all 25 code/name pairs; the agent list tool retains full metadata.
 - Validation uses private temporary files rather than large text argv; no user-facing file-path API is exposed. Files are plaintext while the subprocess runs (owner-only directory), removed afterwards; a hard host/process crash can leave residue under plugin data for owner cleanup.
+- QA checks are advisory, not proof of meaning. The v0.3.1 checks can pass a translation whose meaning changed (for example a flipped negation or a wrong dictionary sense). Read the output before you use it.
 - No Desktop pane or banner/screenshots yet.
 
 License: Apache-2.0 (same as DialectOS).
