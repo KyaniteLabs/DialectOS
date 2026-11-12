@@ -739,6 +739,114 @@ def test_dose_numbers_remain_attached_to_their_day_period(plugin, passing_cli):
     assert data["valid"] is False
 
 
+@pytest.mark.parametrize(("source", "translated", "expected_valid"), [
+    # Scales must not retain a reading that silently drops the scale.
+    ("It costs 10k.", "Cuesta 10.", False),
+    ("$10k", "$10", False),
+    ("Pay 2k euros.", "Pague 2 euros.", False),
+    ("Raised $5M.", "Recaudó 5 dólares.", False),
+    ("About 8 million people.", "Unas 8 personas.", False),
+    ("3 billion dollars.", "3 dólares.", False),
+    ("10 thousand users.", "10 usuarios.", False),
+    ("Salary: 80k per year.", "Salario: 80 al año.", False),
+    ("It costs 1.5k.", "Cuesta 1.5 mil.", True),
+    ("It costs 10k.", "Cuesta 10 mil.", True),
+    ("Sold 5 thousand units.", "Vendió cinco mil unidades.", True),
+    ("3 billion users.", "3 mil millones de usuarios.", True),
+    ("A $2B fund.", "Un fondo de 2 mil millones de dólares.", True),
+    ("Budget 2M.", "Presupuesto 2 millones.", True),
+    ("Budget 2M.", "Presupuesto 2.", False),
+    ("It costs 1.5k.", "Cuesta 1.5.", False),
+    # English and Spanish use different long-scale names.
+    ("3 trillion dollars.", "3 billones de dólares.", True),
+    ("3 billion dollars.", "3 billones de dólares.", False),
+    ("1000000000000000000 dollars.", "1 trillón de dólares.", True),
+    ("In the 2020s.", "En los años 20.", True),
+    # Counts after prepositions are not clock times.
+    ("After two weeks, call me.", "Después de dos semanas, llámame.", True),
+    ("At one point he left.", "En cierto momento se fue.", True),
+    ("Choose from three options.", "Elige entre tres opciones.", True),
+    ("Divide by two.", "Divide entre dos.", True),
+    ("It grew by one percent.", "Creció un uno por ciento.", True),
+    ("Children from three to six years old.", "Niños de tres a seis años.", True),
+    ("After four days, the fever dropped.", "Después de cuatro días, bajó la fiebre.", True),
+    ("Take it after two meals.", "Tómalo después de dos comidas.", True),
+    ("Supported by two people.", "Apoyado por dos personas.", True),
+    ("Available from three suppliers.", "Disponible de tres proveedores.", True),
+    ("Count from one.", "Cuenta desde uno.", True),
+    ("One by one they left.", "Se fueron uno por uno.", True),
+    ("Before one of us leaves.", "Antes de que uno de nosotros se vaya.", True),
+    ("See you at five.", "Nos vemos a las 5.", True),
+    ("See you at five.", "Nos vemos a las seis.", False),
+    ("Meet at five.", "Nos vemos a las 17:00.", True),
+    ("Meet at two.", "Nos vemos a las 14 h.", True),
+    ("Opens at 18h.", "Abre a las 18:00.", True),
+    # Large spelled quantities must preserve their unit and value.
+    ("Take 1000 mg.", "Tome mil miligramos.", True),
+    ("Take 1500 mg.", "Tome mil quinientos miligramos.", True),
+    ("There are 1500 rooms.", "Hay mil quinientas habitaciones.", True),
+    ("Take 1000mg.", "Tome mil miligramos.", True),
+    # Ordinals are not limited to a small noun vocabulary.
+    ("Newton's second law.", "La 2.ª ley de Newton.", True),
+    ("The fourth industrial revolution.", "La 4.ª revolución industrial.", True),
+    ("The third amendment.", "La 3.ª enmienda.", True),
+    ("The 2nd dose.", "La dos dosis.", False),
+    # Evening is compatible with either regional rendering.
+    ("Take 1 in the evening.", "Tome 1 por la noche.", True),
+    ("Take 1 in the evening.", "Tome 1 por la tarde.", True),
+    # Unit names in noun phrases are not measurements.
+    ("I worked 3 day shifts.", "Trabajé 3 turnos de día.", True),
+    ("Top 10 day trips.", "Los 10 mejores viajes de un día.", True),
+    ("Windows 10 S mode.", "Windows 10 en modo S.", True),
+    ("Buy 2 L brackets.", "Compra dos soportes en L.", True),
+    ("We need 4 pound signs.", "Necesitamos cuatro signos de libra.", True),
+    ("I have 2 d printers.", "Tengo 2 impresoras d.", True),
+    ("Line 4 s curve is steep.", "La curva s de la línea 4 es pronunciada.", True),
+    ("A 45 degree angle.", "Un ángulo de 45 grados.", True),
+    ("Buy 2 tablet devices.", "Compra dos dispositivos de tableta.", True),
+    ("There are 5 minute differences.", "Hay 5 diferencias de minutos.", True),
+    ("There are 3 hour glasses.", "Hay 3 relojes de arena.", True),
+    ("Run a 5K on Sunday.", "Corre una 5K el domingo.", True),
+    # A count after "son las" is not a time when it modifies a noun phrase.
+    ("They are the two best options.", "Son las dos mejores opciones.", True),
+    ("They are three winners.", "Son las tres ganadoras.", True),
+    # If destination periods are unparsed, preserve the order of dose counts.
+    ("Take 2 in the morning and 1 at night.",
+     "Tome 1 al despertar y 2 al acostarse.", False),
+    ("Take 2 in the morning and 1 at night.",
+     "Tome 2 al despertar y 1 al acostarse.", True),
+    # Units do not stop dose counts from being paired with their periods.
+    ("Take 10 mg in the morning and 5 mg at night.",
+     "Tome 5 mg por la mañana y 10 mg por la noche.", False),
+    ("Take 10 mL in the morning and 5 mL at night.",
+     "Tome 5 mL por la mañana y 10 mL por la noche.", False),
+    ("Inject 10 units in the morning and 4 units at night.",
+     "Inyecte 4 unidades por la mañana y 10 por la noche.", False),
+    ("Use 10 drops in the morning and 5 drops at night.",
+     "Use 5 gotas por la mañana y 10 por la noche.", False),
+    ("Take 2 puffs in the morning and 1 puff at night.",
+     "Tome 1 inhalación por la mañana y 2 por la noche.", False),
+    ("Take 2 mg in the morning and 1 mg at night.",
+     "Tome 2 mg antes de acostarse y 1 mg al despertar.", False),
+    # A digit with a day period can be a count, not a clock time.
+    ("I ate 2 in the morning and 1 at night.",
+     "Comí 2 por la mañana y 1 por la noche.", True),
+    # Frequency words carry counts and must agree with the translation.
+    ("Take 1 tablet once a day.", "Tome 1 tableta dos veces al día.", False),
+    ("Take 1 tablet twice a day.", "Tome 1 tableta tres veces al día.", False),
+    ("Take 1 tablet thrice a day.", "Tome 1 tableta dos veces al día.", False),
+    ("Take 1 tablet twice a day.", "Tome 1 tableta al día.", False),
+    ("Take 1 tablet twice a day.", "Tome 1 tableta dos veces al día.", True),
+    ("Set the delay to 5000 ms.", "Fija el retraso en 5 segundos.", True),
+    ("On the first and second attempts.", "En los intentos 1 y 2.", True),
+])
+def test_r9_roast_number_time_unit_and_dose_regressions(
+    plugin, source, translated, expected_valid
+):
+    issues = plugin._guard_issues(source, translated)
+    assert (not issues) == expected_valid, issues
+
+
 def test_half_an_hour_is_not_one_hour(plugin, passing_cli):
     data = _verdict(plugin, "1 hora.", "Half an hour.")
     assert data["valid"] is False
