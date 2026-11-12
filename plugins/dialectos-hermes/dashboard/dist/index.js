@@ -112,13 +112,15 @@
     var fs = useState(null), feedback = fs[0], setFeedback = fs[1];
     var bs = useState(false), busy = bs[0], setBusy = bs[1];
     var es = useState(""), error = es[0], setError = es[1];
+    var currentData = data && data.dialect === props.target ? data : null;
+    var currentFeedback = feedback && feedback.dialect === props.target ? feedback.data : null;
     function load() {
       return Promise.all(["tip", "stats", "quiz"].map(function (action) {
         return SDK.fetchJSON(API + "/learn?action=" + action + "&dialect=" + encodeURIComponent(props.target));
       })).then(function (r) {
         var failed = r.find(function (x) { return !x.ok; });
         if (failed) throw new Error(failed.error || "Learning is unavailable.");
-        return { tip: r[0].data, stats: r[1].data, quiz: r[2].data };
+        return { tip: r[0].data, stats: r[1].data, quiz: r[2].data, dialect: props.target };
       });
     }
     useEffect(function () {
@@ -126,15 +128,17 @@
       load().then(function (r) { if (active) { setData(r); setError(""); } }, function (e) { if (active) setError(e.message || "Could not load Learn."); });
       return function () { active = false; };
     }, [props.target, props.revision]);
+    useEffect(function () { setAnswer(""); setFeedback(null); setError(""); }, [props.target]);
     function submit(e) {
       e.preventDefault();
-      if (busy || !answer.trim() || !data || !data.quiz.concept) return;
+      if (busy || !answer.trim() || !currentData || !currentData.quiz.concept) return;
       setBusy(true); setError("");
-      return post("/learn", { action: "answer", dialect: props.target, concept: data.quiz.concept, answer: answer })
+      return post("/learn", { action: "answer", dialect: currentData.dialect, concept: currentData.quiz.concept, answer: answer })
         .then(function (r) {
           if (!r.ok) throw new Error(r.error || "Could not check that answer.");
-          setFeedback(r.data); setAnswer(""); return load();
-        }).then(setData).catch(function (e) { setError(e.message || "Could not load Learn."); })
+          setFeedback({ dialect: currentData.dialect, data: r.data }); setAnswer(""); return load();
+        }).then(function (r) { setData(function (current) { return current && current.dialect === props.target ? r : current; }); })
+        .catch(function (e) { setError(e.message || "Could not load Learn."); })
         .finally(function () { setBusy(false); });
     }
     // Solid blue-apatite colours come from DESIGN-PREFLIGHT; the native form has
@@ -146,22 +150,22 @@
       h("h2", { className: "text-base font-semibold" }, "Learn"),
       h("p", { className: "text-sm" }, "One regional word at a time. Offline, private, whenever you feel like it."),
       error ? h("p", { role: "alert" }, error) : null,
-      !data && !error ? h("p", null, "Loading Learn…") : null,
-      data ? h("div", { className: "grid gap-4 lg:grid-cols-2" },
+      !currentData && !error ? h("p", null, "Loading Learn…") : null,
+      currentData ? h("div", { className: "grid gap-4 lg:grid-cols-2" },
         h("div", null, h("h3", { className: "font-semibold" }, "Tip of the day"),
-          h("p", null, data.tip.englishGloss + " · " + data.tip.concept),
-          h("p", null, props.target + ": ", h("strong", { lang: props.target }, data.tip.term)),
-          data.tip.notes || data.tip.register && data.tip.register !== "universal" ? h("p", null, [data.tip.register, data.tip.notes].filter(Boolean).join(" · ")) : null,
-          h("ul", { className: "list-disc pl-5" }, (data.tip.contrasts || []).map(function (r) {
+          h("p", null, currentData.tip.englishGloss + " · " + currentData.tip.concept),
+          h("p", null, props.target + ": ", h("strong", { lang: props.target }, currentData.tip.term)),
+          currentData.tip.notes || currentData.tip.register && currentData.tip.register !== "universal" ? h("p", null, [currentData.tip.register, currentData.tip.notes].filter(Boolean).join(" · ")) : null,
+          h("ul", { className: "list-disc pl-5" }, (currentData.tip.contrasts || []).map(function (r) {
             return h("li", { key: r.variant }, r.variant + ": ", h("span", { lang: r.variant }, r.term));
           }))),
-        h("div", { className: "space-y-3" }, h("p", null, data.stats.due + " due · " + (data.quiz.practice ? "Just for practice" : "One quick question")),
-          data.quiz.concept ? h("form", { onSubmit: submit, className: "space-y-2" },
-            h("label", { className: "block" }, data.quiz.question,
-              h("input", { style: inputStyle, "aria-label": data.quiz.question, maxLength: 500, value: answer, disabled: busy, autoComplete: "off", onChange: function (e) { setAnswer(e.target.value); } })),
+        h("div", { className: "space-y-3" }, h("p", null, currentData.stats.due + " due · " + (currentData.quiz.practice ? "Just for practice" : "One quick question")),
+          currentData.quiz.concept ? h("form", { onSubmit: submit, className: "space-y-2" },
+            h("label", { className: "block" }, currentData.quiz.question,
+              h("input", { style: inputStyle, "aria-label": currentData.quiz.question, maxLength: 500, value: answer, disabled: busy, autoComplete: "off", onChange: function (e) { setAnswer(e.target.value); } })),
             h("button", { style: buttonStyle, type: "submit", disabled: busy || !answer.trim() }, busy ? "Checking…" : "Check answer"))
             : h("p", null, "All caught up. Come back when you feel like it."),
-          h("p", { role: "status", "aria-live": "polite" }, feedback ? (feedback.correct ? "Correct" : "Good try") + " · " + (feedback.comparison ? feedback.comparison.term : feedback.term) + ". Due " + (feedback.card ? feedback.card.due : feedback.due) + "." : ""))) : null);
+          h("p", { role: "status", "aria-live": "polite" }, currentFeedback ? (currentFeedback.correct ? "Correct" : "Good try") + " · " + (currentFeedback.comparison ? currentFeedback.comparison.term : currentFeedback.term) + ". Due " + (currentFeedback.card ? currentFeedback.card.due : currentFeedback.due) + "." : ""))) : null);
   }
 
   function DialectosPage() {

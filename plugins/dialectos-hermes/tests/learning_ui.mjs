@@ -86,9 +86,9 @@ assert.match(JSON.stringify(tree), /colectivo/)
 assert.match(JSON.stringify(tree), /2026-11-12/)
 assert.doesNotMatch(JSON.stringify(tree), /undefined/)
 assert.ok(nodes(tree).some(x => x.props?.['aria-live'] === 'polite'))
-if (kind === 'desktop-switch') {
+if (kind.endsWith('-switch')) {
   const oldInput = nodes(tree).find(x => x.type === 'input')
-  oldInput.props.onChange({ target: { value: 'colectivo' } })
+  oldInput.props.onChange({ target: { value: 'old answer' } })
   tree = render()
   activeTarget = 'es-MX'
   tree = render()
@@ -102,4 +102,4 @@ if (kind === 'desktop-switch') {
   assert.equal(nodes(tree).find(x => x.type === 'input')?.props.value, '', 'an answer from the old dialect must be cleared')
   assert.equal(calls.filter(c => c.options?.method === 'POST').length, 1, 'switching dialect must not submit the old quiz')
 }
-console.log(`${kind}: comparison, due count, keyboard answer, feedback${kind === 'desktop-switch' ? ' and dialect switch' : ''} passed`)
+console.log(`${kind}: comparison, due count, keyboard answer, feedback${kind.endsWith('-switch') ? ' and dialect switch' : ''} passed`)
