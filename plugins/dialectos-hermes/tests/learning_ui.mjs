@@ -5,6 +5,7 @@ import vm from 'node:vm'
 import assert from 'node:assert/strict'
 
 const kind = process.argv[2]
+const surface = kind.startsWith('desktop') ? 'desktop' : 'dashboard'
 const fixture = process.argv.includes('--fixture') ? JSON.parse(fs.readFileSync(0, 'utf8')) : null
 const root = new URL('../', import.meta.url)
 const slots = []
@@ -24,9 +25,12 @@ const hooks = {
   },
   useCallback: fn => fn,
 }
-const reply = path => path.includes('action=tip') ? { ok: true, data: { concept: 'bus', variant: 'es-AR', term: 'colectivo', englishGloss: 'public transit vehicle', contrasts: [{ variant: 'es-MX', term: 'camión' }] } }
+const reply = path => {
+  const dialect = new URLSearchParams(path.split('?')[1]).get('dialect')
+  return path.includes('action=tip') ? { ok: true, data: { concept: 'bus', variant: dialect, term: dialect === 'es-MX' ? 'camión' : 'colectivo', englishGloss: 'public transit vehicle', contrasts: [{ variant: dialect === 'es-MX' ? 'es-AR' : 'es-MX', term: dialect === 'es-MX' ? 'colectivo' : 'camión' }] } }
   : path.includes('action=stats') ? { ok: true, data: { due: 1 } }
-  : { ok: true, data: { concept: 'bus', variant: 'es-AR', question: 'In es-AR, what do you call a bus?' } }
+  : { ok: true, data: { concept: 'bus', variant: dialect, question: `In ${dialect}, what do you call a bus?` } }
+}
 const request = async (path, options) => {
   calls.push({ path, options })
   if (options?.method === 'POST' && fixture) return fixture.answer
@@ -41,7 +45,7 @@ const components = Object.fromEntries(['Button', 'Card', 'CardHeader', 'CardTitl
 const sandbox = { ...hooks, ...components, jsx: (type, props) => h(type, props), jsxs: (type, props) => h(type, props),
   console, URLSearchParams, window: { __HERMES_PLUGIN_SDK__: { React: { createElement: h }, hooks, components, fetchJSON: request }, __HERMES_PLUGINS__: { register() {} } } }
 vm.createContext(sandbox)
-if (kind === 'desktop') {
+if (surface === 'desktop') {
   let src = fs.readFileSync(new URL('desktop/plugin.js', root), 'utf8')
   src = src.replace(/^import[\s\S]*?from ['"][^'"]+['"]\s*$/gm, '')
   src = src.slice(0, src.indexOf('export default')) + '\nglobalThis.LearnForTest = Learn;'
@@ -51,7 +55,8 @@ if (kind === 'desktop') {
   src = src.replace('window.__HERMES_PLUGINS__.register', 'globalThis.LearnForTest = Learn; window.__HERMES_PLUGINS__.register')
   vm.runInContext(src, sandbox)
 }
-function render() { cursor = 0; return sandbox.LearnForTest({ target: 'es-AR', revision: 0, ctx: { rest: request } }) }
+let activeTarget = 'es-AR'
+function render() { cursor = 0; return sandbox.LearnForTest({ target: activeTarget, revision: 0, ctx: { rest: request } }) }
 function nodes(tree) {
   if (!tree || typeof tree !== 'object') return []
   return [tree, ...[tree.props?.children].flat(Infinity).flatMap(nodes)]
@@ -81,4 +86,20 @@ assert.match(JSON.stringify(tree), /colectivo/)
 assert.match(JSON.stringify(tree), /2026-11-12/)
 assert.doesNotMatch(JSON.stringify(tree), /undefined/)
 assert.ok(nodes(tree).some(x => x.props?.['aria-live'] === 'polite'))
-console.log(`${kind}: comparison, due count, keyboard answer and feedback passed`)
+if (kind === 'desktop-switch') {
+  const oldInput = nodes(tree).find(x => x.type === 'input')
+  oldInput.props.onChange({ target: { value: 'colectivo' } })
+  tree = render()
+  activeTarget = 'es-MX'
+  tree = render()
+  assert.equal(nodes(tree).some(x => x.type === 'form'), false, 'the old dialect quiz must not be answerable while the new one loads')
+  assert.doesNotMatch(JSON.stringify(tree), /Question for es-AR|Correct/)
+  for (const effect of effects.splice(0)) effect()
+  await settle()
+  tree = render()
+  assert.match(JSON.stringify(tree), /In es-MX, what do you call a bus\?/)
+  assert.doesNotMatch(JSON.stringify(tree), /Correct/)
+  assert.equal(nodes(tree).find(x => x.type === 'input')?.props.value, '', 'an answer from the old dialect must be cleared')
+  assert.equal(calls.filter(c => c.options?.method === 'POST').length, 1, 'switching dialect must not submit the old quiz')
+}
+console.log(`${kind}: comparison, due count, keyboard answer, feedback${kind === 'desktop-switch' ? ' and dialect switch' : ''} passed`)

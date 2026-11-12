@@ -319,26 +319,30 @@ function Learn({ ctx, target, revision }) {
   const [feedback, setFeedback] = useState(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const currentData = data?.dialect === target ? data : null
+  const currentFeedback = feedback?.dialect === target ? feedback.data : null
   const load = async () => {
     const results = await Promise.all(['tip', 'stats', 'quiz'].map(action => ctx.rest(`/learn?action=${action}&dialect=${encodeURIComponent(target)}`)))
     const failed = results.find(r => !r.ok)
     if (failed) throw new Error(failed.error || 'Learning is unavailable.')
-    return { tip: results[0].data, stats: results[1].data, quiz: results[2].data }
+    return { tip: results[0].data, stats: results[1].data, quiz: results[2].data, dialect: target }
   }
   useEffect(() => {
     let active = true
     load().then(r => { if (active) { setData(r); setError('') } }, e => { if (active) setError(e.message || 'Could not load Learn.') })
     return () => { active = false }
   }, [ctx, target, revision])
+  useEffect(() => { setAnswer(''); setFeedback(null); setError('') }, [target])
   const submit = async e => {
     e.preventDefault()
-    if (busy || !answer.trim() || !data?.quiz?.concept) return
+    if (busy || !answer.trim() || !currentData?.quiz?.concept) return
     setBusy(true); setError('')
     try {
-      const res = await post(ctx, '/learn', { action: 'answer', dialect: target, concept: data.quiz.concept, answer })
+      const res = await post(ctx, '/learn', { action: 'answer', dialect: target, concept: currentData.quiz.concept, answer })
       if (!res.ok) throw new Error(res.error || 'Could not check that answer.')
-      setFeedback(res.data); setAnswer('')
-      setData(await load())
+      setFeedback({ dialect: target, data: res.data }); setAnswer('')
+      const refreshed = await load()
+      setData(current => current?.dialect === target ? refreshed : current)
     } catch (err) { setError(err.message || 'Could not load Learn.') }
     finally { setBusy(false) }
   }
@@ -346,23 +350,23 @@ function Learn({ ctx, target, revision }) {
     jsx('h2', { className: 'dos-label', children: 'Learn' }),
     jsx('p', { className: 'dos-why', children: 'One regional word at a time. Offline, private, whenever you feel like it.' }),
     error ? jsx('p', { className: 'dos-err', role: 'alert', children: error }) : null,
-    !data && !error ? jsx('p', { children: 'Loading Learn…' }) : null,
-    data ? jsxs('div', { className: 'dos-cols', children: [
+    !currentData && !error ? jsx('p', { children: 'Loading Learn…' }) : null,
+    currentData ? jsxs('div', { className: 'dos-cols', children: [
       jsxs('div', { children: [jsx('h3', { children: 'Tip of the day' }),
-        jsx('p', { children: `${data.tip.englishGloss} · ${data.tip.concept}` }),
-        jsxs('p', { children: [target, ': ', jsx('strong', { lang: target, children: data.tip.term })] }),
-        data.tip.notes || data.tip.register && data.tip.register !== 'universal'
-          ? jsx('p', { className: 'dos-why', children: [data.tip.register, data.tip.notes].filter(Boolean).join(' · ') }) : null,
-        jsx('ul', { className: 'dos-issues', children: (data.tip.contrasts || []).map(r => jsxs('li', { children: [r.variant, ': ', jsx('span', { lang: r.variant, children: r.term })] }, r.variant)) })] }),
-      jsxs('div', { children: [jsx('p', { children: `${data.stats.due} due · ${data.quiz.practice ? 'Just for practice' : 'One quick question'}` }),
-        data.quiz.concept ? jsxs('form', { onSubmit: submit, children: [
-          jsx('label', { className: 'dos-field', children: [data.quiz.question,
-            jsx('input', { 'aria-label': data.quiz.question, value: answer, maxLength: 500, autoComplete: 'off', disabled: busy,
+        jsx('p', { children: `${currentData.tip.englishGloss} · ${currentData.tip.concept}` }),
+        jsxs('p', { children: [target, ': ', jsx('strong', { lang: target, children: currentData.tip.term })] }),
+        currentData.tip.notes || currentData.tip.register && currentData.tip.register !== 'universal'
+          ? jsx('p', { className: 'dos-why', children: [currentData.tip.register, currentData.tip.notes].filter(Boolean).join(' · ') }) : null,
+        jsx('ul', { className: 'dos-issues', children: (currentData.tip.contrasts || []).map(r => jsxs('li', { children: [r.variant, ': ', jsx('span', { lang: r.variant, children: r.term })] }, r.variant)) })] }),
+      jsxs('div', { children: [jsx('p', { children: `${currentData.stats.due} due · ${currentData.quiz.practice ? 'Just for practice' : 'One quick question'}` }),
+        currentData.quiz.concept ? jsxs('form', { onSubmit: submit, children: [
+          jsx('label', { className: 'dos-field', children: [currentData.quiz.question,
+            jsx('input', { 'aria-label': currentData.quiz.question, value: answer, maxLength: 500, autoComplete: 'off', disabled: busy,
               onChange: e => setAnswer(e.target.value) })] }),
           jsx(Button, { type: 'submit', disabled: busy || !answer.trim(), children: busy ? 'Checking…' : 'Check answer' })] })
           : jsx('p', { children: 'All caught up. Come back when you feel like it.' }),
-        jsx('p', { role: 'status', 'aria-live': 'polite', children: feedback
-          ? `${feedback.correct ? 'Correct' : 'Good try'} · ${feedback.comparison?.term || feedback.term}. Due ${feedback.card?.due || feedback.due}.` : '' })] })
+        jsx('p', { role: 'status', 'aria-live': 'polite', children: currentFeedback
+          ? `${currentFeedback.correct ? 'Correct' : 'Good try'} · ${currentFeedback.comparison?.term || currentFeedback.term}. Due ${currentFeedback.card?.due || currentFeedback.due}.` : '' })] })
     ] }) : null
   ] })
 }
