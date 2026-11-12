@@ -693,7 +693,10 @@ _INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 _URL_RE = re.compile(r"https?://\S+")
 _NUM_RE = re.compile(
     r"(?:(?<![\w.,])|(?<=\bv))[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?"
-    r"(?:st|nd|rd|th|s)?(?:(?![\w])|(?=(?:mg|kg|km|gb)\b))", re.I)
+    r"(?:st|nd|rd|th|s)?(?:(?![\w])|(?=(?:"
+    r"mcg|μg|ug|mg|kg|g|ml|l|km|cm|mm|m|kb|mb|gb|tb|b)\b))",
+    re.IGNORECASE,
+)
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 _TIME_12H_RE = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?\s?m\.?(?!\w)", re.I)
 _TIME_24H_RE = re.compile(r"(?<!\d)([01]?\d|2[0-3])[:h]([0-5]\d)(?!\w)", re.I)
@@ -774,8 +777,13 @@ _EN_SPELLED.update({"30": ("thirty",), "40": ("forty",), "50": ("fifty",), "60":
 _EN_SPELLED["1"] = ("one", "a", "an", "once")
 _EN_UNITS = "one two three four five six seven eight nine".split()
 _EN_TENS = "twenty thirty forty fifty sixty seventy eighty ninety".split()
-_EN_NUMBER_WORDS = frozenset(
-    _EN_UNITS + _EN_TENS + "ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen hundred".split())
+_EN_NUMBER_WORDS = frozenset({
+    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
+    "eighteen", "nineteen", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+    "eighty", "ninety", "hundred", "thousand", "once", "dozen",
+})
+_EN_COMPOUND_EXCLUDED = frozenset(("a", "an", "once", "dozen"))
 for tens, base in zip(_EN_TENS, range(20, 100, 10)):
     for unit, offset in zip(_EN_UNITS, range(1, 10)):
         _EN_SPELLED[str(base + offset)] = (f"{tens}-{unit}",)
@@ -785,35 +793,43 @@ for unit, base in zip(_EN_UNITS, range(100, 1000, 100)):
         _EN_SPELLED[str(base)] = (f"{unit} hundred",)
     for remainder in range(1, 100):
         for rest in _EN_SPELLED[str(remainder)]:
-            _EN_SPELLED[str(base + remainder)] = (
-                f"{unit} hundred {rest}", f"{unit} hundred and {rest}")
+            if rest in _EN_COMPOUND_EXCLUDED:
+                continue
+            key = str(base + remainder)
+            aliases = _EN_SPELLED.get(key, ())
+            _EN_SPELLED[key] = tuple(dict.fromkeys(
+                (*aliases, f"{unit} hundred {rest}", f"{unit} hundred and {rest}")))
+_EN_NUMBER_FORMS = frozenset(
+    re.sub(r"[^\w]+", " ", form.casefold()).strip()
+    for forms in _EN_SPELLED.values() for form in forms)
+_EN_NUMBER_RE = re.compile(
+    r"(?<!\w)(?:" + "|".join(
+        re.escape(form) for form in sorted(_EN_NUMBER_FORMS, key=len, reverse=True)) + r")(?!\w)")
 _ES_NUMBER_WORDS = frozenset(w for forms in _ES_SPELLED.values() for f in forms for w in f.split()) | {"mil"}
 _MIN_WORDS_FOR_LANG = 6
 
 
 def _spelled_alone(form: str, normalized: str) -> bool:
-    """True when the spelled number appears as a whole number, not a larger number's prefix."""
-    padded = " " + re.sub(r"[^\w]+", " ", form.casefold()).strip() + " "
+    """True when the spelled number is a complete number phrase in the text."""
+    phrase = re.sub(r"[^\w]+", " ", form.casefold()).strip()
+    if phrase in _EN_NUMBER_FORMS:
+        for match in _EN_NUMBER_RE.finditer(normalized):
+            if match.group() != phrase:
+                continue
+            before = normalized[:match.start()].rstrip().split()
+            after = normalized[match.end():].lstrip().split()
+            previous = before[-1] if before else ""
+            following = after[0] if after else ""
+            if previous not in _EN_NUMBER_WORDS and following not in _EN_NUMBER_WORDS:
+                return True
+        return False
+
+    padded = " " + phrase + " "
     start = normalized.find(padded)
     while start != -1:
-        following_words = normalized[start + len(padded):].split()
-        rest = following_words[0] if following_words else ""
-        next_word = following_words[1] if len(following_words) > 1 else ""
-        previous = normalized[:start].rstrip().split(" ")[-1]
-        form_words = re.sub(r"[^\w]+", " ", form.casefold()).split()
-        english_prefix = (
-            (len(form_words) == 1 and (
-                (form_words[0] in _EN_TENS and rest in _EN_UNITS)
-                or (form_words[0] in _EN_UNITS and rest == "hundred")
-                or (form_words[0] == "hundred" and previous in _EN_UNITS)
-                or (form_words[0] == "hundred" and rest in _EN_NUMBER_WORDS)
-            ))
-            or (form_words[-1] == "hundred" and (
-                rest in _EN_NUMBER_WORDS
-                or (rest == "and" and next_word in _EN_NUMBER_WORDS)
-            ))
-        )
-        if (rest not in _ES_NUMBER_WORDS - {"y"} or form.casefold() != "ciento") and not english_prefix:
+        rest = normalized[start + len(padded):].split()
+        following = rest[0] if rest else ""
+        if following not in _ES_NUMBER_WORDS - {"y"} or form.casefold() != "ciento":
             return True
         start = normalized.find(padded, start + 1)
     return False

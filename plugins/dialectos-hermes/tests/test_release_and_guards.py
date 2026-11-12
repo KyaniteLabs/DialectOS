@@ -162,6 +162,31 @@ def test_spelled_out_small_numbers_pass(plugin, passing_cli):
     assert data["valid"] is True
 
 
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Take twenty-one tablets.", "Tome 1 comprimido."),
+    ("Wait two hundred twenty-one days.", "Espera 21 días."),
+])
+def test_spelled_number_suffixes_are_not_whole_quantities(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is False
+    assert data["pluginGuards"]["passed"] is False
+
+
+def test_compound_english_number_aliases_accumulate_without_grammatical_forms(
+    plugin, passing_cli
+):
+    assert "one hundred and one" in plugin._EN_SPELLED["101"]
+    assert "one hundred and twelve" in plugin._EN_SPELLED["112"]
+    assert "one hundred once" not in plugin._EN_SPELLED["101"]
+    assert "one hundred and once" not in plugin._EN_SPELLED["101"]
+    assert "one hundred dozen" not in plugin._EN_SPELLED["112"]
+    assert "one hundred and dozen" not in plugin._EN_SPELLED["112"]
+    data = _verdict(plugin, "Espera 101 días.", "Wait one hundred and one days.")
+    assert data["valid"] is True
+
+
 @pytest.mark.parametrize("translated", [
     "Che, solo ha sido un día largo.",
     "Os enviamos dos correos con vuestra factura.",
@@ -180,6 +205,22 @@ def test_guards_accept_spelled_numbers_and_localized_24_hour_times(plugin, passi
     data = _verdict(plugin, translated, source)
     assert data["valid"] is True
     assert data["pluginGuards"]["passed"] is True
+
+
+@pytest.mark.parametrize(("source", "translated", "expected_valid"), [
+    ("10ml", "20ml", False),
+    ("10ml", "10 ml", True),
+    ("500MB", "900MB", False),
+    ("500MB", "500 MB", True),
+    ("100cm", "200cm", False),
+    ("100cm", "100 cm", True),
+])
+def test_attached_units_keep_numbers_in_validation(
+    plugin, passing_cli, source, translated, expected_valid
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is expected_valid
+    assert data["pluginGuards"]["passed"] is expected_valid
 
 
 @pytest.mark.parametrize(("source", "translated"), [
