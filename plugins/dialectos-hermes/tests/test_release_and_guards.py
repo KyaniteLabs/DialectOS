@@ -214,6 +214,15 @@ def test_guards_accept_spelled_numbers_and_localized_24_hour_times(plugin, passi
     ("500MB", "500 MB", True),
     ("100cm", "200cm", False),
     ("100cm", "100 cm", True),
+    ("5cm", "5 cm", True),
+    ("100MB", "100 MB", True),
+    ("Wait 30min.", "Espera 30 min.", True),
+    ("60fps", "60 fps", True),
+    ("220V", "220 V", True),
+    ("5lbs", "5 lbs", True),
+    ("3GHz", "3 GHz", True),
+    ("100W", "100 W", True),
+    ("It costs $10k.", "Cuesta $10 mil.", True),
 ])
 def test_attached_units_keep_numbers_in_validation(
     plugin, passing_cli, source, translated, expected_valid
@@ -241,6 +250,95 @@ def test_r5_1_source_number_forms_are_preserved(plugin, passing_cli, source, tra
     data = _verdict(plugin, translated, source)
     assert data["valid"] is True
     assert data["pluginGuards"]["passed"] is True
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Go to the 2nd floor.", "Ve al segundo piso."),
+    ("Art of the 21st century.", "Arte del siglo XXI."),
+    ("It is her 3rd attempt.", "Es su tercer intento."),
+    ("This is the 4th time.", "Es la cuarta vez."),
+    ("The 5th page.", "La quinta página."),
+    ("The 6th attempt.", "El sexto intento."),
+    ("The 7th floor.", "La séptima planta."),
+    ("The 8th time.", "La octava vez."),
+    ("The 9th chapter.", "El noveno capítulo."),
+    ("The 10th anniversary.", "El décimo aniversario."),
+    ("The 20th anniversary.", "El vigésimo aniversario."),
+    ("Twenty-first floor.", "Piso 21."),
+])
+def test_ordinal_numbers_allow_spanish_ordinals_and_century_roman_numerals(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+    assert data["pluginGuards"]["passed"] is True
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Two thousand people came.", "Vinieron 2000 personas."),
+    ("One thousand two hundred users.", "1200 usuarios."),
+    ("In the 1990s.", "En los años 1990."),
+    ("In the 1990s.", "En los años 90."),
+    ("Twice a day.", "2 veces al día."),
+])
+def test_thousands_decades_and_twice_match_numeric_translations(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+    assert data["pluginGuards"]["passed"] is True
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Open from 9 am to 5 pm.", "Abierto de 9 a 17 horas."),
+])
+def test_spanish_time_ranges_accept_full_hour_word(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+    assert data["pluginGuards"]["passed"] is True
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Meet at noon.", "Nos vemos al mediodía."),
+    ("The shop closes at midnight.", "La tienda cierra a medianoche."),
+    ("The shop closes at midnight.", "La tienda cierra a la medianoche."),
+    ("Call me at five pm.", "Llámame a las cinco de la tarde."),
+    ("Open from 8 in the morning until 5 in the afternoon.",
+     "Abierto de 8 de la mañana a 5 de la tarde."),
+    ("Come before 6 in the evening.", "Ven antes de las 6 de la tarde."),
+    ("The meeting is at 5 pm.", "La reunión es sobre las 17 h."),
+    ("Arrive before 5 pm.", "Llegue antes de las 17 h."),
+    ("It is 5 pm.", "Son las 17 h."),
+])
+def test_english_and_spanish_standard_times_match(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+    assert data["pluginGuards"]["passed"] is True
+
+
+@pytest.mark.parametrize(("source", "expected"), [
+    ("Open from 8 in the morning.", [8 * 60]),
+    ("Stay until 5 in the afternoon.", [17 * 60]),
+    ("Come before 6 in the evening.", [18 * 60]),
+    ("Leave after 5 in the afternoon.", [17 * 60]),
+    ("Finish by 4 in the evening.", [16 * 60]),
+    ("Meet around 3 in the afternoon.", [15 * 60]),
+])
+def test_english_day_period_times_accept_common_cues(plugin, source, expected):
+    assert [minute for minute, _ in plugin._time_matches(source)] == expected
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Take 2 tablets with a glass of water.", "Tome 1 tableta con 2 vasos de agua."),
+    ("Take the pills with a meal.", "Tome 1 pastilla con la comida."),
+    ("Wait an hour.", "Espera 1 hora y 1 hora."),
+])
+def test_articles_before_nonunits_do_not_hide_extra_numbers(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is False
+    assert data["pluginGuards"]["passed"] is False
 
 
 @pytest.mark.parametrize("source", [
@@ -367,6 +465,8 @@ def test_adversarial_numbers_and_times_are_not_lost(plugin, passing_cli, source,
     ("2nd floor", "2.º piso"),
     ("due on the 15th", "el día 15"),
     ("Wait an hour.", "Espera 1 hora."),
+    ("Wait a day.", "Espera 1 día."),
+    ("Wait a week.", "Espera 1 semana."),
     ("Once a day", "1 vez al día"),
     ("Twenty-one days", "21 días"),
     # Decades should be localized as decades; the old En 1990 expectation was incorrect.

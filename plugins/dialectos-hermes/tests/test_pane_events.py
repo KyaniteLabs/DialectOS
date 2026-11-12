@@ -182,3 +182,13 @@ def test_ci_pins_and_supplies_native_hermes_runtime():
     workflow = (repo_root / '.github' / 'workflows' / 'ci.yml').read_text()
     assert 'ref: 2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19 # v0.23.0' in workflow
     assert 'HERMES023_PATH: ${{ github.workspace }}/.hermes-v023-runtime' in workflow
+
+
+def test_forgejo_profile_runs_plugin_pytests_with_pinned_hermes():
+    repo_root = Path(__file__).resolve().parents[3]
+    profile = json.loads((repo_root / '.ci' / 'profile.json').read_text())
+    steps = [" ".join(step["argv"]) for step in profile["steps"]]
+    command = next(step for step in steps if "plugins/dialectos-hermes/tests" in step)
+    assert "2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19" in command
+    assert 'HERMES023_PATH="$PWD/.hermes-v023-runtime"' in command
+    assert "-m pytest plugins/dialectos-hermes/tests" in command

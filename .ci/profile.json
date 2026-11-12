@@ -16,6 +16,7 @@
     {"name": "Verify generated demo", "phase": "verify", "argv": ["pnpm", "check:generated"]},
     {"name": "Build all workspace packages", "phase": "build", "argv": ["pnpm", "build"]},
     {"name": "Run static checks and all workspace tests", "phase": "test", "argv": ["pnpm", "test", "--reporter=default", "--reporter=junit", "--outputFile.junit=.ci-results/tests.xml"], "timeout_seconds": 1800},
+    {"name": "Run DialectOS Hermes plugin regressions", "phase": "test", "argv": ["bash", "-euo", "pipefail", "-c", "apt-get update -qq >/dev/null 2>&1 && apt-get install -y -qq python3-venv >/dev/null 2>&1; ci_venv=\"${TMPDIR:-/tmp}/dialectos-hermes-venv\"; git clone --quiet --filter=blob:none --no-checkout --depth 1 https://github.com/NousResearch/hermes-agent.git .hermes-v023-runtime && git -C .hermes-v023-runtime fetch --quiet --depth 1 origin 2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19 && git -C .hermes-v023-runtime checkout --quiet FETCH_HEAD && python3 -m venv \"$ci_venv\" && \"$ci_venv/bin/pip\" install --quiet \"pytest==8.4.2\" \"PyYAML==6.0.3\" \"packaging==26.0\" \"python-dotenv==1.2.2\" \"rich==14.3.3\" \"ruamel.yaml==0.18.16\" \"httpx==0.28.1\" \"requests==2.33.0\" \"fastapi==0.162.0\" && HERMES023_PATH=\"$PWD/.hermes-v023-runtime\" \"$ci_venv/bin/python\" -m pytest plugins/dialectos-hermes/tests -q"], "timeout_seconds": 600},
     {"name": "Exercise built package binary", "phase": "acceptance", "argv": ["node", "scripts/ci-artifact-smoke.mjs"]}
   ]
 }
