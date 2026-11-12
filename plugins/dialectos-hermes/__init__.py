@@ -691,14 +691,17 @@ GUARD_SCOPE = (
 _FENCE_RE = re.compile(r"(?ms)^\s*(```|~~~).*?^\s*\1[^\n]*$")
 _INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 _URL_RE = re.compile(r"https?://\S+")
-_NUM_RE = re.compile(r"(?<![\w.,])[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?![\w])")
+_NUM_RE = re.compile(
+    r"(?<![\w.,])[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?:st|nd|rd|th|s)?(?![\w])", re.I)
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
-_TIME_12H_RE = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?m\.?(?!\w)", re.I)
+_TIME_12H_RE = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?\s?m\.?(?!\w)", re.I)
 _TIME_24H_RE = re.compile(r"(?<!\d)([01]?\d|2[0-3])[:h]([0-5]\d)(?!\w)", re.I)
-# "17 h" and "las 17 horas" are clock times, but "cada 4-6 horas" is a duration. A bare
-# hour counts as a time only after "la/las" or when the source has that same clock time.
+_TIME_EN_HOUR_RE = re.compile(
+    r"\bat\s+(?P<h>[01]?\d|2[0-3])\s+h(?:ours?)?(?!\w)", re.I)
+# A Spanish hour is a clock time after a time preposition, or when it matches a source time.
 _TIME_ES_HOUR_RE = re.compile(
-    r"(?<![\w\d])(?:(?P<art>las?)\s+)?(?P<h>[01]?\d|2[0-3])\s*h(?:oras?)?(?!\w)", re.I)
+    r"(?<![\w\d])(?:(?P<prep>a\s+|desde\s+|hasta\s+)?(?P<art>las?)\s+)?"
+    r"(?P<h>[01]?\d|2[0-3])\s*h(?:oras?)?(?!\w)", re.I)
 # Spanish day periods: "4 de la tarde" is 16:00, "12 de la noche" is midnight.
 # English day periods: "8 in the morning" is 08:00, "3 in the afternoon" is 15:00.
 _TIME_EN_PERIOD_RE = re.compile(
@@ -755,19 +758,49 @@ _EN_SPELLED = {
 _EN_SPELLED.update({"30": ("thirty",), "40": ("forty",), "50": ("fifty",), "60": ("sixty",),
                     "70": ("seventy",), "80": ("eighty",), "90": ("ninety",), "12": ("twelve", "dozen"),
                     "100": ("hundred",), "1000": ("thousand",)})
+_EN_SPELLED["1"] = ("one", "a", "an", "once")
+_EN_UNITS = "one two three four five six seven eight nine".split()
+_EN_TENS = "twenty thirty forty fifty sixty seventy eighty ninety".split()
+_EN_NUMBER_WORDS = frozenset(
+    _EN_UNITS + _EN_TENS + "ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen hundred".split())
+for tens, base in zip(_EN_TENS, range(20, 100, 10)):
+    for unit, offset in zip(_EN_UNITS, range(1, 10)):
+        _EN_SPELLED[str(base + offset)] = (f"{tens}-{unit}",)
+_EN_SPELLED["100"] = ("hundred", "one hundred")
+for unit, base in zip(_EN_UNITS, range(100, 1000, 100)):
+    if base > 100:
+        _EN_SPELLED[str(base)] = (f"{unit} hundred",)
+    for remainder in range(1, 100):
+        for rest in _EN_SPELLED[str(remainder)]:
+            _EN_SPELLED[str(base + remainder)] = (
+                f"{unit} hundred {rest}", f"{unit} hundred and {rest}")
 _ES_NUMBER_WORDS = frozenset(w for forms in _ES_SPELLED.values() for f in forms for w in f.split()) | {"mil"}
 _MIN_WORDS_FOR_LANG = 6
 
 
 def _spelled_alone(form: str, normalized: str) -> bool:
-    """True when the spelled number appears as a whole number, not the start of a larger one.
-
-    "ciento veinte" is 120, so "ciento" only counts as 100 when no number word follows it."""
+    """True when the spelled number appears as a whole number, not a larger number's prefix."""
     padded = " " + re.sub(r"[^\w]+", " ", form.casefold()).strip() + " "
     start = normalized.find(padded)
     while start != -1:
-        rest = normalized[start + len(padded):].split(" ", 1)[0]
-        if rest not in _ES_NUMBER_WORDS - {"y"} or form.casefold() != "ciento":
+        following_words = normalized[start + len(padded):].split()
+        rest = following_words[0] if following_words else ""
+        next_word = following_words[1] if len(following_words) > 1 else ""
+        previous = normalized[:start].rstrip().split(" ")[-1]
+        form_words = re.sub(r"[^\w]+", " ", form.casefold()).split()
+        english_prefix = (
+            (len(form_words) == 1 and (
+                (form_words[0] in _EN_TENS and rest in _EN_UNITS)
+                or (form_words[0] in _EN_UNITS and rest == "hundred")
+                or (form_words[0] == "hundred" and previous in _EN_UNITS)
+                or (form_words[0] == "hundred" and rest in _EN_NUMBER_WORDS)
+            ))
+            or (form_words[-1] == "hundred" and (
+                rest in _EN_NUMBER_WORDS
+                or (rest == "and" and next_word in _EN_NUMBER_WORDS)
+            ))
+        )
+        if (rest not in _ES_NUMBER_WORDS - {"y"} or form.casefold() != "ciento") and not english_prefix:
             return True
         start = normalized.find(padded, start + 1)
     return False
@@ -793,6 +826,7 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
     scrubbed = _URL_RE.sub(" ", text)
     for match in _NUM_RE.finditer(scrubbed):
         raw = match.group(0).replace(" ", "").replace(" ", "").replace(" ", "")
+        raw = re.sub(r"(?:st|nd|rd|th|s)$", "", raw, flags=re.I)
         sign = "-" if raw.startswith(("-", "−")) else ""
         raw = raw.lstrip("+-−")
         is_version = bool(_VERSION_CUE_RE.search(scrubbed[:match.start()]))
@@ -861,20 +895,40 @@ def _time_matches(text: str, source_minutes=()):
             continue
         matches.append((int(match.group(1)) * 60 + int(match.group(2) or "0"), span))
         occupied.append(span)
+    for match in _TIME_EN_HOUR_RE.finditer(text):
+        span = match.span()
+        if any(span[0] < end and start < span[1] for start, end in occupied):
+            continue
+        matches.append((int(match.group("h")) * 60, span))
+        occupied.append(span)
     unclaimed = list(source_minutes)
     for minute, _ in matches:
         if minute in unclaimed:
             unclaimed.remove(minute)
-    for match in _TIME_ES_HOUR_RE.finditer(text):
-        span = match.span("h")[0], match.end()
+    spanish_hours = list(_TIME_ES_HOUR_RE.finditer(text))
+    for match in spanish_hours:
+        if not match.group("art"):
+            continue
+        span = match.span()
         if any(span[0] < end and start < span[1] for start, end in occupied):
             continue
         minute = int(match.group("h")) * 60
-        if match.group("art"):
+        if match.group("prep") or minute in unclaimed:
+            if minute in unclaimed:
+                unclaimed.remove(minute)
             matches.append((minute, span))
-        elif minute in unclaimed:
+            occupied.append(span)
+    for match in spanish_hours:
+        if match.group("art"):
+            continue
+        span = match.span()
+        if any(span[0] < end and start < span[1] for start, end in occupied):
+            continue
+        minute = int(match.group("h")) * 60
+        if minute in unclaimed:
             unclaimed.remove(minute)
             matches.append((minute, span))
+            occupied.append(span)
     return matches
 
 

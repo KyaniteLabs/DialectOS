@@ -8,6 +8,15 @@ from pathlib import Path
 import pytest
 
 
+def _hermes023_path():
+    hermes_path = os.environ.get('HERMES023_PATH')
+    if hermes_path:
+        return Path(hermes_path)
+    if os.environ.get('CI'):
+        pytest.fail('HERMES023_PATH is required for native Hermes regressions in CI')
+    pytest.skip('set HERMES023_PATH to real Hermes source')
+
+
 @pytest.fixture
 def bridge(monkeypatch):
     calls = []
@@ -130,9 +139,8 @@ def test_show_registered_with_bounded_schema(plugin):
     assert params["properties"]["item_id"]["maxLength"] == 5
 
 
-@pytest.mark.skipif(not os.environ.get('HERMES023_PATH'), reason='set HERMES023_PATH to real Hermes source')
 def test_show_uses_real_hermes_v023_event_bridge(plugin, monkeypatch):
-    hermes_path = Path(os.environ['HERMES023_PATH'])
+    hermes_path = _hermes023_path()
     assert (hermes_path / 'hermes_cli' / 'plugin_events.py').is_file()
     monkeypatch.syspath_prepend(str(hermes_path))
     for name in ('hermes_cli', 'hermes_cli.plugin_events'):
@@ -149,11 +157,10 @@ def test_show_uses_real_hermes_v023_event_bridge(plugin, monkeypatch):
     assert frames == [('plugin.dialectos.view.set', {'view': 'by_dialect', 'item_id': 'es-AR'})]
 
 
-@pytest.mark.skipif(not os.environ.get('HERMES023_PATH'), reason='set HERMES023_PATH to real Hermes source')
 def test_tool_calls_outside_the_tui_keep_stdout_on_stdout(plugin, monkeypatch):
     """Roast r4 X-R4-1: importing the real bridge loads tui_gateway.server, which swaps
     sys.stdout to stderr, so "hermes chat -q" answers would leave on stderr."""
-    monkeypatch.syspath_prepend(os.environ['HERMES023_PATH'])
+    monkeypatch.syspath_prepend(str(_hermes023_path()))
     for name in ('hermes_cli', 'hermes_cli.plugin_events', 'tui_gateway', 'tui_gateway.server'):
         monkeypatch.delitem(sys.modules, name, raising=False)
     stdout, excepthook = sys.stdout, sys.excepthook
@@ -161,3 +168,17 @@ def test_tool_calls_outside_the_tui_keep_stdout_on_stdout(plugin, monkeypatch):
     assert json.loads(plugin._tool_show({'view': 'check'}))['ok'] is True
     assert 'tui_gateway.server' not in sys.modules
     assert sys.stdout is stdout and sys.excepthook is excepthook
+
+
+def test_missing_native_runtime_fails_in_ci(plugin, monkeypatch):
+    monkeypatch.delenv('HERMES023_PATH', raising=False)
+    monkeypatch.setenv('CI', 'true')
+    with pytest.raises(pytest.fail.Exception, match='HERMES023_PATH is required'):
+        _hermes023_path()
+
+
+def test_ci_pins_and_supplies_native_hermes_runtime():
+    repo_root = Path(__file__).resolve().parents[3]
+    workflow = (repo_root / '.github' / 'workflows' / 'ci.yml').read_text()
+    assert 'ref: 2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19 # v0.23.0' in workflow
+    assert 'HERMES023_PATH: ${{ github.workspace }}/.hermes-v023-runtime' in workflow
