@@ -746,9 +746,15 @@ _TIME_UNIT_FACTORS = {
 _TIME_UNIT_WORDS = {
     alias for name in _TIME_UNIT_FACTORS for alias in _UNIT_GROUPS[name]
 }
+_LENGTH_UNIT_FACTORS = {
+    "micrometer": Decimal("0.000001"), "millimeter": Decimal("0.001"),
+    "centimeter": Decimal("0.01"), "meter": Decimal(1),
+    "kilometer": Decimal(1000), "mile": Decimal("1609.344"),
+}
+_CONVERTIBLE_UNIT_FACTORS = {**_TIME_UNIT_FACTORS, **_LENGTH_UNIT_FACTORS}
 _NUM_CORE = r"[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?"
 _NUM_RE = re.compile(
-    rf"(?:(?<![\w.,])|(?<=\bv)){_NUM_CORE}(?:st|nd|rd|th|s|x)?"
+    rf"(?:(?<![\w.,])|(?<=\bv)|(?<=USD)|(?<=EUR)|(?<=GBP)){_NUM_CORE}(?:st|nd|rd|th|s|x)?"
     rf"(?:(?![\w])|(?=(?:{_UNIT_PATTERN}|[A-Za-z]{{1,4}})(?![A-Za-z])))",
     re.IGNORECASE,
 )
@@ -808,6 +814,18 @@ _TIME_EN_WORD_HOUR_RE = re.compile(
     r"\b(?P<cue>at|until|from|before|after|by|around)\s+"
     r"(?P<h>one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)(?!\w)",
     re.IGNORECASE)
+_TIME_EN_WORD_RANGE_RE = re.compile(
+    r"\bfrom\s+(?P<start>one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)"
+    r"\s+to\s+(?P<end>one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b",
+    re.IGNORECASE)
+_TIME_ES_WORD_RANGE_RE = re.compile(
+    r"\b(?:de|desde|entre)\s+(?:(?:las?|los)\s+)?"
+    r"(?P<start>una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce)"
+    r"\s+(?:a|hasta|y)\s+(?:(?:las?|los)\s+)?"
+    r"(?P<end>una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce)\b",
+    re.IGNORECASE)
+_TIME_EN_OCLOCK_RE = re.compile(
+    r"(?<!\d)(?P<h>1[0-2]|0?[1-9])\s+o'clock\b", re.IGNORECASE)
 _TIME_ES_DIGIT_WORD_HOUR_RE = re.compile(
     r"(?<!\w)(?:(?P<verb>son)\s+las?|(?P<prep>(?:(?:a|hasta|desde|de|para|sobre)\s+|"
     r"(?:antes|después)\s+de\s+)las?))\s+(?P<h>[01]?\d|2[0-3])(?!\d)",
@@ -1088,10 +1106,137 @@ _ES_CARDINAL_UNIT_RE = re.compile(
     rf"(?P<unit>{_UNIT_PATTERN})(?!\w)", re.IGNORECASE)
 _ES_CARDINAL_WORDS = {word for form in _ES_CARDINAL_VALUE for word in form.split()}
 _UNIT_WORDS = {word for alias in _UNIT_CANONICAL for word in re.findall(r"[a-záéíóúüñ]+", alias)}
+_EN_CARDINAL_FORM_VALUES = {}
+for _cardinal, _forms in _EN_SPELLED.items():
+    if int(_cardinal) <= 999:
+        for _form in _forms:
+            if _form not in {"once", "twice"}:
+                _EN_CARDINAL_FORM_VALUES[_form.replace("-", " ").casefold()] = int(_cardinal)
+_EN_CARDINAL_ATOM_VALUES = {
+    word: value for phrase, value in _EN_CARDINAL_FORM_VALUES.items()
+    if len(phrase.split()) == 1 for word in (phrase,)
+}
+_EN_ORDINAL_WORD_VALUES = {
+    form.replace("-", " ").casefold(): number
+    for number, form in _EN_ORDINALS.items()
+}
+_EN_CARDINAL_SCAN_WORDS = frozenset(
+    (_EN_NUMBER_WORDS - {"once", "twice"}) | {"and", "a", "an"}
+    | {word for form in _EN_ORDINAL_WORD_VALUES for word in form.split()}
+)
+_EN_SCALE_VALUES = {
+    "hundred": 100, "thousand": 1_000, "million": 1_000_000,
+    "billion": 1_000_000_000, "trillion": 1_000_000_000_000,
+}
+_SPELLABLE_COUNT_UNITS = _UNIT_WORDS | _DOSE_UNIT_ALIASES | {
+    "pill", "pills", "capsule", "capsules", "dose", "doses",
+}
+
+
+def _english_cardinal_value(phrase: str) -> int | None:
+    normalized = re.sub(r"[-\s]+", " ", phrase.casefold()).strip()
+    if normalized in _EN_CARDINAL_FORM_VALUES:
+        return _EN_CARDINAL_FORM_VALUES[normalized]
+    tokens = normalized.split()
+    if not tokens:
+        return None
+    if len(tokens) > 1 and tokens[-1] in _EN_ORDINAL_WORD_VALUES:
+        prefix = tokens[:-1]
+        if prefix and prefix[-1] == "and":
+            prefix.pop()
+        base = _english_cardinal_value(" ".join(prefix))
+        if base is not None and (
+            any(token in _EN_SCALE_VALUES for token in prefix)
+            or len(prefix) == 1 and prefix[0] in {
+                "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
+            }
+        ):
+            return base + _EN_ORDINAL_WORD_VALUES[tokens[-1]]
+    if any(
+        token == "and" and (index == 0 or tokens[index - 1] not in _EN_SCALE_VALUES)
+        for index, token in enumerate(tokens)
+    ):
+        return None
+    total = current = 0
+    for index, token in enumerate(tokens):
+        if token in _EN_SCALE_VALUES:
+            scale = _EN_SCALE_VALUES[token]
+            if scale == 100:
+                current = max(1, current) * scale
+            else:
+                total += max(1, current) * scale
+                current = 0
+        elif token in _EN_CARDINAL_ATOM_VALUES:
+            current += _EN_CARDINAL_ATOM_VALUES[token]
+        elif token in {"a", "an"} and index + 1 < len(tokens) and tokens[index + 1] in _EN_SCALE_VALUES:
+            current += 1
+        elif token == "and":
+            continue
+        else:
+            return None
+    return total + current
+
+
+def _english_spelled_numbers(text: str):
+    tokens = list(_WORD_RE.finditer(text))
+    numeric_spans = []
+    for match in _NUM_RE.finditer(text):
+        end = match.end()
+        scale = re.match(
+            r"\s+(?:thousand|million|billion|trillion)(?!\w)", text[end:], re.IGNORECASE
+        )
+        if scale:
+            end += scale.end()
+        numeric_spans.append((match.start(), end))
+    normalized = " " + re.sub(r"[^\w]+", " ", text.casefold()) + " "
+    values = []
+    index = 0
+    while index < len(tokens):
+        current = tokens[index].group(0).casefold()
+        if current in _EN_ORDINAL_WORD_VALUES:
+            previous = tokens[index - 1].group(0).casefold() if index else ""
+            ordinal_value = _EN_ORDINAL_WORD_VALUES[current]
+            ordinal_suffix = "st" if ordinal_value % 10 == 1 and ordinal_value % 100 != 11 else (
+                "nd" if ordinal_value % 10 == 2 and ordinal_value % 100 != 12 else (
+                    "rd" if ordinal_value % 10 == 3 and ordinal_value % 100 != 13 else "th"
+                )
+            )
+            span = _number_phrase_span(current, normalized, "en", ordinal=True)
+            if span is not None and previous in {
+                "the", "my", "our", "his", "her", "their", "its", "this", "that"
+            } and not (current == "second" and previous in {"a", "one"}):
+                values.append((f"{ordinal_value}{ordinal_suffix}", frozenset({str(ordinal_value)})))
+                index += 1
+                continue
+        if current not in _EN_CARDINAL_SCAN_WORDS:
+            index += 1
+            continue
+        end = index
+        while end + 1 < len(tokens):
+            gap = text[tokens[end].end():tokens[end + 1].start()]
+            if (not re.fullmatch(r"[\s-]+", gap)
+                    or tokens[end + 1].group(0).casefold() not in _EN_CARDINAL_SCAN_WORDS):
+                break
+            end += 1
+        phrase = text[tokens[index].start():tokens[end].end()]
+        amount = _english_cardinal_value(phrase)
+        next_word = tokens[end + 1].group(0).casefold() if end + 1 < len(tokens) else ""
+        has_scale = bool(set(phrase.casefold().replace("-", " ").split()) & _EN_SCALE_VALUES.keys())
+        has_unit = next_word in _SPELLABLE_COUNT_UNITS
+        has_ordinal = tokens[end].group(0).casefold() in _EN_ORDINAL_WORD_VALUES
+        span = _number_phrase_span(phrase, normalized, "en", ordinal=has_ordinal)
+        if (amount is not None and (has_scale or has_unit) and span is not None
+                and not any(span[0] < stop and start < span[1] for start, stop in numeric_spans)):
+            values.append((phrase, frozenset({str(amount)})))
+            index = end + 1
+            continue
+        index += 1
+    return values
 
 
 def _es_cardinal_value(number: str):
     phrase = re.sub(r"\s+", " ", number.casefold()).strip()
+    phrase = re.sub(r"\b(mil)\s+y\s+", r"\1 ", phrase)
     scale_match = re.fullmatch(
         r"(.+?)\s+(mill[oó]n(?:es)?|bill[oó]n(?:es)?|trill[oó]n(?:es)?)", phrase)
     if scale_match:
@@ -1169,6 +1314,29 @@ _ARTICLE_UNITS = frozenset((
     "teaspoons", "tablespoon", "tablespoons", "pill", "pills", "tablet", "tablets", "capsule",
     "capsules", "drop", "drops", "dose", "doses", "spoonful", "spoonfuls",
 ))
+_TIME_COUNT_NOUNS = frozenset(_ARTICLE_UNITS | {
+    "people", "person", "persons", "supplier", "suppliers", "user", "users",
+    "child", "children", "page", "pages", "option", "options", "percent",
+    "percentage", "point", "points", "class", "classes", "session", "sessions",
+    "show", "shows", "shift", "shifts", "side", "sides", "meeting", "meetings",
+    "appointment", "appointments", "lecture", "lectures", "lesson", "lessons",
+    "vote", "votes", "witness", "witnesses", "location", "locations", "attempt",
+    "attempts", "example", "examples", "winner", "winners", "ganadora", "ganadoras",
+    "rule", "rules", "regla", "reglas", "color", "colors", "colour", "colours",
+    "meal", "meals", "student", "students", "key", "keys", "clave", "claves",
+    "año", "años",
+    "hora", "horas", "minuto", "minutos", "segundo", "segundos",
+    "día", "días", "semana", "semanas", "mes", "meses", "década",
+    "décadas", "siglo", "siglos", "gramo", "gramos", "kilogramo",
+    "kilogramos", "miligramo", "miligramos", "litro", "litros", "mililitro",
+    "mililitros", "metro", "metros", "kilómetro", "kilómetros", "centímetro",
+    "centímetros", "pulgada", "pulgadas", "pie", "pies", "libra", "libras",
+    "onza", "onzas", "taza", "tazas", "cucharadita", "cucharaditas",
+    "cucharada", "cucharadas", "pastilla", "pastillas", "tableta", "tabletas",
+    "comprimido", "comprimidos", "cápsula", "cápsulas", "gota", "gotas", "dosis",
+    "proveedor", "proveedores", "persona", "personas", "usuario", "usuarios",
+    "página", "páginas", "niño", "niños", "niña", "niñas",
+})
 
 
 def _spelled_span(form: str, normalized: str, ordinal: bool = False):
@@ -1197,33 +1365,56 @@ def _spelled_alone(form: str, normalized: str) -> bool:
     return _spelled_span(form, normalized) is not None
 
 
-def _ordinal_cardinal_alias_allowed(label: str, source: str) -> bool:
+def _ordinal_source_context(source: str):
+    month = (
+        r"January|February|March|April|May|June|July|August|September|October|November|December"
+    )
+    contexts = re.compile(
+        rf"\b(?:{month})\b[^.!?;:]*\b(?P<number>\d{{1,6}})(?:st|nd|rd|th)\b|"
+        rf"\b(?P<before_month>\d{{1,6}})(?:st|nd|rd|th)\s+of\s+(?:{month})\b|"
+        r"\b(?P<century>\d{1,6})(?:st|nd|rd|th)\b[^.!?;:]*\bcentur(?:y|ies)\b",
+        re.IGNORECASE,
+    )
+    return frozenset(
+        value for match in contexts.finditer(source)
+        for value in (match.group("number"), match.group("before_month"), match.group("century"))
+        if value is not None
+    )
+
+
+def _ordinal_cardinal_alias_allowed(label: str, source: str, source_context=None) -> bool:
     number_match = re.fullmatch(r"(\d+)(?:st|nd|rd|th)", label, re.IGNORECASE)
     if not number_match:
         return False
     number = number_match.group(1)
+    if len(number) > 6:
+        return False
     if int(number) >= 11:
         return True
-    month = (
-        r"January|February|March|April|May|June|July|August|September|October|November|December"
-    )
-    return bool(
-        re.search(
-            rf"\b(?:{month})\b[^.!?;:]*\b{number}(?:st|nd|rd|th)\b",
-            source,
-            re.IGNORECASE,
-        )
-        or re.search(
-            rf"\b{number}(?:st|nd|rd|th)\s+of\s+(?:{month})\b",
-            source,
-            re.IGNORECASE,
-        )
-        or re.search(
-            rf"\b{number}(?:st|nd|rd|th)\b[^.!?;:]*\bcentur(?:y|ies)\b",
-            source,
-            re.IGNORECASE,
-        )
-    )
+    context = source_context if source_context is not None else _ordinal_source_context(source)
+    return number in context
+
+
+def _ordinal_cardinal_translation_alias_allowed(label: str, translated: str, translation_context=None) -> bool:
+    number_match = re.fullmatch(r"(\d+)(?:st|nd|rd|th)", label, re.IGNORECASE)
+    if not number_match or len(number_match.group(1)) > 6:
+        return False
+    number = str(int(number_match.group(1)))
+    context = translation_context if translation_context is not None else _ordinal_translation_context(translated)
+    return number in context
+
+
+def _ordinal_translation_context(translated: str):
+    context = set()
+    for match in re.finditer(
+        rf"(?<!\w)(?P<noun>{_WORD_RE.pattern})\s+(?P<number>\d{{1,6}})(?!\d)",
+        translated,
+        re.IGNORECASE,
+    ):
+        noun = match.group("noun").casefold()
+        if noun == "número" or noun not in _ES_WORDS:
+            context.add(str(int(match.group("number"))))
+    return frozenset(context)
 
 
 def _english_ordinal_in_translation(
@@ -1234,10 +1425,14 @@ def _english_ordinal_in_translation(
         return None
     before = normalized_src[:span[0]].rstrip().split()
     after = normalized_src[span[1]:].lstrip().split()
-    if form.casefold() == "second" and before and before[-1] in {"a", "one"} and (
-        not after or after[0] in {"later", "more", "ago", "longer"}
-    ):
-        return None
+    if form.casefold() == "second" and before and before[-1] in {"a", "one"}:
+        temporal_continuation = {
+            "before", "after", "later", "ago", "more", "longer", "for", "until",
+            "to", "of", "is", "was", "will", "can", "should",
+        }
+        temporal_verb = bool(set(before[-3:-1]) & {"wait", "pause", "hold", "stop", "rest"})
+        if temporal_verb or not after or after[0] in temporal_continuation:
+            return None
     if form.casefold() == "third" and before and before[-1] in {"a", "one"} and (
         after and after[0] == "of"
     ):
@@ -1267,8 +1462,39 @@ def _prose(text: str) -> str:
 
 _VERSION_CUE_RE = re.compile(r"(?:\bv|\bversi[oó]n|\brelease|\bbuild|\brev)\.?\s*$", re.I)
 _MONEY_AMOUNT_CUE_RE = re.compile(
-    r"(?:[$€£]\s*$|\b(?:budget|cost|costs|price|priced|raised|revenue|salary|funding|"
-    r"spend|spent|pay|paid|worth)\b[^.!?;:]{0,24}$)", re.IGNORECASE)
+    r"(?:[$€£]\s*$|\b(?:usd|eur|gbp)\s*$|\b(?:budget|presupuesto|cost|costs|coste|costo|"
+    r"price|priced|precio|raised|recaud\w*|revenue|ingres\w*|salary|salario|funding|fondos|"
+    r"spend|spent|pay|paid|pag\w*|cuest\w*|worth)\b[^.!?;:]{0,24}$)", re.IGNORECASE)
+
+
+def _money_amount_context(text: str, start: int, unit: str = "", tail: str = "") -> bool:
+    before = text[max(0, start - 40):start].rstrip()
+    if before.endswith(":"):
+        before = before[:-1].rstrip()
+    explicit_currency = bool(re.search(r"[$€£]\s*$|\b(?:usd|eur|gbp)\s*$", before, re.IGNORECASE))
+    if unit.casefold().strip() == "m" and re.match(
+        r"\s+(?:de|of)\s+(?!d[oó]lares?|euros?|pesos?|libras?|yen(?:es)?|francos?)\w+",
+        tail, re.IGNORECASE,
+    ):
+        return False
+    if explicit_currency:
+        return True
+    cue = _MONEY_AMOUNT_CUE_RE.search(before)
+    if cue is None:
+        return False
+    cue_word = re.search(
+        r"\b(?:budget|presupuesto|cost|costs|coste|costo|price|priced|precio|raised|"
+        r"recaud\w*|revenue|ingres\w*|salary|salario|funding|fondos|spend|spent|pay|paid|"
+        r"pag\w*|cuest\w*|worth)\b",
+        cue.group(0), re.IGNORECASE,
+    )
+    trailing = before[cue.start() + cue_word.end():] if cue_word else ""
+    if re.search(r"\d|[$€£]|\b(?:and|but)\b", trailing, re.IGNORECASE):
+        return False
+    return not (
+        unit.casefold().strip() in {"m", "b"}
+        and re.search(r"\b(?:paid|pay|spend|spent)\s+for\s*$", before, re.IGNORECASE)
+    )
 
 
 def _plain_numeric_readings(number: str, source: bool = False):
@@ -1307,6 +1533,11 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
     numbers = []
     scrubbed = _URL_RE.sub(" ", text)
     for match in _NUM_RE.finditer(scrubbed):
+        if any(
+            cadence.start() <= match.start() and match.end() <= cadence.end()
+            for cadence in _FREQUENCY_HOURS_RE.finditer(scrubbed)
+        ):
+            continue
         raw = match.group(0).replace(" ", "").replace(" ", "").replace(" ", "")
         is_decade = bool(re.fullmatch(r"(?:19|20)\d{2}s", raw, re.IGNORECASE))
         short_decade = bool(re.fullmatch(r"\d{2}s", raw, re.IGNORECASE))
@@ -1318,20 +1549,26 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
         raw = raw.lstrip("+-−")
         is_version = bool(_VERSION_CUE_RE.search(scrubbed[max(0, match.start() - 24):match.start()]))
         multiplier = re.match(
-            r"(?P<unit>k(?![A-Za-z])|m(?![A-Za-z])|b(?![A-Za-z])|\s+(?:thousand|million|billion|trillion|mil\s+millones?|"
+            r"(?P<unit>m(?:€|eur)|k(?![A-Za-z])|m(?![A-Za-z])|b(?![A-Za-z])|"
+            r"\s+(?:m(?:€|eur)?(?![A-Za-z])|b(?![A-Za-z])|thousand|million|billion|trillion|mil\s+millones?|"
             r"mil|mill[oó]n(?:es)?|bill[oó]n(?:es)?|trill[oó]n(?:es)?)(?!\w))",
             scrubbed[match.end():], re.IGNORECASE)
-        if multiplier and multiplier.group("unit").casefold() in {"m", "b"} and not _MONEY_AMOUNT_CUE_RE.search(
-            scrubbed[max(0, match.start() - 32):match.start()]
-        ):
+        multiplier_unit = multiplier.group("unit").strip().casefold() if multiplier else ""
+        scale_tail = scrubbed[match.end() + len(multiplier.group("unit")):] if multiplier else ""
+        if multiplier and multiplier_unit in {"m", "b", "m€", "meur"} and not _money_amount_context(
+            scrubbed, match.start(), multiplier_unit, scale_tail
+        ) and not multiplier_unit.endswith(("€", "eur")):
             multiplier = None
-        if multiplier and multiplier.group("unit") == "K":
+        if multiplier and multiplier.group("unit").casefold() == "k":
             before = scrubbed[max(0, match.start() - 32):match.start()]
             after_k = scrubbed[match.end() + len(multiplier.group("unit")):]
             race_prefix = re.search(
-                r"\b(?:run|race|marathon)\s+(?:a|an|the)\s*$|"
-                r"\b(?:corre|corrió|correr|carrera)\s+(?:un|una)\s*$", before, re.IGNORECASE)
-            if race_prefix or re.match(r"\s+(?:run|race|marathon)\b", after_k, re.IGNORECASE):
+                r"\b(?:run|ran|race|marathon)\s+(?:a|an|the)?\s*$|"
+                r"\bfinish(?:ed)?\s+(?:a|an|the)?\s*$|"
+                r"\b(?:corre|corrió|correr|carrera)\s+(?:un|una)?\s*$", before, re.IGNORECASE)
+            race_suffix = re.match(r"\s+(?:run|race|marathon|starts?|begins?)\b", after_k, re.IGNORECASE)
+            karat = re.match(r"\s+gold\b", after_k, re.IGNORECASE)
+            if race_prefix or race_suffix or karat:
                 multiplier = None
 
         def value(decimal_at):
@@ -1361,7 +1598,7 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
         if multiplier:
             word = re.sub(r"\s+", " ", multiplier.group("unit").strip().casefold())
             factor = 1000
-            if word in ("million", "millón", "millones", "m"):
+            if word in ("million", "millón", "millones", "m", "m€", "meur"):
                 factor = 1_000_000
             elif word in ("mil millón", "mil millones", "billion", "b"):
                 factor = 1_000_000_000
@@ -1385,13 +1622,15 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
         label = match.group(0).strip()
         if multiplier:
             suffix = multiplier.group("unit").strip()
-            if suffix.casefold() == "m":
+            if suffix.casefold() in {"m", "m€", "meur"}:
                 label += " million"
             elif suffix.casefold() == "b":
                 label += " billion"
             else:
                 label += suffix if suffix.casefold() == "k" else " " + suffix
         numbers.append((label, frozenset(readings)))
+    if source:
+        numbers.extend(_english_spelled_numbers(scrubbed))
     if not source:
         tokens = list(_WORD_RE.finditer(scrubbed))
         token_words = {match.group(0).casefold() for match in tokens}
@@ -1469,7 +1708,7 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
     return numbers
 
 
-def _attached_unit_counts(text: str, source: bool = False):
+def _attached_unit_counts(text: str, source: bool = False, translated_unit_readings=()):
     pattern = _ATTACHED_UNIT_RE if source else _TRANSLATED_UNIT_RE
     counts = {}
 
@@ -1477,24 +1716,36 @@ def _attached_unit_counts(text: str, source: bool = False):
         if not text[match.end("number"):match.start("unit")].isspace():
             return False
         raw_unit = match.group("unit")
-        after = _WORD_RE.match(text[match.end("unit"):match.end("unit") + 64].lstrip())
-        following = after.group(0).casefold() if after else ""
-        if len(raw_unit) == 1 and raw_unit.isupper() and following:
-            return True
-        if len(raw_unit) == 1 and following and following not in {
-            "of", "per", "a", "an", "the", "and", "or", "to", "by", "for", "in"
+        readings = _plain_numeric_readings(match.group("number"), source=True)
+        if readings in translated_unit_readings:
+            return False
+        following_match = _WORD_RE.match(
+            text[match.end("unit"):match.end("unit") + 64].lstrip()
+        )
+        following = following_match.group(0).casefold() if following_match else ""
+        if not following:
+            return False
+        if following.endswith("ly") or following in {
+            "as", "before", "after", "and", "or", "to", "by", "for", "in", "with",
+            "over", "under", "long", "wide", "deep", "high", "tall", "thick", "thin",
+            "short",
         }:
+            return False
+        if len(raw_unit) == 1:
             return True
-        return raw_unit.casefold() in {
-            "day", "days", "pound", "pounds", "tablet", "tablets", "minute", "minutes",
-            "hour", "hours", "second", "seconds",
-        } and following.endswith("s")
+        if raw_unit.casefold() != raw_unit or not raw_unit.isalpha() or raw_unit.endswith("s"):
+            return False
+        return following.endswith("s") and not following.endswith("ly")
 
     def add(number, raw_unit, start, spelled=False):
         raw_unit_folded = raw_unit.casefold()
         before = text[max(0, start - 40):start].casefold() if raw_unit_folded in {"m", "b", "s"} else ""
         number_digits = re.sub(r"\D", "", number)
-        if raw_unit_folded in {"m", "b"} and _MONEY_AMOUNT_CUE_RE.search(before):
+        unit_tail = text[start + len(number) + len(raw_unit):]
+        if raw_unit_folded in {"m", "b"} and (
+            _money_amount_context(text, start, raw_unit_folded, unit_tail)
+            or re.match(r"\s*(?:€|eur\b)", unit_tail, re.IGNORECASE)
+        ):
             return
         if raw_unit_folded == "c" and raw_unit == "c":
             return
@@ -1524,15 +1775,16 @@ def _attached_unit_counts(text: str, source: bool = False):
         add(match.group("number"), match.group("unit"), match.start())
     for match in _NUM_RE.finditer(text):
         after_number = text[match.end():]
-        if not after_number.startswith("K"):
+        if after_number[:1].casefold() != "k":
             continue
         before = text[max(0, match.start() - 32):match.start()]
         after_k = after_number[1:]
         is_race_distance = bool(
-            re.search(r"\b(?:run|race|marathon)\s+(?:a|an|the)\s*$|"
-                      r"\b(?:corre|corrió|correr|carrera)\s+(?:un|una)\s*$",
+            re.search(r"\b(?:run|ran|race|marathon)\s+(?:a|an|the)?\s*$|"
+                      r"\bfinish(?:ed)?\s+(?:a|an|the)?\s*$|"
+                      r"\b(?:corre|corrió|correr|carrera)\s+(?:un|una)?\s*$",
                       before, re.IGNORECASE)
-            or re.match(r"\s+(?:run|race|marathon)\b", after_k, re.IGNORECASE)
+            or re.match(r"\s+(?:run|race|marathon|starts?|begins?)\b", after_k, re.IGNORECASE)
         )
         if is_race_distance:
             add(match.group(0), "km", match.start())
@@ -1542,9 +1794,32 @@ def _attached_unit_counts(text: str, source: bool = False):
     return counts
 
 
-def _units_changed(source: str, translated: str) -> bool:
-    expected = _attached_unit_counts(source, source=True)
-    actual = list(_attached_unit_counts(translated).items())
+def _units_changed(source: str, translated: str, source_doses=None, translated_doses=None) -> bool:
+    translated_counts = _attached_unit_counts(translated)
+    translated_unit_readings = {
+        readings for (readings, _unit), count in translated_counts.items() if count
+    }
+    expected = _attached_unit_counts(
+        source, source=True, translated_unit_readings=translated_unit_readings
+    )
+    if source_doses and translated_doses:
+        omissions = {}
+        for period, source_amounts in source_doses.items():
+            target_periods = ("afternoon", "night") if period == "evening" else (period,)
+            for target_period in target_periods:
+                for amount, unit in source_amounts:
+                    if unit not in {"tablet", "pill", "capsule"}:
+                        continue
+                    if (amount, "") in translated_doses.get(target_period, ()):
+                        key = (frozenset({amount}), unit)
+                        omissions[key] = omissions.get(key, 0) + 1
+        for key, count in omissions.items():
+            current = expected.get(key, 0)
+            if current <= count:
+                expected.pop(key, None)
+            else:
+                expected[key] = current - count
+    actual = list(translated_counts.items())
 
     def equivalent(source_readings, target_readings, source_unit, target_unit):
         if source_readings & target_readings:
@@ -1553,6 +1828,12 @@ def _units_changed(source: str, translated: str) -> bool:
             return any(
                 Decimal(source_value) * _TIME_UNIT_FACTORS[source_unit]
                 == Decimal(target_value) * _TIME_UNIT_FACTORS[target_unit]
+                for source_value in source_readings for target_value in target_readings
+            )
+        if source_unit in _LENGTH_UNIT_FACTORS and target_unit in _LENGTH_UNIT_FACTORS:
+            return any(
+                Decimal(source_value) * _LENGTH_UNIT_FACTORS[source_unit]
+                == Decimal(target_value) * _LENGTH_UNIT_FACTORS[target_unit]
                 for source_value in source_readings for target_value in target_readings
             )
         if source_unit != "celsius" or target_unit != "celsius":
@@ -1581,22 +1862,20 @@ def _units_changed(source: str, translated: str) -> bool:
 
 
 def _convertible_unit_number_pairs(source: str, translated: str):
-    source_words = {match.group(0).casefold() for match in _WORD_RE.finditer(source)}
-    translated_words = {match.group(0).casefold() for match in _WORD_RE.finditer(translated)}
-    if not source_words & _TIME_UNIT_WORDS or not translated_words & _TIME_UNIT_WORDS:
-        return []
     source_units = _attached_unit_counts(source, source=True)
     translated_units = _attached_unit_counts(translated)
+    if not source_units or not translated_units:
+        return []
     pairs = []
     for (source_readings, source_unit), source_count in source_units.items():
-        if source_unit not in _TIME_UNIT_FACTORS:
+        if source_unit not in _CONVERTIBLE_UNIT_FACTORS:
             continue
         for (target_readings, target_unit), target_count in translated_units.items():
-            if target_unit not in _TIME_UNIT_FACTORS:
+            if target_unit not in _CONVERTIBLE_UNIT_FACTORS:
                 continue
             equivalent = any(
-                Decimal(source_value) * _TIME_UNIT_FACTORS[source_unit]
-                == Decimal(target_value) * _TIME_UNIT_FACTORS[target_unit]
+                Decimal(source_value) * _CONVERTIBLE_UNIT_FACTORS[source_unit]
+                == Decimal(target_value) * _CONVERTIBLE_UNIT_FACTORS[target_unit]
                 for source_value in source_readings for target_value in target_readings
             )
             if equivalent:
@@ -1606,52 +1885,148 @@ def _convertible_unit_number_pairs(source: str, translated: str):
 
 _EN_DOSE_PERIOD_RE = re.compile(
     r"\b(?P<number>\d+(?:[.,]\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+"
-    rf"(?:(?:tablets?|pills?|doses?|capsules?|units?|drops?|puffs?|{_DOSE_UNIT_PATTERN})\s+)?"
-    r"(?:in\s+the|at)\s+(?P<period>morning|afternoon|evening|night)\b", re.IGNORECASE)
+    rf"(?:(?P<unit>tablets?|pills?|doses?|capsules?|units?|drops?|puffs?|{_DOSE_UNIT_PATTERN})\s+)?"
+    r"(?:in\s+the|at)\s+(?P<period>morning|afternoon|evening|night|bedtime)\b", re.IGNORECASE)
 _ES_DOSE_PERIOD_RE = re.compile(
     rf"\b(?P<number>\d+(?:[.,]\d+)?|{_ES_CARDINAL_PATTERN})\s+"
-    rf"(?:(?:comprimidos?|tabletas?|pastillas?|píldoras?|cápsulas?|dosis|{_DOSE_UNIT_PATTERN})\s+)?"
+    rf"(?:(?P<unit>comprimidos?|tabletas?|pastillas?|píldoras?|cápsulas?|dosis|{_DOSE_UNIT_PATTERN})\s+)?"
     r"(?:(?:(?:por|en|a|de)\s+(?:(?:la|las)\s+)?|cada\s+)"
     r"(?P<period>mañanas?|madrugadas?|tardes?|noches?)\b|"
-    r"(?:al|antes\s+de)\s+(?P<alternative>despertar|acostarse)\b)", re.IGNORECASE)
+    r"(?:al|antes\s+de)\s+(?P<alternative>despertar|acostarse|dormir)\b)", re.IGNORECASE)
+
+_EN_DOSE_PERIOD_ONLY_RE = re.compile(
+    r"\b(?:in\s+(?:the\s+)?|at\s+)(?P<period>morning|afternoon|evening|night|bedtime)\b"
+    r"(?!\s+(?:dose|tablet|pill|meal|class|appointment|meeting|shift|lecture|lesson)s?\b)",
+    re.IGNORECASE)
+_ES_DOSE_PERIOD_ONLY_RE = re.compile(
+    r"\b(?:(?:(?:por|en|a|de)\s+(?:(?:la|las)\s+)?|cada\s+)"
+    r"(?P<period>mañanas?|madrugadas?|tardes?|noches?)|"
+    r"(?:al|antes\s+de)\s+(?P<alternative>despertar|acostarse|dormir))\b", re.IGNORECASE)
+
+
+_EN_DOSE_ITEM_RE = re.compile(
+    rf"(?P<number>\d+(?:[.,]\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)"
+    rf"(?:\s*(?P<unit>tablets?|pills?|doses?|capsules?|units?|drops?|puffs?|{_DOSE_UNIT_PATTERN}))?"
+    r"(?!\w)", re.IGNORECASE)
+_ES_DOSE_ITEM_RE = re.compile(
+    rf"(?P<number>\d+(?:[.,]\d+)?|{_ES_CARDINAL_PATTERN})"
+    rf"(?:\s*(?P<unit>comprimidos?|tabletas?|pastillas?|píldoras?|cápsulas?|dosis|{_DOSE_UNIT_PATTERN}))?"
+    r"(?!\w)", re.IGNORECASE)
+
+
+def _canonical_decimal(value: str) -> str:
+    number = Decimal(value.replace(",", "."))
+    if not number:
+        return "0"
+    return format(number.normalize(), "f")
+
+
+def _dose_amount_value(raw: str, source: bool) -> str | None:
+    value = raw.casefold()
+    if re.fullmatch(r"\d+(?:[.,]\d+)?", value):
+        return _canonical_decimal(value)
+    if source and value in _EN_TIME_WORDS:
+        return str(_EN_TIME_WORDS[value])
+    if not source:
+        spelled = _es_cardinal_value(value)
+        if spelled is not None:
+            return str(spelled)
+    return None
+
+
+def _canonical_dose_unit(raw: str | None) -> str:
+    if not raw:
+        return ""
+    value = raw.casefold()
+    if value in _UNIT_CANONICAL:
+        return _UNIT_CANONICAL[value]
+    if value in {"drop", "drops", "gota", "gotas"}:
+        return "drop"
+    if value in {"puff", "puffs", "inhalación", "inhalaciones"}:
+        return "puff"
+    if value in {"unit", "units", "unidad", "unidades"}:
+        return "unit"
+    return value
 
 
 def _dose_period_values(text: str, source: bool = False, time_matches=()):
-    pattern = _EN_DOSE_PERIOD_RE if source else _ES_DOSE_PERIOD_RE
+    pattern = _EN_DOSE_PERIOD_ONLY_RE if source else _ES_DOSE_PERIOD_ONLY_RE
     time_spans = sorted(span for _, span in time_matches)
-    time_index = 0
     aliases = {"madrugada": "morning", "madrugadas": "morning", "mañana": "morning",
                "mañanas": "morning", "tarde": "afternoon", "tardes": "afternoon",
                "noche": "night", "noches": "night", "despertar": "morning",
-               "acostarse": "night", "afternoon": "afternoon",
+               "acostarse": "night", "dormir": "night", "bedtime": "night", "afternoon": "afternoon",
                "evening": "evening", "morning": "morning", "night": "night"}
-    values = []
+    period_matches = []
     for match in pattern.finditer(text):
-        while time_index < len(time_spans) and time_spans[time_index][1] <= match.start():
-            time_index += 1
-        if time_index < len(time_spans) and time_spans[time_index][0] < match.end():
+        if any(match.start() < end and start < match.end() for start, end in time_spans):
             continue
-        amount = match.group("number").casefold()
-        if re.fullmatch(r"\d+(?:[.,]\d+)?", amount):
-            amount = amount.replace(",", ".")
-        elif amount in _EN_TIME_WORDS:
-            amount = str(_EN_TIME_WORDS[amount])
-        elif not source:
-            spelled = _ES_CARDINAL_VALUE.get(re.sub(r"\s+", " ", amount))
-            if spelled is None:
-                continue
-            amount = str(spelled)
         period = (match.group("period") or match.group("alternative")).casefold()
-        period = aliases.get(period, period)
-        values.append((amount, period))
+        period_matches.append((match, aliases.get(period, period)))
+    if not period_matches:
+        return []
+
+    item_pattern = _EN_DOSE_ITEM_RE if source else _ES_DOSE_ITEM_RE
+    allowed = (
+        {"in", "at", "with", "by", "for", "on", "before", "after", "and", "or"}
+        if source else
+        {"por", "en", "a", "al", "antes", "con", "según", "y", "e", "o"}
+    )
+    sentence_bounds = []
+    for match, _period in period_matches:
+        start = max(
+            (mark.end() for mark in re.finditer(r"(?<!\d)[.!?;](?!\d)", text[:match.start()])),
+            default=0,
+        )
+        end_match = re.search(r"(?<!\d)[.!?;](?!\d)", text[match.end():])
+        end = match.end() + end_match.start() if end_match else len(text)
+        sentence_bounds.append((start, end))
+
+    values = []
+    for item in item_pattern.finditer(text):
+        item_span = item.span()
+        if any(item_span[0] < end and start < item_span[1] for start, end in time_spans):
+            continue
+        if not item.group("unit"):
+            tail = text[item.end():].lstrip(" ,;:")
+            following = _WORD_RE.match(tail)
+            if following and following.group(0).casefold() not in allowed:
+                continue
+        if not any(start <= item.start() <= end for start, end in sentence_bounds):
+            continue
+        candidates = []
+        for index, (match, period) in enumerate(period_matches):
+            if not sentence_bounds[index][0] <= item.start() <= sentence_bounds[index][1]:
+                continue
+            if item.end() <= match.start():
+                between = text[item.end():match.start()]
+                distance = match.start() - item.end()
+            elif match.end() <= item.start():
+                between = text[match.end():item.start()]
+                distance = item.start() - match.end()
+            else:
+                between = ""
+                distance = 0
+            crossed_coordination = bool(
+                re.search(r"\b(?:and|or|but|y|e|o)\b", between, re.IGNORECASE)
+            )
+            candidates.append((crossed_coordination, distance, index, period))
+        if not candidates:
+            continue
+        _crossed, _distance, _selected, period = min(candidates)
+        # The amount/unit belongs to the closest period marker in its sentence,
+        # whether the translator placed the period before or after the dose.
+        amount = _dose_amount_value(item.group("number"), source)
+        if amount is not None:
+            values.append((amount, _canonical_dose_unit(item.group("unit")), period))
     return values
 
 
 def _dose_periods(text: str, source: bool = False, time_matches=()):
     periods = {}
-    for amount, period in _dose_period_values(text, source, time_matches):
-        periods.setdefault(period, []).append(amount)
-    return periods
+    for amount, unit, period in _dose_period_values(text, source, time_matches):
+        periods.setdefault(period, []).append((amount, unit))
+    return {period: tuple(sorted(values)) for period, values in periods.items()}
 
 
 def _dose_periods_match(source, translated):
@@ -1666,7 +2041,7 @@ def _dose_periods_match(source, translated):
         period, amounts = source_items[index]
         options = ("afternoon", "night") if period == "evening" else (period,)
         return any(
-            candidate in remaining and remaining[candidate] == amounts
+            candidate in remaining and _dose_amounts_match(amounts, remaining[candidate])
             and match_remaining(index + 1, {key: value for key, value in remaining.items()
                                             if key != candidate})
             for candidate in options
@@ -1675,41 +2050,208 @@ def _dose_periods_match(source, translated):
     return match_remaining(0, translated_items)
 
 
+def _dose_amounts_match(source_amounts, translated_amounts):
+    if source_amounts == translated_amounts:
+        return True
+    if len(source_amounts) != len(translated_amounts):
+        return False
+    remaining = list(translated_amounts)
+    for amount, unit in source_amounts:
+        index = next((index for index, (other_amount, other_unit) in enumerate(remaining)
+                      if amount == other_amount and (
+                          unit == other_unit or {unit, other_unit} <= {"", "tablet", "pill", "capsule"}
+                      )), None)
+        if index is None:
+            return False
+        remaining.pop(index)
+    return not remaining
+
+
 def _dose_number_sequence(text: str, source: bool = False, time_matches=()):
-    return [amount for amount, _ in _dose_period_values(text, source, time_matches)]
+    return [amount for amount, _unit, _period in _dose_period_values(text, source, time_matches)]
 
 
-_EN_FREQUENCY_RE = re.compile(
-    r"\b(?P<count>once|twice|thrice|one|two|three|four|five|six|seven|eight|nine|ten|"
-    r"eleven|twelve|\d+(?:[.,]\d+)?)\s+(?:(?:times?)\s+)?(?:a|per)\s+day\b|"
-    r"\b(?P<daily>once|twice|thrice)\s+daily\b", re.IGNORECASE)
-_ES_FREQUENCY_RE = re.compile(
+_FREQUENCY_EN_COUNT = (
+    r"once|twice|thrice|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|a|an|"
+    r"\d+(?:[.,]\d+)?x?"
+)
+_FREQUENCY_ES_PERIOD = r"d[ií]as?|semanas?|mes(?:es)?"
+_EN_FREQUENCY_COUNT_RE = re.compile(
+    rf"\b(?P<count>{_FREQUENCY_EN_COUNT})\s+(?:(?:times?)\s+)?"
+    r"(?:(?:a|per)\s+)?(?P<period>days?|weeks?|months?|daily|weekly|monthly)\b",
+    re.IGNORECASE,
+)
+_EN_FREQUENCY_EVERY_RE = re.compile(
+    r"\bevery\s+(?:(?P<interval>other|one|two|three|four|five|six|seven|eight|nine|ten|"
+    r"eleven|twelve|\d+(?:[.,]\d+)?)\s+)?(?P<period>days?|weeks?|months?)\b",
+    re.IGNORECASE,
+)
+_ES_FREQUENCY_COUNT_RE = re.compile(
     rf"\b(?P<count>\d+(?:[.,]\d+)?|{_ES_CARDINAL_NUMBER_PATTERN})\s+"
-    r"(?P<unit>vez|veces)\s+(?:al|por)\s+d[ií]a\b", re.IGNORECASE)
+    rf"(?P<unit>vez|veces)\s+(?:(?:al|por|cada)\s+)?"
+    rf"(?P<period>{_FREQUENCY_ES_PERIOD}|diarias?|semanales?|mensuales?)\b",
+    re.IGNORECASE,
+)
+_ES_FREQUENCY_DIRECT_RE = re.compile(
+    rf"\b(?P<count>\d+(?:[.,]\d+)?|{_ES_CARDINAL_NUMBER_PATTERN})\s+"
+    rf"(?:al|por)\s+(?P<period>{_FREQUENCY_ES_PERIOD})\b",
+    re.IGNORECASE,
+)
+_ES_FREQUENCY_EVERY_RE = re.compile(
+    rf"\b(?:cada\s+|todos?\s+los?\s+)(?:(?P<interval>\d+(?:[.,]\d+)?|{_ES_CARDINAL_NUMBER_PATTERN})\s+)?"
+    rf"(?P<period>{_FREQUENCY_ES_PERIOD})\b",
+    re.IGNORECASE,
+)
+_FREQUENCY_HOURS_RE = re.compile(
+    r"\b(?:every|cada)\s+(?P<interval>\d+(?:[.,]\d+)?)\s+(?:hours?|horas?)\b",
+    re.IGNORECASE,
+)
+_EN_FREQUENCY_DAILY_RE = re.compile(r"\bdaily\b", re.IGNORECASE)
+_ES_FREQUENCY_SINGLE_RE = re.compile(
+    r"\b(?:al|por)\s+d[ií]a\b|\bdiariamente\b|\bsemanalmente\b|\bmensualmente\b",
+    re.IGNORECASE,
+)
+_EN_FREQUENCY_PER_PERIOD_RE = re.compile(
+    r"\b(?:a|per)\s+(?P<period>day|week|month)\b", re.IGNORECASE
+)
+_EN_DAYS_PER_WEEK_RE = re.compile(
+    rf"\b(?P<count>{_FREQUENCY_EN_COUNT})\s+days?\s+(?:a|per)\s+week\b",
+    re.IGNORECASE,
+)
+_ES_DAYS_PER_WEEK_RE = re.compile(
+    rf"\b(?P<count>\d+(?:[.,]\d+)?|{_ES_CARDINAL_NUMBER_PATTERN})\s+"
+    r"d[ií]as?\s+(?:a\s+la|por)\s+semana\b",
+    re.IGNORECASE,
+)
+_ES_FREQUENCY_ADJECTIVE_RE = re.compile(r"\bdiari[oa]s?\b", re.IGNORECASE)
+
+
+def _frequency_count_value(raw: str) -> str | None:
+    value = raw.casefold()
+    if value.endswith("x") and value[:-1].isdigit():
+        value = value[:-1]
+    if value in {"once", "twice", "thrice"}:
+        return {"once": "1", "twice": "2", "thrice": "3"}[value]
+    if re.fullmatch(r"\d+(?:[.,]\d+)?", value):
+        return _canonical_decimal(value)
+    if value in _EN_TIME_WORDS:
+        return str(_EN_TIME_WORDS[value])
+    spelled = _es_cardinal_value(value)
+    return str(spelled) if spelled is not None else None
+
+
+def _frequency_period(raw: str, interval: str | None = None, source: bool = False) -> str | None:
+    value = raw.casefold()
+    if value in {"daily", "diariamente", "diaria", "diario", "diarios", "diarias",
+                 "day", "days", "día", "dia", "días", "dias"}:
+        period = "day"
+    elif value in {"weekly", "semanalmente", "semanal", "semanales", "week", "weeks",
+                   "semana", "semanas"}:
+        period = "week"
+    elif value in {"monthly", "mensualmente", "mensual", "mensuales", "month", "months",
+                   "mes", "meses"}:
+        period = "month"
+    else:
+        return None
+    if interval is None:
+        return period
+    if interval.casefold() == "other":
+        count = 2
+    else:
+        count = _frequency_count_value(interval)
+        if count is None:
+            return None
+        try:
+            count = str(int(Decimal(count)))
+        except (ValueError, ArithmeticError):
+            return None
+    return period if count == "1" else f"{count}-{period}"
 
 
 def _frequency_counts(text: str, source: bool = False):
-    indicator = (
-        r"\b(?:once|twice|thrice|daily|times?\s+(?:a|per)\s+day)\b"
-        if source else r"\b(?:vez|veces)\s+(?:al|por)\s+d[ií]a\b"
-    )
-    if not re.search(indicator, text, re.IGNORECASE):
-        return []
-    pattern = _EN_FREQUENCY_RE if source else _ES_FREQUENCY_RE
-    counts = []
-    for match in pattern.finditer(text):
-        raw = (match.group("count") or match.group("daily")).casefold()
-        if source and raw in {"once", "twice", "thrice"}:
-            counts.append({"once": "1", "twice": "2", "thrice": "3"}[raw])
-        elif re.fullmatch(r"\d+(?:[.,]\d+)?", raw):
-            counts.append(raw.replace(",", "."))
-        elif source:
-            counts.append(str(_EN_TIME_WORDS[raw]))
-        else:
-            value = _es_cardinal_value(raw)
-            if value is not None:
-                counts.append(str(value))
-    return counts
+    found = []
+    spans = []
+
+    def add(match, count, period):
+        count_value = _frequency_count_value(count)
+        period_value = _frequency_period(period)
+        if count_value is not None and period_value is not None:
+            found.append((count_value, period_value))
+            spans.append(match.span())
+
+    for match in _EN_FREQUENCY_COUNT_RE.finditer(text):
+        period = match.group("period")
+        if period.casefold() not in {"daily", "weekly", "monthly"} and not re.search(
+            r"\b(?:a|per)\s+$", text[max(0, match.start("period") - 8):match.start("period")],
+            re.IGNORECASE,
+        ):
+            continue
+        add(match, match.group("count"), period)
+    for match in _EN_DAYS_PER_WEEK_RE.finditer(text):
+        add(match, match.group("count"), "week")
+    for match in _ES_DAYS_PER_WEEK_RE.finditer(text):
+        add(match, match.group("count"), "week")
+    for match in _ES_FREQUENCY_COUNT_RE.finditer(text):
+        add(match, match.group("count"), match.group("period"))
+    for match in _ES_FREQUENCY_DIRECT_RE.finditer(text):
+        if any(match.start() < end and start < match.end() for start, end in spans):
+            continue
+        add(match, match.group("count"), match.group("period"))
+    for match in _EN_FREQUENCY_PER_PERIOD_RE.finditer(text):
+        if any(match.start() < end and start < match.end() for start, end in spans):
+            continue
+        before = text[max(0, match.start() - 64):match.start()]
+        if re.search(r"\b\d+(?:[.,]\d+)?\s*[\w-]+\s*$", before):
+            found.append(("1", _frequency_period(match.group("period"))))
+            spans.append(match.span())
+    for pattern in (_EN_FREQUENCY_EVERY_RE, _ES_FREQUENCY_EVERY_RE):
+        for match in pattern.finditer(text):
+            if any(match.start() < end and start < match.end() for start, end in spans):
+                continue
+            period = _frequency_period(
+                match.group("period"), match.group("interval"), source
+            )
+            if period is not None:
+                found.append(("1", period))
+                spans.append(match.span())
+
+    for match in _FREQUENCY_HOURS_RE.finditer(text):
+        try:
+            hours = Decimal(match.group("interval").replace(",", "."))
+            doses_per_day = Decimal(24) / hours
+        except (ValueError, ArithmeticError):
+            continue
+        if hours > 0 and doses_per_day == doses_per_day.to_integral_value():
+            found.append((_canonical_decimal(str(doses_per_day)), "day"))
+            spans.append(match.span())
+
+    for pattern in (_EN_FREQUENCY_DAILY_RE, _ES_FREQUENCY_SINGLE_RE, _ES_FREQUENCY_ADJECTIVE_RE):
+        for match in pattern.finditer(text):
+            if any(match.start() < end and start < match.end() for start, end in spans):
+                continue
+            if pattern is _EN_FREQUENCY_DAILY_RE or pattern is _ES_FREQUENCY_ADJECTIVE_RE:
+                before = text[max(0, match.start() - 64):match.start()]
+                count = _FREQUENCY_EN_COUNT if pattern is _EN_FREQUENCY_DAILY_RE else (
+                    rf"(?:\d+(?:[.,]\d+)?|{_ES_CARDINAL_NUMBER_PATTERN})"
+                )
+                units = (
+                    rf"(?:tablets?|pills?|doses?|capsules?|units?|drops?|puffs?|{_DOSE_UNIT_PATTERN})"
+                    if pattern is _EN_FREQUENCY_DAILY_RE else
+                    rf"(?:comprimidos?|tabletas?|pastillas?|píldoras?|cápsulas?|dosis|{_DOSE_UNIT_PATTERN})"
+                )
+                spacing = r"\s*" if pattern is _EN_FREQUENCY_DAILY_RE else r"\s+"
+                has_dose = re.search(rf"\b{count}{spacing}{units}\b[^.!?;:]*$", before, re.IGNORECASE)
+                if not has_dose:
+                    continue
+                period = "day"
+            else:
+                if match.group(0).casefold().endswith(("semanalmente", "mensualmente")):
+                    period = "week" if "semanal" in match.group(0).casefold() else "month"
+                else:
+                    period = "day"
+            found.append(("1", period))
+            spans.append(match.span())
+    return sorted(found)
 
 
 def _ordered_number_readings(text: str, source: bool = False):
@@ -1746,6 +2288,17 @@ def _time_matches(text: str, source_minutes=(), source=False):
     only when it renders one of them (otherwise it is a duration and stays a number)."""
     matches = []
     occupied = []
+    ambiguous_count_ranges = []
+    for range_match in _TIME_EN_WORD_RANGE_RE.finditer(text):
+        before = text[max(0, range_match.start() - 48):range_match.start()]
+        start = range_match.group("start").casefold()
+        end = range_match.group("end").casefold()
+        has_clock_context = bool(re.search(
+            r"\b(?:open|opens|close|closes|work|works|working|meet|meets|leave|leaves|"
+            r"store|shop|office|schedule|hours?)\b[^.!?;:]*$", before, re.IGNORECASE
+        ))
+        if start == "one" and end == "ten" and not has_clock_context:
+            ambiguous_count_ranges.append(range_match.span())
     for match in _TIME_12H_RE.finditer(text):
         hour = int(match.group(1)) % 12
         if match.group(3).lower() == "p":
@@ -1778,7 +2331,7 @@ def _time_matches(text: str, source_minutes=(), source=False):
         matches.append((hour * 60, match.span()))
         occupied.append(match.span())
     for match in _TIME_EN_PERIOD_RE.finditer(text):
-        before = text[max(0, match.start() - 32):match.start()]
+        before = text[max(0, match.start() - 128):match.start()]
         tail = text[match.end():match.end() + 64].lstrip(" ,;:")
         following_match = _WORD_RE.match(tail)
         following = following_match.group(0).casefold() if following_match else ""
@@ -1787,14 +2340,15 @@ def _time_matches(text: str, source_minutes=(), source=False):
             r"[^.!?;]*$", before, re.IGNORECASE
         ):
             continue
-        if not match.group("cue") and following and (
-            following in _ARTICLE_UNITS or following.endswith("s")
-            or following in {"class", "session", "show", "shift", "side"}
-        ):
+        if not match.group("cue") and following and following in _TIME_COUNT_NOUNS:
             continue
         if not match.group("cue") and not match.group("oclock") and re.search(
             r"\b(?:take|give|dose|tablet|pill|capsule)s?\b[^.!?;]*$", before, re.IGNORECASE
         ):
+            continue
+        if not match.group("cue") and not match.group("oclock") and re.search(
+            r"\b(?:take|give|dose)\b[^.!?;]*\band\s*$", before, re.IGNORECASE
+        ) and re.search(rf"\b\d+\s+(?:{_DOSE_UNIT_PATTERN})\b[^.!?;]*$", before, re.IGNORECASE):
             continue
         hour = int(match.group("h")) % 12
         period = (match.group("period") or match.group("night")).lower()
@@ -1818,14 +2372,15 @@ def _time_matches(text: str, source_minutes=(), source=False):
             r"[^.!?;]*$", before, re.IGNORECASE
         ):
             continue
-        if not match.group("cue") and following and (
-            following in _ARTICLE_UNITS or following.endswith("s")
-            or following in {"class", "session", "show", "shift", "side"}
-        ):
+        if not match.group("cue") and following and following in _TIME_COUNT_NOUNS:
             continue
         if not match.group("cue") and not match.group("oclock") and re.search(
             r"\b(?:take|give|dose|tablet|pill|capsule)s?\b[^.!?;]*$", before, re.IGNORECASE
         ):
+            continue
+        if not match.group("cue") and not match.group("oclock") and re.search(
+            r"\b(?:take|give|dose)\b[^.!?;]*\band\s*$", before, re.IGNORECASE
+        ) and re.search(rf"\b\d+\s+(?:{_DOSE_UNIT_PATTERN})\b[^.!?;]*$", before, re.IGNORECASE):
             continue
         hour = _EN_TIME_WORDS[match.group("h").lower()] % 12
         period = (match.group("period") or match.group("night") or "").lower()
@@ -1833,19 +2388,36 @@ def _time_matches(text: str, source_minutes=(), source=False):
             hour += 12
         matches.append((hour * 60, match.span()))
         occupied.append(match.span())
+    for range_match in _TIME_EN_WORD_RANGE_RE.finditer(text):
+        if range_match.span() in ambiguous_count_ranges:
+            continue
+        tail = text[range_match.end():range_match.end() + 64].lstrip(" ,;:")
+        following_match = _WORD_RE.match(tail)
+        following = following_match.group(0).casefold() if following_match else ""
+        if following in _TIME_COUNT_NOUNS:
+            continue
+        start_hour = _EN_TIME_WORDS[range_match.group("start").casefold()]
+        end_hour = _EN_TIME_WORDS[range_match.group("end").casefold()]
+        matches.append((start_hour * 60, range_match.span("start")))
+        matches.append((end_hour * 60, range_match.span("end")))
+        occupied.extend((range_match.span("start"), range_match.span("end")))
     for match in _TIME_EN_WORD_HOUR_RE.finditer(text):
         span = match.span()
+        if any(span[0] < end and start < span[1] for start, end in ambiguous_count_ranges):
+            continue
         if any(span[0] < end and start < span[1] for start, end in occupied):
             continue
         tail = text[span[1]:span[1] + 64].lstrip(" ,;:")
         following_match = _WORD_RE.match(tail)
         following = following_match.group(0).casefold() if following_match else ""
         before = text[max(0, span[0] - 40):span[0]]
-        if following and (following in _ARTICLE_UNITS or following.endswith("s") or following in {
-            "people", "percent", "percentage", "point", "points", "side", "to", "of"
-        }):
+        if following and (following in _TIME_COUNT_NOUNS or following in {"to", "of"}):
             continue
-        if match.group("cue").casefold() == "from":
+        if match.group("cue").casefold() in {"after", "before"} and text[span[1]:span[1] + 1] == ",":
+            continue
+        if match.group("cue").casefold() == "from" and re.search(
+            r"\bcount\s*$", before, re.IGNORECASE
+        ):
             continue
         if match.group("cue").casefold() == "by" and re.search(
             r"\b(?:divide|divided|multiply|multiplied|subtract|subtracted|add|added)\b[^.!?;]*$",
@@ -1863,6 +2435,12 @@ def _time_matches(text: str, source_minutes=(), source=False):
         hour = 0 if match.group("period").lower() == "midnight" else 12
         matches.append((hour * 60, match.span()))
         occupied.append(match.span())
+    for match in _TIME_EN_OCLOCK_RE.finditer(text):
+        span = match.span()
+        if any(span[0] < end and start < span[1] for start, end in occupied):
+            continue
+        matches.append((int(match.group("h")) % 12 * 60, span))
+        occupied.append(span)
     for match in _TIME_24H_RE.finditer(text):
         span = match.span()
         if any(span[0] < end and start < span[1] for start, end in occupied):
@@ -1880,6 +2458,17 @@ def _time_matches(text: str, source_minutes=(), source=False):
         if minute in unclaimed:
             unclaimed.remove(minute)
     spanish_hours = list(_TIME_ES_HOUR_RE.finditer(text))
+    for match in _TIME_ES_WORD_RANGE_RE.finditer(text):
+        tail = text[match.end():match.end() + 64].lstrip(" ,;:")
+        following_match = _WORD_RE.match(tail)
+        following = following_match.group(0).casefold() if following_match else ""
+        if following in _TIME_COUNT_NOUNS:
+            continue
+        start = _ES_TIME_WORDS[match.group("start").casefold()] * 60
+        end = _ES_TIME_WORDS[match.group("end").casefold()] * 60
+        matches.append((start, match.span("start")))
+        matches.append((end, match.span("end")))
+        occupied.extend((match.span("start"), match.span("end")))
     for match in _TIME_ES_DIGIT_WORD_HOUR_RE.finditer(text):
         span = match.span()
         if any(span[0] < end and start < span[1] for start, end in occupied):
@@ -1895,7 +2484,7 @@ def _time_matches(text: str, source_minutes=(), source=False):
                        "enfermeras", "girls", "nurses", "semanas", "semana", "meses",
                        "mes", "años", "año", "días", "día", "horas", "hora", "opción",
                        "opciones", "alternativa", "alternativas"}
-        if following in count_nouns or following.endswith("s") or following2 in {
+        if following in count_nouns or following in _TIME_COUNT_NOUNS or following2 in {
             "opción", "opciones", "alternativa", "alternativas", "respuestas", "soluciones"
         }:
             continue
@@ -1917,9 +2506,11 @@ def _time_matches(text: str, source_minutes=(), source=False):
         if following in {"chica", "chicas", "niña", "niñas", "mujeres", "enfermera",
                          "enfermeras", "girls", "nurses", "semanas", "semana", "meses",
                          "mes", "años", "año", "días", "día", "horas", "hora", "opción",
-                         "opciones", "alternativa", "alternativas"} or following.endswith("s") or following2 in {
+                         "opciones", "alternativa", "alternativas"} or following in _TIME_COUNT_NOUNS or following2 in {
             "opción", "opciones", "alternativa", "alternativas", "respuestas", "soluciones"
         }:
+            continue
+        if following == "más" and following2 == "o":
             continue
         minute = _ES_TIME_WORDS[match.group("h").lower()] * 60
         if match.group("verb") or minute in unclaimed or (source and match.group("prep")):
@@ -2010,11 +2601,23 @@ def _times_match(source: str, source_matches, source_values, translated_values) 
         for match in _TIME_EN_WORD_HOUR_RE.finditer(source)
         if match.span() in matched_spans
     }
-    return all(
-        source_value == translated_value
-        or source_value in ambiguous and source_value % (12 * 60) == translated_value % (12 * 60)
-        for source_value, translated_value in zip(source_values, translated_values)
-    )
+    for match in _TIME_EN_WORD_RANGE_RE.finditer(source):
+        if match.span("start") in matched_spans:
+            ambiguous.add(_EN_TIME_WORDS[match.group("start").casefold()] * 60)
+        if match.span("end") in matched_spans:
+            ambiguous.add(_EN_TIME_WORDS[match.group("end").casefold()] * 60)
+    remaining = list(translated_values)
+    for source_value in source_values:
+        index = next((
+            index for index, translated_value in enumerate(remaining)
+            if source_value == translated_value
+            or source_value in ambiguous
+            and source_value % (12 * 60) == translated_value % (12 * 60)
+        ), None)
+        if index is None:
+            return False
+        remaining.pop(index)
+    return not remaining
 
 
 def _language_guess(text: str) -> Optional[str]:
@@ -2030,6 +2633,8 @@ def _language_guess(text: str) -> Optional[str]:
 def _guard_issues(source: str, translated: str) -> List[str]:
     src, dst = _prose(source), _prose(translated)
     issues: List[str] = []
+    ordinal_context = _ordinal_source_context(src)
+    translation_ordinal_context = _ordinal_translation_context(dst)
     src_matches = _time_matches(src, source=True)
     dst_matches = _time_matches(dst, [minute for minute, _ in src_matches])
     src_times = sorted(minute for minute, _ in src_matches)
@@ -2037,10 +2642,10 @@ def _guard_issues(source: str, translated: str) -> List[str]:
     if not _times_match(src, src_matches, src_times, dst_times) and (src_times or dst_times):
         issues.append("Times from the source are missing or changed.")
     src_numbers, dst_numbers = _without_times(src, dst, src_matches, dst_matches)
-    if _units_changed(src_numbers, dst_numbers):
-        issues.append("Units attached to source numbers are missing or changed.")
     src_periods = _dose_periods(src, source=True, time_matches=src_matches)
     dst_periods = _dose_periods(dst, time_matches=dst_matches)
+    if _units_changed(src_numbers, dst_numbers, src_periods, dst_periods):
+        issues.append("Units attached to source numbers are missing or changed.")
     if src_periods:
         dose_periods_match = (
             _dose_periods_match(src_periods, dst_periods)
@@ -2054,7 +2659,7 @@ def _guard_issues(source: str, translated: str) -> List[str]:
             issues.append("Dose counts attached to day periods are missing or changed.")
     src_frequencies = _frequency_counts(src, source=True)
     dst_frequencies = _frequency_counts(dst)
-    if src_frequencies and src_frequencies != dst_frequencies:
+    if (src_frequencies or dst_frequencies) and src_frequencies != dst_frequencies:
         issues.append("Frequency counts from the source are missing or changed.")
     same_number_text = src_numbers.casefold() == dst_numbers.casefold()
     missing = [] if same_number_text else list(_numbers(src_numbers, source=True))
@@ -2066,6 +2671,7 @@ def _guard_issues(source: str, translated: str) -> List[str]:
     for item in missing:
         missing_by_readings.setdefault(item[1], deque()).append(item)
     consumed_numbers = set()
+    normalized_src = " " + re.sub(r"[^\w]+", " ", src.casefold()) + " "
 
     def has_scale(value):
         return bool(re.search(
@@ -2075,7 +2681,10 @@ def _guard_issues(source: str, translated: str) -> List[str]:
     def ordinal_match_allowed(candidate):
         if not re.fullmatch(r"\d+(?:st|nd|rd|th)", candidate[0], re.IGNORECASE):
             return True
-        if _ordinal_cardinal_alias_allowed(candidate[0], src):
+        if (_ordinal_cardinal_alias_allowed(candidate[0], src, ordinal_context)
+                or _ordinal_cardinal_translation_alias_allowed(
+                    candidate[0], dst, translation_ordinal_context
+                )):
             return True
         return any(
             re.search(rf"(?<!\w){re.escape(value)}\s*(?:\.?[ºª°]|\.?er\b)", dst, re.IGNORECASE)
@@ -2097,6 +2706,7 @@ def _guard_issues(source: str, translated: str) -> List[str]:
         ))
 
     def take_exact(readings, label):
+        nonlocal normalized_src
         candidates = missing_by_readings.get(readings)
         if not candidates:
             return None
@@ -2106,6 +2716,22 @@ def _guard_issues(source: str, translated: str) -> List[str]:
                 continue
             if ordinal_match_allowed(candidate) and decade_alias_allowed(candidate, readings, label):
                 consumed_numbers.add(id(candidate))
+                source_forms = [candidate[0]]
+                ordinal = bool(re.fullmatch(r"\d+(?:st|nd|rd|th)", candidate[0], re.IGNORECASE))
+                if ordinal:
+                    source_forms = [
+                        form for value in candidate[1]
+                        if re.fullmatch(r"\d+", value) and len(value) <= 6
+                        for form in _en_ordinal_forms(int(value))
+                    ]
+                for form in source_forms:
+                    span = _spelled_span(form, normalized_src, ordinal=ordinal)
+                    if span is not None:
+                        normalized_src = (
+                            normalized_src[:span[0]] + (" " * (span[1] - span[0]))
+                            + normalized_src[span[1]:]
+                        )
+                        break
                 return candidate
             candidates.append(candidate)
         return None
@@ -2129,7 +2755,10 @@ def _guard_issues(source: str, translated: str) -> List[str]:
             if converted_pair is not None:
                 convertible_unit_pairs.remove(converted_pair)
         else:
-            extra.append((label, readings))
+            # Spelled Spanish readings can satisfy a source number, but are not
+            # independently treated as extra quantities when the source has none.
+            if re.match(r"^[+\-−]?\d", label):
+                extra.append((label, readings))
     missing = [item for item in missing if id(item) not in consumed_numbers]
     for cold in re.finditer(
         r"(?<!\w)(\d+(?:[.,]\d+)?)\s*(?:grados?|°\s*[cf]?)\s+bajo\s+cero\b", dst, re.I):
@@ -2142,10 +2771,9 @@ def _guard_issues(source: str, translated: str) -> List[str]:
                 extra.remove(dst_hit)
     if extra:
         # A digit the source spelled out ("three tablets" -> "3 comprimidos") is not new.
-        normalized_src = " " + re.sub(r"[^\w]+", " ", src.casefold()) + " "
         normalized_dst = " " + re.sub(r"[^\w]+", " ", dst.casefold()) + " "
         for item in list(extra):
-            forms = [f for v in sorted(item[1]) if re.fullmatch(r"\d+", v)
+            forms = [f for v in sorted(item[1]) if re.fullmatch(r"\d+", v) and len(v) <= 6
                      for f in _en_number_forms(int(v)) + _es_cardinal_forms(int(v))]
             if "1" in item[1]:
                 forms.extend(("a", "an"))
@@ -2153,7 +2781,7 @@ def _guard_issues(source: str, translated: str) -> List[str]:
                          if (candidate := _spelled_span(form, normalized_src)) is not None), None)
             if span is None:
                 for value in item[1]:
-                    if not re.fullmatch(r"\d+", value):
+                    if not re.fullmatch(r"\d+", value) or len(value) > 6:
                         continue
                     span = next((candidate for form in _en_ordinal_forms(int(value))
                                  if (candidate := _english_ordinal_in_translation(
@@ -2163,18 +2791,21 @@ def _guard_issues(source: str, translated: str) -> List[str]:
             if span is not None:
                 extra.remove(item)
                 normalized_src = normalized_src[:span[0]] + (" " * (span[1] - span[0])) + normalized_src[span[1]:]
-        if re.search(r"\bhalf\s+an?\s+hour\b", src, re.IGNORECASE):
-            for item in list(extra):
-                if "30" in item[1]:
-                    extra.remove(item)
+        if (re.search(r"\bhalf\s+an?\s+hour\b", src, re.IGNORECASE)
+                and re.search(r"(?<!\d)30(?:[.,]0+)?\s+minutos\b", dst, re.IGNORECASE)):
+            item = next((item for item in extra if "30" in item[1]), None)
+            if item is not None:
+                extra.remove(item)
     if missing:
         normalized_dst = " " + re.sub(r"[^\w]+", " ", dst.casefold()) + " "
         for item in list(missing):
             ordinal = bool(re.fullmatch(r"\d+(?:st|nd|rd|th)", item[0], re.IGNORECASE))
-            forms = [(form, True) for value in sorted(item[1]) if re.fullmatch(r"\d+", value)
+            forms = [(form, True) for value in sorted(item[1])
+                     if re.fullmatch(r"\d+", value) and len(value) <= 6
                      for form in _ES_ORDINALS.get(value, ())] if ordinal else []
-            if not ordinal or _ordinal_cardinal_alias_allowed(item[0], src):
-                forms.extend((form, False) for value in sorted(item[1]) if re.fullmatch(r"\d+", value)
+            if not ordinal or _ordinal_cardinal_alias_allowed(item[0], src, ordinal_context):
+                forms.extend((form, False) for value in sorted(item[1])
+                             if re.fullmatch(r"\d+", value) and len(value) <= 6
                              for form in _es_cardinal_forms(int(value)))
             if item[0].lower().endswith("x"):
                 if "2" in item[1]:
@@ -2205,7 +2836,10 @@ def _guard_issues(source: str, translated: str) -> List[str]:
 
 def _apply_guards(report: Dict[str, Any], source: str, translated: str) -> None:
     """Merge guard failures into the CLI report as blocking issues (never flips a fail to pass)."""
-    issues = _guard_issues(source, translated)
+    try:
+        issues = _guard_issues(source, translated)
+    except Exception:
+        issues = ["Validation guard failed closed."]
     report["pluginGuards"] = {"passed": not issues, "issues": issues, "scope": GUARD_SCOPE}
     if not issues:
         return

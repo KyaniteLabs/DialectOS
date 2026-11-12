@@ -1,0 +1,408 @@
+{"expected": "OK", "source": "In 2020 a new law passed.", "translated": "En 2020 se aprobó una nueva ley.", "origins": ["fable-r9/dos9_cases.txt:2"]}
+{"expected": "OK", "source": "Take 3 a day.", "translated": "Tome 3 al día.", "origins": ["fable-r9/dos9_cases.txt:3"]}
+{"expected": "OK", "source": "He scored 3 a game.", "translated": "Anotó 3 por partido.", "origins": ["fable-r9/dos9_cases.txt:4"]}
+{"expected": "OK", "source": "On page 5 a table shows the data.", "translated": "En la página 5 una tabla muestra los datos.", "origins": ["fable-r9/dos9_cases.txt:5"]}
+{"expected": "OK", "source": "The meeting is at 9 a.m.", "translated": "La reunión es a las 9 a. m.", "origins": ["fable-r9/dos9_cases.txt:6"]}
+{"expected": "OK", "source": "Top 10 day trips.", "translated": "Las 10 mejores excursiones de un día.", "origins": ["fable-r9/dos9_cases.txt:7"]}
+{"expected": "OK", "source": "See section 2 b for details.", "translated": "Consulte la sección 2 b para más detalles.", "origins": ["fable-r9/dos9_cases.txt:8"]}
+{"expected": "OK", "source": "Open 7 days a week, 24 h service.", "translated": "Abierto 7 días a la semana, servicio 24 h.", "origins": ["fable-r9/dos9_cases.txt:9"]}
+{"expected": "OK", "source": "Chapter 3 A covers this.", "translated": "El capítulo 3 A cubre esto.", "origins": ["fable-r9/dos9_cases.txt:10"]}
+{"expected": "OK", "source": "I have 2 d printers and 1 laser.", "translated": "Tengo 2 impresoras d y 1 láser.", "origins": ["fable-r9/dos9_cases.txt:11"]}
+{"expected": "OK", "source": "Line 4 s curve is steep.", "translated": "La curva s de la línea 4 es pronunciada.", "origins": ["fable-r9/dos9_cases.txt:12"]}
+{"expected": "OK", "source": "We sold 12 in May.", "translated": "Vendimos 12 en mayo.", "origins": ["fable-r9/dos9_cases.txt:13"]}
+{"expected": "OK", "source": "Add 2 g of salt.", "translated": "Añade 2 g de sal.", "origins": ["fable-r9/dos9_cases.txt:14"]}
+{"expected": "OK", "source": "In 1999 a storm hit.", "translated": "En 1999 azotó una tormenta.", "origins": ["fable-r9/dos9_cases.txt:15"]}
+{"expected": "OK", "source": "I ate 5 W burgers.", "translated": "Comí 5 hamburguesas W.", "origins": ["fable-r9/dos9_cases.txt:16"]}
+{"expected": "OK", "source": "Version 2 B is out.", "translated": "Ya salió la versión 2 B.", "origins": ["fable-r9/dos9_cases.txt:17"]}
+{"expected": "OK", "source": "He has 3 A grades.", "translated": "Tiene 3 calificaciones A.", "origins": ["fable-r9/dos9_cases.txt:18"]}
+{"expected": "OK", "source": "Group 4 V shape.", "translated": "Grupo 4 forma en V.", "origins": ["fable-r9/dos9_cases.txt:19"]}
+{"expected": "OK", "source": "Type 2 L bracket.", "translated": "Soporte tipo 2 en L.", "origins": ["fable-r9/dos9_cases.txt:20"]}
+{"expected": "OK", "source": "Win 5 G networks contracts.", "translated": "Gane 5 contratos de redes G.", "origins": ["fable-r9/dos9_cases.txt:21"]}
+{"expected": "OK", "source": "Turn 90 degrees left.", "translated": "Gire 90 grados a la izquierda.", "origins": ["fable-r9/dos9_cases.txt:22"]}
+{"expected": "OK", "source": "It is 30 degrees outside.", "translated": "Hace 30 grados afuera.", "origins": ["fable-r9/dos9_cases.txt:23"]}
+{"expected": "OK", "source": "A 45 degree angle.", "translated": "Un ángulo de 45 grados.", "origins": ["fable-r9/dos9_cases.txt:24"]}
+{"expected": "OK", "source": "After two weeks, call me.", "translated": "Después de dos semanas, llámame.", "origins": ["fable-r9/dos9_cases.txt:26"]}
+{"expected": "OK", "source": "At one point he left.", "translated": "En un momento se fue.", "origins": ["fable-r9/dos9_cases.txt:27"]}
+{"expected": "OK", "source": "Choose from three options.", "translated": "Elige entre tres opciones.", "origins": ["fable-r9/dos9_cases.txt:28"]}
+{"expected": "OK", "source": "By two votes, the motion passed.", "translated": "Por dos votos, la moción fue aprobada.", "origins": ["fable-r9/dos9_cases.txt:29"]}
+{"expected": "OK", "source": "Around ten people came.", "translated": "Vinieron unas diez personas.", "origins": ["fable-r9/dos9_cases.txt:30"]}
+{"expected": "OK", "source": "Before five witnesses.", "translated": "Ante cinco testigos.", "origins": ["fable-r9/dos9_cases.txt:31"]}
+{"expected": "OK", "source": "It grew by one percent.", "translated": "Creció un uno por ciento.", "origins": ["fable-r9/dos9_cases.txt:32"]}
+{"expected": "OK", "source": "From one to ten.", "translated": "Del uno al diez.", "origins": ["fable-r9/dos9_cases.txt:33"]}
+{"expected": "OK", "source": "At two locations.", "translated": "En dos ubicaciones.", "origins": ["fable-r9/dos9_cases.txt:34"]}
+{"expected": "OK", "source": "After three attempts, stop.", "translated": "Tras tres intentos, pare.", "origins": ["fable-r9/dos9_cases.txt:35"]}
+{"expected": "OK", "source": "Count from one.", "translated": "Cuenta desde uno.", "origins": ["fable-r9/dos9_cases.txt:36"]}
+{"expected": "OK", "source": "One by one they left.", "translated": "Se fueron uno por uno.", "origins": ["fable-r9/dos9_cases.txt:37"]}
+{"expected": "OK", "source": "Look at four examples.", "translated": "Mira cuatro ejemplos.", "origins": ["fable-r9/dos9_cases.txt:38"]}
+{"expected": "OK", "source": "Until six months pass.", "translated": "Hasta que pasen seis meses.", "origins": ["fable-r9/dos9_cases.txt:39"]}
+{"expected": "BAD", "source": "See you at five.", "translated": "Nos vemos a las seis.", "origins": ["fable-r9/dos9_cases.txt:40"]}
+{"expected": "OK", "source": "See you at five.", "translated": "Nos vemos a las 5.", "origins": ["fable-r9/dos9_cases.txt:41", "fable-r9/dos9b_cases.txt:20", "fable-r10/dos10_cases.txt:26"]}
+{"expected": "OK", "source": "Come by six.", "translated": "Ven antes de las seis.", "origins": ["fable-r9/dos9_cases.txt:42"]}
+{"expected": "OK", "source": "I ate 2 in the morning and 1 at night.", "translated": "Comí 2 por la mañana y 1 por la noche.", "origins": ["fable-r9/dos9_cases.txt:44"]}
+{"expected": "OK", "source": "We had 3 in the morning session.", "translated": "Tuvimos 3 en la sesión de la mañana.", "origins": ["fable-r9/dos9_cases.txt:45"]}
+{"expected": "OK", "source": "Only 4 in the afternoon class passed.", "translated": "Solo 4 de la clase de la tarde aprobaron.", "origins": ["fable-r9/dos9_cases.txt:46"]}
+{"expected": "OK", "source": "There were 5 in the evening show.", "translated": "Hubo 5 en la función de la noche.", "origins": ["fable-r9/dos9_cases.txt:47"]}
+{"expected": "OK", "source": "2 in the morning shift called in sick.", "translated": "2 del turno de la mañana avisaron que estaban enfermos.", "origins": ["fable-r9/dos9_cases.txt:48"]}
+{"expected": "OK", "source": "Take 1 in the evening.", "translated": "Tome 1 por la noche.", "origins": ["fable-r9/dos9_cases.txt:50"]}
+{"expected": "OK", "source": "Take 1 tablet in the evening.", "translated": "Tome 1 comprimido por la noche.", "origins": ["fable-r9/dos9_cases.txt:51"]}
+{"expected": "OK", "source": "Take one in the evening.", "translated": "Tome uno por la noche.", "origins": ["fable-r9/dos9_cases.txt:52"]}
+{"expected": "OK", "source": "Take 2 in the afternoon and 1 in the evening.", "translated": "Tome 2 por la tarde y 1 por la noche.", "origins": ["fable-r9/dos9_cases.txt:53"]}
+{"expected": "BAD", "source": "Take 2 in the morning and 1 at night.", "translated": "Tome 1 por la mañana y 2 por la noche.", "origins": ["fable-r9/dos9_cases.txt:54"]}
+{"expected": "BAD", "source": "Take 2 in the morning and 1 at night.", "translated": "Tome 1 al despertar y 2 al acostarse.", "origins": ["fable-r9/dos9_cases.txt:55"]}
+{"expected": "BAD", "source": "Take 2 in the morning and 1 at night.", "translated": "Tome 1 por la mañana.", "origins": ["fable-r9/dos9_cases.txt:56"]}
+{"expected": "BAD", "source": "Take 2 in the morning and 1 at night.", "translated": "Tome 1 de mañana y 2 de noche.", "origins": ["fable-r9/dos9_cases.txt:57"]}
+{"expected": "BAD", "source": "Take 2 in the morning and 1 at night.", "translated": "Tome 1 al amanecer y 2 al anochecer.", "origins": ["fable-r9/dos9_cases.txt:58"]}
+{"expected": "BAD", "source": "It costs 3k.", "translated": "Cuesta 3.", "origins": ["fable-r9/dos9_cases.txt:60"]}
+{"expected": "BAD", "source": "It costs 5k a month.", "translated": "Cuesta 5 al mes.", "origins": ["fable-r9/dos9_cases.txt:61"]}
+{"expected": "BAD", "source": "About 50 thousand people.", "translated": "Unas 50 personas.", "origins": ["fable-r9/dos9_cases.txt:62"]}
+{"expected": "BAD", "source": "It cost 3 billion dollars.", "translated": "Costó 3 dólares.", "origins": ["fable-r9/dos9_cases.txt:63"]}
+{"expected": "BAD", "source": "It cost 3 billion dollars.", "translated": "Costó 3 billones de dólares.", "origins": ["fable-r9/dos9_cases.txt:64"]}
+{"expected": "OK", "source": "It cost 3 trillion dollars.", "translated": "Costó 3 billones de dólares.", "origins": ["fable-r9/dos9_cases.txt:65"]}
+{"expected": "BAD", "source": "It cost 3 million dollars.", "translated": "Costó 3 mil dólares.", "origins": ["fable-r9/dos9_cases.txt:66"]}
+{"expected": "BAD", "source": "It cost 3 million dollars.", "translated": "Costó 3 mil millones de dólares.", "origins": ["fable-r9/dos9_cases.txt:67"]}
+{"expected": "OK", "source": "It cost 3 million dollars.", "translated": "Costó 3 millones de dólares.", "origins": ["fable-r9/dos9_cases.txt:68"]}
+{"expected": "OK", "source": "It cost 1.5 million dollars.", "translated": "Costó 1,5 millones de dólares.", "origins": ["fable-r9/dos9_cases.txt:69"]}
+{"expected": "OK", "source": "It cost 1.5 million dollars.", "translated": "Costó 1.500.000 dólares.", "origins": ["fable-r9/dos9_cases.txt:70"]}
+{"expected": "OK", "source": "A $2B fund.", "translated": "Un fondo de 2 mil millones de dólares.", "origins": ["fable-r9/dos9_cases.txt:71"]}
+{"expected": "OK", "source": "Raised $5M.", "translated": "Recaudó 5 millones de dólares.", "origins": ["fable-r9/dos9_cases.txt:72", "opus-r10/dos10.txt:4"]}
+{"expected": "OK", "source": "It holds 2 trillion cells.", "translated": "Contiene 2 billones de células.", "origins": ["fable-r9/dos9_cases.txt:73"]}
+{"expected": "BAD", "source": "It holds 2 billion cells.", "translated": "Contiene 2 billones de células.", "origins": ["fable-r9/dos9_cases.txt:74"]}
+{"expected": "OK", "source": "The US has 330 million people.", "translated": "EE. UU. tiene 330 millones de habitantes.", "origins": ["fable-r9/dos9_cases.txt:75"]}
+{"expected": "OK", "source": "Sold 5 thousand units.", "translated": "Vendió 5000 unidades.", "origins": ["fable-r9/dos9_cases.txt:76"]}
+{"expected": "OK", "source": "Sold 5 thousand units.", "translated": "Vendió cinco mil unidades.", "origins": ["fable-r9/dos9_cases.txt:77"]}
+{"expected": "OK", "source": "Two million people.", "translated": "Dos millones de personas.", "origins": ["fable-r9/dos9_cases.txt:78"]}
+{"expected": "OK", "source": "Two million people.", "translated": "2 millones de personas.", "origins": ["fable-r9/dos9_cases.txt:79"]}
+{"expected": "OK", "source": "3 million and 2 thousand.", "translated": "3 millones y 2 mil.", "origins": ["fable-r9/dos9_cases.txt:80"]}
+{"expected": "OK", "source": "It is 2x faster.", "translated": "Es el doble de rápido.", "origins": ["fable-r9/dos9_cases.txt:82"]}
+{"expected": "OK", "source": "It is 2x faster.", "translated": "Es 2 veces más rápido.", "origins": ["fable-r9/dos9_cases.txt:83"]}
+{"expected": "OK", "source": "It is 3x bigger.", "translated": "Es el triple de grande.", "origins": ["fable-r9/dos9_cases.txt:84"]}
+{"expected": "BAD", "source": "It is 2x faster.", "translated": "Es el triple de rápido.", "origins": ["fable-r9/dos9_cases.txt:85"]}
+{"expected": "OK", "source": "A 4x4 truck.", "translated": "Una camioneta 4x4.", "origins": ["fable-r9/dos9_cases.txt:86"]}
+{"expected": "OK", "source": "Use 0x1F as the mask.", "translated": "Usa 0x1F como máscara.", "origins": ["fable-r9/dos9_cases.txt:87"]}
+{"expected": "OK", "source": "Resolution 1920x1080.", "translated": "Resolución 1920x1080.", "origins": ["fable-r9/dos9_cases.txt:88"]}
+{"expected": "OK", "source": "Take 2x daily.", "translated": "Tome 2 veces al día.", "origins": ["fable-r9/dos9_cases.txt:89"]}
+{"expected": "OK", "source": "Watch in 4K.", "translated": "Míralo en 4K.", "origins": ["fable-r9/dos9_cases.txt:91"]}
+{"expected": "BAD", "source": "Watch in 4K.", "translated": "Míralo en 8K.", "origins": ["fable-r9/dos9_cases.txt:92"]}
+{"expected": "OK", "source": "Use 5G networks.", "translated": "Usa redes 5G.", "origins": ["fable-r9/dos9_cases.txt:93"]}
+{"expected": "OK", "source": "Enable 2FA now.", "translated": "Activa la 2FA ahora.", "origins": ["fable-r9/dos9_cases.txt:94"]}
+{"expected": "OK", "source": "A 3D model.", "translated": "Un modelo 3D.", "origins": ["fable-r9/dos9_cases.txt:95"]}
+{"expected": "OK", "source": "Buy the 13in laptop.", "translated": "Compra la laptop de 13 pulgadas.", "origins": ["fable-r9/dos9_cases.txt:96"]}
+{"expected": "OK", "source": "The B2B market and 3M tape.", "translated": "El mercado B2B y la cinta 3M.", "origins": ["fable-r9/dos9_cases.txt:97"]}
+{"expected": "OK", "source": "Covid19 hit in 2020.", "translated": "El covid19 llegó en 2020.", "origins": ["fable-r9/dos9_cases.txt:98"]}
+{"expected": "OK", "source": "Open at 9am.", "translated": "Abre a las 9 a. m.", "origins": ["fable-r9/dos9_cases.txt:99"]}
+{"expected": "OK", "source": "Model X5 costs 50 thousand.", "translated": "El modelo X5 cuesta 50 mil.", "origins": ["fable-r9/dos9_cases.txt:100"]}
+{"expected": "OK", "source": "He is 5yo.", "translated": "Tiene 5 años.", "origins": ["fable-r9/dos9_cases.txt:101"]}
+{"expected": "OK", "source": "A 64bit system.", "translated": "Un sistema de 64 bits.", "origins": ["fable-r9/dos9_cases.txt:102"]}
+{"expected": "OK", "source": "Speed limit 30mph.", "translated": "Límite de velocidad de 30 mph.", "origins": ["fable-r9/dos9_cases.txt:103"]}
+{"expected": "OK", "source": "Inject 5cc now.", "translated": "Inyecte 5 cc ahora.", "origins": ["fable-r9/dos9_cases.txt:104"]}
+{"expected": "OK", "source": "Set the margin to 10px.", "translated": "Pon el margen en 10 px.", "origins": ["fable-r9/dos9_cases.txt:105"]}
+{"expected": "OK", "source": "It uses 50kWh a day.", "translated": "Usa 50 kWh al día.", "origins": ["fable-r9/dos9_cases.txt:106"]}
+{"expected": "OK", "source": "A 20MPa pump.", "translated": "Una bomba de 20 MPa.", "origins": ["fable-r9/dos9_cases.txt:107"]}
+{"expected": "OK", "source": "Add 200 g of flour.", "translated": "Añada doscientos gramos de harina.", "origins": ["fable-r9/dos9_cases.txt:109"]}
+{"expected": "OK", "source": "Walk 2 km.", "translated": "Camine dos kilómetros.", "origins": ["fable-r9/dos9_cases.txt:110"]}
+{"expected": "OK", "source": "Wait 1 h.", "translated": "Espere una hora.", "origins": ["fable-r9/dos9_cases.txt:111"]}
+{"expected": "OK", "source": "Wait 1 min.", "translated": "Espere un minuto.", "origins": ["fable-r9/dos9_cases.txt:112"]}
+{"expected": "BAD", "source": "Add 200 g of flour.", "translated": "Añada trescientos gramos de harina.", "origins": ["fable-r9/dos9_cases.txt:113"]}
+{"expected": "OK", "source": "It takes 21 days.", "translated": "Tarda veintiún días.", "origins": ["fable-r9/dos9_cases.txt:114"]}
+{"expected": "OK", "source": "Take 1 tab daily.", "translated": "Tome un comprimido al día.", "origins": ["fable-r9/dos9_cases.txt:115"]}
+{"expected": "OK", "source": "From one side to another, 5 m apart.", "translated": "De una a otra parte, a 5 m de distancia.", "origins": ["fable-r9/dos9_cases.txt:116"]}
+{"expected": "OK", "source": "The second edition of the first volume.", "translated": "La 2.ª edición del 1.er volumen.", "origins": ["fable-r9/dos9_cases.txt:118"]}
+{"expected": "OK", "source": "Wait a second.", "translated": "Espera un segundo.", "origins": ["fable-r9/dos9_cases.txt:119"]}
+{"expected": "OK", "source": "The 21st century.", "translated": "El siglo XXI.", "origins": ["fable-r9/dos9_cases.txt:120"]}
+{"expected": "BAD", "source": "The 21st century.", "translated": "El siglo XX.", "origins": ["fable-r9/dos9_cases.txt:121"]}
+{"expected": "OK", "source": "The 3rd quarter.", "translated": "El tercer trimestre.", "origins": ["fable-r9/dos9_cases.txt:122"]}
+{"expected": "OK", "source": "One hundred first street.", "translated": "Calle ciento uno.", "origins": ["fable-r9/dos9_cases.txt:123"]}
+{"expected": "OK", "source": "Back in the 1990s.", "translated": "Allá por los años 90.", "origins": ["fable-r9/dos9_cases.txt:125"]}
+{"expected": "OK", "source": "Back in the 2010s.", "translated": "Allá por la década de 2010.", "origins": ["fable-r9/dos9_cases.txt:126"]}
+{"expected": "OK", "source": "In the 2020s.", "translated": "En los años 20.", "origins": ["fable-r9/dos9_cases.txt:127", "fable-r10/dos10_cases.txt:144"]}
+{"expected": "OK", "source": "It is -5 °C.", "translated": "Hace 5 grados bajo cero.", "origins": ["fable-r9/dos9_cases.txt:129"]}
+{"expected": "BAD", "source": "It is -5 °C.", "translated": "Hace 5 grados.", "origins": ["fable-r9/dos9_cases.txt:130"]}
+{"expected": "OK", "source": "Heat to 180 °C.", "translated": "Caliente a 180 ºC.", "origins": ["fable-r9/dos9_cases.txt:131"]}
+{"expected": "BAD", "source": "Heat to 180 °C.", "translated": "Caliente a 180 °F.", "origins": ["fable-r9/dos9_cases.txt:132"]}
+{"expected": "OK", "source": "Fever of 38 C.", "translated": "Fiebre de 38 °C.", "origins": ["fable-r9/dos9_cases.txt:133"]}
+{"expected": "OK", "source": "The shop opens at 9.", "translated": "La tienda abre a las 9.", "origins": ["fable-r9/dos9_cases.txt:135"]}
+{"expected": "OK", "source": "It lasts 3 hours.", "translated": "Dura 3 horas.", "origins": ["fable-r9/dos9_cases.txt:136"]}
+{"expected": "OK", "source": "Call the 2 nurses.", "translated": "Llama a las 2 enfermeras.", "origins": ["fable-r9/dos9_cases.txt:137"]}
+{"expected": "OK", "source": "Give it to the 3 girls.", "translated": "Dáselo a las 3 chicas.", "origins": ["fable-r9/dos9_cases.txt:138"]}
+{"expected": "OK", "source": "I saw the two movies.", "translated": "Vi las dos películas.", "origins": ["fable-r9/dos9_cases.txt:139"]}
+{"expected": "OK", "source": "Both of them agreed.", "translated": "Las dos estuvieron de acuerdo.", "origins": ["fable-r9/dos9_cases.txt:140"]}
+{"expected": "OK", "source": "I prefer the two red ones.", "translated": "Prefiero las dos rojas.", "origins": ["fable-r9/dos9_cases.txt:141"]}
+{"expected": "OK", "source": "It's two o'clock.", "translated": "Son las dos.", "origins": ["fable-r9/dos9_cases.txt:142"]}
+{"expected": "OK", "source": "The two houses are big.", "translated": "Las dos casas son grandes.", "origins": ["fable-r9/dos9_cases.txt:143"]}
+{"expected": "OK", "source": "They are the three winners.", "translated": "Son las tres ganadoras.", "origins": ["fable-r9/dos9_cases.txt:144"]}
+{"expected": "OK", "source": "Those are the four rules.", "translated": "Son las cuatro reglas.", "origins": ["fable-r9/dos9_cases.txt:145"]}
+{"expected": "OK", "source": "After one year, renew the license.", "translated": "Después de un año, renueve la licencia.", "origins": ["fable-r9/dos9b_cases.txt:2"]}
+{"expected": "OK", "source": "Wait until two people confirm.", "translated": "Espere hasta que dos personas confirmen.", "origins": ["fable-r9/dos9b_cases.txt:3"]}
+{"expected": "OK", "source": "Divide by two.", "translated": "Divida entre dos.", "origins": ["fable-r9/dos9b_cases.txt:4"]}
+{"expected": "OK", "source": "At ten percent interest.", "translated": "Al diez por ciento de interés.", "origins": ["fable-r9/dos9b_cases.txt:5"]}
+{"expected": "OK", "source": "Pick from five colors.", "translated": "Elija entre cinco colores.", "origins": ["fable-r9/dos9b_cases.txt:6"]}
+{"expected": "OK", "source": "Before one of us leaves.", "translated": "Antes de que uno de nosotros se vaya.", "origins": ["fable-r9/dos9b_cases.txt:7"]}
+{"expected": "OK", "source": "Children from three to six years old.", "translated": "Niños de tres a seis años.", "origins": ["fable-r9/dos9b_cases.txt:8"]}
+{"expected": "OK", "source": "Multiply by three.", "translated": "Multiplique por tres.", "origins": ["fable-r9/dos9b_cases.txt:9"]}
+{"expected": "OK", "source": "Step by step, one by one.", "translated": "Paso a paso, uno por uno.", "origins": ["fable-r9/dos9b_cases.txt:10"]}
+{"expected": "OK", "source": "After four days, the fever dropped.", "translated": "A los cuatro días, bajó la fiebre.", "origins": ["fable-r9/dos9b_cases.txt:11"]}
+{"expected": "OK", "source": "Take it after two meals.", "translated": "Tómelo después de dos comidas.", "origins": ["fable-r9/dos9b_cases.txt:12"]}
+{"expected": "OK", "source": "Around twelve students failed.", "translated": "Unos doce estudiantes reprobaron.", "origins": ["fable-r9/dos9b_cases.txt:13"]}
+{"expected": "OK", "source": "The store opens at nine.", "translated": "La tienda abre a las nueve.", "origins": ["fable-r9/dos9b_cases.txt:15"]}
+{"expected": "BAD", "source": "The store opens at nine.", "translated": "La tienda abre a las ocho.", "origins": ["fable-r9/dos9b_cases.txt:16"]}
+{"expected": "OK", "source": "Come after five.", "translated": "Ven después de las cinco.", "origins": ["fable-r9/dos9b_cases.txt:17"]}
+{"expected": "OK", "source": "We are open until eight.", "translated": "Abrimos hasta las ocho.", "origins": ["fable-r9/dos9b_cases.txt:18"]}
+{"expected": "OK", "source": "See you at 5.", "translated": "Nos vemos a las 5.", "origins": ["fable-r9/dos9b_cases.txt:19"]}
+{"expected": "OK", "source": "See you at five.", "translated": "Nos vemos a las 5:00.", "origins": ["fable-r9/dos9b_cases.txt:21"]}
+{"expected": "OK", "source": "See you at five.", "translated": "Nos vemos a las 17:00.", "origins": ["fable-r9/dos9b_cases.txt:22", "fable-r10/dos10_cases.txt:25"]}
+{"expected": "OK", "source": "The meeting is at two.", "translated": "La reunión es a las 2.", "origins": ["fable-r9/dos9b_cases.txt:23"]}
+{"expected": "OK", "source": "The meeting is at two.", "translated": "La reunión es a las 14 h.", "origins": ["fable-r9/dos9b_cases.txt:24"]}
+{"expected": "OK", "source": "They are the two best options.", "translated": "Son las dos mejores opciones.", "origins": ["fable-r9/dos9b_cases.txt:26"]}
+{"expected": "OK", "source": "These are the five keys to success.", "translated": "Son las cinco claves del éxito.", "origins": ["fable-r9/dos9b_cases.txt:27"]}
+{"expected": "OK", "source": "Those are the ten rules.", "translated": "Son las diez reglas.", "origins": ["fable-r9/dos9b_cases.txt:28"]}
+{"expected": "BAD", "source": "Salary: 80k per year.", "translated": "Salario: 80 al año.", "origins": ["fable-r9/dos9b_cases.txt:30"]}
+{"expected": "OK", "source": "Salary: 80k per year.", "translated": "Salario: 80 000 al año.", "origins": ["fable-r9/dos9b_cases.txt:31"]}
+{"expected": "OK", "source": "Salary: 80k per year.", "translated": "Salario: 80 mil al año.", "origins": ["fable-r9/dos9b_cases.txt:32"]}
+{"expected": "OK", "source": "Salary: 80k per year.", "translated": "Salario: 80k al año.", "origins": ["fable-r9/dos9b_cases.txt:33"]}
+{"expected": "BAD", "source": "Salary: 80k per year.", "translated": "Salario: 80 millones al año.", "origins": ["fable-r9/dos9b_cases.txt:34"]}
+{"expected": "BAD", "source": "A 5 million budget.", "translated": "Un presupuesto de 5.", "origins": ["fable-r9/dos9b_cases.txt:35"]}
+{"expected": "OK", "source": "I worked 3 day shifts.", "translated": "Trabajé 3 turnos de día.", "origins": ["fable-r9/dos9b_cases.txt:37"]}
+{"expected": "OK", "source": "The top 5 day hikes.", "translated": "Las 5 mejores caminatas de un día.", "origins": ["fable-r9/dos9b_cases.txt:38"]}
+{"expected": "OK", "source": "A 2 second delay.", "translated": "Un retraso de 2 segundos.", "origins": ["fable-r9/dos9b_cases.txt:39"]}
+{"expected": "OK", "source": "Reserve 2 tablet devices.", "translated": "Reserve 2 dispositivos tablet.", "origins": ["fable-r9/dos9b_cases.txt:40"]}
+{"expected": "OK", "source": "We need 4 pound signs.", "translated": "Necesitamos 4 signos de libra.", "origins": ["fable-r9/dos9b_cases.txt:41"]}
+{"expected": "OK", "source": "He got 3 second places.", "translated": "Obtuvo 3 segundos lugares.", "origins": ["fable-r9/dos9b_cases.txt:42"]}
+{"expected": "OK", "source": "Windows 10 S mode.", "translated": "Modo S de Windows 10.", "origins": ["fable-r9/dos9b_cases.txt:43"]}
+{"expected": "OK", "source": "Buy 2 L brackets.", "translated": "Compre 2 soportes en L.", "origins": ["fable-r9/dos9b_cases.txt:44"]}
+{"expected": "OK", "source": "Section 3 B applies.", "translated": "Se aplica la sección 3 B.", "origins": ["fable-r9/dos9b_cases.txt:45"]}
+{"expected": "OK", "source": "There are 5 minute differences.", "translated": "Hay 5 diferencias mínimas.", "origins": ["fable-r9/dos9b_cases.txt:46"]}
+{"expected": "OK", "source": "Order 3 hour glasses.", "translated": "Pida 3 relojes de arena.", "origins": ["fable-r9/dos9b_cases.txt:47"]}
+{"expected": "OK", "source": "12 h shifts.", "translated": "Turnos de 12 h.", "origins": ["fable-r9/dos9b_cases.txt:48"]}
+{"expected": "OK", "source": "The 3 day weekend.", "translated": "El fin de semana de 3 días.", "origins": ["fable-r9/dos9b_cases.txt:49"]}
+{"expected": "BAD", "source": "The meeting at five is cancelled.", "translated": "La reunión a las seis está cancelada.", "origins": ["fable-r10/dos10_cases.txt:2"]}
+{"expected": "BAD", "source": "See you at five, as agreed.", "translated": "Nos vemos a las seis, como acordamos.", "origins": ["fable-r10/dos10_cases.txt:3"]}
+{"expected": "BAD", "source": "We meet at six this Friday.", "translated": "Nos reunimos a las siete este viernes.", "origins": ["fable-r10/dos10_cases.txt:4"]}
+{"expected": "BAD", "source": "Dinner is at seven unless it rains.", "translated": "La cena es a las ocho a menos que llueva.", "origins": ["fable-r10/dos10_cases.txt:5"]}
+{"expected": "BAD", "source": "Call me at nine, thanks.", "translated": "Llámame a las diez, gracias.", "origins": ["fable-r10/dos10_cases.txt:6"]}
+{"expected": "BAD", "source": "Open from nine until five.", "translated": "Abierto desde las ocho hasta las seis.", "origins": ["fable-r10/dos10_cases.txt:7"]}
+{"expected": "BAD", "source": "We work from nine to five.", "translated": "Trabajamos de ocho a seis.", "origins": ["fable-r10/dos10_cases.txt:8"]}
+{"expected": "BAD", "source": "Come by five.", "translated": "Ven antes de las seis.", "origins": ["fable-r10/dos10_cases.txt:9"]}
+{"expected": "BAD", "source": "The store closes at eight on Sundays.", "translated": "La tienda cierra a las nueve los domingos.", "origins": ["fable-r10/dos10_cases.txt:10"]}
+{"expected": "OK", "source": "We leave at five.", "translated": "A las cinco salimos.", "origins": ["fable-r10/dos10_cases.txt:12"]}
+{"expected": "OK", "source": "At five we leave.", "translated": "A las cinco nos vamos.", "origins": ["fable-r10/dos10_cases.txt:13"]}
+{"expected": "OK", "source": "The meeting at five is cancelled.", "translated": "La reunión a las cinco está cancelada.", "origins": ["fable-r10/dos10_cases.txt:14"]}
+{"expected": "OK", "source": "At six we have dinner.", "translated": "A las seis cenamos.", "origins": ["fable-r10/dos10_cases.txt:15"]}
+{"expected": "OK", "source": "The class at nine is full.", "translated": "La clase de las nueve está llena.", "origins": ["fable-r10/dos10_cases.txt:16"]}
+{"expected": "OK", "source": "See you at five, as agreed.", "translated": "Nos vemos a las cinco, según lo acordado.", "origins": ["fable-r10/dos10_cases.txt:17"]}
+{"expected": "OK", "source": "It is three, more or less.", "translated": "Son las tres más o menos.", "origins": ["fable-r10/dos10_cases.txt:18"]}
+{"expected": "OK", "source": "At 5 pm we close.", "translated": "A las 5 p. m. cerramos.", "origins": ["fable-r10/dos10_cases.txt:19"]}
+{"expected": "OK", "source": "We close at 17:00.", "translated": "A las 17:00 cerramos.", "origins": ["fable-r10/dos10_cases.txt:20"]}
+{"expected": "OK", "source": "We leave at 5 pm.", "translated": "A las 5 de la tarde salimos.", "origins": ["fable-r10/dos10_cases.txt:21"]}
+{"expected": "OK", "source": "At 5 we leave.", "translated": "A las 5 salimos.", "origins": ["fable-r10/dos10_cases.txt:22"]}
+{"expected": "OK", "source": "Come at 5.", "translated": "Venga a las 5.", "origins": ["fable-r10/dos10_cases.txt:23"]}
+{"expected": "BAD", "source": "Come at 5.", "translated": "Venga a las 6.", "origins": ["fable-r10/dos10_cases.txt:24"]}
+{"expected": "OK", "source": "Go to the 3rd floor.", "translated": "Vaya al piso 3.", "origins": ["fable-r10/dos10_cases.txt:28"]}
+{"expected": "OK", "source": "It is on the 7th day.", "translated": "Es el día 7.", "origins": ["fable-r10/dos10_cases.txt:29"]}
+{"expected": "OK", "source": "Read the 2nd chapter.", "translated": "Lea el capítulo 2.", "origins": ["fable-r10/dos10_cases.txt:30"]}
+{"expected": "OK", "source": "This is the 5th attempt.", "translated": "Este es el intento número 5.", "origins": ["fable-r10/dos10_cases.txt:31"]}
+{"expected": "OK", "source": "Take the 2nd dose tomorrow.", "translated": "Tome la dosis 2 mañana.", "origins": ["fable-r10/dos10_cases.txt:32"]}
+{"expected": "OK", "source": "Go to the 3rd floor.", "translated": "Vaya al 3.er piso.", "origins": ["fable-r10/dos10_cases.txt:33"]}
+{"expected": "OK", "source": "Go to the 3rd floor.", "translated": "Vaya al tercer piso.", "origins": ["fable-r10/dos10_cases.txt:34"]}
+{"expected": "OK", "source": "On the 4th of July.", "translated": "El 4 de julio.", "origins": ["fable-r10/dos10_cases.txt:35"]}
+{"expected": "OK", "source": "The 21st century.", "translated": "El siglo 21.", "origins": ["fable-r10/dos10_cases.txt:36"]}
+{"expected": "BAD", "source": "Go to the 3rd floor.", "translated": "Vaya al piso 4.", "origins": ["fable-r10/dos10_cases.txt:37"]}
+{"expected": "OK", "source": "It is 24k gold.", "translated": "Es oro de 24 quilates.", "origins": ["fable-r10/dos10_cases.txt:39"]}
+{"expected": "OK", "source": "I ran a 10K yesterday.", "translated": "Ayer corrí una carrera de 10 km.", "origins": ["fable-r10/dos10_cases.txt:40"]}
+{"expected": "OK", "source": "I ran 10K yesterday.", "translated": "Ayer corrí 10 km.", "origins": ["fable-r10/dos10_cases.txt:41"]}
+{"expected": "OK", "source": "The 10K starts at noon.", "translated": "La carrera de 10 km empieza al mediodía.", "origins": ["fable-r10/dos10_cases.txt:42"]}
+{"expected": "OK", "source": "She finished the 5K in 30 minutes.", "translated": "Terminó los 5 km en 30 minutos.", "origins": ["fable-r10/dos10_cases.txt:43"]}
+{"expected": "OK", "source": "A 4K monitor.", "translated": "Un monitor 4K.", "origins": ["fable-r10/dos10_cases.txt:44"]}
+{"expected": "OK", "source": "The cable costs $40 and is 5 m long.", "translated": "El cable cuesta $40 y mide 5 m de largo.", "origins": ["fable-r10/dos10_cases.txt:45"]}
+{"expected": "OK", "source": "He paid for 5 m of fabric.", "translated": "Pagó 5 m de tela.", "origins": ["fable-r10/dos10_cases.txt:46"]}
+{"expected": "OK", "source": "The fence cost $900 and is 30 m long.", "translated": "La cerca costó $900 y mide 30 m de largo.", "origins": ["fable-r10/dos10_cases.txt:47"]}
+{"expected": "OK", "source": "The budget is 5M.", "translated": "El presupuesto es de 5M.", "origins": ["fable-r10/dos10_cases.txt:48"]}
+{"expected": "OK", "source": "The budget is $5M.", "translated": "El presupuesto es de 5 millones de dólares.", "origins": ["fable-r10/dos10_cases.txt:49"]}
+{"expected": "OK", "source": "We raised 3M last year.", "translated": "Recaudamos 3 millones el año pasado.", "origins": ["fable-r10/dos10_cases.txt:50"]}
+{"expected": "BAD", "source": "We raised 3M last year.", "translated": "Recaudamos 3 mil el año pasado.", "origins": ["fable-r10/dos10_cases.txt:51"]}
+{"expected": "OK", "source": "Revenue was 2B.", "translated": "Los ingresos fueron de 2 mil millones.", "origins": ["fable-r10/dos10_cases.txt:52"]}
+{"expected": "OK", "source": "It costs 5k.", "translated": "Cuesta 5 mil.", "origins": ["fable-r10/dos10_cases.txt:53"]}
+{"expected": "OK", "source": "It costs 5k.", "translated": "Cuesta 5000.", "origins": ["fable-r10/dos10_cases.txt:54"]}
+{"expected": "OK", "source": "A salary of 80k.", "translated": "Un salario de 80.000.", "origins": ["fable-r10/dos10_cases.txt:55"]}
+{"expected": "OK", "source": "The price is 1.5 million.", "translated": "El precio es de 1,5 millones.", "origins": ["fable-r10/dos10_cases.txt:56"]}
+{"expected": "OK", "source": "The price is 1.5 million.", "translated": "El precio es de 1 500 000.", "origins": ["fable-r10/dos10_cases.txt:57"]}
+{"expected": "BAD", "source": "2 billion people.", "translated": "2 billones de personas.", "origins": ["fable-r10/dos10_cases.txt:58"]}
+{"expected": "OK", "source": "2 billion people.", "translated": "2 mil millones de personas.", "origins": ["fable-r10/dos10_cases.txt:59"]}
+{"expected": "OK", "source": "2 billion people.", "translated": "2000 millones de personas.", "origins": ["fable-r10/dos10_cases.txt:60"]}
+{"expected": "OK", "source": "A worth of 3 b in sales.", "translated": "Un valor de 3 mil millones en ventas.", "origins": ["fable-r10/dos10_cases.txt:61"]}
+{"expected": "OK", "source": "Buy 3 b batteries.", "translated": "Compre 3 pilas b.", "origins": ["fable-r10/dos10_cases.txt:62"]}
+{"expected": "BAD", "source": "The room is 5 m wide.", "translated": "La sala mide 5 km de ancho.", "origins": ["fable-r10/dos10_cases.txt:64"]}
+{"expected": "BAD", "source": "Add 2 g sugar.", "translated": "Añada 2 kg de azúcar.", "origins": ["fable-r10/dos10_cases.txt:65"]}
+{"expected": "BAD", "source": "Take 5 g daily.", "translated": "Tome 5 mg al día.", "origins": ["fable-r10/dos10_cases.txt:66"]}
+{"expected": "BAD", "source": "Drink 2 l water.", "translated": "Beba 2 ml de agua.", "origins": ["fable-r10/dos10_cases.txt:67"]}
+{"expected": "BAD", "source": "Wait 30 minutes this time.", "translated": "Espere 30 segundos esta vez.", "origins": ["fable-r10/dos10_cases.txt:68"]}
+{"expected": "BAD", "source": "Wait 5 minutes as instructed.", "translated": "Espere 5 horas como se indica.", "origins": ["fable-r10/dos10_cases.txt:69"]}
+{"expected": "BAD", "source": "Rest 2 days this week.", "translated": "Descanse 2 horas esta semana.", "origins": ["fable-r10/dos10_cases.txt:70"]}
+{"expected": "BAD", "source": "Rest for 2 hours is enough.", "translated": "Descansar 2 días es suficiente.", "origins": ["fable-r10/dos10_cases.txt:71"]}
+{"expected": "BAD", "source": "Lost 10 pounds less than planned.", "translated": "Perdió 10 kilos menos de lo previsto.", "origins": ["fable-r10/dos10_cases.txt:72"]}
+{"expected": "BAD", "source": "Take 2 tablets as needed.", "translated": "Tome 2 gotas según sea necesario.", "origins": ["fable-r10/dos10_cases.txt:73"]}
+{"expected": "BAD", "source": "The pool is 2 m deep.", "translated": "La piscina tiene 2 cm de profundidad.", "origins": ["fable-r10/dos10_cases.txt:74"]}
+{"expected": "BAD", "source": "Infuse over 2 h continuously.", "translated": "Infundir durante 2 min continuamente.", "origins": ["fable-r10/dos10_cases.txt:75"]}
+{"expected": "OK", "source": "The room is 5 m wide.", "translated": "La sala mide 5 m de ancho.", "origins": ["fable-r10/dos10_cases.txt:76"]}
+{"expected": "OK", "source": "Wait 30 minutes this time.", "translated": "Espere 30 minutos esta vez.", "origins": ["fable-r10/dos10_cases.txt:77"]}
+{"expected": "OK", "source": "Thank you so much!", "translated": "¡Mil gracias!", "origins": ["fable-r10/dos10_cases.txt:79"]}
+{"expected": "OK", "source": "Thanks a million!", "translated": "¡Un millón de gracias!", "origins": ["fable-r10/dos10_cases.txt:80"]}
+{"expected": "OK", "source": "A thousand apologies.", "translated": "Mil disculpas.", "origins": ["fable-r10/dos10_cases.txt:81"]}
+{"expected": "OK", "source": "Wait a couple of hours.", "translated": "Espere dos horas.", "origins": ["fable-r10/dos10_cases.txt:82"]}
+{"expected": "OK", "source": "Take one tablet every other day.", "translated": "Tome una tableta cada dos días.", "origins": ["fable-r10/dos10_cases.txt:83"]}
+{"expected": "OK", "source": "Come back in a fortnight.", "translated": "Vuelva en quince días.", "origins": ["fable-r10/dos10_cases.txt:84"]}
+{"expected": "OK", "source": "Come back in a week.", "translated": "Vuelva en siete días.", "origins": ["fable-r10/dos10_cases.txt:85"]}
+{"expected": "OK", "source": "Wait two hours.", "translated": "Espere dos horas.", "origins": ["fable-r10/dos10_cases.txt:86"]}
+{"expected": "BAD", "source": "Wait two hours.", "translated": "Espere tres horas.", "origins": ["fable-r10/dos10_cases.txt:87"]}
+{"expected": "OK", "source": "It takes a quarter of an hour.", "translated": "Tarda quince minutos.", "origins": ["fable-r10/dos10_cases.txt:88"]}
+{"expected": "OK", "source": "There are thousands of stars.", "translated": "Hay miles de estrellas.", "origins": ["fable-r10/dos10_cases.txt:89"]}
+{"expected": "OK", "source": "One thousand and one nights.", "translated": "Las mil y una noches.", "origins": ["fable-r10/dos10_cases.txt:90"]}
+{"expected": "OK", "source": "He is going a mile a minute.", "translated": "Va a mil por hora.", "origins": ["fable-r10/dos10_cases.txt:91"]}
+{"expected": "OK", "source": "Two thousand people came.", "translated": "Vinieron dos mil personas.", "origins": ["fable-r10/dos10_cases.txt:92"]}
+{"expected": "BAD", "source": "Two thousand people came.", "translated": "Vinieron tres mil personas.", "origins": ["fable-r10/dos10_cases.txt:93"]}
+{"expected": "OK", "source": "A million people came.", "translated": "Vino un millón de personas.", "origins": ["fable-r10/dos10_cases.txt:94"]}
+{"expected": "OK", "source": "Wait 90 minutes.", "translated": "Espere 1,5 horas.", "origins": ["fable-r10/dos10_cases.txt:96"]}
+{"expected": "OK", "source": "Wait 2 hours.", "translated": "Espere 120 minutos.", "origins": ["fable-r10/dos10_cases.txt:97"]}
+{"expected": "BAD", "source": "Wait 2 hours.", "translated": "Espere 12 minutos.", "origins": ["fable-r10/dos10_cases.txt:98"]}
+{"expected": "OK", "source": "Wait 60 minutes.", "translated": "Espere 1 hora.", "origins": ["fable-r10/dos10_cases.txt:99"]}
+{"expected": "OK", "source": "It lasts 1 day.", "translated": "Dura 24 horas.", "origins": ["fable-r10/dos10_cases.txt:100"]}
+{"expected": "BAD", "source": "It lasts 2 days.", "translated": "Dura 24 horas.", "origins": ["fable-r10/dos10_cases.txt:101"]}
+{"expected": "BAD", "source": "Take 500 mg every 8 hours.", "translated": "Tome 500 mg cada 480 minutos durante 8 horas.", "origins": ["fable-r10/dos10_cases.txt:102"]}
+{"expected": "BAD", "source": "Take it three times daily.", "translated": "Tómelo dos veces al día.", "origins": ["fable-r10/dos10_cases.txt:104"]}
+{"expected": "BAD", "source": "Take it 3 times daily.", "translated": "Tómelo 2 veces al día.", "origins": ["fable-r10/dos10_cases.txt:105"]}
+{"expected": "BAD", "source": "Take it four times a day.", "translated": "Tómelo tres veces al día.", "origins": ["fable-r10/dos10_cases.txt:106"]}
+{"expected": "BAD", "source": "Take it twice a day.", "translated": "Tómelo una vez al día.", "origins": ["fable-r10/dos10_cases.txt:107"]}
+{"expected": "BAD", "source": "Take it twice a week.", "translated": "Tómelo tres veces por semana.", "origins": ["fable-r10/dos10_cases.txt:108"]}
+{"expected": "BAD", "source": "Take it once a month.", "translated": "Tómelo dos veces al mes.", "origins": ["fable-r10/dos10_cases.txt:109"]}
+{"expected": "OK", "source": "Take it twice a day.", "translated": "Tómelo dos veces al día.", "origins": ["fable-r10/dos10_cases.txt:110"]}
+{"expected": "OK", "source": "Take it twice a day.", "translated": "Tómelo 2 veces al día.", "origins": ["fable-r10/dos10_cases.txt:111"]}
+{"expected": "OK", "source": "Take it twice a day.", "translated": "Tómelo dos veces cada día.", "origins": ["fable-r10/dos10_cases.txt:112"]}
+{"expected": "OK", "source": "Take it twice daily.", "translated": "Tómelo dos veces diarias.", "origins": ["fable-r10/dos10_cases.txt:113"]}
+{"expected": "OK", "source": "Take it twice daily.", "translated": "Tómelo cada 12 horas.", "origins": ["fable-r10/dos10_cases.txt:114"]}
+{"expected": "OK", "source": "Take 1 tablet daily.", "translated": "Tome 1 comprimido al día.", "origins": ["fable-r10/dos10_cases.txt:115"]}
+{"expected": "OK", "source": "Take 1 tablet daily.", "translated": "Tome 1 comprimido diario.", "origins": ["fable-r10/dos10_cases.txt:116"]}
+{"expected": "OK", "source": "Take one tablet once a day.", "translated": "Tome una tableta una vez al día.", "origins": ["fable-r10/dos10_cases.txt:117"]}
+{"expected": "OK", "source": "Apply once daily at bedtime.", "translated": "Aplique una vez al día al acostarse.", "origins": ["fable-r10/dos10_cases.txt:118"]}
+{"expected": "OK", "source": "I go there twice a day.", "translated": "Voy allí dos veces por día.", "origins": ["fable-r10/dos10_cases.txt:119"]}
+{"expected": "OK", "source": "The bus runs 3 times a day.", "translated": "El autobús pasa 3 veces al día.", "origins": ["fable-r10/dos10_cases.txt:120"]}
+{"expected": "OK", "source": "The daily report is ready.", "translated": "El informe diario está listo.", "origins": ["fable-r10/dos10_cases.txt:121"]}
+{"expected": "OK", "source": "Once upon a time.", "translated": "Érase una vez.", "origins": ["fable-r10/dos10_cases.txt:122"]}
+{"expected": "OK", "source": "Feed the cat once a day, every day.", "translated": "Alimente al gato una vez al día, todos los días.", "origins": ["fable-r10/dos10_cases.txt:123"]}
+{"expected": "BAD", "source": "Take 5 mg in the morning and 10 mg at night.", "translated": "Tome 10 mg por la mañana y 5 mg por la noche.", "origins": ["fable-r10/dos10_cases.txt:125"]}
+{"expected": "OK", "source": "Take 5 mg in the morning and 10 mg at night.", "translated": "Tome 5 mg por la mañana y 10 mg por la noche.", "origins": ["fable-r10/dos10_cases.txt:126"]}
+{"expected": "OK", "source": "Take 2 in the morning and 1 at night.", "translated": "Tome 2 por la mañana y 1 antes de dormir.", "origins": ["fable-r10/dos10_cases.txt:127"]}
+{"expected": "OK", "source": "Take 2 in the morning and 1 at night.", "translated": "Tome 2 en la mañana y 1 en la noche.", "origins": ["fable-r10/dos10_cases.txt:128"]}
+{"expected": "OK", "source": "Take 2 in the morning and 1 at night.", "translated": "Por la mañana tome 2 y por la noche 1.", "origins": ["fable-r10/dos10_cases.txt:129"]}
+{"expected": "BAD", "source": "Take 2 in the morning and 1 at night.", "translated": "Por la mañana tome 1 y por la noche 2.", "origins": ["fable-r10/dos10_cases.txt:130"]}
+{"expected": "OK", "source": "Take 2 in the morning and 1 in the evening.", "translated": "Tome 2 por la mañana y 1 por la noche.", "origins": ["fable-r10/dos10_cases.txt:131"]}
+{"expected": "OK", "source": "Take 2 in the morning and 1 in the evening.", "translated": "Tome 2 por la mañana y 1 por la tarde.", "origins": ["fable-r10/dos10_cases.txt:132"]}
+{"expected": "BAD", "source": "Take 2 in the morning and 1 in the evening.", "translated": "Tome 1 por la mañana y 2 por la tarde.", "origins": ["fable-r10/dos10_cases.txt:133"]}
+{"expected": "BAD", "source": "Take 1 in the afternoon and 2 in the evening.", "translated": "Tome 2 por la tarde y 1 por la noche.", "origins": ["fable-r10/dos10_cases.txt:134"]}
+{"expected": "OK", "source": "Take 1 in the afternoon and 2 in the evening.", "translated": "Tome 1 por la tarde y 2 por la noche.", "origins": ["fable-r10/dos10_cases.txt:135"]}
+{"expected": "OK", "source": "Take 2 puffs in the morning and 1 puff at night.", "translated": "Haga 2 inhalaciones por la mañana y 1 inhalación por la noche.", "origins": ["fable-r10/dos10_cases.txt:136"]}
+{"expected": "BAD", "source": "Take 2 puffs in the morning and 1 puff at night.", "translated": "Haga 1 inhalación por la mañana y 2 inhalaciones por la noche.", "origins": ["fable-r10/dos10_cases.txt:137"]}
+{"expected": "OK", "source": "Take 2 tablets by mouth in the morning and 1 at night.", "translated": "Tome 2 comprimidos por vía oral por la mañana y 1 por la noche.", "origins": ["fable-r10/dos10_cases.txt:138"]}
+{"expected": "BAD", "source": "Take 2 tablets with food in the morning and 1 tablet with water at night.", "translated": "Tome 1 comprimido con comida por la mañana y 2 comprimidos con agua por la noche.", "origins": ["fable-r10/dos10_cases.txt:139"]}
+{"expected": "OK", "source": "I had 2 in the morning and 3 at night.", "translated": "Comí 2 por la mañana y 3 por la noche.", "origins": ["fable-r10/dos10_cases.txt:140"]}
+{"expected": "OK", "source": "We met 3 people in the morning.", "translated": "Conocimos a 3 personas por la mañana.", "origins": ["fable-r10/dos10_cases.txt:141"]}
+{"expected": "OK", "source": "In the 2020s.", "translated": "En la década de 2020.", "origins": ["fable-r10/dos10_cases.txt:143"]}
+{"expected": "OK", "source": "In the 1990s.", "translated": "En los años 90.", "origins": ["fable-r10/dos10_cases.txt:145"]}
+{"expected": "OK", "source": "In the 1990s.", "translated": "En los noventa.", "origins": ["fable-r10/dos10_cases.txt:146"]}
+{"expected": "BAD", "source": "In the 1990s.", "translated": "En los años 80.", "origins": ["fable-r10/dos10_cases.txt:147"]}
+{"expected": "BAD", "source": "Born in the 2020s, aged 20.", "translated": "Nacido en 2020.", "origins": ["fable-r10/dos10_cases.txt:148"]}
+{"expected": "OK", "source": "Version 2 is out.", "translated": "La versión 2 ya salió.", "origins": ["fable-r10/dos10_cases.txt:150"]}
+{"expected": "OK", "source": "Take 2 tablets.", "translated": "Tome 2 comprimidos.", "origins": ["fable-r10/dos10_cases.txt:151"]}
+{"expected": "BAD", "source": "Take 2 tablets.", "translated": "Tome 3 comprimidos.", "origins": ["fable-r10/dos10_cases.txt:152"]}
+{"expected": "OK", "source": "It weighs 1,000 kg.", "translated": "Pesa 1.000 kg.", "origins": ["fable-r10/dos10_cases.txt:153"]}
+{"expected": "OK", "source": "It weighs 1,000 kg.", "translated": "Pesa 1000 kg.", "origins": ["fable-r10/dos10_cases.txt:154"]}
+{"expected": "BAD", "source": "It weighs 1,000 kg.", "translated": "Pesa 1 kg.", "origins": ["fable-r10/dos10_cases.txt:155"]}
+{"expected": "OK", "source": "Half an hour later.", "translated": "30 minutos después.", "origins": ["fable-r10/dos10_cases.txt:156"]}
+{"expected": "BAD", "source": "Wait 5 minutes, half an hour at most.", "translated": "Espere 5 minutos, 30 horas como máximo.", "origins": ["fable-r10/dos10_cases.txt:157"]}
+{"expected": "OK", "source": "I ate 3 in the morning.", "translated": "Comí 3 por la mañana.", "origins": ["fable-r10/dos10_cases.txt:158"]}
+{"expected": "OK", "source": "Meet me at 8 in the morning.", "translated": "Nos vemos a las 8 de la mañana.", "origins": ["fable-r10/dos10_cases.txt:159"]}
+{"expected": "BAD", "source": "Meet me at 8 in the morning.", "translated": "Nos vemos a las 9 de la mañana.", "origins": ["fable-r10/dos10_cases.txt:160"]}
+{"expected": "BAD", "source": "The 8 in the morning class is full.", "translated": "La clase de las 9 de la mañana está llena.", "origins": ["fable-r10/dos10_cases.txt:161"]}
+{"expected": "BAD", "source": "Come 8 in the morning sharp.", "translated": "Venga a las 9 de la mañana en punto.", "origins": ["fable-r10/dos10_cases.txt:162"]}
+{"expected": "BAD", "source": "Arrive 8 in the morning as usual.", "translated": "Llegue a las 9 de la mañana como siempre.", "origins": ["fable-r10/dos10_cases.txt:163"]}
+{"expected": "OK", "source": "It costs 10k.", "translated": "Cuesta 10 mil.", "origins": ["opus-r10/dos10.txt:1"]}
+{"expected": "OK", "source": "It costs 10k.", "translated": "Cuesta 10.000.", "origins": ["opus-r10/dos10.txt:2"]}
+{"expected": "OK", "source": "Salary: 50k a year.", "translated": "Salario: 50 000 al año.", "origins": ["opus-r10/dos10.txt:3"]}
+{"expected": "OK", "source": "Raised $5M.", "translated": "Recaudó US$5 M.", "origins": ["opus-r10/dos10.txt:5"]}
+{"expected": "OK", "source": "It costs 1.5k.", "translated": "Cuesta 1500.", "origins": ["opus-r10/dos10.txt:6"]}
+{"expected": "OK", "source": "It costs 1.5k.", "translated": "Cuesta 1,5 mil.", "origins": ["opus-r10/dos10.txt:7"]}
+{"expected": "OK", "source": "The file is 5M.", "translated": "El archivo pesa 5M.", "origins": ["opus-r10/dos10.txt:8"]}
+{"expected": "OK", "source": "Use 5M of RAM.", "translated": "Use 5M de RAM.", "origins": ["opus-r10/dos10.txt:9"]}
+{"expected": "OK", "source": "A 3 billion dollar deal.", "translated": "Un acuerdo de 3 mil millones de dólares.", "origins": ["opus-r10/dos10.txt:10"]}
+{"expected": "OK", "source": "Population: 8 million.", "translated": "Población: 8.000.000.", "origins": ["opus-r10/dos10.txt:11"]}
+{"expected": "OK", "source": "They have 1 billón euros.", "translated": "Tienen 1 billón de euros.", "origins": ["opus-r10/dos10.txt:12"]}
+{"expected": "BAD", "source": "A 3 billion dollar deal.", "translated": "Un acuerdo de 3 billones de dólares.", "origins": ["opus-r10/dos10.txt:13"]}
+{"expected": "OK", "source": "Take 1 tablet twice a day.", "translated": "Tome 1 tableta dos veces al día.", "origins": ["opus-r10/dos10.txt:14"]}
+{"expected": "OK", "source": "Take 1 tablet twice a day.", "translated": "Tome 1 tableta 2 veces al día.", "origins": ["opus-r10/dos10.txt:15"]}
+{"expected": "OK", "source": "Take 1 tablet twice daily.", "translated": "Tome 1 tableta cada 12 horas.", "origins": ["opus-r10/dos10.txt:16"]}
+{"expected": "OK", "source": "Take 1 tablet once a day.", "translated": "Tome 1 tableta una vez al día.", "origins": ["opus-r10/dos10.txt:17"]}
+{"expected": "OK", "source": "Take 1 tablet once a day.", "translated": "Tome 1 tableta al día.", "origins": ["opus-r10/dos10.txt:18"]}
+{"expected": "OK", "source": "Take 1 tablet daily.", "translated": "Tome 1 tableta diariamente.", "origins": ["opus-r10/dos10.txt:19"]}
+{"expected": "BAD", "source": "Take 1 tablet once a day.", "translated": "Tome 1 tableta dos veces al día.", "origins": ["opus-r10/dos10.txt:20"]}
+{"expected": "BAD", "source": "Take 1 tablet daily.", "translated": "Tome 1 tableta dos veces al día.", "origins": ["opus-r10/dos10.txt:21"]}
+{"expected": "OK", "source": "Take 2 tablets three times a day.", "translated": "Tome 2 tabletas tres veces al día.", "origins": ["opus-r10/dos10.txt:22"]}
+{"expected": "OK", "source": "Take 2 tablets three times a day.", "translated": "Tome 2 tabletas 3 veces al día.", "origins": ["opus-r10/dos10.txt:23"]}
+{"expected": "BAD", "source": "Take 2 tablets three times a day.", "translated": "Tome 3 tabletas dos veces al día.", "origins": ["opus-r10/dos10.txt:24"]}
+{"expected": "OK", "source": "Take 10 mg in the morning and 5 mg at night.", "translated": "Tome 10 mg por la mañana y 5 mg por la noche.", "origins": ["opus-r10/dos10.txt:25"]}
+{"expected": "OK", "source": "Take 10 mg in the morning and 5 mg at night.", "translated": "Por la mañana tome 10 mg y por la noche 5 mg.", "origins": ["opus-r10/dos10.txt:26"]}
+{"expected": "OK", "source": "Take 10 mg in the morning and 5 mg at night.", "translated": "Tome 10 mg en la mañana y 5 mg en la noche.", "origins": ["opus-r10/dos10.txt:27"]}
+{"expected": "OK", "source": "Take 10 mg in the morning and 5 mg in the evening.", "translated": "Tome 10 mg por la mañana y 5 mg por la tarde.", "origins": ["opus-r10/dos10.txt:28"]}
+{"expected": "OK", "source": "Take 2 in the morning and 1 at bedtime.", "translated": "Tome 2 por la mañana y 1 al acostarse.", "origins": ["opus-r10/dos10.txt:29"]}
+{"expected": "BAD", "source": "Take 2 in the morning and 1 at bedtime.", "translated": "Tome 1 por la mañana y 2 al acostarse.", "origins": ["opus-r10/dos10.txt:30"]}
+{"expected": "OK", "source": "Meet at 3 in the afternoon.", "translated": "Nos vemos a las 3 de la tarde.", "origins": ["opus-r10/dos10.txt:31"]}
+{"expected": "OK", "source": "Split it into 3 parts.", "translated": "Divídalo en 3 partes.", "origins": ["opus-r10/dos10.txt:32"]}
+{"expected": "OK", "source": "Wait for 2 minutes.", "translated": "Espere 2 minutos.", "origins": ["opus-r10/dos10.txt:33"]}
+{"expected": "OK", "source": "The 2nd amendment.", "translated": "La 2.ª enmienda.", "origins": ["opus-r10/dos10.txt:34"]}
+{"expected": "OK", "source": "The second amendment.", "translated": "La segunda enmienda.", "origins": ["opus-r10/dos10.txt:35"]}
+{"expected": "OK", "source": "Wait a second.", "translated": "Espere un segundo.", "origins": ["opus-r10/dos10.txt:36"]}
+{"expected": "BAD", "source": "The second amendment.", "translated": "La primera enmienda.", "origins": ["opus-r10/dos10.txt:37"]}
+{"expected": "OK", "source": "It weighs two thousand kilograms.", "translated": "Pesa dos mil kilogramos.", "origins": ["opus-r10/dos10.txt:38"]}
+{"expected": "OK", "source": "It weighs 2000 kg.", "translated": "Pesa dos mil kg.", "origins": ["opus-r10/dos10.txt:39"]}
+{"expected": "OK", "source": "It weighs 1500 kg.", "translated": "Pesa mil quinientos kg.", "origins": ["opus-r10/dos10.txt:40"]}
+{"expected": "BAD", "source": "It weighs 1500 kg.", "translated": "Pesa mil kg.", "origins": ["opus-r10/dos10.txt:41"]}
+{"expected": "OK", "source": "Son las 3.", "translated": "It is 3 o'clock.", "origins": ["opus-r10/dos10.txt:42"]}
+{"expected": "OK", "source": "Son las 3 opciones.", "translated": "They are the 3 options.", "origins": ["opus-r10/dos10.txt:43"]}
+{"expected": "OK", "source": "It was a 3-day trip.", "translated": "Fue un viaje de 3 días.", "origins": ["opus-r10/dos10.txt:44"]}
+{"expected": "OK", "source": "Take 3 days off.", "translated": "Tómese 3 días libres.", "origins": ["opus-r10/dos10.txt:45"]}
+{"expected": "BAD", "source": "Take 3 days off.", "translated": "Tómese 2 días libres.", "origins": ["opus-r10/dos10.txt:46"]}
+{"expected": "OK", "source": "Revenue was €2M last year.", "translated": "Los ingresos fueron de 2 M€ el año pasado.", "origins": ["opus-r10/dos10.txt:47"]}
+{"expected": "OK", "source": "Revenue was €2M last year.", "translated": "Los ingresos fueron de 2 millones de euros el año pasado.", "origins": ["opus-r10/dos10.txt:48"]}
+{"expected": "OK", "source": "Take 5 ml every 8 hours.", "translated": "Tome 5 ml cada 8 horas.", "origins": ["opus-r10/dos10.txt:49"]}
+{"expected": "BAD", "source": "Take 5 ml every 8 hours.", "translated": "Tome 5 ml cada 6 horas.", "origins": ["opus-r10/dos10.txt:50"]}
+{"expected": "OK", "source": "Take 1 pill every other day.", "translated": "Tome 1 pastilla cada dos días.", "origins": ["opus-r10/dos10.txt:51"]}
+{"expected": "OK", "source": "Take 1 pill twice a week.", "translated": "Tome 1 pastilla dos veces por semana.", "origins": ["opus-r10/dos10.txt:52"]}
+{"expected": "BAD", "source": "Take 1 pill twice a week.", "translated": "Tome 1 pastilla dos veces al día.", "origins": ["opus-r10/dos10.txt:53"]}
+{"expected": "BAD", "source": "Take 10 mg in the morning and 10 mL at night.", "translated": "Tome 10 mL por la mañana y 10 mg por la noche.", "origins": ["sol-r10/guards.py:1"]}
+{"expected": "OK", "source": "Take 10 mg and 5 mL in the morning.", "translated": "Tome 5 mL y 10 mg por la mañana.", "origins": ["sol-r10/guards.py:2", "sol-r10/more.py:5"]}
+{"expected": "OK", "source": "Take 2 in the morning and 1 at night.", "translated": "Tome 1 por la noche y 2 por la mañana.", "origins": ["sol-r10/guards.py:3"]}
+{"expected": "OK", "source": "Take 1 tablet twice a day.", "translated": "Tome 1 tableta dos veces diarias.", "origins": ["sol-r10/guards.py:4"]}
+{"expected": "OK", "source": "Take 1 tablet twice a day.", "translated": "Tome 1 tableta dos veces cada día.", "origins": ["sol-r10/guards.py:5"]}
+{"expected": "OK", "source": "Take 1 tablet once a day.", "translated": "Tome 1 tableta diariamente.", "origins": ["sol-r10/guards.py:6"]}
+{"expected": "BAD", "source": "Wait a second before leaving.", "translated": "Espera 2 segundos antes de salir.", "origins": ["sol-r10/guards.py:7"]}
+{"expected": "BAD", "source": "Wait a second and leave.", "translated": "Espera 2 segundos y sal.", "origins": ["sol-r10/guards.py:8"]}
+{"expected": "OK", "source": "Open from five until ten.", "translated": "Abierto de las cinco hasta las diez.", "origins": ["sol-r10/guards.py:9"]}
+{"expected": "BAD", "source": "Open from five until ten.", "translated": "Abierto de las seis hasta las diez.", "origins": ["sol-r10/guards.py:10"]}
+{"expected": "OK", "source": "Open from five until ten.", "translated": "Abierto de las 5 hasta las 10.", "origins": ["sol-r10/guards.py:11"]}
+{"expected": "BAD", "source": "Take 5 tablets daily.", "translated": "Tome 5 diariamente.", "origins": ["sol-r10/guards.py:12"]}
+{"expected": "BAD", "source": "Take 5 mg daily.", "translated": "Tome 5 ml diariamente.", "origins": ["sol-r10/guards.py:13"]}
+{"expected": "BAD", "source": "Take 5 g daily.", "translated": "Tome 5 diariamente.", "origins": ["sol-r10/guards.py:14"]}
+{"expected": "BAD", "source": "Take 5 hours as needed.", "translated": "Tome 5 minutos según sea necesario.", "origins": ["sol-r10/guards.py:15"]}
+{"expected": "BAD", "source": "The board is 2 m long.", "translated": "La tabla tiene 2 cm de largo.", "origins": ["sol-r10/guards.py:16"]}
+{"expected": "BAD", "source": "Give 2 L daily.", "translated": "Administre 2 mL diarios.", "origins": ["sol-r10/guards.py:17"]}
+{"expected": "OK", "source": "Budget 2M.", "translated": "Presupuesto: 2M.", "origins": ["sol-r10/guards.py:18"]}
+{"expected": "OK", "source": "Pay 2B.", "translated": "Paga 2B.", "origins": ["sol-r10/guards.py:19"]}
+{"expected": "OK", "source": "Take 2 mg and pay $2M.", "translated": "Tome 2 mg y pague 2M de dólares.", "origins": ["sol-r10/guards.py:20"]}
+{"expected": "OK", "source": "Newton's second law.", "translated": "La 2.ª ley de Newton.", "origins": ["sol-r10/guards.py:21"]}
+{"expected": "OK", "source": "It costs 2M euros.", "translated": "Cuesta 2M euros.", "origins": ["sol-r10/more.py:1"]}
+{"expected": "BAD", "source": "Take 1 tablet twice a day.", "translated": "Tome 1 tableta tres veces cada día.", "origins": ["sol-r10/more.py:2"]}
+{"expected": "OK", "source": "Take 1 tablet two times per day.", "translated": "Tome 1 tableta 2,0 veces al día.", "origins": ["sol-r10/more.py:3"]}
+{"expected": "OK", "source": "Take 1 tablet once a day.", "translated": "Tome 1 tableta una vez cada día.", "origins": ["sol-r10/more.py:4"]}
+{"expected": "OK", "source": "Take 10 mg in the morning and 5 mg in the morning.", "translated": "Tome 5 mg por la mañana y 10 mg por la mañana.", "origins": ["sol-r10/more.py:6"]}
+{"expected": "BAD", "source": "Wait 5 seconds as instructed.", "translated": "Espere 5 minutos según las instrucciones.", "origins": ["sol-r10/more.py:7"]}
+{"expected": "BAD", "source": "Wait 5 seconds later.", "translated": "Espere 5 minutos más tarde.", "origins": ["sol-r10/more.py:8"]}
+{"expected": "BAD", "source": "Open from five to ten.", "translated": "Abierto de las seis a las diez.", "origins": ["sol-r10/more.py:9"]}
+{"expected": "BAD", "source": "Open five to ten.", "translated": "Abierto de las seis a las diez.", "origins": ["sol-r10/more.py:10"]}
+{"expected": "OK", "source": "After two, leave.", "translated": "Después de dos, vete.", "origins": ["sol-r10/more.py:11"]}
