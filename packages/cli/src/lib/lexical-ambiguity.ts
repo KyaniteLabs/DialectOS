@@ -1,5 +1,6 @@
 import type { SpanishDialect } from "@dialectos/types";
 import { COGER_TABOO_DIALECTS, isDialectInRegion, isDialectInList } from "@dialectos/types";
+import { hasTerm } from "./term-match.js";
 
 export interface LexicalAmbiguityRule {
   id: string;
@@ -27,13 +28,9 @@ export interface LexicalComplianceResult {
   violations: string[];
 }
 
-/**
- * Check whether a term appears as a whole word in text (case-insensitive).
- * Uses Unicode-aware word boundaries to avoid false positives on substrings.
- */
+/** Whole-word, accent-insensitive, inflection-aware match (see term-match.ts). */
 function hasWord(text: string, term: string): boolean {
-  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return new RegExp(`(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`, "iu").test(text);
+  return hasTerm(text, term);
 }
 
 /**
@@ -255,7 +252,11 @@ export const LEXICAL_AMBIGUITY_RULES: readonly LexicalAmbiguityRule[] = [
     guidance: "For generic 'take/grab/get', coger is standard in Spain and Andorra but is vulgar (fuck) in most of Latin America. Use tomar, agarrar, or recoger in American dialects. Only use coger for es-ES and es-AD.",
     expectations: (dialect) => ({
       requiredOutputGroups: [
-        ["toma", "tomar", "agarra", "agarrar", "recoge", "recoger", "obtiene", "obtener"],
+        [
+          "toma", "tomar", "agarra", "agarrar", "recoge", "recoger", "obtiene", "obtener",
+          // coger is the everyday verb in Spain and Andorra ("Coged un zumo").
+          ...(dialect === "es-ES" || dialect === "es-AD" ? ["coge", "coger"] : []),
+        ],
       ],
       forbiddenOutputTerms: TABOO_RISK_COGER_DIALECTS.includes(dialect) ? ["coger", "coge"] : [],
     }),

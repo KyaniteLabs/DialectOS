@@ -5443,7 +5443,10 @@
       "es-AD": {
         "term": "frigorífico",
         "frequency": 1,
-        "register": "formal"
+        "register": "formal",
+        "alsoAccepted": [
+          "nevera"
+        ]
       },
       "es-AR": {
         "term": "heladera",
@@ -5493,7 +5496,10 @@
       "es-ES": {
         "term": "frigorífico",
         "frequency": 1,
-        "register": "formal"
+        "register": "formal",
+        "alsoAccepted": [
+          "nevera"
+        ]
       },
       "es-GQ": {
         "term": "frigorífico",
@@ -5565,7 +5571,10 @@
         "frequency": 1,
         "register": "universal"
       }
-    }
+    },
+    "englishTerms": [
+      "fridge"
+    ]
   },
   {
     "field": "household",
