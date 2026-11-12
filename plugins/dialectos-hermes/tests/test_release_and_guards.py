@@ -232,6 +232,11 @@ def test_attached_units_keep_numbers_in_validation(
     assert data["pluginGuards"]["passed"] is expected_valid
 
 
+def test_bare_celsius_unit_keeps_source_number(plugin):
+    assert plugin._guard_issues("Heat to 180C.", "Caliente a 180 °C.") == []
+    assert plugin._guard_issues("Heat to 180C.", "Caliente a 280 °C.")
+
+
 @pytest.mark.parametrize(("source", "translated"), [
     ("The party is on May 1st.", "La fiesta es el 1 de mayo."),
     ("4th of July", "4 de julio"),
@@ -254,6 +259,8 @@ def test_r5_1_source_number_forms_are_preserved(plugin, passing_cli, source, tra
 
 @pytest.mark.parametrize(("source", "translated"), [
     ("Go to the 2nd floor.", "Ve al segundo piso."),
+    ("Second floor.", "Piso 2."),
+    ("Take the second dose.", "Tome la dosis 2."),
     ("Art of the 21st century.", "Arte del siglo XXI."),
     ("It is her 3rd attempt.", "Es su tercer intento."),
     ("This is the 4th time.", "Es la cuarta vez."),
@@ -564,3 +571,183 @@ def test_the_ledger_counts_guard_failures(plugin, passing_cli):
     plugin._on_post_tool("dialectos_validate", {"dialect": "es-MX"}, json.dumps(res))
     row = json.loads(plugin._ledger_path().read_text())[-1]
     assert row.get("passed") is False or row.get("valid") is False
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Wait 2 seconds before retrying.", "Espere un segundo antes de volver a intentarlo."),
+    ("Take 2 doses.", "Tome la segunda dosis."),
+    ("Give the 5 tablets.", "Dé la quinta tableta."),
+    ("Book 4 rooms.", "Reserve un cuarto."),
+    ("Add 3 eggs.", "Agregue el tercer huevo."),
+    ("The 20 children.", "El vigésimo niño."),
+    ("Take 3 tablets.", "Tome un tercer comprimido."),
+])
+def test_cardinal_source_numbers_do_not_match_spanish_ordinal_words(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is False
+    assert data["pluginGuards"]["passed"] is False
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Take two and rest.", "Tome 2 y descanse."),
+    ("Take 2 and rest.", "Tome dos y descanse."),
+    ("Between five and seven people.", "Entre 5 y 7 personas."),
+    ("Give one now and one later.", "Dé 1 ahora y 1 después."),
+    ("Wait one second.", "Espere 1 segundo."),
+    ("Three first aid kits.", "3 botiquines de primeros auxilios."),
+    ("Read chapters one and two.", "Lea los capítulos 1 y 2."),
+    ("Use four and a half cups.", "Use 4 tazas y media."),
+])
+def test_conjunctions_and_half_phrases_do_not_join_cardinal_numbers(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Wait a second.", "Espere 2 minutos."),
+    ("On second thought, take one.", "Pensándolo bien, tome 2."),
+    ("A third of patients improved.", "3 pacientes mejoraron."),
+])
+def test_english_ordinal_words_do_not_match_cardinal_counts(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is False
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Wait 2 days.", "Espera treinta y dos días."),
+    ("Wait 30 days.", "Espera ciento treinta días."),
+    ("The 20th floor.", "La vigésima primera planta."),
+])
+def test_complete_spanish_number_phrases_are_compared(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is False
+
+
+@pytest.mark.parametrize(("source", "translated", "expected_valid"), [
+    ("Limit: 100bytes.", "Límite: 900bytes.", False),
+    ("Walk 10miles.", "Camina 20miles.", False),
+    ("Wait 10hours.", "Espera 10 horas.", True),
+    ("Take 500µg daily.", "Tome 500 mg al día.", False),
+    ("Take 10ml.", "Tome 10 l.", False),
+    ("Wait 30min.", "Espera 30 h.", False),
+    ("Take 5mg daily.", "Tome 5 g al día.", False),
+    ("Set to 20°C.", "Fije a 20 °F.", False),
+    ("10mg", "10 mg", True),
+])
+def test_attached_unit_names_are_preserved_and_compared(
+    plugin, passing_cli, source, translated, expected_valid
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is expected_valid, data["blockingIssues"]
+
+
+def test_articles_are_consumed_at_the_matching_occurrence(plugin, passing_cli):
+    data = _verdict(
+        plugin,
+        "Tome 1 comprimido con 2 comidas y 1 taza de agua.",
+        "Take 2 tablets with a meal and a cup of water.",
+    )
+    assert data["valid"] is False
+    assert data["pluginGuards"]["passed"] is False
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Come at three in the afternoon.", "Ven a las tres de la tarde."),
+    ("We open at eight in the morning.", "Abrimos a las ocho de la mañana."),
+    ("Dinner is at nine at night.", "La cena es a las nueve de la noche."),
+    ("He left at one in the morning.", "Se fue a la una de la madrugada."),
+    ("We meet at three o'clock.", "Nos vemos a las tres."),
+    ("At midday.", "Al mediodía."),
+])
+def test_spelled_clock_times_match_between_languages(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+
+
+def test_afternoon_class_counts_are_not_clock_times(plugin, passing_cli):
+    assert plugin._time_matches("Two of the afternoon classes are full.") == []
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Add 2 tablets after 1 in the morning dose.", "Agregue 2 tabletas después de la dosis de la 1 de la mañana."),
+    ("Take 2 tablets before 8 in the morning meal.", "Tome 2 tabletas antes de la comida de las 8 de la mañana."),
+])
+def test_day_period_followed_by_a_noun_is_not_a_clock_time(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("It is 2x faster.", "Es el doble de rápido."),
+    ("In the 90s.", "En la década de 1990."),
+])
+def test_multipliers_and_short_decades_keep_their_readings(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Take a pill every 8 hours.", "Tome 1 pastilla cada 8 horas."),
+    ("Take a tablet daily.", "Tome 1 tableta al día."),
+    ("Apply a drop in each eye.", "Aplique 1 gota en cada ojo."),
+    ("A single dose.", "1 dosis."),
+])
+def test_articles_before_dose_nouns_count_as_one(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+
+
+def test_english_thousand_aliases_are_built_on_demand(plugin):
+    assert len(plugin._EN_SPELLED) < 1100
+    normalized = " ten thousand steps "
+    assert plugin._spelled_alone("ten thousand", normalized)
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Open between 9 am and 5 pm.", "Abre entre las 9 y las 17 h."),
+    ("Costs 10k dollars.", "Cuesta 10 000 dólares."),
+    ("Twenty twenty-six.", "2026."),
+    ("Ten thousand steps.", "10 000 pasos."),
+])
+def test_alternative_clock_ranges_years_and_ten_thousand_match(
+    plugin, passing_cli, source, translated
+):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+
+
+def test_dose_numbers_remain_attached_to_their_day_period(plugin, passing_cli):
+    data = _verdict(
+        plugin,
+        "Tome 1 por la mañana y 2 por la noche.",
+        "Take 2 in the morning and 1 at night.",
+    )
+    assert data["valid"] is False
+
+
+def test_half_an_hour_is_not_one_hour(plugin, passing_cli):
+    data = _verdict(plugin, "1 hora.", "Half an hour.")
+    assert data["valid"] is False
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Meet at noon.", "Nos vemos a mediodía."),
+    ("It is 5 pm.", "Son las 17 horas."),
+])
+def test_additional_spanish_time_spellings_match(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]

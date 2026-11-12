@@ -18,12 +18,13 @@ def test_learn_page_comparison_keyboard_answer_and_feedback(surface):
     assert proc.returncode == 0, proc.stderr
 
 
-def test_desktop_learn_page_binds_quiz_state_to_selected_dialect():
+@pytest.mark.parametrize("surface", ["desktop", "dashboard"])
+def test_learn_page_binds_quiz_state_to_selected_dialect(surface):
     node = shutil.which("node")
     if not node:
         pytest.skip("Node is required for page component checks")
     proc = subprocess.run(
-        [node, str(PLUGIN_DIR / "tests/learning_ui.mjs"), "desktop-switch"],
+        [node, str(PLUGIN_DIR / "tests/learning_ui.mjs"), f"{surface}-switch"],
         capture_output=True, text=True, timeout=15,
         check=False,
     )
