@@ -751,3 +751,89 @@ def test_half_an_hour_is_not_one_hour(plugin, passing_cli):
 def test_additional_spanish_time_spellings_match(plugin, passing_cli, source, translated):
     data = _verdict(plugin, translated, source)
     assert data["valid"] is True, data["blockingIssues"]
+
+
+@pytest.mark.parametrize(
+    ("source", "translated", "expected_valid"),
+    [
+        ("Call 5551234567.", "Llame al 5551234568.", False),
+        ("One million users.", "1 000 000 usuarios.", True),
+        ("One million users.", "Un millón de usuarios.", True),
+        ("Population: eight million users.", "Población: 8 000 000 usuarios.", True),
+        ("Three billion users.", "3 000 000 000 usuarios.", True),
+        ("Wait 5ms.", "Espera 50ms.", False),
+        ("Storage: 1TB.", "Almacenamiento: 2TB.", False),
+        ("Set to 1080p.", "Ajústalo a 720p.", False),
+        ("Take 10IU.", "Tome 100IU.", False),
+        ("Take 2x faster.", "Tome 3x más rápido.", False),
+        ("Take 2x faster.", "Tome 2 veces más rápido.", True),
+        ("Take 5mg daily.", "Tome cinco miligramos al día.", True),
+        ("Walk 10miles.", "Camina diez millas.", True),
+        ("Wait 30min.", "Espera treinta minutos.", True),
+        (
+            "Take 2 in the morning and 1 at night.",
+            "Tome dos en la mañana y uno en la noche.",
+            True,
+        ),
+        (
+            "Take 2 tablets in the morning and 1 at night.",
+            "Tome dos comprimidos por las mañanas y uno por las noches.",
+            True,
+        ),
+        ("Take 2 in the morning.", "Tome 2 cada mañana.", True),
+        ("Take 2 in the morning.", "Tome 2 a la mañana.", True),
+        ("Take 2 in the morning.", "Tome 2 de mañana.", True),
+        ("Take 2 in the evening.", "Tome 2 por la tarde.", True),
+        (
+            "Take 2 in the morning and 1 at night.",
+            "Tome 1 por la mañana y 2 por la noche.",
+            False,
+        ),
+        ("The twenty-first floor.", "El piso 1.", False),
+        ("The first floor.", "El piso 1 y el piso 1.", False),
+        ("On July 4th.", "El cuatro de julio.", True),
+        ("The third trimester.", "El 3.er trimestre.", True),
+        ("The twenty-first century.", "El siglo XXI.", True),
+        ("The 20th century.", "El siglo veinte.", True),
+        ("The second edition.", "La 2.ª edición.", True),
+        ("Give it to the three girls.", "Dáselo a las tres chicas.", True),
+        ("She spoke to the two nurses.", "Habló a las dos enfermeras.", True),
+        ("See you at five.", "Nos vemos a las cinco.", True),
+        ("Wait until 3 in the afternoon.", "Espera hasta las tres de la tarde.", True),
+        ("Wait 2 days.", "Espera doscientos dos días.", False),
+        ("Wait 30 days.", "Espera doscientos treinta días.", False),
+        ("Wait 2 days.", "Espera doscientas dos jornadas.", False),
+        ("Wait 200 days.", "Espera doscientas jornadas.", True),
+        ("Wait 500 pages.", "Espera quinientas páginas.", True),
+        ("About 50 thousand people.", "Unas 50 mil personas.", True),
+        ("About 50 thousand people.", "Unas 60 mil personas.", False),
+        ("3 billion users.", "3 mil millones de usuarios.", True),
+        ("3 billion users.", "3 million users.", False),
+        ("Run a 5K on Sunday.", "Corre 5 km el domingo.", True),
+        ("It costs $5M.", "Cuesta 5 millones de dólares.", True),
+        ("80s music.", "Música de los 80.", True),
+        ("In her 30s.", "En sus 30.", True),
+        ("50c.", "50 centavos.", True),
+        ("Heat to 180C.", "Calienta a 180 grados.", True),
+        ("Use 2kg and 16GB.", "Usa 2 kilos y 16 gigas.", True),
+        ("Take 5 mg daily.", "Tome 5 g al día.", False),
+        ("500 mcg.", "500 mg.", False),
+        ("Set to 20 °C.", "Ajústalo a 20 °F.", False),
+        ("It is 2x faster.", "Es 3 veces más rápido.", False),
+        ("It is 2x faster.", "Es el doble de rápido.", True),
+        ("It is 3x faster.", "Es el triple de rápido.", True),
+        ("A 2.5k run.", "Una carrera de 2500 metros.", True),
+        ("It is 3 in the afternoon now.", "Ahora son las tres de la tarde.", True),
+        ("In the 2010s.", "En 10 años.", False),
+        ("20°C.", "20 grados centígrados.", True),
+        ("20°C.", "20ºC.", True),
+        ("3kg.", "3 kilos.", True),
+        ("Take 2tabs.", "Tome 2 tabletas.", True),
+    ],
+)
+def test_r8_numeric_guard_regressions(plugin, source, translated, expected_valid):
+    issues = plugin._guard_issues(source, translated)
+    if expected_valid:
+        assert not issues, issues
+    else:
+        assert issues, "expected a guard failure"
