@@ -694,7 +694,7 @@ _URL_RE = re.compile(r"https?://\S+")
 _NUM_RE = re.compile(
     r"(?:(?<![\w.,])|(?<=\bv))[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?"
     r"(?:st|nd|rd|th|s)?(?:(?![\w])|(?=(?:"
-    r"mcg|μg|ug|mg|kg|g|ml|l|km|cm|mm|m|kb|mb|gb|tb|b)\b))",
+    r"[A-Za-zµ°]{1,4}\b)))",
     re.IGNORECASE,
 )
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
@@ -709,7 +709,8 @@ _TIME_ES_HOUR_RE = re.compile(
 # Spanish day periods: "4 de la tarde" is 16:00, "12 de la noche" is midnight.
 # English day periods: "8 in the morning" is 08:00, "3 in the afternoon" is 15:00.
 _TIME_EN_PERIOD_RE = re.compile(
-    r"(?<!\d)(?P<at>at\s+)?(?P<h>1[0-2]|0?[1-9])(?::(?P<minute>[0-5]\d))?\s+"
+    r"(?<!\d)(?P<cue>\b(?:at|from|until|before|after|by|around)\s+)?"
+    r"(?P<h>1[0-2]|0?[1-9])(?::(?P<minute>[0-5]\d))?\s+"
     r"(?P<oclock>o'clock\s+)?(?:in\s+the\s+(?P<period>morning|afternoon|evening)|at\s+(?P<night>night))(?!\w)",
     re.I)
 _TIME_EN_WORD_RE = re.compile(
@@ -717,14 +718,24 @@ _TIME_EN_WORD_RE = re.compile(
     r"(?P<period>a\.?m\.?|p\.?m\.?)\b", re.IGNORECASE)
 _TIME_EN_NOON_RE = re.compile(r"\bat\s+(?P<period>noon|midnight)\b", re.IGNORECASE)
 _TIME_ES_RANGE_RE = re.compile(
-    r"\bde\s+(?P<start>[01]?\d|2[0-3])\s+a\s+(?P<end>[01]?\d|2[0-3])\s*h\b",
+    r"\bde\s+(?P<start>[01]?\d|2[0-3])\s+a\s+(?P<end>[01]?\d|2[0-3])\s*h(?:oras?)?\b",
     re.IGNORECASE)
 _TIME_ES_PERIOD_RE = re.compile(
     r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s+(?:de\s+la\s+(mañana|madrugada|tarde|noche)|del\s+(mediod[ií]a))(?!\w)",
     re.I)
+_TIME_ES_WORD_PERIOD_RE = re.compile(
+    r"(?<!\w)(?:(?:a\s+)?las?\s+)?"
+    r"(?P<h>una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce)\s+"
+    r"de\s+la\s+(?P<period>mañana|madrugada|tarde|noche)(?!\w)", re.IGNORECASE)
+_TIME_ES_NAMED_RE = re.compile(
+    r"\b(?:al\s+mediod[ií]a|a\s+(?:la\s+)?medianoche)\b", re.IGNORECASE)
 _EN_TIME_WORDS = {
     "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
     "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12,
+}
+_ES_TIME_WORDS = {
+    "una": 1, "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5, "seis": 6,
+    "siete": 7, "ocho": 8, "nueve": 9, "diez": 10, "once": 11, "doce": 12,
 }
 _ES_WORDS = frozenset(
     "el la los las de del y en que es un una por para con se no su sus al lo como más pero "
@@ -765,6 +776,38 @@ _ES_SPELLED = {
     "60": ("sesenta",), "70": ("setenta",), "80": ("ochenta",), "90": ("noventa",),
     "100": ("cien", "ciento"), "1000": ("mil",),
 }
+_ES_SPELLED.update({
+    "1": (*_ES_SPELLED["1"], "primero", "primera"),
+    "2": (*_ES_SPELLED["2"], "segundo", "segunda"),
+    "3": (*_ES_SPELLED["3"], "tercer", "tercero", "tercera"),
+    "4": (*_ES_SPELLED["4"], "cuarto", "cuarta"),
+    "5": (*_ES_SPELLED["5"], "quinto", "quinta"),
+    "6": (*_ES_SPELLED["6"], "sexto", "sexta"),
+    "7": (*_ES_SPELLED["7"], "séptimo", "septimo", "séptima", "septima"),
+    "8": (*_ES_SPELLED["8"], "octavo", "octava"),
+    "9": (*_ES_SPELLED["9"], "noveno", "novena"),
+    "10": (*_ES_SPELLED["10"], "décimo", "decimo", "décima", "decima"),
+    "11": ("once", "undécimo", "undecimo", "undécima", "undecima"),
+    "12": ("doce", "duodécimo", "duodecimo", "duodécima", "duodecima"),
+    "13": ("trece", "decimotercero", "decimotercera"),
+    "14": ("catorce", "decimocuarto", "decimocuarta"),
+    "15": ("quince", "decimoquinto", "decimoquinta"),
+    "16": ("dieciséis", "dieciseis", "decimosexto", "decimosexta"),
+    "17": ("diecisiete", "decimoséptimo", "decimoseptimo", "decimoséptima", "decimoseptima"),
+    "18": ("dieciocho", "decimoctavo", "decimoctava"),
+    "19": ("diecinueve", "decimonoveno", "decimonovena"),
+    "20": ("veinte", "vigésimo", "vigesimo", "vigésima", "vigesima"),
+    "21": ("veintiuno", "veintiún", "veintiun", "veintiuna", "vigésimo primero",
+          "vigésimo primer", "vigésima primera"),
+    "30": ("treinta", "trigésimo", "trigesimo", "trigésima", "trigesima"),
+    "40": ("cuarenta", "cuadragésimo", "cuadragesimo", "cuadragésima", "cuadragesima"),
+    "50": ("cincuenta", "quincuagésimo", "quincuagesimo", "quincuagésima", "quincuagesima"),
+    "60": ("sesenta", "sexagésimo", "sexagesimo", "sexagésima", "sexagesima"),
+    "70": ("setenta", "septuagésimo", "septuagesimo", "septuagésima", "septuagesima"),
+    "80": ("ochenta", "octogésimo", "octogesimo", "octogésima", "octogesima"),
+    "90": ("noventa", "nonagésimo", "nonagesimo", "nonagésima", "nonagesima"),
+    "100": ("cien", "ciento", "centésimo", "centesimo", "centésima", "centesima"),
+})
 # English number words in the source, so "three tablets" -> "3 comprimidos" is not a new number.
 _EN_SPELLED = {
     str(i): (w,) for i, w in enumerate(
@@ -774,16 +817,11 @@ _EN_SPELLED = {
 _EN_SPELLED.update({"30": ("thirty",), "40": ("forty",), "50": ("fifty",), "60": ("sixty",),
                     "70": ("seventy",), "80": ("eighty",), "90": ("ninety",), "12": ("twelve", "dozen"),
                     "100": ("hundred",), "1000": ("thousand",)})
-_EN_SPELLED["1"] = ("one", "a", "an", "once")
+_EN_SPELLED["1"] = ("one", "once")
+_EN_SPELLED["2"] = (*_EN_SPELLED["2"], "twice")
 _EN_UNITS = "one two three four five six seven eight nine".split()
 _EN_TENS = "twenty thirty forty fifty sixty seventy eighty ninety".split()
-_EN_NUMBER_WORDS = frozenset({
-    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
-    "eighteen", "nineteen", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
-    "eighty", "ninety", "hundred", "thousand", "once", "dozen",
-})
-_EN_COMPOUND_EXCLUDED = frozenset(("a", "an", "once", "dozen"))
+_EN_COMPOUND_EXCLUDED = frozenset(("a", "an", "once", "twice", "dozen"))
 for tens, base in zip(_EN_TENS, range(20, 100, 10)):
     for unit, offset in zip(_EN_UNITS, range(1, 10)):
         _EN_SPELLED[str(base + offset)] = (f"{tens}-{unit}",)
@@ -799,12 +837,67 @@ for unit, base in zip(_EN_UNITS, range(100, 1000, 100)):
             aliases = _EN_SPELLED.get(key, ())
             _EN_SPELLED[key] = tuple(dict.fromkeys(
                 (*aliases, f"{unit} hundred {rest}", f"{unit} hundred and {rest}")))
+
+def _en_under_1000(number: int) -> str:
+    if number < 20:
+        return _EN_SPELLED[str(number)][0]
+    if number < 100:
+        tens, remainder = divmod(number, 10)
+        return _EN_TENS[tens - 2] + (f" {_EN_UNITS[remainder - 1]}" if remainder else "")
+    hundreds, remainder = divmod(number, 100)
+    prefix = f"{_EN_UNITS[hundreds - 1]} hundred"
+    return prefix + (f" {_en_under_1000(remainder)}" if remainder else "")
+
+
+for number in range(1000, 10000):
+    thousands, remainder = divmod(number, 1000)
+    prefix = f"{_EN_UNITS[thousands - 1]} thousand"
+    if remainder:
+        rest = _en_under_1000(remainder)
+        forms = (f"{prefix} {rest}", f"{prefix} and {rest}")
+    else:
+        forms = (prefix,)
+    _EN_SPELLED[str(number)] = tuple(dict.fromkeys((*_EN_SPELLED.get(str(number), ()), *forms)))
+
+_EN_ORDINALS = {
+    1: "first", 2: "second", 3: "third", 4: "fourth", 5: "fifth", 6: "sixth",
+    7: "seventh", 8: "eighth", 9: "ninth", 10: "tenth", 11: "eleventh",
+    12: "twelfth", 13: "thirteenth", 14: "fourteenth", 15: "fifteenth",
+    16: "sixteenth", 17: "seventeenth", 18: "eighteenth", 19: "nineteenth",
+    20: "twentieth", 30: "thirtieth", 40: "fortieth", 50: "fiftieth",
+    60: "sixtieth", 70: "seventieth", 80: "eightieth", 90: "ninetieth",
+    100: "hundredth", 1000: "thousandth",
+}
+for number, ordinal in _EN_ORDINALS.items():
+    if str(number) in _EN_SPELLED:
+        _EN_SPELLED[str(number)] = tuple(dict.fromkeys((*_EN_SPELLED[str(number)], ordinal)))
+for tens, base in zip(_EN_TENS, range(20, 100, 10)):
+    for unit, offset in zip(_EN_UNITS, range(1, 10)):
+        number = base + offset
+        _EN_SPELLED[str(number)] = tuple(dict.fromkeys(
+            (*_EN_SPELLED[str(number)], f"{tens}-{_EN_ORDINALS[offset]}")
+        ))
+_EN_NUMBER_WORDS = frozenset({
+    "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen",
+    "eighteen", "nineteen", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+    "eighty", "ninety", "hundred", "thousand", "once", "twice", "dozen", "and",
+    *{word for ordinal in _EN_ORDINALS.values() for word in ordinal.split()},
+    *{word for number in range(21, 100) if number % 10
+      for word in f"{_EN_TENS[number // 10 - 2]} {_EN_ORDINALS[number % 10]}".split()},
+})
 _EN_NUMBER_FORMS = frozenset(
     re.sub(r"[^\w]+", " ", form.casefold()).strip()
-    for forms in _EN_SPELLED.values() for form in forms)
+    for number, forms in _EN_SPELLED.items() if int(number) < 1000 for form in forms)
+_EN_THOUSAND_FORMS = frozenset(
+    re.sub(r"[^\w]+", " ", form.casefold()).strip()
+    for number, forms in _EN_SPELLED.items() if int(number) >= 1000 for form in forms)
 _EN_NUMBER_RE = re.compile(
     r"(?<!\w)(?:" + "|".join(
         re.escape(form) for form in sorted(_EN_NUMBER_FORMS, key=len, reverse=True)) + r")(?!\w)")
+_ROMAN_CENTURY_RE = re.compile(
+    r"\bsiglo\s+(?P<roman>M{0,3}(?:CM|CD|D?C{0,3})(?:XC|XL|L?X{0,3})"
+    r"(?:IX|IV|V?I{0,3}))\b", re.IGNORECASE)
 _ES_NUMBER_WORDS = frozenset(w for forms in _ES_SPELLED.values() for f in forms for w in f.split()) | {"mil"}
 _MIN_WORDS_FOR_LANG = 6
 
@@ -812,6 +905,25 @@ _MIN_WORDS_FOR_LANG = 6
 def _spelled_alone(form: str, normalized: str) -> bool:
     """True when the spelled number is a complete number phrase in the text."""
     phrase = re.sub(r"[^\w]+", " ", form.casefold()).strip()
+    if phrase in ("a", "an"):
+        units = (
+            "hour|minute|second|day|week|month|year|decade|century|half|dozen|"
+            "gram|kilogram|milligram|liter|litre|meter|metre|kilometer|kilometre|"
+            "centimeter|centimetre|inch|foot|feet|pound|ounce|cup|teaspoon|tablespoon"
+        )
+        return re.search(rf"\b{phrase}\s+(?:{units})s?\b", normalized) is not None
+    if phrase in _EN_THOUSAND_FORMS:
+        padded = " " + phrase + " "
+        start = normalized.find(padded)
+        while start != -1:
+            before = normalized[:start].rstrip().split()
+            after = normalized[start + len(padded):].split()
+            previous = before[-1] if before else ""
+            following = after[0] if after else ""
+            if previous not in _EN_NUMBER_WORDS and following not in _EN_NUMBER_WORDS:
+                return True
+            start = normalized.find(padded, start + 1)
+        return False
     if phrase in _EN_NUMBER_FORMS:
         for match in _EN_NUMBER_RE.finditer(normalized):
             if match.group() != phrase:
@@ -856,9 +968,7 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
     for match in _NUM_RE.finditer(scrubbed):
         raw = match.group(0).replace(" ", "").replace(" ", "").replace(" ", "")
         is_decade = bool(re.fullmatch(r"(?:19|20)\d{2}s", raw, re.IGNORECASE))
-        raw = re.sub(r"(?:st|nd|rd|th|s)$", "", raw, flags=re.I)
-        if is_decade:
-            raw = raw[-2:]
+        raw = raw[:-1] if is_decade else re.sub(r"(?:st|nd|rd|th|s)$", "", raw, flags=re.I)
         sign = "-" if raw.startswith(("-", "−")) else ""
         raw = raw.lstrip("+-−")
         is_version = bool(_VERSION_CUE_RE.search(scrubbed[:match.start()]))
@@ -887,7 +997,18 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
                 readings = {value(at), value(None)}
         else:
             readings = {value(None)}
+        if is_decade:
+            readings.add(str(int(raw[-2:])))
         numbers.append((match.group(0).strip(), frozenset(readings)))
+    for match in _ROMAN_CENTURY_RE.finditer(scrubbed):
+        total = 0
+        previous = 0
+        for char in reversed(match.group("roman").upper()):
+            value = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}[char]
+            total += -value if value < previous else value
+            previous = max(previous, value)
+        if total:
+            numbers.append((match.group("roman"), frozenset({str(total)})))
     return numbers
 
 
@@ -914,8 +1035,19 @@ def _time_matches(text: str, source_minutes=()):
         minute = int(match.group(2) or "0")
         matches.append((hour * 60 + minute, match.span()))
         occupied.append(match.span())
+    for match in _TIME_ES_WORD_PERIOD_RE.finditer(text):
+        hour = _ES_TIME_WORDS[match.group("h").lower()] % 12
+        period = match.group("period").lower()
+        if period == "tarde" or (period == "noche" and hour > 4):
+            hour += 12
+        matches.append((hour * 60, match.span()))
+        occupied.append(match.span())
+    for match in _TIME_ES_NAMED_RE.finditer(text):
+        hour = 12 if "mediod" in match.group(0).lower() else 0
+        matches.append((hour * 60, match.span()))
+        occupied.append(match.span())
     for match in _TIME_EN_PERIOD_RE.finditer(text):
-        if not match.group("at") and not match.group("oclock"):
+        if not match.group("cue") and not match.group("oclock"):
             continue
         hour = int(match.group("h")) % 12
         period = (match.group("period") or match.group("night")).lower()
@@ -957,7 +1089,9 @@ def _time_matches(text: str, source_minutes=()):
         if any(span[0] < end and start < span[1] for start, end in occupied):
             continue
         minute = int(match.group("h")) * 60
-        if match.group("prep"):
+        if match.group("prep") or (
+            match.group("unit").lower() == "h" and minute in unclaimed
+        ):
             if minute in unclaimed:
                 unclaimed.remove(minute)
             matches.append((minute, span))
@@ -978,9 +1112,18 @@ def _time_matches(text: str, source_minutes=()):
     for match in _TIME_ES_RANGE_RE.finditer(text):
         start = int(match.group("start")) * 60
         end = int(match.group("end")) * 60
-        if end in [minute for minute, _ in matches] and start in unclaimed:
+        matched_minutes = [minute for minute, _ in matches]
+        if start != end and start in unclaimed and end in unclaimed:
+            matches.append((start, match.span("start")))
+            matches.append((end, match.span("end")))
+            unclaimed.remove(start)
+            unclaimed.remove(end)
+        elif end in matched_minutes and start in unclaimed:
             matches.append((start, match.span("start")))
             unclaimed.remove(start)
+        elif start in matched_minutes and end in unclaimed:
+            matches.append((end, match.span("end")))
+            unclaimed.remove(end)
     return matches
 
 
@@ -1039,6 +1182,8 @@ def _guard_issues(source: str, translated: str) -> List[str]:
         normalized_src = " " + re.sub(r"[^\w]+", " ", src.casefold()) + " "
         for item in list(extra):
             forms = [f for v in sorted(item[1]) for f in _EN_SPELLED.get(v, ()) + _ES_SPELLED.get(v, ())]
+            if "1" in item[1]:
+                forms.extend(("a", "an"))
             form = next((f for f in forms if _spelled_alone(f, normalized_src)), None)
             if form is not None:
                 extra.remove(item)
