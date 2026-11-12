@@ -182,6 +182,59 @@ def test_guards_accept_spelled_numbers_and_localized_24_hour_times(plugin, passi
     assert data["pluginGuards"]["passed"] is True
 
 
+@pytest.mark.parametrize(("source", "translated"), [
+    ("The party is on May 1st.", "La fiesta es el 1 de mayo."),
+    ("4th of July", "4 de julio"),
+    ("November 5th, 2026", "5 de noviembre de 2026"),
+    ("Take 10mg twice a day.", "Tome 10 mg dos veces al día."),
+    ("5km", "5 km"),
+    ("2GB", "2 GB"),
+    ("3rd floor", "3.er piso"),
+    ("1st place", "1.er lugar"),
+    ("In the 1990s.", "En los años 90."),
+    ("Twenty-five", "25"),
+    ("Three hundred", "300"),
+    ("once a day", "1 vez al día"),
+])
+def test_r5_1_source_number_forms_are_preserved(plugin, passing_cli, source, translated):
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True
+    assert data["pluginGuards"]["passed"] is True
+
+
+@pytest.mark.parametrize("source", [
+    "Take 2 in the morning and 1 at night.",
+    "Give 5 in the evening.",
+])
+def test_r5_2_dose_counts_are_not_parsed_as_times(plugin, source):
+    assert plugin._time_matches(source) == []
+
+
+@pytest.mark.parametrize(("text", "source_minutes", "expected"), [
+    ("Las 8 horas de sueño importan.", [8 * 60], []),
+    ("Durante las 3 horas siguientes, descanse.", [3 * 60], []),
+    ("El turno dura 15 horas y empieza a las 15 h.", [15 * 60], [15 * 60]),
+])
+def test_r5_3_duration_hours_are_not_parsed_as_times(plugin, text, source_minutes, expected):
+    assert [minute for minute, _ in plugin._time_matches(text, source_minutes)] == expected
+
+
+@pytest.mark.parametrize(("source", "translated"), [
+    ("Open from 9 am to 5 pm.", "Abierto de 9 a 17 h."),
+    ("at five pm", "a las 17:00"),
+    ("at noon", "a las 12:00"),
+    ("It is -5 °C.", "Hace 5 °C bajo cero."),
+    ("Version 2.10 is out.", "Ya salió la v2.10."),
+])
+def test_r5_4_standard_times_temperatures_and_versions_pass(plugin, passing_cli, source, translated):
+    if source == "Open from 9 am to 5 pm.":
+        actual = sorted(minute for minute, _ in plugin._time_matches(translated, [9 * 60, 17 * 60]))
+        assert actual == [9 * 60, 17 * 60]
+    data = _verdict(plugin, translated, source)
+    assert data["valid"] is True, data["blockingIssues"]
+    assert data["pluginGuards"]["passed"] is True
+
+
 def test_dont_forget_spanish_request_is_not_treated_as_a_refusal(plugin):
     assert plugin._wants_spanish("Don't forget to reply in Spanish") is True
 
@@ -275,7 +328,8 @@ def test_adversarial_numbers_and_times_are_not_lost(plugin, passing_cli, source,
     ("Wait an hour.", "Espera 1 hora."),
     ("Once a day", "1 vez al día"),
     ("Twenty-one days", "21 días"),
-    ("In the 1990s", "En 1990."),
+    # Decades should be localized as decades; the old En 1990 expectation was incorrect.
+    ("In the 1990s", "En los años 90."),
     ("one hundred twenty", "120"),
     ("The store opens at 10am.", "La tienda abre a las 10 a. m."),
     ("Meet at 3:30 PM.", "Reúnete a las 3:30 p. m."),
