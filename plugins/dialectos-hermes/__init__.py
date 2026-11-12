@@ -692,24 +692,37 @@ _FENCE_RE = re.compile(r"(?ms)^\s*(```|~~~).*?^\s*\1[^\n]*$")
 _INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
 _URL_RE = re.compile(r"https?://\S+")
 _NUM_RE = re.compile(
-    r"(?<![\w.,])[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?(?:st|nd|rd|th|s)?(?![\w])", re.I)
+    r"(?:(?<![\w.,])|(?<=\bv))[+\-−]?\d+(?:[.,   ]\d{3})*(?:[.,]\d+)?"
+    r"(?:st|nd|rd|th|s)?(?:(?![\w])|(?=(?:mg|kg|km|gb)\b))", re.I)
 _WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 _TIME_12H_RE = re.compile(r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s*([ap])\.?\s?m\.?(?!\w)", re.I)
 _TIME_24H_RE = re.compile(r"(?<!\d)([01]?\d|2[0-3])[:h]([0-5]\d)(?!\w)", re.I)
 _TIME_EN_HOUR_RE = re.compile(
     r"\bat\s+(?P<h>[01]?\d|2[0-3])\s+h(?:ours?)?(?!\w)", re.I)
-# A Spanish hour is a clock time after a time preposition, or when it matches a source time.
+# A Spanish hour is a clock time after a time preposition; bare abbreviated "N h" may match a source time.
 _TIME_ES_HOUR_RE = re.compile(
     r"(?<![\w\d])(?:(?P<prep>a\s+|desde\s+|hasta\s+)?(?P<art>las?)\s+)?"
-    r"(?P<h>[01]?\d|2[0-3])\s*h(?:oras?)?(?!\w)", re.I)
+    r"(?P<h>[01]?\d|2[0-3])\s*(?P<unit>h(?:oras?)?)(?!\w)", re.IGNORECASE)
 # Spanish day periods: "4 de la tarde" is 16:00, "12 de la noche" is midnight.
 # English day periods: "8 in the morning" is 08:00, "3 in the afternoon" is 15:00.
 _TIME_EN_PERIOD_RE = re.compile(
-    r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s+(?:o'clock\s+)?(?:in\s+the\s+(morning|afternoon|evening)|at\s+(night))(?!\w)",
+    r"(?<!\d)(?P<at>at\s+)?(?P<h>1[0-2]|0?[1-9])(?::(?P<minute>[0-5]\d))?\s+"
+    r"(?P<oclock>o'clock\s+)?(?:in\s+the\s+(?P<period>morning|afternoon|evening)|at\s+(?P<night>night))(?!\w)",
     re.I)
+_TIME_EN_WORD_RE = re.compile(
+    r"\bat\s+(?P<h>one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+"
+    r"(?P<period>a\.?m\.?|p\.?m\.?)\b", re.IGNORECASE)
+_TIME_EN_NOON_RE = re.compile(r"\bat\s+(?P<period>noon|midnight)\b", re.IGNORECASE)
+_TIME_ES_RANGE_RE = re.compile(
+    r"\bde\s+(?P<start>[01]?\d|2[0-3])\s+a\s+(?P<end>[01]?\d|2[0-3])\s*h\b",
+    re.IGNORECASE)
 _TIME_ES_PERIOD_RE = re.compile(
     r"(?<!\d)(1[0-2]|0?[1-9])(?::([0-5]\d))?\s+(?:de\s+la\s+(mañana|madrugada|tarde|noche)|del\s+(mediod[ií]a))(?!\w)",
     re.I)
+_EN_TIME_WORDS = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+    "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12,
+}
 _ES_WORDS = frozenset(
     "el la los las de del y en que es un una por para con se no su sus al lo como más pero "
     "le les ya o este esta estos estas ese esa eso porque entre cuando muy sin sobre también "
@@ -826,7 +839,10 @@ def _numbers(text: str, source: bool = False) -> List[Tuple[str, frozenset]]:
     scrubbed = _URL_RE.sub(" ", text)
     for match in _NUM_RE.finditer(scrubbed):
         raw = match.group(0).replace(" ", "").replace(" ", "").replace(" ", "")
+        is_decade = bool(re.fullmatch(r"(?:19|20)\d{2}s", raw, re.IGNORECASE))
         raw = re.sub(r"(?:st|nd|rd|th|s)$", "", raw, flags=re.I)
+        if is_decade:
+            raw = raw[-2:]
         sign = "-" if raw.startswith(("-", "−")) else ""
         raw = raw.lstrip("+-−")
         is_version = bool(_VERSION_CUE_RE.search(scrubbed[:match.start()]))
@@ -883,11 +899,23 @@ def _time_matches(text: str, source_minutes=()):
         matches.append((hour * 60 + minute, match.span()))
         occupied.append(match.span())
     for match in _TIME_EN_PERIOD_RE.finditer(text):
-        hour = int(match.group(1)) % 12
-        period = (match.group(3) or match.group(4)).lower()
+        if not match.group("at") and not match.group("oclock"):
+            continue
+        hour = int(match.group("h")) % 12
+        period = (match.group("period") or match.group("night")).lower()
         if period in ("afternoon", "evening") or (period == "night" and hour > 4):
             hour += 12
-        matches.append((hour * 60 + int(match.group(2) or "0"), match.span()))
+        matches.append((hour * 60 + int(match.group("minute") or "0"), match.span()))
+        occupied.append(match.span())
+    for match in _TIME_EN_WORD_RE.finditer(text):
+        hour = _EN_TIME_WORDS[match.group("h").lower()] % 12
+        if match.group("period").lower().startswith("p"):
+            hour += 12
+        matches.append((hour * 60, match.span()))
+        occupied.append(match.span())
+    for match in _TIME_EN_NOON_RE.finditer(text):
+        hour = 12 if match.group("period").lower() == "noon" else 0
+        matches.append((hour * 60, match.span()))
         occupied.append(match.span())
     for match in _TIME_24H_RE.finditer(text):
         span = match.span()
@@ -913,13 +941,15 @@ def _time_matches(text: str, source_minutes=()):
         if any(span[0] < end and start < span[1] for start, end in occupied):
             continue
         minute = int(match.group("h")) * 60
-        if match.group("prep") or minute in unclaimed:
+        if match.group("prep"):
             if minute in unclaimed:
                 unclaimed.remove(minute)
             matches.append((minute, span))
             occupied.append(span)
     for match in spanish_hours:
         if match.group("art"):
+            continue
+        if match.group("unit").lower() != "h":
             continue
         span = match.span()
         if any(span[0] < end and start < span[1] for start, end in occupied):
@@ -929,6 +959,12 @@ def _time_matches(text: str, source_minutes=()):
             unclaimed.remove(minute)
             matches.append((minute, span))
             occupied.append(span)
+    for match in _TIME_ES_RANGE_RE.finditer(text):
+        start = int(match.group("start")) * 60
+        end = int(match.group("end")) * 60
+        if end in [minute for minute, _ in matches] and start in unclaimed:
+            matches.append((start, match.span("start")))
+            unclaimed.remove(start)
     return matches
 
 
@@ -973,7 +1009,8 @@ def _guard_issues(source: str, translated: str) -> List[str]:
             missing.remove(hit)
         else:
             extra.append((label, readings))
-    for cold in re.finditer(r"(?<!\w)(\d+(?:[.,]\d+)?)\s*(?:grados?|°)\s+bajo\s+cero\b", dst, re.I):
+    for cold in re.finditer(
+        r"(?<!\w)(\d+(?:[.,]\d+)?)\s*(?:grados?|°\s*[cf]?)\s+bajo\s+cero\b", dst, re.I):
         for label, magnitude in _numbers(cold.group(1)):
             signed = frozenset("-" + v for v in magnitude)
             src_hit = next((m for m in missing if m[1] & signed), None)
