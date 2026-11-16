@@ -55,12 +55,20 @@ describe("semantic-backstop torture", () => {
   });
 
   it("handles source with all negation words", () => {
-    // Each negation word in source must have a matching partner in translated
-    // Source uses base-form negation words; Spanish uses base forms from NEGATION_WORDS_ES
-    const source = "Not no never nothing nobody nowhere neither nor none without lack absent refuse deny decline reject prevent avoid stop cease cannot";
-    const translated = "No no nunca nada nadie ningún lugar ni ni ninguno sin falta ausente rechazar negar rehusar rechazar evitar impedir detener parar carecer";
+    // Only grammatical negators count (shared @dialectos/types list); verbs
+    // like "stop" or "avoid" carry no negator in Spanish and are ignored.
+    const source = "Not no never nothing nobody nowhere neither nor none without cannot stop avoid";
+    const translated = "No no nunca nada nadie ningún ni ni ninguno sin no detener evitar";
     const result = runSemanticBackstop(source, translated, 0.5);
-    // Both have matching negation counts → ratio = 1
+    expect(result.checks.negationPreservation).toBe(1);
+  });
+
+  it("does not count 'bus stop' as a negation", () => {
+    const result = runSemanticBackstop(
+      "Can you pick me up at the bus stop?",
+      "¿Me podés buscar en la parada del colectivo?",
+      0.5,
+    );
     expect(result.checks.negationPreservation).toBe(1);
   });
 
