@@ -1,0 +1,11 @@
+{
+  "name": "dialectos",
+  "version": "0.3.1",
+  "displayName": "DialectOS",
+  "description": "Use DialectOS to localize content into specific regional Spanish variants with glossary and QA gates.",
+  "author": "Kyanite Labs",
+  "category": "Localization",
+  "skills": [
+    "skills/dialectos/SKILL.md"
+  ]
+}
