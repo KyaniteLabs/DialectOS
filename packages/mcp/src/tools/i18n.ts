@@ -605,7 +605,8 @@ async function handleManageDialectVariants(
       return { ...entry, value: adapted };
     });
 
-    // Resolve the output path. The source is only rewritten on explicit opt-in.
+    // Resolve the output path. The source is rewritten only on explicit opt-in,
+    // including when a caller-supplied outputPath resolves to the same file.
     let outputPath: string;
     if (params.outputPath) {
       outputPath = validateJsonPath(params.outputPath);
@@ -613,6 +614,12 @@ async function handleManageDialectVariants(
       outputPath = sourcePath;
     } else {
       outputPath = deriveVariantOutputPath(sourcePath, params.variant);
+    }
+    if (outputPath === sourcePath && params.overwrite !== true) {
+      throw new SecurityError(
+        "Refusing to rewrite the source file: resolved output path is the source and overwrite is not true",
+        ErrorCode.VALIDATION_FAILED,
+      );
     }
     writeLocaleFile(outputPath, adaptedEntries);
 
@@ -922,7 +929,7 @@ export function registerI18nTools(
     {
       title: "Create dialect locale variant",
       description:
-        "Apply deterministic regional vocabulary substitutions (with article gender agreement, e.g. el ordenador -> la computadora) to a JSON locale file for a specific Spanish dialect. Writes the adapted locale to outputPath when provided; without outputPath it writes a sibling variant file (<stem>-<variant>.json, or <variant>.json when the source stem is a locale code) and never touches the source. The source file is rewritten in place only when overwrite is explicitly set to true.",
+        "Apply deterministic regional vocabulary substitutions (with article gender agreement, e.g. el ordenador -> la computadora) to a JSON locale file for a specific Spanish dialect. Writes the adapted locale to outputPath when provided; without outputPath it writes a sibling variant file (<stem>-<variant>.json, or <variant>.json when the source stem is a locale code) and never touches the source. The source file is rewritten in place only when overwrite is explicitly set to true. An outputPath that resolves to the source file is refused unless overwrite is true.",
       inputSchema: {
         sourcePath: z.string().min(1).describe("Path to the source JSON locale file whose string values should be adapted. The source is never modified unless overwrite is true."),
         variant: z.string().refine((v) => ALL_SPANISH_DIALECTS.includes(v as SpanishDialect), {

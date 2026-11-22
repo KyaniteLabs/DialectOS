@@ -178,8 +178,9 @@ describe("MCP i18n Tools", () => {
       commonKeys: ["hello", "goodbye"],
     });
 
-    // Mock validateJsonPath
-    vi.mocked(validateJsonPath).mockReturnValue("/test/locale.json");
+    // Distinct caller paths stay distinct unless a test says they resolve together.
+    // A constant return made every outputPath look like the source.
+    vi.mocked(validateJsonPath).mockImplementation((filePath: string) => filePath);
 
     // Mock validateFilePath
     vi.mocked(validateFilePath).mockReturnValue("/test/locales");
@@ -523,6 +524,41 @@ describe("MCP i18n Tools", () => {
       // The response reports where the variant landed, without absolute paths.
       expect(parsedResult.outputPath).toBe("es-MX.json");
       expect(parsedResult.outputPath).not.toContain("/tmp/locales");
+    });
+
+    it("regression: overwrite=false leaves a source-identical outputPath unwritten", async () => {
+      vi.mocked(readLocaleFile).mockReturnValue([
+        { key: "computer", value: "el ordenador" },
+      ]);
+      // Caller strings differ; both resolve to the source file. The contract
+      // is resolved-path identity, not raw string equality.
+      const resolvedSource = "/tmp/locales/es.json";
+      vi.mocked(validateJsonPath).mockImplementation((filePath: string) => {
+        if (filePath === "/tmp/locales/es.json" || filePath === "/tmp/locales/alias.json") {
+          return resolvedSource;
+        }
+        return filePath;
+      });
+
+      const { registerI18nTools } = await import("../tools/i18n.js");
+      const mockServer = { tool: vi.fn() };
+      registerI18nTools(mockServer as any, { registry: mockRegistry });
+      const handler = vi.mocked(mockServer.tool).mock.calls.find(
+        (call) => call[0] === "manage_dialect_variants"
+      )![3];
+
+      vi.mocked(writeLocaleFile).mockClear();
+      const result = await handler({
+        sourcePath: "/tmp/locales/es.json",
+        outputPath: "/tmp/locales/alias.json",
+        variant: "es-MX",
+        overwrite: false,
+      } as any);
+      const parsedResult = JSON.parse(result.content[0].text);
+
+      expect(writeLocaleFile).not.toHaveBeenCalled();
+      expect(result.isError).toBe(true);
+      expect(parsedResult.error).toBe("VALIDATION_FAILED");
     });
 
     it("regression: overwrite is an explicit opt-in that rewrites sourcePath", async () => {
