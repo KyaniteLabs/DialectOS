@@ -74,8 +74,11 @@ export interface BulkCheckpoint {
   createdAt: string;
   /** Items that have been successfully processed */
   completedIds: string[];
-  /** Completed item results (for true resume without cache) */
-  completedResults: Array<{ id: string; result: TranslationResult }>;
+  /** Completed item results (for true resume without cache). requestKey
+   *  scopes a result to the exact request (text, languages, dialect,
+   *  formality, context) so a saved entry is never replayed for a different
+   *  dialect that happens to reuse the item ID. */
+  completedResults: Array<{ id: string; requestKey: string; result: TranslationResult }>;
   /** Items that failed */
   failedItems: BulkTranslationFailure[];
   /** Total items in the job */

@@ -31,7 +31,10 @@ const DEFAULT_MAX_CONCURRENCY = 4;
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_RETRY_DELAY_MS = 1000;
 const DEFAULT_CHECKPOINT_INTERVAL = 50;
-const CHECKPOINT_VERSION = 2;
+// v3 scopes every checkpointed result to its request key (text, languages,
+// dialect, formality, context). Older files are ignored rather than risk
+// replaying one dialect's results for another across ID collisions.
+const CHECKPOINT_VERSION = 3;
 
 /**
  * Build the persisted checkpoint from the per-item terminal states
@@ -53,10 +56,28 @@ export function buildBulkCheckpoint(
     version: CHECKPOINT_VERSION,
     createdAt: now.toISOString(),
     completedIds: successes.map((s) => s.item.id),
-    completedResults: successes.map((s) => ({ id: s.item.id, result: s.result })),
+    completedResults: successes.map((s) => ({ id: s.item.id, requestKey: bulkRequestKey(s.item), result: s.result })),
     failedItems: [...failures],
     totalItems,
   };
+}
+
+/**
+ * Stable key identifying one translation request: normalized text, languages,
+ * dialect, formality and context. The dedup map and the checkpoint both use
+ * it, so a result produced for one dialect is never shared with another.
+ */
+export function bulkRequestKey(
+  item: Pick<BulkTranslationItem, "sourceText" | "sourceLang" | "targetLang" | "options">
+): string {
+  return JSON.stringify([
+    item.sourceText.trim().replace(/\s+/g, " "),
+    (item.sourceLang ?? "").toLowerCase(),
+    (item.targetLang ?? "").toLowerCase(),
+    item.options?.dialect ?? null,
+    item.options?.formality ?? null,
+    item.options?.context ?? null,
+  ]);
 }
 
 /** Result of processing a single deduplicated group of items. */
@@ -128,22 +149,22 @@ export class BulkTranslationEngine {
     const resumedIds = new Set<string>();
 
     if (checkpoint && checkpoint.version === CHECKPOINT_VERSION) {
-      for (const { id, result } of checkpoint.completedResults) {
-        const item = itemMap.get(id);
-        if (item) {
+      for (const entry of checkpoint.completedResults) {
+        const item = itemMap.get(entry.id);
+        if (item && entry.requestKey === bulkRequestKey(item)) {
           resumedSuccesses.push({
             item,
-            result,
+            result: entry.result,
             latencyMs: 0,
             cacheHit: false,
             retryCount: 0,
           });
-          resumedIds.add(id);
+          resumedIds.add(item.id);
         }
       }
       for (const failure of checkpoint.failedItems) {
         const item = itemMap.get(failure.item.id);
-        if (item) {
+        if (item && bulkRequestKey(failure.item) === bulkRequestKey(item)) {
           resumedFailures.push({ ...failure, item });
           resumedIds.add(item.id);
         }
@@ -350,14 +371,7 @@ export class BulkTranslationEngine {
     for (const item of items) {
       // Only items that would produce the same request share one call: the
       // same text to a different target or dialect is a different translation.
-      const key = JSON.stringify([
-        item.sourceText.trim().replace(/\s+/g, " "),
-        (item.sourceLang ?? "").toLowerCase(),
-        (item.targetLang ?? "").toLowerCase(),
-        item.options?.dialect ?? null,
-        item.options?.formality ?? null,
-        item.options?.context ?? null,
-      ]);
+      const key = bulkRequestKey(item);
       const existing = map.get(key);
       if (existing) {
         existing.push(item.id);
