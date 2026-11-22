@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { BulkTranslationEngine } from "../engine.js";
+import { BulkTranslationEngine, bulkRequestKey } from "../engine.js";
 import { TranslationMemory } from "../../translation-memory.js";
 import type { BulkTranslationItem, TranslationProvider, TranslationResult } from "../../types.js";
 
@@ -319,7 +319,7 @@ describe("BulkTranslationEngine", () => {
 
       expect(checkpoints.length).toBeGreaterThanOrEqual(1);
       const cp = checkpoints[checkpoints.length - 1] as { version: number; totalItems: number };
-      expect(cp.version).toBe(2);
+      expect(cp.version).toBe(3);
       expect(cp.totalItems).toBe(1);
     } finally {
       try {
@@ -371,10 +371,14 @@ describe("BulkTranslationEngine", () => {
       fs.writeFileSync(
         checkpointPath,
         JSON.stringify({
-          version: 2,
+          version: 3,
           createdAt: new Date().toISOString(),
           completedIds: ["1"],
-          completedResults: [{ id: "1", result: { translatedText: "checkpoint-a" } }],
+          completedResults: [{
+            id: "1",
+            requestKey: bulkRequestKey({ sourceText: "A", sourceLang: "en", targetLang: "es" }),
+            result: { translatedText: "checkpoint-a" },
+          }],
           failedItems: [],
           totalItems: 2,
         }),
@@ -470,7 +474,7 @@ describe("BulkTranslationEngine", () => {
 });
 
 describe("buildBulkCheckpoint (single checkpoint serializer)", () => {
-  it("keeps the v2 on-disk shape byte-compatible", async () => {
+  it("serializes the v3 shape with a request key per completed result", async () => {
     const { buildBulkCheckpoint } = await import("../engine.js");
     const item = { id: "1", sourceText: "Hi", sourceLang: "en", targetLang: "es" };
     const failed = { id: "2", sourceText: "Bye", sourceLang: "en", targetLang: "es" };
@@ -482,15 +486,151 @@ describe("buildBulkCheckpoint (single checkpoint serializer)", () => {
     );
     expect(JSON.stringify(checkpoint)).toBe(
       JSON.stringify({
-        version: 2,
+        version: 3,
         createdAt: "2026-01-02T00:00:00.000Z",
         completedIds: ["1"],
-        completedResults: [{ id: "1", result: { translatedText: "Hola" } }],
+        completedResults: [
+          { id: "1", requestKey: bulkRequestKey(item), result: { translatedText: "Hola" } },
+        ],
         failedItems: [
           { item: failed, error: "boom", retryCount: 2, failedAt: "2026-01-01T00:00:00.000Z" },
         ],
         totalItems: 2,
       })
     );
+  });
+});
+
+describe("dialect isolation (GH issue #263: bulk translations leak between dialects)", () => {
+  function dialectProvider(calls?: string[]): TranslationProvider {
+    return {
+      name: "mock",
+      async translate(text: string, _s: string, _t: string, options?: { dialect?: string }) {
+        calls?.push(options?.dialect ?? "-");
+        return { translatedText: `${options?.dialect ?? "-"}:${text}` };
+      },
+    };
+  }
+
+  it("one bulk run across dialects produces a separate translation for each", async () => {
+    const engine = new BulkTranslationEngine({ cache: createFreshCache() });
+    const result = await engine.translate(
+      [
+        { id: "mx", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } },
+        { id: "ar", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-AR" } },
+        { id: "es", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-ES" } },
+      ],
+      dialectProvider()
+    );
+
+    const byId = Object.fromEntries(result.successes.map((s) => [s.item.id, s.result.translatedText]));
+    expect(byId["mx"]).toBe("es-MX:Hello");
+    expect(byId["ar"]).toBe("es-AR:Hello");
+    expect(byId["es"]).toBe("es-ES:Hello");
+  });
+
+  it("never replays a checkpointed result for another dialect, even with the same item ID", async () => {
+    const checkpointPath = `/tmp/test-bulk-dialect-cp-${Date.now()}.json`;
+    try {
+      const run = (dialect: "es-MX" | "es-AR") =>
+        new BulkTranslationEngine({ cache: createFreshCache(), checkpointPath }).translate(
+          [{ id: "k1", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect } }],
+          dialectProvider()
+        );
+
+      await run("es-MX");
+      const second = await run("es-AR");
+
+      expect(second.apiCalls).toBe(1);
+      expect(second.cacheHits).toBe(0);
+      expect(second.successes[0].result.translatedText).toBe("es-AR:Hello");
+    } finally {
+      try {
+        const fs = await import("node:fs");
+        fs.unlinkSync(checkpointPath);
+      } catch {
+        // ignore
+      }
+    }
+  });
+
+  it("still resumes the same dialect from a checkpoint", async () => {
+    const checkpointPath = `/tmp/test-bulk-dialect-resume-${Date.now()}.json`;
+    try {
+      const first = await new BulkTranslationEngine({ cache: createFreshCache(), checkpointPath }).translate(
+        [{ id: "k1", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } }],
+        dialectProvider()
+      );
+      expect(first.apiCalls).toBe(1);
+
+      const calls: string[] = [];
+      const resumed = await new BulkTranslationEngine({ cache: createFreshCache(), checkpointPath }).translate(
+        [{ id: "k1", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } }],
+        dialectProvider(calls)
+      );
+
+      expect(calls).toEqual([]); // restored from the checkpoint, no new call
+      expect(resumed.successes[0].result.translatedText).toBe("es-MX:Hello");
+    } finally {
+      try {
+        const fs = await import("node:fs");
+        fs.unlinkSync(checkpointPath);
+      } catch {
+        // ignore
+      }
+    }
+  });
+
+  it("keeps results distinct when two items share an ID across different dialects in one run", async () => {
+    const engine = new BulkTranslationEngine({ cache: createFreshCache() });
+    const result = await engine.translate(
+      [
+        { id: "same-id", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } },
+        { id: "same-id", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-AR" } },
+      ],
+      dialectProvider()
+    );
+
+    expect(result.apiCalls).toBe(2);
+    expect(result.successes).toHaveLength(2);
+    const byDialect = Object.fromEntries(
+      result.successes.map((s) => [s.item.options?.dialect ?? "-", s.result.translatedText])
+    );
+    expect(byDialect["es-MX"]).toBe("es-MX:Hello");
+    expect(byDialect["es-AR"]).toBe("es-AR:Hello");
+  });
+
+  it("resumes one dialect from checkpoint without suppressing a same-ID item for another dialect", async () => {
+    const checkpointPath = `/tmp/test-bulk-dialect-mixed-id-${Date.now()}.json`;
+    try {
+      await new BulkTranslationEngine({ cache: createFreshCache(), checkpointPath }).translate(
+        [{ id: "shared", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } }],
+        dialectProvider()
+      );
+
+      const calls: string[] = [];
+      const mixed = await new BulkTranslationEngine({ cache: createFreshCache(), checkpointPath }).translate(
+        [
+          { id: "shared", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } },
+          { id: "shared", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-AR" } },
+        ],
+        dialectProvider(calls)
+      );
+
+      expect(calls).toEqual(["es-AR"]);
+      expect(mixed.successes).toHaveLength(2);
+      const byDialect = Object.fromEntries(
+        mixed.successes.map((s) => [s.item.options?.dialect ?? "-", s.result.translatedText])
+      );
+      expect(byDialect["es-MX"]).toBe("es-MX:Hello");
+      expect(byDialect["es-AR"]).toBe("es-AR:Hello");
+    } finally {
+      try {
+        const fs = await import("node:fs");
+        fs.unlinkSync(checkpointPath);
+      } catch {
+        // ignore
+      }
+    }
   });
 });

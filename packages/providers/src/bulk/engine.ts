@@ -31,7 +31,10 @@ const DEFAULT_MAX_CONCURRENCY = 4;
 const DEFAULT_MAX_RETRIES = 2;
 const DEFAULT_RETRY_DELAY_MS = 1000;
 const DEFAULT_CHECKPOINT_INTERVAL = 50;
-const CHECKPOINT_VERSION = 2;
+// v3 scopes every checkpointed result to its request key (text, languages,
+// dialect, formality, context). Older files are ignored rather than risk
+// replaying one dialect's results for another across ID collisions.
+const CHECKPOINT_VERSION = 3;
 
 /**
  * Build the persisted checkpoint from the per-item terminal states
@@ -53,10 +56,28 @@ export function buildBulkCheckpoint(
     version: CHECKPOINT_VERSION,
     createdAt: now.toISOString(),
     completedIds: successes.map((s) => s.item.id),
-    completedResults: successes.map((s) => ({ id: s.item.id, result: s.result })),
+    completedResults: successes.map((s) => ({ id: s.item.id, requestKey: bulkRequestKey(s.item), result: s.result })),
     failedItems: [...failures],
     totalItems,
   };
+}
+
+/**
+ * Stable key identifying one translation request: normalized text, languages,
+ * dialect, formality and context. The dedup map and the checkpoint both use
+ * it, so a result produced for one dialect is never shared with another.
+ */
+export function bulkRequestKey(
+  item: Pick<BulkTranslationItem, "sourceText" | "sourceLang" | "targetLang" | "options">
+): string {
+  return JSON.stringify([
+    item.sourceText.trim().replace(/\s+/g, " "),
+    (item.sourceLang ?? "").toLowerCase(),
+    (item.targetLang ?? "").toLowerCase(),
+    item.options?.dialect ?? null,
+    item.options?.formality ?? null,
+    item.options?.context ?? null,
+  ]);
 }
 
 /** Result of processing a single deduplicated group of items. */
@@ -114,46 +135,63 @@ export class BulkTranslationEngine {
       };
     }
 
-    // O(1) item lookup for the entire pipeline
-    const itemMap = new Map(items.map((i) => [i.id, i]));
+    // Composite identity (id + requestKey) → input indices, so items sharing an
+    // ID across different dialects never overwrite or suppress one another.
+    const compositeIndexMap = new Map<string, number[]>();
+    for (let idx = 0; idx < items.length; idx++) {
+      const compositeKey = JSON.stringify([items[idx].id, bulkRequestKey(items[idx])]);
+      const bucket = compositeIndexMap.get(compositeKey);
+      if (bucket) {
+        bucket.push(idx);
+      } else {
+        compositeIndexMap.set(compositeKey, [idx]);
+      }
+    }
 
-    // Deduplicate: map (source text + languages + options) → list of item IDs
+    // Deduplicate: map (source text + languages + options) → list of item indices
     const dedupMap = this.buildDedupMap(items);
     const uniqueTexts = Array.from(dedupMap.keys());
 
-    // Load checkpoint and restore completed items
+    // Load checkpoint and restore completed items by composite (id, requestKey)
     const checkpoint = this.checkpointPath ? await this.loadCheckpoint(this.checkpointPath) : null;
     const resumedSuccesses: BulkTranslationSuccess[] = [];
     const resumedFailures: BulkTranslationFailure[] = [];
-    const resumedIds = new Set<string>();
+    const resumedIndices = new Set<number>();
 
     if (checkpoint && checkpoint.version === CHECKPOINT_VERSION) {
-      for (const { id, result } of checkpoint.completedResults) {
-        const item = itemMap.get(id);
-        if (item) {
+      for (const entry of checkpoint.completedResults) {
+        if (!entry.requestKey) continue;
+        const compositeKey = JSON.stringify([entry.id, entry.requestKey]);
+        const matchedIndices = compositeIndexMap.get(compositeKey);
+        if (!matchedIndices) continue;
+        for (const idx of matchedIndices) {
+          if (resumedIndices.has(idx)) continue;
           resumedSuccesses.push({
-            item,
-            result,
+            item: items[idx],
+            result: entry.result,
             latencyMs: 0,
             cacheHit: false,
             retryCount: 0,
           });
-          resumedIds.add(id);
+          resumedIndices.add(idx);
         }
       }
       for (const failure of checkpoint.failedItems) {
-        const item = itemMap.get(failure.item.id);
-        if (item) {
-          resumedFailures.push({ ...failure, item });
-          resumedIds.add(item.id);
+        const compositeKey = JSON.stringify([failure.item.id, bulkRequestKey(failure.item)]);
+        const matchedIndices = compositeIndexMap.get(compositeKey);
+        if (!matchedIndices) continue;
+        for (const idx of matchedIndices) {
+          if (resumedIndices.has(idx)) continue;
+          resumedFailures.push({ ...failure, item: items[idx] });
+          resumedIndices.add(idx);
         }
       }
     }
 
     // Filter out resumed items from translation
     const pendingTexts = uniqueTexts.filter((text) => {
-      const ids = dedupMap.get(text)!;
-      return ids.some((id) => !resumedIds.has(id));
+      const indices = dedupMap.get(text)!;
+      return indices.some((idx) => !resumedIndices.has(idx));
     });
 
     // Results accumulators (no longer mutated by concurrent closures)
@@ -168,7 +206,7 @@ export class BulkTranslationEngine {
     const checkpointWarnings: string[] = [];
 
     // Progress tracking
-    let completedCount = resumedIds.size;
+    let completedCount = resumedIndices.size;
     const totalCount = items.length;
 
     const emit = () => {
@@ -184,19 +222,19 @@ export class BulkTranslationEngine {
     };
 
     for (const dedupKey of pendingTexts) {
-      const itemIds = dedupMap.get(dedupKey)!;
-      const pendingIds = itemIds.filter((id) => !resumedIds.has(id));
-      if (pendingIds.length === 0) continue;
+      const itemIndices = dedupMap.get(dedupKey)!;
+      const pendingIndices = itemIndices.filter((idx) => !resumedIndices.has(idx));
+      if (pendingIndices.length === 0) continue;
 
-      const representativeItem = itemMap.get(pendingIds[0])!;
+      const representativeItem = items[pendingIndices[0]];
 
       await this.semaphore.acquire();
 
       const task = this.processItem(
         representativeItem,
         provider,
-        pendingIds,
-        itemMap
+        pendingIndices,
+        items
       ).then((group) => {
         successes.push(...group.successes);
         failures.push(...group.failures);
@@ -205,7 +243,7 @@ export class BulkTranslationEngine {
         if (group.latencyMs > 0) latencies.push(group.latencyMs);
       }).finally(() => {
         this.semaphore.release();
-        completedCount += pendingIds.length;
+        completedCount += pendingIndices.length;
         emit();
       });
 
@@ -259,8 +297,8 @@ export class BulkTranslationEngine {
   private async processItem(
     representativeItem: BulkTranslationItem,
     provider: TranslationProvider,
-    pendingIds: string[],
-    itemMap: Map<string, BulkTranslationItem>
+    pendingIndices: number[],
+    items: readonly BulkTranslationItem[]
   ): Promise<ProcessedGroup> {
     const { sourceText, sourceLang, targetLang, options } = representativeItem;
 
@@ -277,8 +315,8 @@ export class BulkTranslationEngine {
       const cached = await this.cache.get(cacheKey);
       if (cached) {
         const successes: BulkTranslationSuccess[] = [];
-        for (const id of pendingIds) {
-          const item = itemMap.get(id)!;
+        for (const idx of pendingIndices) {
+          const item = items[idx];
           successes.push({
             item,
             result: { ...cached.result },
@@ -319,8 +357,8 @@ export class BulkTranslationEngine {
         await this.cache.set(cacheKey, result);
       }
       const successes: BulkTranslationSuccess[] = [];
-      for (const id of pendingIds) {
-        const item = itemMap.get(id)!;
+      for (const idx of pendingIndices) {
+        const item = items[idx];
         successes.push({
           item,
           result: { ...result },
@@ -332,8 +370,8 @@ export class BulkTranslationEngine {
       return { successes, failures: [], cacheHit: false, apiCall: true, latencyMs };
     } else {
       const failures: BulkTranslationFailure[] = [];
-      for (const id of pendingIds) {
-        const item = itemMap.get(id)!;
+      for (const idx of pendingIndices) {
+        const item = items[idx];
         failures.push({
           item,
           error: lastError ?? "Unknown error",
@@ -345,24 +383,17 @@ export class BulkTranslationEngine {
     }
   }
 
-  private buildDedupMap(items: BulkTranslationItem[]): Map<string, string[]> {
-    const map = new Map<string, string[]>();
-    for (const item of items) {
+  private buildDedupMap(items: BulkTranslationItem[]): Map<string, number[]> {
+    const map = new Map<string, number[]>();
+    for (let idx = 0; idx < items.length; idx++) {
       // Only items that would produce the same request share one call: the
       // same text to a different target or dialect is a different translation.
-      const key = JSON.stringify([
-        item.sourceText.trim().replace(/\s+/g, " "),
-        (item.sourceLang ?? "").toLowerCase(),
-        (item.targetLang ?? "").toLowerCase(),
-        item.options?.dialect ?? null,
-        item.options?.formality ?? null,
-        item.options?.context ?? null,
-      ]);
+      const key = bulkRequestKey(items[idx]);
       const existing = map.get(key);
       if (existing) {
-        existing.push(item.id);
+        existing.push(idx);
       } else {
-        map.set(key, [item.id]);
+        map.set(key, [idx]);
       }
     }
     return map;

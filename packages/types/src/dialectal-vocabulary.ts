@@ -203,6 +203,9 @@ const CONCEPT_PATTERNS: Map<string, RegExp[]> = (() => {
     for (const part of parts) {
       if (part.length >= 3 && !CONCEPT_JOINERS.has(part)) heads.add(part);
     }
+    for (const t of entry.englishTerms ?? []) {
+      if (t.trim()) heads.add(t.trim().toLowerCase());
+    }
     if (heads.size === 0) continue;
     const patterns = [...heads].map(
       (h) => new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegExp(h)}(?:s|es|ed|d|ing)?(?![\\p{L}\\p{N}])`, "iu")
@@ -245,13 +248,16 @@ export function validateDialectCompliance(
     const hasExpected = containsTerm(lowerTranslated, expectedLower);
 
     // Check if a wrong-dialect term is present instead
+    const accepted = new Set((expected.alsoAccepted ?? []).map((t) => t.toLowerCase()));
+    const hasAccepted = [...accepted].some((t) => containsTerm(lowerTranslated, t));
     for (const term of allTerms) {
       if (term.toLowerCase() === expectedLower) continue;
+      if (accepted.has(term.toLowerCase())) continue;
       if (containsTerm(lowerTranslated, term)) {
         const duplicate = violations.some(
           (v) => v.foundTerm === term && v.expectedTerm === expected.term
         );
-        if (!hasExpected && !duplicate) {
+        if (!hasExpected && !hasAccepted && !duplicate) {
           const severity: "error" | "warning" = expected.notes?.includes("vulgar") ? "error" : "warning";
           violations.push({
             concept: entry.concept,
