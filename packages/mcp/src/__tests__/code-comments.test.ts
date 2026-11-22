@@ -1,5 +1,15 @@
-import { describe, it, expect } from "vitest";
-import { extractCodeComments } from "../tools/translator-handlers.js";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { describe, it, expect, vi } from "vitest";
+import {
+  extractCodeComments,
+  handleTranslateCodeComment,
+} from "../tools/translator-handlers.js";
+
+/** Audit ledger row 38. The only "//" is inside a string, and that string contains "the". */
+const COMMENT_SHAPED_STRING = 'const label = "// The world";';
 
 describe("extractCodeComments", () => {
   it("ignores // inside string literals such as URLs", () => {
@@ -34,5 +44,51 @@ describe("extractCodeComments", () => {
     const found = extractCodeComments(code);
     expect(found).toHaveLength(2);
     expect(found[1].index).toBe(code.lastIndexOf("//"));
+  });
+
+  it("does not treat a string whose value is a // comment as a comment", () => {
+    expect(extractCodeComments(COMMENT_SHAPED_STRING)).toEqual([]);
+  });
+
+  it("keeps a real comment after a comment-shaped string and leaves the assignment alone", () => {
+    const code = `${COMMENT_SHAPED_STRING}\nconst count = 1; // keep the count`;
+    const found = extractCodeComments(code);
+    expect(found.map((c) => c.content)).toEqual(["keep the count"]);
+    expect(code.slice(0, found[0].index)).toBe(
+      'const label = "// The world";\nconst count = 1; '
+    );
+  });
+});
+
+describe("translate_code_comment string literals", () => {
+  it("reports zero comments and returns code that still parses", async () => {
+    const translate = vi.fn(async () => ({ translatedText: "EL MUNDO" }));
+    const registry = {
+      get: () => ({ name: "mock", translate }),
+      getAuto: () => ({ name: "mock", translate }),
+      prepareRequest: () => ({
+        sourceLang: "en",
+        targetLang: "es-ES",
+        options: {},
+        warnings: [],
+      }),
+    };
+    const result = await handleTranslateCodeComment(
+      { code: COMMENT_SHAPED_STRING, dialect: "es-ES" },
+      registry as never,
+      { acquire: async () => undefined } as never
+    );
+
+    expect(result.isError).toBe(false);
+    const parsed = JSON.parse(result.content[0].text);
+    expect(parsed.commentsTranslated).toBe(0);
+    expect(parsed.errors).toEqual([]);
+    expect(parsed.translatedCode).toBe(COMMENT_SHAPED_STRING);
+    expect(translate).not.toHaveBeenCalled();
+
+    const dir = mkdtempSync(join(tmpdir(), "dialectos-comment-"));
+    const file = join(dir, "audit.js");
+    writeFileSync(file, `${parsed.translatedCode}\n`);
+    execFileSync("node", ["--check", file], { stdio: "pipe" });
   });
 });
