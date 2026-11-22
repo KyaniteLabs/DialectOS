@@ -1,0 +1,16 @@
+{
+  "status": "UNSUBMITTED",
+  "note": "Payload for a future PR to xai-org/plugin-marketplace. Do not submit without CEO gate.",
+  "name": "dialectos",
+  "version": "0.3.1",
+  "description": "Use DialectOS to translate and QA Spanish across 25 regional dialect variants.",
+  "keywords": [
+    "dialectos",
+    "kyanite-labs"
+  ],
+  "source": {
+    "source": "url",
+    "url": "https://github.com/KyaniteLabs/DialectOS.git",
+    "sha": "PIN-AFTER-MERGE"
+  }
+}

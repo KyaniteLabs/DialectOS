@@ -1,0 +1,13 @@
+{
+  "name": "dialectos",
+  "displayName": "DialectOS",
+  "version": "0.3.1",
+  "description": "Use DialectOS to translate and QA Spanish across 25 regional dialect variants via MCP or CLI.",
+  "author": {
+    "name": "Kyanite Labs",
+    "url": "https://github.com/KyaniteLabs"
+  },
+  "homepage": "https://github.com/KyaniteLabs/DialectOS",
+  "repository": "https://github.com/KyaniteLabs/DialectOS",
+  "license": "Apache-2.0"
+}
