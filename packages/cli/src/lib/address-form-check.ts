@@ -39,8 +39,32 @@ const TU_HOMOGRAPHS = new Set([
 ]);
 const VOS_HOMOGRAPHS = new Set(["sos"]);
 const CLITICS = /^(?:me|te|lo|la|los|las|le|les|nos|se)+$/;
-// Spain-only plural nouns ending in -éis that are not verbs.
-const EIS_NOUNS = new Set(["jerséis"]);
+// Valid plural nouns ending in -áis/-éis that are not vosotros verbs.
+const AIS_EIS_NOUNS = new Set(["jerséis", "bonsáis", "samuráis", "jeréis", "spráis", "guirigáis"]);
+// Unambiguous irregular bare tú imperatives (never 3s indicative) mapped to voseo.
+const BARE_TU_IMPERATIVES: Record<string, string> = {
+  ten: "tené",
+  pon: "poné",
+  haz: "hacé",
+};
+// Words that precede 3pl present indicative "ven" ("they see"), not imperative "ven" ("come").
+const VER_3PL_PRECEDERS = new Set([
+  "ellos", "ellas", "ustedes", "quienes", "todos", "todas", "muchos", "muchas",
+  "algunos", "algunas", "varios", "varias", "ambos", "ambas", "estos", "estas",
+  "esos", "esas", "aquellos", "aquellas", "se", "nos", "te", "me", "lo", "la",
+  "los", "las", "le", "les", "no", "nunca", "ya", "aún", "todavía", "solo",
+  "sólo", "también", "siempre", "que", "como", "donde", "cuando", "si",
+]);
+// Voseo -er/-ir imperatives that collide with standard 1s preterite or other tuteo forms.
+const VOS_IMP_HOMOGRAPHS = new Set([
+  "creé", // 1s preterite of crear
+  "salí", "viví", "escribí", "abrí", "subí", "recibí", "permití", "sentí",
+  "dormí", "pedí", "seguí", "morí", "partí", "cubrí", "imprimí", "reuní", "influí",
+]);
+// Enclitic vosotros imperatives: -ad/-ed/-id + object pronoun ("preparadlo", "hacedlo", "decidme").
+const VOSOTROS_IMP_ENCLITIC = /^\p{L}{2,}(?:ad|ed|id)(?:lo|la|los|las|me|nos|le|les)$/u;
+// Common non-verb nouns/words ending in -ad/-ed/-id to never treat as bare vosotros imperatives.
+const VOSOTROS_IMP_NOUNS = new Set(["id", "red", "sed", "vid", "lid", "pared", "merced", "madrid", "david"]);
 
 function tokens(text: string): string[] {
   return (text ?? "")
@@ -55,21 +79,30 @@ function stripAccents(s: string): string {
   return s.normalize("NFD").replace(/[̀-́]/g, "").normalize("NFC");
 }
 
-interface Pair { tu: string; vos: string; tuImp?: string; vosImp?: string }
+interface Pair { infinitive: string; tu: string; vos: string; tuImp?: string; vosImp?: string; vosotrosImp?: string }
 let pairs: Pair[] | undefined;
+let bareVosotrosImps: Set<string> | undefined;
 function verbPairs(): Pair[] {
   if (pairs) return pairs;
   pairs = [];
+  bareVosotrosImps = new Set();
   for (const v of VERB_CONJUGATIONS) {
     if (v.category !== "conjugation-pattern") continue;
     const tu = v.forms["es-ES"];
     const vos = v.forms["es-AR"];
     if (!tu?.present_2s || !vos?.present_2s) continue;
+    const inf = v.infinitive.toLowerCase();
+    const vosotrosImp = /[aei]r$/.test(inf) ? `${inf.slice(0, -1)}d` : undefined;
+    if (vosotrosImp && !VOSOTROS_IMP_NOUNS.has(vosotrosImp)) {
+      bareVosotrosImps.add(vosotrosImp);
+    }
     pairs.push({
+      infinitive: inf,
       tu: tu.present_2s.toLowerCase(),
       vos: vos.present_2s.toLowerCase(),
       tuImp: tu.imperative_2s?.toLowerCase(),
       vosImp: vos.imperative_2s?.toLowerCase(),
+      vosotrosImp,
     });
   }
   return pairs;
@@ -92,6 +125,37 @@ function tuImperativeWithClitic(word: string): Pair | undefined {
   return undefined;
 }
 
+/** "decime", "ponelo", "venite", "hablame": a voseo imperative with an enclitic pronoun. */
+function vosImperativeWithClitic(word: string): Pair | undefined {
+  for (const p of verbPairs()) {
+    if (!p.tuImp || !p.vosImp || p.tuImp === p.vosImp) continue;
+    const base = stripAccents(p.vosImp);
+    const tuBase = stripAccents(p.tuImp);
+    const w = stripAccents(word);
+    if (!w.startsWith(base) || w.length === base.length) continue;
+    if (!CLITICS.test(w.slice(base.length))) continue;
+    // Distinct stem ("decime", "ponelo", "hacelo", "venite", "andate") or
+    // unaccented polysyllabic voseo ("hablame", "mirame", "escuchame") where
+    // tuteo requires a written accent ("háblame", "mírame", "escúchame").
+    const distinctStem = base !== tuBase;
+    const unaccentedPolysyllabic = word === w && (base.match(/[aeiou]+/g) || []).length >= 2;
+    if (distinctStem || unaccentedPolysyllabic) return p;
+  }
+  return undefined;
+}
+
+/** Bare imperative "ven" ("come!") vs 3pl present indicative "ven" ("they see"). */
+function isBareImperativeVen(words: string[], index: number, rawText: string): boolean {
+  if (words[index] !== "ven") return false;
+  const prev = index > 0 ? words[index - 1] : undefined;
+  if (prev && VER_3PL_PRECEDERS.has(prev)) return false;
+  if (index === 0) return true;
+  const next = words[index + 1];
+  if (next && /^(?:aquí|acá|conmigo|para|a|ya|pronto|rápido)$/.test(next)) return true;
+  // Clause-initial after punctuation (e.g. "Escúchame, ven." or "¡Ven!")
+  return /(?:^|[,;:!?¡¿.]\s+)ven\b/i.test(rawText.normalize("NFC"));
+}
+
 export function checkAddressForms(translated: string, dialect: SpanishDialect): AddressFormResult {
   const violations: AddressFormViolation[] = [];
   const words = tokens(translated);
@@ -106,7 +170,8 @@ export function checkAddressForms(translated: string, dialect: SpanishDialect): 
 
   if (fullVoseo) {
     const hasVos = words.includes("vos");
-    for (const w of words) {
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
       if (w === "tú") {
         add({ kind: "tu-in-voseo-dialect", found: "tú", expected: "vos",
           message: `"tú" is not used in ${dialect}; use "vos".` });
@@ -118,6 +183,16 @@ export function checkAddressForms(translated: string, dialect: SpanishDialect): 
           message: hasVos
             ? `"vos" with the tú verb "${w}"; ${dialect} says "${p.vos}".`
             : `"${w}" is the tú form; ${dialect} uses voseo "${p.vos}".` });
+        continue;
+      }
+      if (BARE_TU_IMPERATIVES[w]) {
+        add({ kind: "tu-in-voseo-dialect", found: w, expected: BARE_TU_IMPERATIVES[w],
+          message: `"${w}" is a tú imperative; ${dialect} uses voseo "${BARE_TU_IMPERATIVES[w]}".` });
+        continue;
+      }
+      if (isBareImperativeVen(words, i, translated)) {
+        add({ kind: "tu-in-voseo-dialect", found: w, expected: "vení",
+          message: `"${w}" is a tú imperative; ${dialect} uses voseo "vení".` });
         continue;
       }
       const imp = tuImperativeWithClitic(w);
@@ -133,14 +208,31 @@ export function checkAddressForms(translated: string, dialect: SpanishDialect): 
       if (p) {
         add({ kind: "voseo-in-tuteo-dialect", found: w, expected: p.tu,
           message: `"${w}" is a voseo form, not used in ${dialect}; use "${p.tu}".` });
+        continue;
+      }
+      const vImp = !VOS_IMP_HOMOGRAPHS.has(w)
+        ? verbPairs().find((x) => x.vosImp === w && x.tuImp && x.vosImp !== x.tuImp)
+        : undefined;
+      if (vImp) {
+        add({ kind: "voseo-in-tuteo-dialect", found: w, expected: vImp.tuImp,
+          message: `"${w}" is a voseo imperative, not used in ${dialect}; use "${vImp.tuImp}".` });
+        continue;
+      }
+      const vClitic = vosImperativeWithClitic(w);
+      if (vClitic) {
+        add({ kind: "voseo-in-tuteo-dialect", found: w, expected: vClitic.tuImp,
+          message: `"${w}" is a voseo imperative, not used in ${dialect}; use the tú imperative ("${vClitic.tuImp}" + pronoun).` });
       }
     }
   }
 
   if (dialect !== "es-ES") {
+    verbPairs();
     for (const w of words) {
       const plural = /^(vosotr[oa]s|vuestr[oa]s?|sois)$/.test(w)
-        || (/^\p{L}{3,}(áis|éis)$/u.test(w) && !EIS_NOUNS.has(w));
+        || (/^\p{L}{3,}(áis|éis)$/u.test(w) && !AIS_EIS_NOUNS.has(w))
+        || VOSOTROS_IMP_ENCLITIC.test(w)
+        || (bareVosotrosImps?.has(w) ?? false);
       if (plural) {
         add({ kind: "vosotros-outside-spain", found: w, expected: "ustedes",
           message: `"${w}" is a vosotros form; ${dialect} uses "ustedes" and its third-person plural verbs.` });

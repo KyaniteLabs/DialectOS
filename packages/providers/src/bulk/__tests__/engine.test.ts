@@ -580,4 +580,57 @@ describe("dialect isolation (GH issue #263: bulk translations leak between diale
       }
     }
   });
+
+  it("keeps results distinct when two items share an ID across different dialects in one run", async () => {
+    const engine = new BulkTranslationEngine({ cache: createFreshCache() });
+    const result = await engine.translate(
+      [
+        { id: "same-id", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } },
+        { id: "same-id", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-AR" } },
+      ],
+      dialectProvider()
+    );
+
+    expect(result.apiCalls).toBe(2);
+    expect(result.successes).toHaveLength(2);
+    const byDialect = Object.fromEntries(
+      result.successes.map((s) => [s.item.options?.dialect ?? "-", s.result.translatedText])
+    );
+    expect(byDialect["es-MX"]).toBe("es-MX:Hello");
+    expect(byDialect["es-AR"]).toBe("es-AR:Hello");
+  });
+
+  it("resumes one dialect from checkpoint without suppressing a same-ID item for another dialect", async () => {
+    const checkpointPath = `/tmp/test-bulk-dialect-mixed-id-${Date.now()}.json`;
+    try {
+      await new BulkTranslationEngine({ cache: createFreshCache(), checkpointPath }).translate(
+        [{ id: "shared", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } }],
+        dialectProvider()
+      );
+
+      const calls: string[] = [];
+      const mixed = await new BulkTranslationEngine({ cache: createFreshCache(), checkpointPath }).translate(
+        [
+          { id: "shared", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-MX" } },
+          { id: "shared", sourceText: "Hello", sourceLang: "en", targetLang: "es", options: { dialect: "es-AR" } },
+        ],
+        dialectProvider(calls)
+      );
+
+      expect(calls).toEqual(["es-AR"]);
+      expect(mixed.successes).toHaveLength(2);
+      const byDialect = Object.fromEntries(
+        mixed.successes.map((s) => [s.item.options?.dialect ?? "-", s.result.translatedText])
+      );
+      expect(byDialect["es-MX"]).toBe("es-MX:Hello");
+      expect(byDialect["es-AR"]).toBe("es-AR:Hello");
+    } finally {
+      try {
+        const fs = await import("node:fs");
+        fs.unlinkSync(checkpointPath);
+      } catch {
+        // ignore
+      }
+    }
+  });
 });

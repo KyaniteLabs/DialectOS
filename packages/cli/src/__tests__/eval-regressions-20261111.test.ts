@@ -33,8 +33,26 @@ describe("address forms", () => {
   it("accepts vosotros in Spain", () => {
     expect(checkAddressForms("Vosotros deberíais traer vuestras chaquetas.", "es-ES" as never).violations).toEqual([]);
   });
-  it("does not flag jerséis or the clitic os", () => {
+  it("does not flag jerséis, bonsáis, or the clitic os", () => {
     expect(checkAddressForms("Los jerséis están aquí.", "es-MX" as never).violations).toEqual([]);
+    expect(checkAddressForms("Los bonsáis están en el jardín.", "es-MX" as never).violations).toEqual([]);
+  });
+  it("flags bare tú imperatives like 'Ven aquí' in es-AR without flagging 3pl 'ven'", () => {
+    expect(checkAddressForms("Ven aquí.", "es-AR" as never).violations.length).toBeGreaterThan(0);
+    expect(checkAddressForms("Haz esto ahora.", "es-AR" as never).violations.length).toBeGreaterThan(0);
+    expect(checkAddressForms("Ellos ven la película.", "es-AR" as never).violations).toEqual([]);
+    expect(checkAddressForms("No se ven cambios.", "es-AR" as never).violations).toEqual([]);
+  });
+  it("flags bare voseo imperatives like 'Hablá ahora' in es-MX without flagging 1s preterite", () => {
+    expect(checkAddressForms("Hablá ahora.", "es-MX" as never).violations.length).toBeGreaterThan(0);
+    expect(checkAddressForms("Vení acá.", "es-MX" as never).violations.length).toBeGreaterThan(0);
+    expect(checkAddressForms("Salí temprano ayer.", "es-MX" as never).violations).toEqual([]);
+    expect(checkAddressForms("Creé un archivo nuevo.", "es-MX" as never).violations).toEqual([]);
+  });
+  it("flags vosotros imperatives like 'Preparadlo' outside Spain", () => {
+    expect(checkAddressForms("Preparadlo para mañana.", "es-MX" as never).violations.length).toBeGreaterThan(0);
+    expect(checkAddressForms("Venid pronto.", "es-AR" as never).violations.length).toBeGreaterThan(0);
+    expect(checkAddressForms("Preparadlo para mañana.", "es-ES" as never).violations).toEqual([]);
   });
 });
 
