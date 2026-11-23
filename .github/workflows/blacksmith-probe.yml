@@ -2,6 +2,7 @@ name: Blacksmith Probe
 
 on:
   workflow_dispatch:
+  # Only when the probe itself changes; otherwise run it by hand.
   pull_request:
     types: [opened, synchronize, reopened]
     paths:

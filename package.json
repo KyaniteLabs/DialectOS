@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
-    "test": "node scripts/build-demo.cjs --check && node --test docs/__tests__/*.test.mjs scripts/__tests__/*.test.mjs && pnpm -r test",
+    "test": "pnpm test:static && pnpm -r test",
+    "test:static": "node scripts/build-demo.cjs --check && node --test docs/__tests__/*.test.mjs scripts/__tests__/*.test.mjs",
     "check:generated": "node scripts/build-demo.cjs --check",
     "demo": "pnpm build && node scripts/demo-server.mjs",
     "test:coverage": "pnpm -r test:coverage",
