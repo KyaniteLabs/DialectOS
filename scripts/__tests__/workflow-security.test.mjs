@@ -9,9 +9,7 @@ const workflowFiles = readdirSync(workflowsDir)
   .map((f) => join(workflowsDir, f));
 
 // Workflows that reference reusable workflows with mutable refs for documented reasons
-const mutableRefAllowlist = new Map([
-  ['.github/workflows/blacksmith-probe.yml', 'KyaniteLabs/.github/.github/workflows/blacksmith-probe.yml@main'],
-]);
+const mutableRefAllowlist = new Map([]);
 
 test('all workflows declare explicit permissions', () => {
   for (const file of workflowFiles) {

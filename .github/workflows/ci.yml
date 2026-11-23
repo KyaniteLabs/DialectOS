@@ -13,16 +13,28 @@ on:
 permissions:
   contents: read
 
+# PRs: a new push cancels the superseded run. main: each merge gets its own
+# group (its SHA), so a run on main is never cancelled or dropped from the queue.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build-and-test:
+    # PRs run Node 22 (engines floor) and 24. The push to main after a merge
+    # re-checks the merged tree once, on Node 22: the PR already ran both.
+    # A sync merge (Forgejo -> GitHub) skips that push run: its PR ran this
+    # whole workflow on the same commits.
+    if: >-
+      github.event_name != 'push' || !(
+        startsWith(github.event.head_commit.message, 'sync:') ||
+        startsWith(github.event.head_commit.message, 'chore(sync):') ||
+        contains(github.event.head_commit.message, 'mirror Forgejo'))
     runs-on: blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 20
     strategy:
       matrix:
-        node-version: [22, 24]
+        node-version: ${{ fromJSON(github.event_name == 'push' && '[22]' || '[22, 24]') }}
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
@@ -63,10 +75,19 @@ jobs:
             fi
           done
 
-      - run: pnpm test
-
-      - name: Run coverage
-        run: pnpm test:coverage
+      # One pass of the suite per leg. Node 22 runs it under coverage, which
+      # also enforces the coverage thresholds; Node 24 runs it plain. The
+      # adversarial fixture corpus is part of this suite on both legs.
+      - name: Run tests (coverage on Node 22)
+        env:
+          NODE_LEG: ${{ matrix.node-version }}
+        run: |
+          if [ "$NODE_LEG" = 22 ]; then
+            pnpm test:static
+            pnpm test:coverage
+          else
+            pnpm test
+          fi
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -78,8 +99,11 @@ jobs:
           retention-days: 14
 
   adversarial-ci:
+    # Required check. Runs beside build-and-test instead of after it, so it no
+    # longer adds its own queue + setup time to every PR's wall-clock.
+    if: github.event_name == 'pull_request'
     runs-on: blacksmith-2vcpu-ubuntu-2404
-    needs: build-and-test
+    timeout-minutes: 15
     strategy:
       matrix:
         node-version: [22, 24]
@@ -110,7 +134,10 @@ jobs:
         run: pnpm --filter=@dialectos/cli test:adversarial
 
   hermes-plugin-tests:
+    # PR-only: the post-merge push run re-checks the main suite, not this.
+    if: github.event_name == 'pull_request'
     runs-on: blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
         with:
@@ -132,6 +159,11 @@ jobs:
           ref: 2bd378ed1b8d6bf2192cb26e0a55ff3091e6bd19 # v0.23.0
           path: .hermes-v023-runtime
           persist-credentials: false
+
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: ~/.cache/pip
+          key: pip-hermes-${{ runner.os }}-${{ hashFiles('.github/workflows/ci.yml') }}
 
       - name: Hermes dialectos plugin regressions (Python)
         env:
