@@ -252,6 +252,43 @@ export function extractCodeComments(code: string): CodeComment[] {
 }
 
 /**
+ * Machine directives that must stay byte-identical: translating "@ts-ignore"
+ * or an eslint-disable line would silence or disable the wrong thing, so they
+ * are skipped and reported rather than rewritten.
+ */
+const TOOLING_DIRECTIVE =
+  /^(?:@[\w-]+|eslint-[\w-]+|prettier-[\w-]+|istanbul\s+ignore|c8\s+ignore|v8\s+ignore|webpack\w*:|tslint:|biome-ignore|noqa\b|#?(?:end)?region\b|(?:vim?|ex):|ts-(?:ignore|nocheck|expect-error)\b)/i;
+
+/** Spanish function words: enough of them means the comment is already Spanish. */
+const SPANISH_WORDS =
+  /\b(?:el|la|los|las|un|una|unos|unas|del|al|es|son|está|están|hay|que|con|para|por|sin|sobre|entre|desde|hasta|cuando|donde|porque|pero|como|más|muy|ya|ser|tiene|también|este|esta|esto|estos|estas|su|sus|mi|mis|tu|tus|nuestro|nuestra)\b/i;
+
+/**
+ * Why a comment must not be sent to a translation provider, or null when it is
+ * a translation candidate.
+ *
+ * Deliberately permissive: every comment that has words and is neither a
+ * tooling directive nor already Spanish is translated. The previous gate kept
+ * only comments containing one of nine English stopwords, so an ordinary short
+ * comment such as "Hello world" was dropped before the provider ever saw it
+ * while "The world" translated (audit ledger row 39). Skips made here are
+ * reported in the tool result, never dropped silently.
+ */
+export function commentSkipReason(content: string): string | null {
+  const text = content.trim();
+  if (text.length === 0) return "empty";
+  if (TOOLING_DIRECTIVE.test(text)) return "directive";
+  const words = text.match(/\p{L}+/gu) ?? [];
+  if (words.length === 0) return "no words";
+  if (/[áéíóúñ¿¡]/i.test(text)) return "already Spanish";
+  const spanishHits = text.match(SPANISH_WORDS)?.length ?? 0;
+  const mostlySpanish =
+    spanishHits >= 2 ||
+    (words.length <= 3 && spanishHits >= 1 && spanishHits >= words.length - 1);
+  return mostlySpanish ? "already Spanish" : null;
+}
+
+/**
  * Handle translate_code_comment tool
  */
 export async function handleTranslateCodeComment(
@@ -275,9 +312,15 @@ export async function handleTranslateCodeComment(
       ? registry.get(params.provider)
       : registry.getAuto("es", { dialect: params.dialect || "es-ES" });
 
-    const comments = extractCodeComments(params.code).filter((c) =>
-      /\b(the|and|is|in|at|of|for|with|to)\b/i.test(c.content)
-    );
+    // Every extracted comment is a candidate unless it is machinery or already
+    // Spanish; see commentSkipReason. Skips are reported, not silently dropped.
+    const skipped: Array<{ index: number; content: string; reason: string }> = [];
+    const comments = extractCodeComments(params.code).filter((c) => {
+      const reason = commentSkipReason(c.content);
+      if (reason === null) return true;
+      skipped.push({ index: c.index, content: c.content, reason });
+      return false;
+    });
 
     // Translate each comment sequentially
     let commentsTranslated = 0;
@@ -339,6 +382,8 @@ export async function handleTranslateCodeComment(
             translatedCode,
             commentsTranslated,
             errors,
+            commentsSkipped: skipped.length,
+            skipped,
             skippedCount: errors.length,
             warnings: [...warnings],
           }),

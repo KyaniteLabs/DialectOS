@@ -92,3 +92,94 @@ describe("translate_code_comment string literals", () => {
     execFileSync("node", ["--check", file], { stdio: "pipe" });
   });
 });
+
+/** Registry stub whose provider records every comment it is asked to translate. */
+function commentRegistry(translatedText = "Hola mundo") {
+  const provider = { name: "mock", translate: vi.fn(async () => ({ translatedText })) };
+  const registry = {
+    get: () => provider,
+    getAuto: () => provider,
+    prepareRequest: () => ({
+      sourceLang: "en",
+      targetLang: "es-ES",
+      options: {},
+      warnings: [],
+    }),
+  };
+  const translateCodeComment = async (code: string) =>
+    JSON.parse(
+      (
+        await handleTranslateCodeComment({ code, dialect: "es-ES" }, registry as never, {
+          acquire: async () => undefined,
+        } as never)
+      ).content[0].text
+    );
+  return { provider, translateCodeComment };
+}
+
+/** Audit ledger row 39: this comment was dropped before any provider call. */
+describe("translate_code_comment English candidate selection", () => {
+  it("translates the short English comment // Hello world", async () => {
+    const { provider, translateCodeComment } = commentRegistry("Hola mundo");
+    const parsed = await translateCodeComment("const x = 1; // Hello world");
+
+    expect(provider.translate).toHaveBeenCalledTimes(1);
+    expect(provider.translate.mock.calls[0][0]).toBe("Hello world");
+    expect(parsed.commentsTranslated).toBe(1);
+    expect(parsed.errors).toEqual([]);
+    expect(parsed.translatedCode).toBe("const x = 1; // Hola mundo");
+  });
+
+  it("still translates // The world, the paired comment from the audit", async () => {
+    const { translateCodeComment } = commentRegistry("El mundo");
+    const parsed = await translateCodeComment("x(); // The world");
+
+    expect(parsed.commentsTranslated).toBe(1);
+    expect(parsed.translatedCode).toBe("x(); // El mundo");
+  });
+
+  it("translates English comments containing none of the old nine stopwords", async () => {
+    const { translateCodeComment } = commentRegistry("Maneja errores de reintento");
+    const parsed = await translateCodeComment("// Handles retry errors\nretry();");
+
+    expect(parsed.commentsTranslated).toBe(1);
+    expect(parsed.errors).toEqual([]);
+  });
+
+  it("translates a short block comment", async () => {
+    const { translateCodeComment } = commentRegistry("Hola mundo");
+    const parsed = await translateCodeComment("/* Hello world */\nx();");
+
+    expect(parsed.commentsTranslated).toBe(1);
+    expect(parsed.translatedCode).toBe("/* Hola mundo */\nx();");
+  });
+
+  it("reports tooling directives it skips instead of dropping them silently", async () => {
+    const { provider, translateCodeComment } = commentRegistry();
+    const code = "// @ts-ignore\n// eslint-disable-next-line no-console\nconst x = 1;";
+    const parsed = await translateCodeComment(code);
+
+    expect(provider.translate).not.toHaveBeenCalled();
+    expect(parsed.commentsTranslated).toBe(0);
+    expect(parsed.errors).toEqual([]);
+    expect(parsed.commentsSkipped).toBe(2);
+    expect(parsed.skipped.map((s: { reason: string }) => s.reason)).toEqual([
+      "directive",
+      "directive",
+    ]);
+    expect(parsed.translatedCode).toBe(code);
+  });
+
+  it("reports comments that are already Spanish instead of re-translating them", async () => {
+    const { provider, translateCodeComment } = commentRegistry();
+    const code = "const ready = true; // el valor está listo";
+    const parsed = await translateCodeComment(code);
+
+    expect(provider.translate).not.toHaveBeenCalled();
+    expect(parsed.commentsTranslated).toBe(0);
+    expect(parsed.errors).toEqual([]);
+    expect(parsed.commentsSkipped).toBe(1);
+    expect(parsed.skipped[0].reason).toBe("already Spanish");
+    expect(parsed.translatedCode).toBe(code);
+  });
+});
