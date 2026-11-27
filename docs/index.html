@@ -402,11 +402,11 @@
       <div class="demo-body">
         <aside class="preset-rail" aria-label="Stress presets">
           <p class="rail-title">Stress presets</p>
-          <button class="chip" data-preset="es-pr-orange">Puerto Rico orange<small>Orange juice should become jugo de china.</small></button>
-          <button class="chip" data-preset="es-pr-room">Puerto Rico room<small>Tidying should become recoger el cuarto.</small></button>
-          <button class="chip" data-preset="es-mx-file">Mexico file pickup<small>Retrieve a file without accidental download/coger.</small></button>
-          <button class="chip" data-preset="es-cl-food">Chile food<small>Avocado should prefer palta.</small></button>
-          <button class="chip" data-preset="es-ar-voseo">Argentina voseo<small>Account copy should sound local, not neutral.</small></button>
+          <button class="chip" data-preset="es-pr-orange" data-client-expect="jugo computadora guagua" data-client-absent="zumo ordenador autobús">Puerto Rico orange<small>Client mode swaps zumo → jugo, ordenador → computadora, autobús → guagua.</small></button>
+          <button class="chip" data-preset="es-pr-room" data-client-expect="apartamento ustedes" data-client-absent="piso vosotros">Puerto Rico room<small>Client mode swaps piso → apartamento, vosotros → ustedes.</small></button>
+          <button class="chip" data-preset="es-mx-file" data-client-expect="computadora carro lentes" data-client-absent="ordenador coche gafas">Mexico file pickup<small>Retrieve a file without accidental download/coger.</small></button>
+          <button class="chip" data-preset="es-cl-food" data-client-expect="palta frutillas auto bencina" data-client-absent="aguacate fresas coche gasolina">Chile food<small>Avocado should prefer palta.</small></button>
+          <button class="chip" data-preset="es-ar-voseo" data-client-expect="celular ustedes" data-client-absent="móvil vosotros">Argentina voseo<small>Account copy should sound local, not neutral.</small></button>
           <p class="pipeline-note"><strong>Works on GitHub Pages.</strong> Without a backend, the client engine applies dialect vocabulary adaptations with a full receipt. With a backend, the full LLM pipeline runs instead.</p>
         </aside>
 
