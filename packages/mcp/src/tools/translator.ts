@@ -122,7 +122,7 @@ export function registerTranslatorTools(
     {
       title: "Translate code comments",
       description:
-        "Translate English // and /* */ comments inside a code snippet into a Spanish dialect while leaving executable code unchanged. Returns a translated code string and comment-level error list; it does not write files. Use when localising in-source comments; pass the code snippet from a read of the source file.",
+        "Translate English // and /* */ comments inside a code snippet into a Spanish dialect while leaving executable code unchanged. Every comment is translated, however short; tooling directives (such as @ts-ignore or eslint-disable) and comments that are already Spanish are skipped and listed with a reason in `skipped`. Returns a translated code string, a comment-level error list and the skip list; it does not write files. Use when localising in-source comments; pass the code snippet from a read of the source file.",
       inputSchema: {
         code: z.string().min(1).describe("Source code text containing comments to translate. The tool only rewrites comments detected in this string."),
         dialect: dialectSchema.optional().describe("Target Spanish dialect code for translated comments. Defaults to es-ES when omitted."),
